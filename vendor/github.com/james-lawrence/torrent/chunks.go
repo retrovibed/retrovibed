@@ -99,10 +99,13 @@ func newChunks(clength uint64, m *metainfo.Info, options ...chunkopt) *chunks {
 		panic("chunksize cannot be zero")
 	}
 
+	pieces := m.NumPieces()
+
 	p := new(langx.Clone(chunks{
 		chunkstate: chunkstate{
 			meta:        m,
-			pieces:      uint64(m.NumPieces()),
+			pieces:      pieces,
+			shortfall:   (pieces * uint64(m.PieceLength)) - uint64(m.TotalLength()),
 			cmaximum:    numChunks(m.TotalLength(), m.PieceLength, int64(clength)),
 			clength:     int64(clength),
 			gracePeriod: 2 * time.Minute,
@@ -152,6 +155,10 @@ type chunkstate struct {
 	meta *metainfo.Info
 
 	pieces uint64
+
+	// shortfall how many bytes the last piece falls short of a full piece length. zero when
+	// the torrent length divides evenly by the piece length, and when there are no pieces.
+	shortfall uint64
 
 	// chunk length
 	clength int64
@@ -619,17 +626,6 @@ func (t *chunks) Incomplete() bool {
 	return (int(t.missing.GetCardinality()) + int(t.inflight.GetCardinality()) + int(t.unverified.GetCardinality())) > 0
 }
 
-func (t *chunks) Snapshot(s *Stats) *Stats {
-	t.mu.RLock()
-	defer t.mu.RUnlock()
-	s.Missing = int(t.missing.GetCardinality())
-	s.Outstanding = int(t.inflight.GetCardinality())
-	s.Unverified = int(t.unverified.GetCardinality())
-	s.Failed = int(t.failed.GetCardinality())
-	s.Completed = int(t.completed.GetCardinality())
-	return s
-}
-
 // FailuresReset - used to clear failures
 func (t *chunks) FailuresReset() {
 	t.mu.Lock()
@@ -784,6 +780,44 @@ func (t *chunks) String() string {
 		t.completed.GetCardinality(),
 		t.pieces,
 	)
+}
+
+// copSnapshot populates the chunk counts and downloaded/optimistic/remaining bytes of the given stats.
+func copSnapshot(s *Stats) ChunkOp[*Stats] {
+	return func(c *chunks) *Stats {
+		s.Missing = int(c.missing.GetCardinality())
+		s.Outstanding = int(c.inflight.GetCardinality())
+		s.Unverified = int(c.unverified.GetCardinality())
+		s.Failed = int(c.failed.GetCardinality())
+		s.Completed = int(c.completed.GetCardinality())
+
+		// only pieces known to be good are downloaded: the completed pieces and the pieces credited
+		// when the torrent was resumed. unverified chunks may not match what the torrent expects.
+		// every piece is assumed to be a full PieceLength, except the last piece of the torrent,
+		// which is frequently shorter.
+		tlength := c.meta.TotalLength()
+		// when there are no pieces this wraps to MaxUint32, which is safe: the piece bitmaps are empty
+		// so it is never contained, and the shortfall is zero so nothing would be subtracted anyway.
+		last := uint32(c.pieces - 1)
+
+		downloaded := c.completed.OrCardinality(c.credited) * uint64(c.meta.PieceLength)
+		if c.completed.Contains(last) || c.credited.Contains(last) {
+			downloaded -= c.shortfall
+		}
+
+		// optimistically assume the unverified chunks are good as well, only the completed pieces
+		// are counted by piece since the chunks of credited pieces are already unverified.
+		optimistic := uint64(s.Completed)*uint64(c.meta.PieceLength) + uint64(s.Unverified)*uint64(c.clength)
+		if c.completed.Contains(last) {
+			optimistic -= c.shortfall
+		}
+
+		s.Downloaded = downloaded
+		s.DownloadedOptimistic = optimistic
+		s.Remaining = uint64(tlength) - s.Downloaded
+
+		return s
+	}
 }
 
 type copCompletedOutstanding struct{ completed, outstanding int }
