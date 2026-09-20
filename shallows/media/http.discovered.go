@@ -802,8 +802,7 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 
 	for {
 		select {
-		case v := <-sub.Values:
-			log.Println("DERP socket stats", spew.Sdump(v))
+		case <-sub.Values:
 			if err := genmsg(ctx); err != nil {
 				log.Println(err)
 				errorsx.Log(errorsx.Wrap(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"), "failed to close websocket"))
