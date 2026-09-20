@@ -534,7 +534,8 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 		bytes = uint64(i.TotalLength())
 	}
 
-	if err := MetadataCompleteByID(ctx, q, md.ID, 0, bytes, stats.BytesValidated.Uint64(), stats.BytesWrittenData.Uint64(), uint64(t.BytesCompleted())).Scan(md); err != nil {
+	log.Println("DERP download stats", spew.Sdump(stats))
+	if err := MetadataCompleteByID(ctx, q, md.ID, 0, bytes, uint64(stats.Downloaded), uint64(stats.Downloaded)).Scan(md); err != nil {
 		return errorsx.Wrap(err, "unable to mark completed")
 	}
 
@@ -590,13 +591,13 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 				continue
 			}
 
-			current := uint64(dl.BytesCompleted())
+			current := uint64(stats.Downloaded)
 			if md.Available == current || info == nil {
 				continue
 			}
 
 			uctx, done := context.WithTimeout(context.Background(), time.Second)
-			if err := MetadataProgressByID(uctx, q, md.ID, uint16(stats.ActivePeers), uint64(info.TotalLength()), stats.BytesValidated.Uint64(), current).Scan(md); err != nil {
+			if err := MetadataProgressByID(uctx, q, md.ID, uint16(stats.ActivePeers), uint64(info.TotalLength()), current, current).Scan(md); err != nil {
 				done()
 				log.Println("failed to update progress", err)
 			}
@@ -613,7 +614,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 
 			stats := dl.Stats()
 			info := dl.Info()
-			current := uint64(dl.BytesCompleted())
+			current := uint64(stats.Downloaded)
 			if md.Available == current || info == nil {
 				continue
 			}
@@ -624,7 +625,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 				"%s - %s - %s: info(%t) %s\n", md.ID, hex.EncodeToString(md.Infohash), md.Description, true, stats,
 			)
 
-			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), uint64(info.TotalLength()), stats.BytesValidated.Uint64(), current).Scan(md); err != nil {
+			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), uint64(info.TotalLength()), current, current).Scan(md); err != nil {
 				log.Println("failed to update progress", err)
 			}
 		case <-ctx.Done():

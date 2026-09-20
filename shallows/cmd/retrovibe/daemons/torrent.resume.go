@@ -98,10 +98,10 @@ func VerifyTorrents(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual,
 			continue
 		}
 
-		log.Println("verification completed", md.ID, md.Description, t.BytesCompleted(), "/", t.Info().TotalLength())
-
 		stats := t.Stats()
-		if err := tracking.MetadataVerifiedByID(ctx, db, md.ID, 0, (&stats.BytesValidated).Uint64(), uint64(t.BytesCompleted())).Scan(&md); err != nil {
+		log.Println("verification completed", md.ID, md.Description, stats.Downloaded, "/", t.Info().TotalLength())
+
+		if err := tracking.MetadataVerifiedByID(ctx, db, md.ID, 0, uint64(stats.Downloaded), uint64(stats.Downloaded)).Scan(&md); err != nil {
 			log.Println(errorsx.Wrapf(err, "unable to update bytes completed during verification %s - %s", md.ID, md.Description))
 			continue
 		}

@@ -521,7 +521,14 @@ func (t *HTTPDiscovered) pause(w http.ResponseWriter, r *http.Request) {
 	var (
 		md tracking.Metadata
 		id = mux.Vars(r)["id"]
+		cl *torrent.Client
 	)
+
+	if cl = t.d.Load(); cl == nil {
+		log.Println("torrent client unavailable")
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusServiceUnavailable))
+		return
+	}
 
 	if err := tracking.MetadataFindByID(r.Context(), t.q, id).Scan(&md); sqlx.ErrNoRows(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to find metadata"))
@@ -540,7 +547,7 @@ func (t *HTTPDiscovered) pause(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = t.d.Load().Stop(metadata); err != nil {
+	if err = cl.Stop(metadata); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to stop download"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
@@ -701,13 +708,11 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go func(meta tracking.Metadata) {
-		if _, added, err := tracking.Resume(context.Background(), t.q, t.rootstorage, t.mediacleaner, cl, t.c, meta, t.pub); err != nil {
-			log.Println(errorsx.Wrap(err, "unable to start download"))
-		} else if !added {
-			log.Println("torrent", meta.ID, meta.Description, "already running")
-		}
-	}(meta)
+	if _, added, err := tracking.Resume(context.Background(), t.q, t.rootstorage, t.mediacleaner, cl, t.c, meta, t.pub); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to start download"))
+	} else if !added {
+		log.Println("torrent", meta.ID, meta.Description, "already running")
+	}
 
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &DownloadBeginResponse{
 		Download: new(
@@ -797,7 +802,8 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 
 	for {
 		select {
-		case <-sub.Values:
+		case v := <-sub.Values:
+			log.Println("DERP socket stats", spew.Sdump(v))
 			if err := genmsg(ctx); err != nil {
 				log.Println(err)
 				errorsx.Log(errorsx.Wrap(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"), "failed to close websocket"))

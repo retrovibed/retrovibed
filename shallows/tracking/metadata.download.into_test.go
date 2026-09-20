@@ -308,6 +308,83 @@ func TestDownloadInto(t *testing.T) {
 		}
 	})
 
+	t.Run("completion does not reset uploaded bytes recorded before this session", func(t *testing.T) {
+		var (
+			actual   = md5.New()
+			expected = md5.New()
+		)
+
+		ctx := t.Context()
+		q := sqltestx.Metadatabase(t)
+
+		seedir := t.TempDir()
+
+		mi, err := torrenttest.RandomMulti(seedir, 5, 16*bytesx.KiB, 64*bytesx.KiB)
+		require.NoError(t, err)
+
+		seeder := torrenttestx.Client(
+			t,
+			autobind.NewLoopback(
+				autobind.EnableDHT(torrenttestx.QuickDHT(t)),
+			),
+			torrent.NewMetadataCache(seedir),
+			blockcache.NewTorrentFromVirtualFS(fsx.DirVirtual(seedir)),
+		)
+
+		md, err := torrent.NewFromInfo(mi, torrent.OptionStorage(storage.NewFile(filepath.Join(seedir))))
+		require.NoError(t, err)
+
+		seederTorrent, _, err := seeder.Start(md)
+		require.NoError(t, err)
+		defer seeder.Close()
+
+		require.NoError(t, torrent.Verify(ctx, seederTorrent))
+		n, err := torrent.DownloadInto(ctx, expected, seederTorrent, torrent.TuneSeeding)
+		require.NoError(t, err)
+		require.Equal(t, mi.TotalLength(), n)
+
+		root := fsx.DirVirtual(t.TempDir())
+
+		leechdir := root.Path("torrent")
+		mediadir := root.Path("media")
+		require.NoError(t, fsx.MkDirs(0700, leechdir, mediadir))
+
+		leecher := torrenttestx.Client(
+			t,
+			autobind.NewLoopback(
+				autobind.EnableDHT(torrenttestx.QuickDHT(t)),
+			),
+			torrent.NewMetadataCache(leechdir),
+			blockcache.NewTorrentFromVirtualFS(fsx.DirVirtual(leechdir)),
+		)
+		defer leecher.Close()
+
+		// uploaded is accumulated across sessions (by the connection closed hook), so
+		// a previous session may have already recorded bytes served to peers.
+		const previouslyUploaded = 7 * bytesx.KiB
+		lmd := tracking.NewMetadata(
+			new(md.ID),
+			tracking.MetadataOptionFromInfo(mi),
+			tracking.MetadataOptionAutoDescription,
+			tracking.MetadataOptionUploaded(previouslyUploaded),
+		)
+
+		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
+
+		ltor, added, err := leecher.MaybeStart(
+			torrent.NewFromInfo(mi),
+		)
+		require.NoError(t, err)
+		assert.True(t, added)
+
+		require.NoError(t, ltor.Tune(torrent.TuneClientPeer(seeder)))
+
+		require.NoError(t, tracking.DownloadInto(t.Context(), q, root, library.QueryCleanerNoop(), &lmd, ltor, actual, asyncx.NewWakeup(t.Context())))
+
+		require.NoError(t, tracking.MetadataFindByID(t.Context(), q, lmd.ID).Scan(&lmd))
+		assert.GreaterOrEqual(t, lmd.Uploaded, uint64(previouslyUploaded), "uploaded is a running total and must not be replaced by this session's count")
+	})
+
 	t.Run("bluray torrent treated as single file", func(t *testing.T) {
 		var (
 			actual   = md5.New()

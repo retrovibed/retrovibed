@@ -168,7 +168,7 @@ func TestPublishPluginTorrentImport(t *testing.T) {
 		}, false))
 
 		var lmd tracking.Metadata
-		require.NoError(t, tracking.MetadataCompleteByID(t.Context(), q, torrentx.HashUID(new(md.ID)), 0, uint64(len(content)), uint64(len(content)), 0, uint64(len(content))).Scan(&lmd))
+		require.NoError(t, tracking.MetadataCompleteByID(t.Context(), q, torrentx.HashUID(new(md.ID)), 0, uint64(len(content)), uint64(len(content)), uint64(len(content))).Scan(&lmd))
 
 		require.NoError(t, daemons.PublishPluginTorrentImport(t.Context(), q, plugindir, tvfs, tstore))
 
