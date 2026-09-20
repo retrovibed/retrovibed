@@ -480,26 +480,30 @@ func DownloadInto(ctx context.Context, dst io.Writer, m Torrent, options ...Tune
 		return 0, err
 	}
 
+	log.Println("DERP DERP 0")
 	select {
 	case <-m.GotInfo():
 	case <-ctx.Done():
 		return 0, errorsx.Compact(context.Cause(ctx), ctx.Err())
 	}
-
+	log.Println("DERP DERP 1")
 	if err = m.Tune(TuneRecordMetadata, TuneAutoDownload, TuneNewConns, TuneAnnounceOnce(tracker.AnnounceOptionEventStarted)); err != nil {
 		return 0, err
 	}
 
+	log.Println("DERP DERP 2")
 	if n, err = io.Copy(dst, NewReader(m)); err != nil {
 		return n, err
 	} else if n != m.Info().TotalLength() {
 		return n, errorsx.Errorf("download failed, missing data %d != %d", n, m.Info().TotalLength())
 	}
 
+	log.Println("DERP DERP 3")
 	if err = m.Tune(TuneAnnounceOnce(tracker.AnnounceOptionEventCompleted), TuneComplete); err != nil {
 		log.Println("failed to announce completion", err)
 	}
 
+	log.Println("DERP DERP 4")
 	return n, nil
 }
 

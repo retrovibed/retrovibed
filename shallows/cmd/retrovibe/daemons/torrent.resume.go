@@ -40,7 +40,6 @@ func ResumeDownloads(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual
 
 	for md := range iter.Iter() {
 		log.Println("resuming", md.ID, md.Description, md.Private)
-
 		if _, added, err := tracking.Resume(ctx, db, rootstore, mc, tclient, tstore, md, pub); err != nil {
 			log.Println(errorsx.Wrap(err, "unable to resume download"))
 			continue

@@ -447,6 +447,7 @@ func NewResumableMetadata(vfs fsx.Virtual, tstore storage.ClientImpl, md Metadat
 // running DownloadInto (it is what marks the metadata completed), so callers that find the
 // torrent already running (added == false) must not start it again.
 func Resume(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc library.QueryCleaner, tclient *torrent.Client, tstore storage.ClientImpl, md Metadata, pub *asyncx.Wakeup, options ...torrent.Tuner) (dl torrent.Torrent, added bool, err error) {
+
 	t, err := NewResumableMetadata(vfs, tstore, md)
 	if err != nil {
 		return nil, false, errorsx.Wrapf(err, "unable to create metadata from %s - %s", md.ID, md.Description)
@@ -463,6 +464,7 @@ func Resume(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc library.Que
 	// DownloadInto updates the metadata as it makes progress, so it is given its own copy
 	// to avoid racing with the caller's use of md.
 	go func(md Metadata) {
+		log.Println("running download into", md.ID, md.Description)
 		errorsx.Log(errorsx.Wrap(DownloadInto(ctx, q, vfs, mc, &md, dl, md5.New(), pub), "download failed"))
 	}(md)
 
@@ -622,7 +624,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 			statst.Reset(statsfreq)
 
 			log.Printf(
-				"%s - %s - %s: info(%t) %s\n", md.ID, hex.EncodeToString(md.Infohash), md.Description, true, stats,
+				"DEBUG progress %s - %s - %s: info(%t) %s\n", md.ID, hex.EncodeToString(md.Infohash), md.Description, true, stats,
 			)
 
 			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), uint64(info.TotalLength()), current, current).Scan(md); err != nil {
