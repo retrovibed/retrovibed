@@ -624,7 +624,7 @@ func DownloadProgress(ctx context.Context, q sqlx.Queryer, md *Metadata, dl torr
 			statst.Reset(statsfreq)
 
 			log.Printf(
-				"DEBUG progress %s - %s - %s: info(%t) %s\n", md.ID, hex.EncodeToString(md.Infohash), md.Description, true, stats,
+				"progress %s - %s - %s: info(%t) %s\n", md.ID, hex.EncodeToString(md.Infohash), md.Description, true, stats,
 			)
 
 			if err := MetadataProgressByID(ctx, q, md.ID, uint16(stats.ActivePeers), uint64(info.TotalLength()), current, current).Scan(md); err != nil {

@@ -707,7 +707,6 @@ func (t *HTTPDiscovered) download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("Resume 0", meta.ID, meta.Description)
 	if _, added, err := tracking.Resume(context.Background(), t.q, t.rootstorage, t.mediacleaner, cl, t.c, meta, t.pub); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to start download"))
 	} else if !added {
@@ -765,7 +764,6 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 
 	// this connection may be the first to add the torrent to the client, resume and begin skip
 	// torrents that are already running, so it must run the download to completion as well.
-	log.Println("Resume 1", md.ID, md.Description)
 	if dl, _, err = tracking.Resume(ctx, t.q, t.rootstorage, t.mediacleaner, tclient, t.c, md, t.pub, torrent.TuneSubscribe(&sub)); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to track download"))
 		errorsx.Log(errorsx.Wrap(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"), "failed to close websocket"))
@@ -798,17 +796,9 @@ func (t *HTTPDiscovered) websocket(w http.ResponseWriter, r *http.Request) {
 		errorsx.Log(errorsx.Wrap(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"), "failed to close websocket"))
 		return
 	}
-	statst := time.NewTicker(5 * time.Second)
-	defer statst.Stop()
+
 	for {
-		statst.Reset(5 * time.Second)
 		select {
-		case <-statst.C:
-			if err := genmsg(ctx); err != nil {
-				log.Println(err)
-				errorsx.Log(errorsx.Wrap(c.Close(websocketx.PrivateStatus(http.StatusInternalServerError), "internal service error"), "failed to close websocket"))
-				return
-			}
 		case <-sub.Values:
 			if err := genmsg(ctx); err != nil {
 				log.Println(err)
