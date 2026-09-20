@@ -127,6 +127,8 @@ Future<(_FakeRemoteControlSocket, List<lib.RecentRecordRequest>, String)> _mount
           recorded.add(req);
           return lib.RecentRecordResponse();
         },
+        apirecenthistory: (req, {String? host, List<httpx.Option> options = const []}) async =>
+            lib.WatchHistoryRecordResponse(),
         recentRecordThrottle: recentRecordThrottle,
       ),
       daemon: daemon,
@@ -620,6 +622,8 @@ void main() {
                 recorded.add(req);
                 return lib.RecentRecordResponse();
               },
+              apirecenthistory: (req, {String? host, List<httpx.Option> options = const []}) async =>
+                  lib.WatchHistoryRecordResponse(),
             ),
             daemon: daemon,
           ),
