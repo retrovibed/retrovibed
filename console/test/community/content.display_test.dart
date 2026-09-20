@@ -358,6 +358,9 @@ void main() {
     });
 
     group('deletion', () {
+      // the delete button shows a spinner for as long as the confirmation
+      // modal is open, so pumpAndSettle can't be used between tapping delete
+      // and answering the modal.
       Future<PublishContentDeleteResponse> tombstone(
         String id, {
         List<httpx.Option> options = const [],
@@ -394,7 +397,8 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.tap(find.byIcon(Icons.delete).first);
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
 
         expect(find.text('Yes'), findsOneWidget);
         expect(find.text('No'), findsOneWidget);
@@ -417,7 +421,8 @@ void main() {
         expect(find.text('Movie One'), findsOneWidget);
 
         await tester.tap(find.byIcon(Icons.delete).first);
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
 
         await tester.tap(find.text('Yes'));
         await tester.pumpAndSettle();
@@ -441,7 +446,8 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.tap(find.byIcon(Icons.delete).first);
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
 
         await tester.tap(find.text('No'));
         await tester.pumpAndSettle();
@@ -474,7 +480,8 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.tap(find.byIcon(Icons.delete).first);
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
 
         await tester.tap(find.text('Yes'));
         await tester.pumpAndSettle();
@@ -506,7 +513,8 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.tap(find.byIcon(Icons.delete).first);
-        await tester.pumpAndSettle();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
 
         await tester.tap(find.text('No'));
         await tester.pumpAndSettle();

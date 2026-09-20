@@ -106,25 +106,25 @@ void main() {
       });
 
       testWidgets('tapping subscribe icon updates to subscribed', (tester) async {
-        int calls = 0;
+        final alpha = Community(
+          id: '1',
+          url: 'https://alpha.community.retrovibe.space',
+          accountId: 'other',
+        );
+        String? subscribed;
+
         Future<CommunitySearchResponse> search(
           CommunitySearchRequest req, {
           List<httpx.Option> options = const [],
-        }) async {
-          calls++;
-          return CommunitySearchResponse(
-            items: [
-              Community(
-                id: '1',
-                url: 'https://alpha.community.retrovibe.space',
-                accountId: 'other',
-                subscribedAt: calls > 1 ? '2026-03-20T00:00:00Z' : '',
-              ),
-            ],
-          );
-        }
+        }) async => CommunitySearchResponse(items: [alpha]);
 
-        Future<CommunitySubscribeResponse> subscribe(String id, {List<httpx.Option> options = const []}) async => CommunitySubscribeResponse();
+        // the list doesn't re-query and the response carries no state, so the
+        // subscription is only visible through the community the list holds.
+        Future<CommunitySubscribeResponse> subscribe(String id, {List<httpx.Option> options = const []}) async {
+          subscribed = id;
+          alpha.subscribedAt = '2026-03-20T00:00:00Z';
+          return CommunitySubscribeResponse();
+        }
 
         await tester.pumpApp(
           physicalSize: Size(1280, 720),
@@ -138,6 +138,7 @@ void main() {
         await tester.tap(find.byIcon(Icons.add_circle_outline));
         await tester.pumpAndSettle();
 
+        expect(subscribed, '1');
         expect(find.byIcon(Icons.check_circle), findsOneWidget);
         expect(find.byIcon(Icons.add_circle_outline), findsNothing);
         expect(tester.takeException(), isNull);

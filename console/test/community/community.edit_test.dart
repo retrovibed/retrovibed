@@ -18,7 +18,7 @@ void main() {
       await tester.pumpApp(CommunityEdit(community: empty, onChange: (_) {}));
       await tester.pumpAndSettle();
 
-      expect(find.text('URL'), findsOneWidget);
+      expect(find.textContaining('URL:'), findsOneWidget);
       expect(find.text('Description'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
@@ -28,7 +28,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('https://example.community.retrovibe.space'),
+        find.text('URL: https://example.community.retrovibe.space'),
         findsOneWidget,
       );
       expect(tester.takeException(), isNull);
@@ -39,8 +39,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('https://mysite.community.retrovibe.space'),
-        findsAtLeastNWidgets(1),
+        find.text('URL: https://mysite.community.retrovibe.space'),
+        findsOneWidget,
       );
       expect(tester.takeException(), isNull);
     });
