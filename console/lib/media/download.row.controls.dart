@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
-import 'package:retrovibed/timex.dart' as timex;
-import './api.dart' as api;
+import 'api.dart' as api;
 
 class DownloadRowControls extends StatefulWidget {
   final api.Download current;
