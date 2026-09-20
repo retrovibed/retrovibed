@@ -161,19 +161,21 @@ func (cl *Client) newTorrent(md Metadata, options ...Tuner) *torrent {
 }
 
 func (cl *Client) start(md Metadata, options ...Tuner) (dlt *torrent, added bool, err error) {
-	log.Println("start initiated", md.ID, md.DisplayName)
-	defer log.Println("start completed", md.ID, md.DisplayName)
 	dlt, cached, err := cl.torrents.Load(md.ID, cl.newTorrent, tuneMerge(md), langx.ComposeErr(options...))
 	if errorsx.Ignore(err, fs.ErrNotExist) != nil {
 		return nil, false, err
 	}
 
-	if cached {
-		return dlt, false, nil
+	if !cached {
+		if dlt, err = cl.torrents.Insert(md, cl.newTorrent, tuneMerge(md), langx.ComposeErr(options...)); err != nil {
+			return nil, false, err
+		}
 	}
 
-	if dlt, err = cl.torrents.Insert(md, cl.newTorrent, tuneMerge(md), langx.ComposeErr(options...)); err != nil {
-		return nil, false, err
+	// a torrent that is already loaded may have been loaded by a peer or dht announce to seed it,
+	// only the first Start counts as adding it. it is also the one that sets up the announcing.
+	if !dlt.started.CompareAndSwap(false, true) {
+		return dlt, false, nil
 	}
 
 	cl.AddDHTNodes(dlt.md.DHTNodes)
@@ -632,11 +634,11 @@ func (cl *Client) receiveHandshakes(c *connection) (t *torrent, err error) {
 	c.PeerID = int160.FromByteArray(info.PeerID)
 	c.completedHandshake = time.Now()
 
-	t, cached, err := cl.torrents.Load(int160.FromByteArray(info.Hash), cl.newTorrent)
+	t, _, err = cl.torrents.Load(int160.FromByteArray(info.Hash), cl.newTorrent)
 	if err != nil {
 		return nil, err
 	}
-	log.Println("DERP DERP peer cached", t.md.ID, t.md.DisplayName, cached)
+
 	return t, nil
 }
 

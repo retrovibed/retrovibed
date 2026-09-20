@@ -447,7 +447,16 @@ func TuneRecordMetadata(t *torrent) error {
 func tuneMerge(md Metadata) Tuner {
 	return func(t *torrent) error {
 		t.md.DisplayName = langx.FirstNonZero(md.DisplayName, t.md.DisplayName)
-		t.md.Trackers = append(t.md.Trackers, md.Trackers...)
+		// trackers are in priority order, keep the first occurrence of each.
+		seen := make(map[string]struct{}, len(t.md.Trackers)+len(md.Trackers))
+		t.md.Trackers = slicesx.Filter(func(tracker string) bool {
+			if _, ok := seen[tracker]; ok {
+				return false
+			}
+
+			seen[tracker] = struct{}{}
+			return true
+		}, slicesx.Flatten(t.md.Trackers, md.Trackers)...)
 
 		if md.ChunkSize != t.md.ChunkSize && md.ChunkSize != 0 {
 			log.Println("merging set chunk size")
@@ -480,30 +489,26 @@ func DownloadInto(ctx context.Context, dst io.Writer, m Torrent, options ...Tune
 		return 0, err
 	}
 
-	log.Println("DERP DERP 0")
 	select {
 	case <-m.GotInfo():
 	case <-ctx.Done():
 		return 0, errorsx.Compact(context.Cause(ctx), ctx.Err())
 	}
-	log.Println("DERP DERP 1")
+
 	if err = m.Tune(TuneRecordMetadata, TuneAutoDownload, TuneNewConns, TuneAnnounceOnce(tracker.AnnounceOptionEventStarted)); err != nil {
 		return 0, err
 	}
 
-	log.Println("DERP DERP 2")
 	if n, err = io.Copy(dst, NewReader(m)); err != nil {
 		return n, err
 	} else if n != m.Info().TotalLength() {
 		return n, errorsx.Errorf("download failed, missing data %d != %d", n, m.Info().TotalLength())
 	}
 
-	log.Println("DERP DERP 3")
 	if err = m.Tune(TuneAnnounceOnce(tracker.AnnounceOptionEventCompleted), TuneComplete); err != nil {
 		log.Println("failed to announce completion", err)
 	}
 
-	log.Println("DERP DERP 4")
 	return n, nil
 }
 
@@ -744,6 +749,11 @@ type torrent struct {
 
 	readabledataavailable atomic.Bool
 	metainfoAvailable     atomic.Bool
+
+	// set by the first Client.Start of the torrent. the client also loads torrents on its own
+	// (a peer connecting, a dht announce) to seed them, those loads do not set it, so the first
+	// Start of a torrent loaded that way is still the one that added it.
+	started atomic.Bool
 
 	// The bencoded bytes of the info dict. This is actively manipulated if
 	// the info bytes aren't initially available, and we try to fetch them
