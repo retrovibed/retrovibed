@@ -329,11 +329,23 @@ final $typed_data.Uint8List communitySubscribeRequestDescriptor =
 @$core.Deprecated('Use communitySubscribeResponseDescriptor instead')
 const CommunitySubscribeResponse$json = {
   '1': 'CommunitySubscribeResponse',
+  '2': [
+    {
+      '1': 'community',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.retrovibed.community.Community',
+      '10': 'community'
+    },
+  ],
 };
 
 /// Descriptor for `CommunitySubscribeResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List communitySubscribeResponseDescriptor =
-    $convert.base64Decode('ChpDb21tdW5pdHlTdWJzY3JpYmVSZXNwb25zZQ==');
+    $convert.base64Decode(
+        'ChpDb21tdW5pdHlTdWJzY3JpYmVSZXNwb25zZRI9Cgljb21tdW5pdHkYASABKAsyHy5yZXRyb3'
+        'ZpYmVkLmNvbW11bml0eS5Db21tdW5pdHlSCWNvbW11bml0eQ==');
 
 @$core.Deprecated('Use youTubeStatusDescriptor instead')
 const YouTubeStatus$json = {

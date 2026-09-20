@@ -818,6 +818,7 @@ func (*CommunitySubscribeRequest) Descriptor() ([]byte, []int) {
 
 type CommunitySubscribeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Community     *Community             `protobuf:"bytes,1,opt,name=community,proto3" json:"community,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -850,6 +851,13 @@ func (x *CommunitySubscribeResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CommunitySubscribeResponse.ProtoReflect.Descriptor instead.
 func (*CommunitySubscribeResponse) Descriptor() ([]byte, []int) {
 	return file_community_community_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *CommunitySubscribeResponse) GetCommunity() *Community {
+	if x != nil {
+		return x.Community
+	}
+	return nil
 }
 
 type YouTubeStatus struct {
@@ -961,8 +969,9 @@ const file_community_community_proto_rawDesc = "" +
 	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\"X\n" +
 	"\x17CommunityUpdateResponse\x12=\n" +
 	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\"\x1b\n" +
-	"\x19CommunitySubscribeRequest\"\x1c\n" +
-	"\x1aCommunitySubscribeResponse\"7\n" +
+	"\x19CommunitySubscribeRequest\"[\n" +
+	"\x1aCommunitySubscribeResponse\x12=\n" +
+	"\tcommunity\x18\x01 \x01(\v2\x1f.retrovibed.community.CommunityR\tcommunity\"7\n" +
 	"\rYouTubeStatus\x12\x16\n" +
 	"\x06linked\x18\x01 \x01(\bR\x06linked\x12\x0e\n" +
 	"\x02id\x18\x02 \x01(\tR\x02id*7\n" +
@@ -1018,11 +1027,12 @@ var file_community_community_proto_depIdxs = []int32{
 	1,  // 8: retrovibed.community.CommunityDeleteResponse.community:type_name -> retrovibed.community.Community
 	1,  // 9: retrovibed.community.CommunityUpdateRequest.community:type_name -> retrovibed.community.Community
 	1,  // 10: retrovibed.community.CommunityUpdateResponse.community:type_name -> retrovibed.community.Community
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	1,  // 11: retrovibed.community.CommunitySubscribeResponse.community:type_name -> retrovibed.community.Community
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_community_community_proto_init() }

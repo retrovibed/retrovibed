@@ -1070,7 +1070,13 @@ class CommunitySubscribeRequest extends $pb.GeneratedMessage {
 }
 
 class CommunitySubscribeResponse extends $pb.GeneratedMessage {
-  factory CommunitySubscribeResponse() => CommunitySubscribeResponse._();
+  factory CommunitySubscribeResponse({
+    Community? community,
+  }) {
+    final result = CommunitySubscribeResponse._();
+    if (community != null) result.community = community;
+    return result;
+  }
 
   CommunitySubscribeResponse._();
 
@@ -1086,6 +1092,8 @@ class CommunitySubscribeResponse extends $pb.GeneratedMessage {
       package: const $pb.PackageName(
           _omitMessageNames ? '' : 'retrovibed.community'),
       createEmptyInstance: CommunitySubscribeResponse.$_createMessage)
+    ..aOM<Community>(1, _omitFieldNames ? '' : 'community',
+        subBuilder: Community.$_createMessage)
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -1114,6 +1122,17 @@ class CommunitySubscribeResponse extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<CommunitySubscribeResponse>(
           CommunitySubscribeResponse.$_createMessage);
   static CommunitySubscribeResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Community get community => $_getN(0);
+  @$pb.TagNumber(1)
+  set community(Community value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasCommunity() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearCommunity() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Community ensureCommunity() => $_ensure(0);
 }
 
 class YouTubeStatus extends $pb.GeneratedMessage {

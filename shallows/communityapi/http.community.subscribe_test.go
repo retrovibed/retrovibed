@@ -11,12 +11,14 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
+	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -52,11 +54,15 @@ func newCommunityMockClient(communityID string) *http.Client {
 }
 
 func TestSubscribeEndpoint(t *testing.T) {
+	// the encoded form of an unsubscribed community's subscribed_at (infinity).
+	unsubscribed := grpcx.EncodeTime(timex.RFC3339NanoEncode(timex.Inf()))
+
 	t.Run("subscribes to a community", func(t *testing.T) {
 		var (
 			p   meta.Profile
 			v   meta.Authz
 			sub community.Community
+			got communityapi.CommunitySubscribeResponse
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -90,6 +96,9 @@ func TestSubscribeEndpoint(t *testing.T) {
 
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &got))
+		require.Equal(t, communityID, got.Community.Id)
+		require.NotEqual(t, unsubscribed, got.Community.SubscribedAt)
 
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
 		require.Equal(t, communityID, sub.ID)
@@ -109,6 +118,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 			p   meta.Profile
 			v   meta.Authz
 			sub community.Community
+			got communityapi.CommunitySubscribeResponse
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -141,6 +151,10 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
+		got.Reset()
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &got))
+		require.Equal(t, communityID, got.Community.Id)
+		require.NotEqual(t, unsubscribed, got.Community.SubscribedAt)
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
@@ -154,6 +168,10 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
+		got.Reset()
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &got))
+		require.Equal(t, communityID, got.Community.Id)
+		require.Equal(t, unsubscribed, got.Community.SubscribedAt)
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
 		require.True(t, sub.SubscribedAt.Equal(timex.Inf()), "expected subscribed_at to be infinity after unsubscribe")
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
@@ -164,6 +182,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 			p   meta.Profile
 			v   meta.Authz
 			sub community.Community
+			got communityapi.CommunitySubscribeResponse
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -196,6 +215,10 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
+		got.Reset()
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &got))
+		require.Equal(t, communityID, got.Community.Id)
+		require.NotEqual(t, unsubscribed, got.Community.SubscribedAt)
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
 
@@ -209,6 +232,10 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
+		got.Reset()
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &got))
+		require.Equal(t, communityID, got.Community.Id)
+		require.Equal(t, unsubscribed, got.Community.SubscribedAt)
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
 		require.True(t, sub.SubscribedAt.Equal(timex.Inf()), "expected subscribed_at to be infinity after unsubscribe")
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))
@@ -223,6 +250,10 @@ func TestSubscribeEndpoint(t *testing.T) {
 		require.NoError(t, err)
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusOK, resp.Code)
+		got.Reset()
+		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &got))
+		require.Equal(t, communityID, got.Community.Id)
+		require.NotEqual(t, unsubscribed, got.Community.SubscribedAt)
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&sub))
 		require.Equal(t, communityID, sub.ID)
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM torrents_feed_rss"))

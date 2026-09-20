@@ -106,24 +106,25 @@ void main() {
       });
 
       testWidgets('tapping subscribe icon updates to subscribed', (tester) async {
-        final alpha = Community(
-          id: '1',
-          url: 'https://alpha.community.retrovibe.space',
-          accountId: 'other',
-        );
         String? subscribed;
 
         Future<CommunitySearchResponse> search(
           CommunitySearchRequest req, {
           List<httpx.Option> options = const [],
-        }) async => CommunitySearchResponse(items: [alpha]);
+        }) async => CommunitySearchResponse(
+          items: [Community(id: '1', url: 'https://alpha.community.retrovibe.space', accountId: 'other')],
+        );
 
-        // the list doesn't re-query and the response carries no state, so the
-        // subscription is only visible through the community the list holds.
         Future<CommunitySubscribeResponse> subscribe(String id, {List<httpx.Option> options = const []}) async {
           subscribed = id;
-          alpha.subscribedAt = '2026-03-20T00:00:00Z';
-          return CommunitySubscribeResponse();
+          return CommunitySubscribeResponse(
+            community: Community(
+              id: id,
+              url: 'https://alpha.community.retrovibe.space',
+              accountId: 'other',
+              subscribedAt: '2026-03-20T00:00:00Z',
+            ),
+          );
         }
 
         await tester.pumpApp(

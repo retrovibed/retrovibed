@@ -24,7 +24,7 @@ class SubscribeButton extends StatelessWidget {
       ),
       onPressed: () {
         final auth = [authn.request(authn.AuthzCache.meta(context))];
-        return httpx.withRetry(() => subscribe(community.id, options: auth)).then((v) => onChanged?.call(community));
+        return httpx.withRetry(() => subscribe(community.id, options: auth)).then((v) => onChanged?.call(v.community));
       },
       tooltip: subscribed ? 'Unsubscribe' : 'Subscribe',
       help: ds.Hint(Text(subscribed ? "tap to unsubscribe from this community" : "tap to subscribe to this community")),

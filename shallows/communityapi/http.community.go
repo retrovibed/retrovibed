@@ -183,7 +183,12 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusOK))
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &CommunitySubscribeResponse{
+		Community: NewCommunity(CommunityOptionFromDB(langx.Clone(existing, timex.JSONSafeEncodeOption))),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
 }
 
 func (t *HTTP) resync(w http.ResponseWriter, r *http.Request) {

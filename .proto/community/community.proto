@@ -76,7 +76,9 @@ message CommunityUpdateResponse {
 }
 
 message CommunitySubscribeRequest {}
-message CommunitySubscribeResponse {}
+message CommunitySubscribeResponse {
+  Community community = 1 [ json_name = "community" ];
+}
 
 message YouTubeStatus {
   bool linked = 1 [ json_name = "linked" ];
