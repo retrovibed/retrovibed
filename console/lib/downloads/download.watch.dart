@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn.dart' as authn;
@@ -37,6 +38,24 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
   Timer _debounce = Timer(Duration.zero, () {});
   bool _notifiedCompleted = false;
 
+  /// transfer rate in bytes per second, derived from successive updates.
+  int rate = 0;
+  DateTime _sampled = DateTime.now();
+  int _sampledBytes = 0;
+
+  /// minimum period between rate updates.
+  static const Duration _rateInterval = Duration(seconds: 1);
+
+  void _sample(api.Download v) {
+    final now = DateTime.now();
+    final elapsed = now.difference(_sampled);
+    if (elapsed < _rateInterval) return;
+
+    rate = math.max(0, ((v.downloaded.toInt() - _sampledBytes) * Duration.microsecondsPerSecond / elapsed.inMicroseconds).round());
+    _sampled = now;
+    _sampledBytes = v.downloaded.toInt();
+  }
+
   void _maybeNotifyCompleted() {
     if (_notifiedCompleted || !api.download.completed(current)) return;
     print("notified completed ${_notifiedCompleted} ${api.download.completed(current)} ${current}");
@@ -61,6 +80,7 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
           _subscription = socket.listen(
             (v) {
               setState(() {
+                _sample(v);
                 current = v;
               });
               _debounce.cancel();
@@ -98,6 +118,7 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
   void initState() {
     super.initState();
     current = widget.current;
+    _sampledBytes = current.downloaded.toInt();
     ds.postframe(_maybeNotifyCompleted);
   }
 
@@ -120,8 +141,9 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
       cause: cause,
       DownloadRowDisplay(
         current: current,
+        rate: rate,
         help: ds.Hint.multiline([
-          Text("An active download showing progress, peer count, and completion percentage."),
+          Text("An active download showing progress, peer count, transfer rate, and completion percentage."),
           ds.HelpLabelled(
             label: Text("pause"),
             description: Text("suspend the download"),

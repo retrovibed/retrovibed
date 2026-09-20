@@ -7,11 +7,15 @@ class DownloadRowDisplay extends StatelessWidget {
   final api.Download current;
   final Widget? Function(BuildContext)? trailing;
   final Widget help;
-  const DownloadRowDisplay({super.key, required this.current, this.trailing, this.help = ds.HelpScope.None});
+
+  /// current transfer rate in bytes per second.
+  final int rate;
+  const DownloadRowDisplay({super.key, required this.current, this.rate = 0, this.trailing, this.help = ds.HelpScope.None});
 
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
+    final rated = "${ds.bytesx(rate).toIEC600272Format()}/s".padLeft(10);
     var percentage = math.min(
       current.bytes == 0 ? 0.0 : (current.downloaded.toDouble() / current.bytes.toDouble()),
       1.0,
@@ -85,6 +89,7 @@ class DownloadRowDisplay extends StatelessWidget {
                 ),
                 Icon(Icons.people_outline, size: 16),
                 Text(current.peers.toString().padLeft(3), style: const TextStyle(fontFamily: 'monospace')),
+                Text(rated, style: const TextStyle(fontFamily: 'monospace')),
                 Text(
                   "${(percentage * 100).toStringAsFixed(2).padLeft(6)}%",
                   style: const TextStyle(fontFamily: 'monospace'),
