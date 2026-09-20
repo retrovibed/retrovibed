@@ -120,11 +120,16 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
     current = widget.current;
     _sampledBytes = current.downloaded.toInt();
     ds.postframe(_maybeNotifyCompleted);
+    // connecting here rather than in didChangeDependencies so dependency changes
+    // after mount don't tear down a live watch.
+    ds.postframe(_connect);
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void didUpdateWidget(RefreshingDownload oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.current.media.id == widget.current.media.id) return;
+    current = widget.current;
     _connect();
   }
 

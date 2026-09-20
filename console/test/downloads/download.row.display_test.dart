@@ -60,6 +60,7 @@ void main() {
           current: _download(),
           interval: _reconnectInterval,
           watch: mockWatch,
+          updates: StreamController<api.Download>().sink,
         ),
       );
       await tester.pump(); // let initState future resolve
@@ -90,6 +91,7 @@ void main() {
           current: _download(),
           interval: _reconnectInterval,
           watch: mockWatch,
+          updates: StreamController<api.Download>().sink,
         ),
       );
       await tester.pump();
@@ -120,11 +122,12 @@ void main() {
           current: _download(),
           interval: _reconnectInterval,
           watch: mockWatch,
+          updates: StreamController<api.Download>().sink,
         ),
       );
       await tester.pump();
 
-      await controllers.first.close();
+      unawaited(controllers.first.close());
       await tester.pump(_reconnectInterval * 2);
 
       expect(watchCallCount, equals(2));
@@ -151,6 +154,7 @@ void main() {
           current: _download(),
           interval: _reconnectInterval,
           watch: mockWatch,
+          updates: StreamController<api.Download>().sink,
         ),
       );
       await tester.pump(_reconnectInterval * 2);
@@ -181,6 +185,7 @@ void main() {
         RefreshingDownload(
           current: _download(),
           interval: _reconnectInterval,
+          updates: StreamController<api.Download>().sink,
           watch: (id, {options = const []}) async {
             final c = StreamController<api.Download>();
             controllers.add(c);
