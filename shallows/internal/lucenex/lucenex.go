@@ -55,7 +55,15 @@ func Query(d Driver, s string, options ...Option) squirrel.Sqlizer {
 			return "", nil, err
 		}
 
-		return d.RenderParam(ast)
+		sql, args, err = d.RenderParam(ast)
+		if err != nil || stringsx.Blank(sql) {
+			return sql, args, err
+		}
+
+		// drivers only parenthesize the operands of an operator, never the root expression.
+		// a top level OR would otherwise escape any sibling predicate it is combined with,
+		// i.e. `adult = ? AND (a) OR (b)`.
+		return "(" + sql + ")", args, nil
 	})
 }
 
@@ -74,19 +82,25 @@ func Clean(s string) string {
 	}
 
 	o = stringsx.CompactWhitespace(o)
-	o = strings.ToLower(o)
-	o = strings.TrimPrefix(o, "and ")
-	o = strings.ReplaceAll(o, " and ", " ")
-	o = strings.TrimSuffix(o, " and")
-	o = strings.TrimPrefix(o, "or ")
-	o = strings.ReplaceAll(o, " or ", " ")
-	o = strings.TrimSuffix(o, " or")
-	o = strings.TrimPrefix(o, "to ")
-	o = strings.ReplaceAll(o, " to ", " ")
-	o = strings.TrimSuffix(o, " to")
-	o = strings.TrimPrefix(o, "not ")
-	o = strings.ReplaceAll(o, " not ", " ")
-	o = strings.TrimSuffix(o, " not")
 
-	return o
+	words := strings.Fields(o)
+	kept := words[:0]
+	for _, w := range words {
+		if isLuceneKeyword(w) {
+			continue
+		}
+		kept = append(kept, w)
+	}
+
+	return strings.Join(kept, " ")
+}
+
+// isLuceneKeyword reports whether w is a lucene operator word, ignoring case.
+func isLuceneKeyword(w string) bool {
+	for _, k := range []string{"and", "or", "to", "not"} {
+		if strings.EqualFold(w, k) {
+			return true
+		}
+	}
+	return false
 }

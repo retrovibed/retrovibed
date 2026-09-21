@@ -13,7 +13,7 @@ func TestSearchToSql(t *testing.T) {
 	t.Run("query", func(t *testing.T) {
 		q, args, err := duckdbx.Search("arch linux", "a", "b").ToSql()
 		require.NoError(t, err)
-		require.Equal(t, `SELECT true FROM (SELECT UNNEST($1::VARCHAR[]) AS val) AS t WHERE ("val" ILIKE '%' || $2 || '%') AND ("val" ILIKE '%' || $3 || '%')`, q)
+		require.Equal(t, `SELECT true FROM (SELECT UNNEST($1::VARCHAR[]) AS val) AS t WHERE (("val" ILIKE '%' || $2 || '%') AND ("val" ILIKE '%' || $3 || '%'))`, q)
 		require.Equal(t, []any{[]string{"a", "b"}, "arch", "linux"}, args)
 	})
 
