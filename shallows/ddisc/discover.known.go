@@ -139,7 +139,7 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				return d, errorsx.Wrapf(err, "unable to clean title: %s", d.Title)
 			}
 
-			title, _, _ := library.ParseReleaseEpisode(cleaned)
+			title, _, _, _ := library.ParseReleaseEpisode(cleaned)
 			title = library.StripHallucinations(d.Title, title)
 			title = lucenex.Clean(title)
 

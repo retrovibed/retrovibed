@@ -2,7 +2,11 @@ package library
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"math"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Masterminds/squirrel"
@@ -114,6 +118,63 @@ func KnownCollationEpisode(season, episode uint16) uint32 {
 	return uint32(season)<<16 | uint32(episode)
 }
 
+// KnownStringCollationEpisode converts the string episode format
+// to a collation. math.MaxUint32 means not a collation value.
+func KnownStringCollationEpisode(s string) uint32 {
+	if stringsx.Blank(s) {
+		return math.MaxUint32
+	}
+
+	s, ok := strings.CutPrefix(s, "S")
+	if !ok {
+		return math.MaxUint32
+	}
+
+	season, episode, ok := strings.Cut(s, "E")
+	if !ok {
+		return math.MaxUint32
+	}
+
+	snumeric, err := strconv.Atoi(season)
+	if err != nil {
+		return math.MaxUint32
+	}
+
+	enumeric, err := strconv.Atoi(episode)
+	if err != nil {
+		return math.MaxUint32
+	}
+
+	return KnownCollationEpisode(uint16(snumeric), uint16(enumeric))
+}
+
+// KnownCollationString converts a collation to the string episode format
+// (S01E02), the inverse of KnownStringCollationEpisode. The specials season
+// is rendered as S00. A collation of 0 (standalone/overall item) is blank.
+func KnownCollationString(collation uint32) string {
+	if collation == 0 {
+		return ""
+	}
+
+	season, episode := uint16(collation>>16), uint16(collation)
+	if season == KnownCollationSpecialsSeason {
+		season = 0
+	}
+
+	return fmt.Sprintf("S%02dE%02d", season, episode)
+}
+
+// KnownStringRelease converts the string release format (YYYY-MM-DD) to a
+// time, always in UTC. The zero time means not a release value.
+func KnownStringRelease(s string) time.Time {
+	ts, err := time.ParseInLocation(time.DateOnly, strings.TrimSpace(s), time.UTC)
+	if err != nil {
+		return time.Time{}
+	}
+
+	return ts.UTC()
+}
+
 func KnownOptionTestNoPoster(t *Known) {
 	t.PosterPath = ""
 	t.BackdropPath = ""
@@ -170,6 +231,60 @@ func KnownQueryLanguage(v string) squirrel.Sqlizer {
 	}
 
 	return squirrel.Expr("cache.library_known_media.original_language = ?", v)
+}
+
+func KnownQueryCollation(v uint32) squirrel.Sqlizer {
+	if v == math.MaxUint32 {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Expr("cache.library_known_media.\"collation\" = ?", v)
+}
+
+func KnownOrderSubtitleSimilarity(v string, cutoff float32) squirrel.Sqlizer {
+	if stringsx.Blank(v) {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Expr("(jaro_winkler_similarity(subtitle, ?, ?) + jaro_similarity(subtitle, ?, ?)) DESC", v, cutoff, v, cutoff)
+}
+
+func KnownOrderTitleSimilarity(v string, cutoff float32) squirrel.Sqlizer {
+	if stringsx.Blank(v) {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Expr("(jaro_winkler_similarity(title, ?, ?) + jaro_similarity(title, ?, ?)) DESC", v, cutoff, v, cutoff)
+}
+
+// KnownOrderParentUIDNilLast orders rows with a nil parent_uid (standalone
+// items, e.g. a show's own row) after rows that have a parent (e.g. episodes).
+func KnownOrderParentUIDNilLast() squirrel.Sqlizer {
+	return squirrel.Expr("(cache.library_known_media.parent_uid = ?) ASC", uuid.Nil.String())
+}
+
+// KnownOrderCollationNearest orders rows by ascending distance between their
+// collation and v. math.MaxUint32 means no target collation, which targets
+// collation 0 (the standalone/overall item) so those rows sort first.
+func KnownOrderCollationNearest(v uint32) squirrel.Sqlizer {
+	if v == math.MaxUint32 {
+		v = 0
+	}
+
+	// collation is unsigned, so widen before subtracting to avoid overflow.
+	return squirrel.Expr("abs(CAST(cache.library_known_media.\"collation\" AS BIGINT) - CAST(? AS BIGINT)) ASC", v)
+}
+
+// KnownOrderReleasedNearest orders rows by ascending distance between their
+// release timestamp and ts. A zero ts means no target release and yields an
+// empty clause; it must not be the first ordering part. Rows with an unknown
+// (infinite) release have no distance and sort last.
+func KnownOrderReleasedNearest(ts time.Time) squirrel.Sqlizer {
+	if ts.IsZero() {
+		return squirrelx.Noop{}
+	}
+
+	return squirrel.Expr("abs(date_diff('second', cache.library_known_media.released, ?)) ASC NULLS LAST", ts)
 }
 
 func KnownQueryMimetype(v string) squirrel.Sqlizer {

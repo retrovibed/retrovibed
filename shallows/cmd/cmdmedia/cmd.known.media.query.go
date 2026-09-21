@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/unsafepretty"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
@@ -66,21 +66,31 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			query = rec.Query
 		}
 
-		query, release, episode := library.ParseReleaseEpisode(query)
+		log.Println("clean result", unsafepretty.Print(query, unsafepretty.OptionDisplaySpaces()))
+		query, subquery, release, episode := library.ParseReleaseEpisode(query)
+		log.Printf("parsed title '%s'\n", query)
+		log.Printf("parsed episode '%s'\n", subquery)
+		log.Printf("parsed collation '%s'\n", episode)
+		log.Printf("parsed released '%s'\n", release)
 		query = library.StripHallucinations(rec.Query, query)
+		subquery = library.StripHallucinations(rec.Query, subquery)
+		log.Printf("stripped '%s' | '%s'\n", query, subquery)
 		query = lucenex.Clean(query)
-
 		log.Println("query cleaned", query, release, episode)
 		result := ScoredKnown{Relevance: t.MinRelevance}
+
+		collation := library.KnownStringCollationEpisode(episode)
 
 		{
 			q := library.KnownSearchBuilder().Where(squirrel.And{
 				library.KnownQueryExplicit(t.Explicit),
 				lucenex.Query(duckdbx.NewLucene(), query, lucenex.WithDefaultField("auto_description")),
-				// TEMPORARY: exclude episode rows (they share their show's
-				// title) until real episode-aware matching exists.
-				library.KnownQueryParentUID(uuid.Nil.String()),
-			}).OrderBy("title DESC").Limit(1028)
+			}).
+				OrderByClause(library.KnownOrderCollationNearest(collation)).
+				OrderByClause(library.KnownOrderReleasedNearest(library.KnownStringRelease(release))).
+				OrderByClause(library.KnownOrderTitleSimilarity(query, 0.7)).
+				OrderByClause(library.KnownOrderSubtitleSimilarity(subquery, 0.7)).
+				Limit(1028)
 
 			scanner := sqlx.Scan(library.KnownSearch(ctx, db, q))
 
@@ -94,7 +104,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 
 				if cur.Relevance > result.Relevance {
 					result = cur
-					log.Println(cur.Relevance, cur.UID, cur.Title, cur.Released)
+					log.Println(cur.Relevance, cur.UID, cur.Title, library.KnownCollationString(cur.Collation), cur.Subtitle, cur.Released)
 				}
 			}
 
@@ -104,21 +114,24 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 		}
 
 		if stringsx.Present(result.Title) {
-			log.Println("result", result.Relevance, result.UID, result.Title, result.Released, result.Mimetype)
+			log.Println("result", result.Relevance, result.UID, result.Title, library.KnownCollationString(result.Collation), result.Subtitle, result.Released, result.Mimetype)
 			continue
 		}
 
 		{
 			terms := strings.ReplaceAll(stringsx.CompactWhitespace(query), " ", " OR ")
+			log.Println("DERP DERP", terms)
 			q := library.KnownSearchBuilder().Where(squirrel.And{
 				library.KnownQueryExplicit(t.Explicit),
 				lucenex.Query(duckdbx.NewLucene(), terms, lucenex.WithDefaultField("title")),
-				// TEMPORARY: exclude episode rows (they share their show's
-				// title) until real episode-aware matching exists.
-				library.KnownQueryParentUID(uuid.Nil.String()),
-			}).Limit(1028)
+			}).
+				OrderByClause(library.KnownOrderCollationNearest(collation)).
+				OrderByClause(library.KnownOrderReleasedNearest(library.KnownStringRelease(release))).
+				OrderByClause(library.KnownOrderTitleSimilarity(query, 0.7)).
+				OrderByClause(library.KnownOrderSubtitleSimilarity(subquery, 0.7)).
+				Limit(1028)
 
-			scanner := sqlx.Scan(library.KnownSearch(ctx, db, q))
+			scanner := sqlx.Scan(library.KnownSearch(ctx, sqlx.Debug(db), q))
 
 			for v := range scanner.Iter() {
 				var cur = ScoredKnown{Known: v}
@@ -130,7 +143,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 
 				if cur.Relevance > result.Relevance {
 					result = cur
-					log.Println(cur.Relevance, cur.UID, cur.Title, cur.Released)
+					log.Println(cur.Relevance, cur.UID, cur.Title, library.KnownCollationString(cur.Collation), cur.Subtitle, cur.Released)
 				}
 			}
 
@@ -140,7 +153,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 		}
 
 		if stringsx.Present(result.Title) {
-			log.Println("result", result.Relevance, result.UID, result.Title, result.Released, result.Mimetype)
+			log.Println("result", result.Relevance, result.UID, result.Title, library.KnownCollationString(result.Collation), result.Subtitle, result.Released, result.Mimetype)
 		} else {
 			log.Println("no result found")
 		}

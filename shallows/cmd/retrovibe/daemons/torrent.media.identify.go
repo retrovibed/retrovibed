@@ -50,7 +50,7 @@ func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 			continue
 		}
 
-		title, _, _ := library.ParseReleaseEpisode(cleaned)
+		title, _, _, _ := library.ParseReleaseEpisode(cleaned)
 		title = library.StripHallucinations(md.Description, title)
 		title = lucenex.Clean(title)
 

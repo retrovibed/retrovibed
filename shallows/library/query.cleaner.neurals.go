@@ -68,44 +68,34 @@ func (t QueryerCleanerV0) Clean(_ context.Context, input string) (r string, err 
 }
 
 var (
-	reEpisode = regexp.MustCompile(`(?i)^(?:s\d{1,5}e\d{1,5}|ep\d{1,5}|e\d{1,5}|\d{1,5}x\d{1,5})$`)
+	reEpisode = regexp.MustCompile(`(?i)^s\d+e\d+$`)
 
-	reDate = regexp.MustCompile(`^(?:` +
-		`\d{3,5}[-/]\d{1,3}[-/]\d{1,3}` + // YYYY-MM-DD / YYYY/MM/DD (loose digit counts)
-		`|\d{1,3}[-/]\d{1,3}[-/]\d{3,5}` + // MM-DD-YYYY
-		`|\d{3,5}[-/]\d{1,3}` + // YYYY-MM
-		`|\d{1,3}/\d{3,5}` + // MM/YYYY
-		`|\d{3,5}` + // bare year
-		`)$`)
+	reDate = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
 )
 
-// ParseReleaseEpisode splits a cleaned/predicted media string into its
-// title remainder plus any trailing release-date and episode markers.
-// Matching is intentionally loose on digit counts: the source is neural
-// model output, not the synthetic generator, so a token like a year or
-// episode number may carry a spurious extra digit from a generation error.
-// Release always precedes episode, so the episode marker is only looked
-// for as the final token, and the release marker only immediately before it.
-func ParseReleaseEpisode(input string) (remaining, datish, episodish string) {
-	tokens := strings.FieldsFunc(input, func(r rune) bool { return r == '\n' })
-	if len(tokens) == 1 {
-		tokens = strings.Fields(input)
+// ParseReleaseEpisode splits a cleaned/predicted media string, formatted as
+// {input.literal}\n{media.episode}\n{input.subtitle}\n{media.release}, into
+// its parts. Empty fields are omitted from the output entirely (no blank
+// lines), so only the literal is guaranteed: it is always the first line,
+// the episode is only recognized as the line directly after it, and the
+// release only as the last line. Whatever remains between is the subtitle.
+func ParseReleaseEpisode(input string) (remaining, subtitle, datish, episodish string) {
+	lines := strings.FieldsFunc(input, func(r rune) bool { return r == '\n' })
+	if len(lines) == 0 {
+		return "", "", "", ""
 	}
 
-	end := len(tokens)
-	if end > 0 && reEpisode.MatchString(tokens[end-1]) {
-		episodish = tokens[end-1]
-		end--
+	remaining, lines = lines[0], lines[1:]
+
+	if len(lines) > 0 && reEpisode.MatchString(lines[0]) {
+		episodish, lines = lines[0], lines[1:]
 	}
 
-	if end > 0 && reDate.MatchString(tokens[end-1]) {
-		datish = tokens[end-1]
-		end--
+	if end := len(lines) - 1; end >= 0 && reDate.MatchString(lines[end]) {
+		datish, lines = lines[end], lines[:end]
 	}
 
-	remaining = strings.Join(tokens[:end], " ")
-
-	return remaining, datish, episodish
+	return remaining, strings.Join(lines, " "), datish, episodish
 }
 
 // removes any hallucinated strings from the title.
