@@ -342,16 +342,6 @@ func KnownQueryTombstoned() squirrel.Sqlizer {
 	return squirrel.Expr("cache.library_known_media.tombstoned_at < 'infinity'")
 }
 
-func DetectKnownMedia(ctx context.Context, db sqlx.Queryer, mimecat string, query string, similarity float32) (k Known, err error) {
-	k = Unknown()
-
-	if err := KnownBestMatch(ctx, db, mimecat, query, similarity).Scan(&k); sqlx.IgnoreNoRows(err) != nil {
-		return k, errorsx.Wrap(err, "unable to score")
-	}
-
-	return k, nil
-}
-
 // NewKnownMediaTombstonedCleanup purges known-media catalog rows (e.g. stale
 // TOFU placeholders from the discovery pipeline) once tombstoned.
 func NewKnownMediaTombstonedCleanup(ctx context.Context, q sqlx.Queryer) error {

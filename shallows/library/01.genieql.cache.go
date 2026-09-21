@@ -91,16 +91,6 @@ func KnownScoreByID(
 	gql = gql.Query(`SELECT (jaro_winkler_similarity(title, {terms}, {cutoff}) + jaro_similarity(title, {terms}, {cutoff})) / 2 AS relevance FROM cache.library_known_media WHERE uid = {uid}`)
 }
 
-func KnownBestMatch(
-	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, mime string, terms string, cutoff float32) NewKnownScannerStaticRow,
-) {
-	// TEMPORARY: parent_uid = nil uuid excludes episode rows (which share their
-	// show's title) from best-match scoring until real episode-aware matching
-	// exists; without it, a show and all its episodes tie on title similarity.
-	gql = gql.Query(`WITH scored AS (SELECT uid, {terms} as q, (jaro_winkler_similarity(title, q, {cutoff}) + jaro_similarity(title, q, {cutoff})) / 2 AS relevance FROM cache.library_known_media WHERE NOT adult AND ({mime} = '' OR mimetype = {mime}) AND parent_uid = '00000000-0000-0000-0000-000000000000' ORDER BY relevance DESC) SELECT ` + KnownScannerStaticColumns + ` FROM cache.library_known_media INNER JOIN scored ON cache.library_known_media.uid = scored.uid WHERE scored.relevance > {cutoff} ORDER BY scored.relevance DESC`)
-}
-
 func KnownTombstoneByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewKnownScannerStaticRow,

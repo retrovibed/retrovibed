@@ -8,7 +8,6 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
-	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -29,29 +28,12 @@ func IdentifyLibraryMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 
 	for md := range iter.Iter() {
 		var (
-			err     error
-			cleaned string
-			known   library.Known
+			err   error
+			known library.KnownScored
 		)
 
-		if cleaned, err = mc.Clean(ctx, md.Description); err != nil {
-			log.Println("unable to clean media for torrent", md.ID, md.Description, "|", cleaned, "|", err)
-			continue
-		} else if stringsx.Blank(cleaned) {
-			log.Println("unable to clean media for library - detected messy description ended up with blank", md.ID, md.Description, "|", "''", "|", err)
-			updated := md
-			updated.KnownMediaID = uuid.Nil.String()
-			if err = library.MetadataUpdate(ctx, db, md.ID, updated).Scan(&md); err != nil {
-				log.Println("unable to mark library media as unidentifiable", md.ID, err)
-			}
-			continue
-		}
-
-		title, _, _, _ := library.ParseReleaseEpisode(cleaned)
-		title = library.StripHallucinations(md.Description, title)
-		title = lucenex.Clean(title)
-
-		if known, err = library.DetectKnownMedia(ctx, db, mimex.Category(stringsx.FirstNonBlank(md.Mimetype, mimex.Binary)), title, library.KnownMatchCutoff); err != nil {
+		identifier := library.NewKnownIdentifier(db, mc, library.KnownIdentifierOptionMimetype(mimex.Category(stringsx.FirstNonBlank(md.Mimetype, mimex.Binary))))
+		if known, err = identifier.Identify(ctx, md.Description); err != nil {
 			log.Println("unable to detect known media for library media", md.ID, md.Description, "|", err)
 			continue
 		}

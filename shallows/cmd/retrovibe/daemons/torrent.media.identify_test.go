@@ -23,6 +23,7 @@ func TestTorrentMetadataIdentify(t *testing.T) {
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
 		known.Title = "The Grand Budapest Hotel"
+		library.KnownOptionAutoDescription(&known)
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		lmd := tracking.NewMetadata(

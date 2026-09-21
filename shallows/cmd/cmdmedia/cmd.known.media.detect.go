@@ -12,7 +12,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
-	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -50,18 +49,9 @@ func (t knowndetect) run(ctx context.Context, in io.Reader, db sqlx.Queryer, cle
 	for rec := range seq.Each(ctx) {
 		count++
 
-		query, err := cleaner.Clean(ctx, rec.Query)
-		if err != nil {
-			log.Println("unable to clean query", err)
-			query = rec.Query
-		}
-		query = lucenex.Clean(query)
+		identifier := library.NewKnownIdentifier(db, cleaner, library.KnownIdentifierOptionMimetype(mimex.Category(rec.Mimetype)))
 
-		if rec.Query != query {
-			log.Println("query cleaned", rec.Query, "->", query)
-		}
-
-		result, err := library.DetectKnownMedia(ctx, db, mimex.Category(rec.Mimetype), query, library.KnownMatchCutoff)
+		result, err := identifier.Identify(ctx, rec.Query)
 		if err != nil {
 			return err
 		}

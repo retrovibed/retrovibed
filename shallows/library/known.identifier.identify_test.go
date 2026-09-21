@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -33,7 +35,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		require.Greater(t, res.Relevance, 0.0)
 	})
 
-	t.Run("returns the zero value when nothing matches", func(t *testing.T) {
+	t.Run("returns the unknown media when nothing matches", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 		db := sqltestx.Metadatabase(t)
@@ -50,11 +52,11 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err := identifier.Identify(ctx, "xyzzy")
 		require.NoError(t, err)
-		require.Empty(t, res.UID)
+		require.Equal(t, uuid.Nil.String(), res.UID)
 		require.Zero(t, res.Relevance)
 	})
 
-	t.Run("returns the zero value when the catalog is empty", func(t *testing.T) {
+	t.Run("returns the unknown media when the catalog is empty", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 		db := sqltestx.Metadatabase(t)
@@ -65,7 +67,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err := identifier.Identify(ctx, "Inception")
 		require.NoError(t, err)
-		require.Empty(t, res.UID)
+		require.Equal(t, uuid.Nil.String(), res.UID)
 	})
 
 	t.Run("prefers the candidate with the highest relevance", func(t *testing.T) {
@@ -113,7 +115,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err := identifier.Identify(ctx, "Inception")
 		require.NoError(t, err)
-		require.Empty(t, res.UID)
+		require.Equal(t, uuid.Nil.String(), res.UID)
 	})
 
 	t.Run("excludes adult content unless explicit", func(t *testing.T) {
@@ -134,7 +136,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err := identifier.Identify(ctx, "Inception")
 		require.NoError(t, err)
-		require.Empty(t, res.UID)
+		require.Equal(t, uuid.Nil.String(), res.UID)
 
 		identifier.Explicit = true
 		res, err = identifier.Identify(ctx, "Inception")
@@ -212,5 +214,136 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		res, err := identifier.Identify(ctx, "Inception S01E02")
 		require.NoError(t, err)
 		require.Equal(t, expected.UID, res.UID)
+	})
+
+	t.Run("defaults the configuration", func(t *testing.T) {
+		identifier := library.NewKnownIdentifier(nil, library.QueryCleanerNoop())
+
+		require.Equal(t, float32(0.7), identifier.Cutoff)
+		require.Equal(t, float32(0.7), identifier.Threshold)
+		require.Equal(t, 0.85, identifier.MinRelevance)
+		require.Equal(t, uint(8), identifier.Limit)
+		require.False(t, identifier.Explicit)
+		require.Empty(t, identifier.Mimetype)
+	})
+
+	t.Run("options override the defaults", func(t *testing.T) {
+		identifier := library.NewKnownIdentifier(nil, library.QueryCleanerNoop(), func(t *library.KnownIdentifier) {
+			t.Limit = 2
+			t.Mimetype = mimex.Audio
+		})
+
+		require.Equal(t, uint(2), identifier.Limit)
+		require.Equal(t, mimex.Audio, identifier.Mimetype)
+		require.Equal(t, float32(0.7), identifier.Cutoff)
+	})
+
+	t.Run("restricts candidates to the mimetype unless blank", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Application)))
+		known.Title = "Inception"
+		library.KnownOptionAutoDescription(&known)
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
+
+		identifier := library.NewKnownIdentifier(db, library.QueryCleanerNoop())
+
+		identifier.Mimetype = mimex.Application
+		res, err := identifier.Identify(ctx, "Inception")
+		require.NoError(t, err)
+		require.Equal(t, known.UID, res.UID)
+
+		identifier.Mimetype = mimex.Audio
+		res, err = identifier.Identify(ctx, "Inception")
+		require.NoError(t, err)
+		require.Equal(t, uuid.Nil.String(), res.UID)
+
+		identifier.Mimetype = ""
+		res, err = identifier.Identify(ctx, "Inception")
+		require.NoError(t, err)
+		require.Equal(t, known.UID, res.UID)
+	})
+
+	t.Run("only scores candidates within the limit", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		// decoys share the standalone collation the search targets, so they are ordered ahead of the
+		// best match despite being far weaker matches.
+		for range 8 {
+			var decoy library.Known
+			require.NoError(t, testx.Fake(&decoy, library.KnownOptionTestDefaults, library.KnownOptionCollation(0)))
+			decoy.Title = "Zzzzz"
+			decoy.OriginalTitle = "Zzzzz"
+			decoy.Overview = "a film that mentions Inception in passing"
+			library.KnownOptionAutoDescription(&decoy)
+			require.NoError(t, library.KnownInsertWithDefaults(ctx, db, decoy).Scan(&decoy))
+		}
+
+		var best library.Known
+		require.NoError(t, testx.Fake(&best, library.KnownOptionTestDefaults, library.KnownOptionCollation(library.KnownCollationEpisode(1, 1))))
+		best.Title = "Inception"
+		library.KnownOptionAutoDescription(&best)
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, best).Scan(&best))
+
+		identifier := library.NewKnownIdentifier(db, library.QueryCleanerNoop())
+
+		res, err := identifier.Identify(ctx, "Inception")
+		require.NoError(t, err)
+		require.Equal(t, uuid.Nil.String(), res.UID)
+
+		identifier.Limit = 9
+		res, err = identifier.Identify(ctx, "Inception")
+		require.NoError(t, err)
+		require.Equal(t, best.UID, res.UID)
+	})
+
+	t.Run("mimetype option restricts candidates to the mimetype", func(t *testing.T) {
+		identifier := library.NewKnownIdentifier(nil, library.QueryCleanerNoop(), library.KnownIdentifierOptionMimetype(mimex.Video))
+
+		require.Equal(t, mimex.Video, identifier.Mimetype)
+	})
+
+	t.Run("does not search when the cleaner blanks the input", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		cleaner := library.NewQueryCleanerFn(func(string) string { return "" })
+		// the nil queryer fails any attempt to query the catalog.
+		identifier := library.NewKnownIdentifier(nil, cleaner)
+
+		res, err := identifier.Identify(ctx, "Inception")
+		require.NoError(t, err)
+		require.Equal(t, uuid.Nil.String(), res.UID)
+	})
+
+	t.Run("identifies a candidate ranked behind weaker candidates within the limit", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		var decoy library.Known
+		require.NoError(t, testx.Fake(&decoy, library.KnownOptionTestDefaults, library.KnownOptionCollation(0)))
+		decoy.Title = "Zzzzz"
+		decoy.OriginalTitle = "Zzzzz"
+		decoy.Overview = "a film that mentions Inception in passing"
+		library.KnownOptionAutoDescription(&decoy)
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, decoy).Scan(&decoy))
+
+		var best library.Known
+		require.NoError(t, testx.Fake(&best, library.KnownOptionTestDefaults, library.KnownOptionCollation(library.KnownCollationEpisode(1, 1))))
+		best.Title = "Inception"
+		library.KnownOptionAutoDescription(&best)
+		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, best).Scan(&best))
+
+		identifier := library.NewKnownIdentifier(db, library.QueryCleanerNoop())
+
+		res, err := identifier.Identify(ctx, "Inception")
+		require.NoError(t, err)
+		require.Equal(t, best.UID, res.UID)
 	})
 }

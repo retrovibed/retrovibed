@@ -11,10 +11,10 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
+	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
-	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
@@ -106,12 +106,11 @@ func (t *knownSeq) Err() error {
 
 // KnownMediaDetector builds a DiscoverOptionDetectMedia transform: for every
 // Discovered candidate that doesn't already carry a known-media-id, it
-// cleans the candidate's own Title through mc and lucenex.Clean, strips any
-// trailing release/episode tokens via library.ParseReleaseEpisode, and looks
-// up the remaining title via library.DetectKnownMedia - stamping a match
-// onto the candidate before it's yielded. Unlike KnownStrategy (which
-// matches the raw, uncleaned request query and yields its own catalog-only
-// candidates), this enriches candidates already produced by other
+// identifies the candidate's own Title (cleaned through mc) against the
+// catalog via library.KnownIdentifier, restricted to the candidate's mimetype
+// category - stamping a match onto the candidate before it's yielded. Unlike
+// KnownStrategy (which matches the raw, uncleaned request query and yields
+// its own catalog-only candidates), this enriches candidates already produced by other
 // strategies (e.g. plugin/peertube hits) that don't know their own catalog
 // match.
 func KnownMediaDetector(q sqlx.Queryer, mc library.QueryCleaner) func(iterx.Seq[Discovered]) iterx.Seq[Discovered] {
@@ -134,25 +133,19 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				return d, errorsx.Errorf("unable to identify media missing title")
 			}
 
-			cleaned, err := t.mc.Clean(ctx, d.Title)
-			if err != nil {
-				return d, errorsx.Wrapf(err, "unable to clean title: %s", d.Title)
-			}
+			// known media stores the coarse mimetype category, see Generalize.
+			identifier := library.NewKnownIdentifier(t.q, t.mc, library.KnownIdentifierOptionMimetype(mimex.Category(Generalize(d.Mimetype))))
 
-			title, _, _, _ := library.ParseReleaseEpisode(cleaned)
-			title = library.StripHallucinations(d.Title, title)
-			title = lucenex.Clean(title)
-
-			known, err := library.DetectKnownMedia(ctx, t.q, d.Mimetype, title, library.KnownMatchCutoff)
+			known, err := identifier.Identify(ctx, d.Title)
 			if err != nil {
 				return d, errorsx.Wrap(err, "unable to detect known media")
 			}
 
 			if !uuidx.IsMinMax(uuid.FromStringOrNil(known.UID)) {
-				log.Println("known media", cleaned, "->", title, spew.Sdump(known))
+				log.Println("known media", d.Title, "->", spew.Sdump(known))
 				d.KnownMediaID = known.UID
 			} else {
-				log.Println("unknown media", cleaned, "->", title)
+				log.Println("unknown media", d.Title)
 			}
 
 			return d, nil

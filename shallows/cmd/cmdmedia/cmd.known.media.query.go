@@ -10,12 +10,13 @@ import (
 	"os"
 	"text/tabwriter"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
-	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
@@ -59,7 +60,6 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 
 	identifier := library.NewKnownIdentifier(db, cleaner)
 	identifier.Cutoff = t.Cutoff
-	identifier.Threshold = 0.7
 	identifier.MinRelevance = t.MinRelevance
 	identifier.Explicit = t.Explicit
 
@@ -71,7 +71,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			tw  = tabwriter.NewWriter(&buf, 1, 0, 2, ' ', 0)
 		)
 
-		if stringsx.Present(rpt.Result.UID) {
+		if !uuidx.IsMinMax(uuid.FromStringOrNil(rpt.Result.UID)) {
 			c.Compact(fmt.Fprintf(tw, "\n--------------------- result found ---------------------\n"))
 			c.Compact(fmt.Fprintf(tw, "input:\t%s\n", rpt.Input))
 			c.Compact(fmt.Fprintf(tw, "result relevance:\t%v\n", rpt.Result.Relevance))

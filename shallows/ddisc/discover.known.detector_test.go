@@ -25,6 +25,7 @@ func TestKnownMediaDetector(t *testing.T) {
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
 		known.Title = "The Grand Budapest Hotel"
+		library.KnownOptionAutoDescription(&known)
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		id := int160.Random()
@@ -79,6 +80,7 @@ func TestKnownMediaDetector(t *testing.T) {
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionMimetype(mimex.Video)))
 		known.Title = "The Grand Budapest Hotel"
+		library.KnownOptionAutoDescription(&known)
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		failingID := int160.Random()
