@@ -18,6 +18,7 @@ type Pool[T any] struct {
 	async    func(ctx context.Context, w T) error
 	queued   chan pending
 	failed   atomic.Pointer[error]
+	closed   sync.Once // guards closing queued so Close is idempotent
 }
 
 func (t *Pool[T]) Run(ctx context.Context, w T) error {
@@ -30,7 +31,7 @@ func (t *Pool[T]) Run(ctx context.Context, w T) error {
 }
 
 func (t *Pool[T]) Close() error {
-	close(t.queued)
+	t.closed.Do(func() { close(t.queued) })
 	t.shutdown.Wait()
 	return langx.Zero(t.failed.Load())
 }
