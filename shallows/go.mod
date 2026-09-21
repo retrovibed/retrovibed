@@ -26,7 +26,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
-	github.com/grindlemire/go-lucene v0.0.33
+	github.com/grindlemire/go-lucene v0.2.1
 	github.com/hashicorp/mdns v1.0.6
 	github.com/james-lawrence/genieql v0.0.0-20260917171911-8038e3e1d315
 	github.com/james-lawrence/torrent v0.0.0-20260920183043-a66f94c3283c
