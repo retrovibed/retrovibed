@@ -51,14 +51,17 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
     final elapsed = now.difference(_sampled);
     if (elapsed < _rateInterval) return;
 
-    rate = math.max(0, ((v.downloaded.toInt() - _sampledBytes) * Duration.microsecondsPerSecond / elapsed.inMicroseconds).round());
+    rate = math.max(
+      0,
+      ((v.downloaded.toInt() - _sampledBytes) * Duration.microsecondsPerSecond / elapsed.inMicroseconds).round(),
+    );
     _sampled = now;
     _sampledBytes = v.downloaded.toInt();
   }
 
   void _maybeNotifyCompleted() {
     if (_notifiedCompleted || !api.download.completed(current)) return;
-    print("notified completed ${_notifiedCompleted} ${api.download.completed(current)} ${current}");
+    print("notified completed ${_notifiedCompleted} ${api.download.completed(current)}");
     _notifiedCompleted = true;
     widget.onCompleted(current);
   }

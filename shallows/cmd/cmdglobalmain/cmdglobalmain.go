@@ -166,7 +166,7 @@ func Main(args ...string) {
 		log.Fatalln(err)
 		return
 	}
-	defer shellcli.Trace.Close()
+	defer shellcli.Trace.Close() // nolint: staticcheck
 
 	if err = errorsx.LogErr(ctx.Run()); err != nil {
 		shellcli.Shutdown()
