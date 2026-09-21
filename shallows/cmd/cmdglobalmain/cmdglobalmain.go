@@ -55,7 +55,8 @@ func Main(args ...string) {
 		cmdopts.PeerID
 		cmdopts.SSHID
 		cmdopts.Endpoint
-		Version   cmdopts.Version        `cmd:"" help:"display versioning information"`
+		cmdopts.Trace
+		Version  cmdopts.Version        `cmd:"" help:"display versioning information"`
 		Identity  cmdmeta.Identity       `cmd:"" help:"identity management commands"`
 		Cloud     cmdmeta.Cloud          `cmd:"" name:"cloud" help:"retrovibe.space cloud service commands"`
 		U12t      cmdmeta.Usermanagement `cmd:"" name:"u12t" help:"user management commands"`
@@ -136,6 +137,7 @@ func Main(args ...string) {
 			"env_auto_backup":                   env.AutoBackup,
 			"env_backup_frequency":              env.BackupFrequency,
 			"env_auto_reclaim":                  env.AutoReclaim,
+			"env_trace":                         env.Trace,
 			"vars_gdx_socket":                   gdxpath,
 			"vars_gdx_default_output":           "-",
 		},
@@ -164,6 +166,7 @@ func Main(args ...string) {
 		log.Fatalln(err)
 		return
 	}
+	defer shellcli.Trace.Close()
 
 	if err = errorsx.LogErr(ctx.Run()); err != nil {
 		shellcli.Shutdown()

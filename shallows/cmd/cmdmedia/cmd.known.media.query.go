@@ -8,18 +8,13 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
 	"text/tabwriter"
 
-	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/fsx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
-	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
-	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -55,26 +50,18 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 		Query string `json:"query"`
 	}
 
-	type ScoredKnown struct {
-		library.Known
-		Relevance float64
-	}
-
-	// report carries the parsing stages of a query alongside its result so the printer can log them together.
 	type report struct {
-		Input     string
-		Lucene    string
-		Cleaned   string
-		Title     string
-		Subtitle  string
-		Collation string
-		Released  string
-		Query     string
-		Subquery  string
-		Result    ScoredKnown
+		Input  string
+		Result library.KnownScored
 	}
 
 	var count, matched uint
+
+	identifier := library.NewKnownIdentifier(db, cleaner)
+	identifier.Cutoff = t.Cutoff
+	identifier.Threshold = 0.7
+	identifier.MinRelevance = t.MinRelevance
+	identifier.Explicit = t.Explicit
 
 	// single worker so results are reported serially, matched is only touched by this worker until shutdown.
 	printer := asynccompute.New(func(ctx context.Context, rpt report) error {
@@ -84,13 +71,9 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			tw  = tabwriter.NewWriter(&buf, 1, 0, 2, ' ', 0)
 		)
 
-		if stringsx.Present(rpt.Result.Title) {
+		if stringsx.Present(rpt.Result.UID) {
 			c.Compact(fmt.Fprintf(tw, "\n--------------------- result found ---------------------\n"))
 			c.Compact(fmt.Fprintf(tw, "input:\t%s\n", rpt.Input))
-			c.Compact(fmt.Fprintf(tw, "parsed title:\t'%s'\n", rpt.Title))
-			c.Compact(fmt.Fprintf(tw, "parsed episode:\t'%s'\n", rpt.Subtitle))
-			c.Compact(fmt.Fprintf(tw, "parsed collation:\t'%s'\n", rpt.Collation))
-			c.Compact(fmt.Fprintf(tw, "parsed released:\t'%s'\n", rpt.Released))
 			c.Compact(fmt.Fprintf(tw, "result relevance:\t%v\n", rpt.Result.Relevance))
 			c.Compact(fmt.Fprintf(tw, "result uid:\t%s\n", rpt.Result.UID))
 			c.Compact(fmt.Fprintf(tw, "result title:\t%s\n", rpt.Result.Title))
@@ -103,12 +86,6 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 		} else {
 			c.Compact(fmt.Fprintf(tw, "\n-------------------- no result found -------------------\n"))
 			c.Compact(fmt.Fprintf(tw, "input:\t'%s'\n", rpt.Input))
-			c.Compact(fmt.Fprintf(tw, "lucene:\t'%s'\n", rpt.Lucene))
-			c.Compact(fmt.Fprintf(tw, "parsed title:\t'%s'\n", rpt.Title))
-			c.Compact(fmt.Fprintf(tw, "parsed episode:\t'%s'\n", rpt.Subtitle))
-			c.Compact(fmt.Fprintf(tw, "parsed collation:\t'%s'\n", rpt.Collation))
-			c.Compact(fmt.Fprintf(tw, "parsed released:\t'%s'\n", rpt.Released))
-			c.Compact(fmt.Fprintf(tw, "stripped:\t'%s' | '%s'\n", rpt.Query, rpt.Subquery))
 			c.Compact(fmt.Fprintf(tw, "--------------------------------------------------------\n"))
 		}
 
@@ -123,99 +100,13 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 	}, asynccompute.Backlog[report](t.Backlog), asynccompute.Workers[report](1))
 
 	queries := asynccompute.New(func(ctx context.Context, rec input) (err error) {
-		var (
-			cleaned, query, subquery, release, episode string
-		)
+		var res library.KnownScored
 
-		if cleaned, err = cleaner.Clean(ctx, rec.Query); err != nil {
-			log.Println("unable to clean query", err)
-			query = rec.Query
-		} else {
-			query, subquery, release, episode = library.ParseReleaseEpisode(cleaned)
+		if res, err = identifier.Identify(ctx, rec.Query); err != nil {
+			return err
 		}
 
-		collation := library.KnownStringCollationEpisode(episode)
-		rpt := report{
-			Input:     rec.Query,
-			Cleaned:   cleaned,
-			Title:     query,
-			Subtitle:  subquery,
-			Collation: episode,
-			Released:  release,
-			Lucene:    lucenex.Clean(query),
-			Query:     library.StripHallucinations(rec.Query, query),
-			Subquery:  library.StripHallucinations(rec.Query, subquery),
-			Result:    ScoredKnown{Relevance: t.MinRelevance},
-		}
-
-		{
-			q := library.KnownSearchBuilder().Where(squirrel.And{
-				library.KnownQueryExplicit(t.Explicit),
-				lucenex.Query(duckdbx.NewLucene(), rpt.Lucene, lucenex.WithDefaultField("auto_description")),
-			}).
-				OrderByClause(library.KnownOrderCollationNearest(collation)).
-				OrderByClause(library.KnownOrderReleasedNearest(library.KnownStringRelease(release))).
-				OrderByClause(library.KnownOrderTitleSimilarity(rpt.Query, 0.7)).
-				OrderByClause(library.KnownOrderSubtitleSimilarity(rpt.Subquery, 0.7)).
-				Limit(1028)
-
-			scanner := sqlx.Scan(library.KnownSearch(ctx, db, q))
-
-			for v := range scanner.Iter() {
-				var cur = ScoredKnown{Known: v}
-
-				if err := library.KnownScoreByID(ctx, db, v.UID, rpt.Query, t.Cutoff).Scan(&cur.Relevance); err != nil {
-					log.Println("unable to score", v.UID, err)
-					continue
-				}
-
-				if cur.Relevance > rpt.Result.Relevance {
-					rpt.Result = cur
-				}
-			}
-
-			if err := scanner.Err(); err != nil {
-				return err
-			}
-		}
-
-		if stringsx.Present(rpt.Result.Title) {
-			return printer.Run(ctx, rpt)
-		}
-
-		{
-			terms := strings.ReplaceAll(stringsx.CompactWhitespace(rpt.Lucene), " ", " OR ")
-			q := library.KnownSearchBuilder().Where(squirrel.And{
-				library.KnownQueryExplicit(t.Explicit),
-				lucenex.Query(duckdbx.NewLucene(), terms, lucenex.WithDefaultField("title")),
-			}).
-				OrderByClause(library.KnownOrderCollationNearest(collation)).
-				OrderByClause(library.KnownOrderReleasedNearest(library.KnownStringRelease(release))).
-				OrderByClause(library.KnownOrderTitleSimilarity(rpt.Query, 0.7)).
-				OrderByClause(library.KnownOrderSubtitleSimilarity(rpt.Subquery, 0.7)).
-				Limit(1028)
-
-			scanner := sqlx.Scan(library.KnownSearch(ctx, db, q))
-
-			for v := range scanner.Iter() {
-				var cur = ScoredKnown{Known: v}
-
-				if err := library.KnownScoreByID(ctx, db, v.UID, rpt.Query, t.Cutoff).Scan(&cur.Relevance); err != nil {
-					log.Println("unable to score", v.UID, err)
-					continue
-				}
-
-				if cur.Relevance > rpt.Result.Relevance {
-					rpt.Result = cur
-				}
-			}
-
-			if err := scanner.Err(); err != nil {
-				return err
-			}
-		}
-
-		return printer.Run(ctx, rpt)
+		return printer.Run(ctx, report{Input: rec.Query, Result: res})
 	}, asynccompute.Backlog[input](t.Backlog), asynccompute.Workers[input](t.Workers))
 
 	defer func() {

@@ -75,6 +75,7 @@ const (
 	DDiscBackgroundFrequency   = "RETROVIBED_DDISC_BACKGROUND_FREQUENCY"       // how frequently to push work into the queue.
 	DDiscBackgroundWorkers     = "RETROVIBED_DDISC_BACKGROUND_WORKERS"         // number of identifying workers
 	LoggingVerbosity           = "RETROVIBED_LOGGING_VERBOSITY"                // controls logging verbosity level
+	Trace                      = "RETROVIBED_TRACE"                            // enable/disable recording a runtime trace for the entire run. strconv.ParseBool
 )
 
 var v = sync.OnceValue(func() []byte {
