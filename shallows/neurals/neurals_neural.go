@@ -14,18 +14,10 @@ import "C"
 
 import (
 	"fmt"
-	"log"
 	"unsafe"
 )
 
 func predict(t *Text, input string) (res string, err error) {
-	log.Println("-----------------------------------------------------------------------")
-	defer func() {
-		if err != nil {
-			return
-		}
-		log.Println("cleaned", input, "->", res)
-	}()
 	cModel := C.CString(t.model)
 	defer C.free(unsafe.Pointer(cModel))
 	cInput := C.CString(input)
