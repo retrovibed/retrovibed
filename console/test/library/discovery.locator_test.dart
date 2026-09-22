@@ -26,29 +26,6 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('declining the p2p prompt never calls locate', (tester) async {
-      bool locateCalled = false;
-      await tester.pumpApp(
-        DiscoveryLocator(
-          query: 'ubuntu',
-          mimetype: 'video',
-          onFound: (located) async => const SizedBox.shrink(),
-          ensureP2P: (context, {options = const []}) async => false,
-          locate: (req, {options = const []}) async {
-            locateCalled = true;
-            return api.LocateCreateResponse(locate: req);
-          },
-        ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.byType(ds.Card));
-      await tester.pumpAndSettle();
-
-      expect(locateCalled, isFalse);
-      expect(tester.takeException(), isNull);
-      expect(find.byIcon(Icons.travel_explore_rounded), findsOneWidget);
-    });
-
     testWidgets('tapping locates with the query and mimetype and switches to pending', (tester) async {
       api.Locate? requested;
       await tester.pumpApp(
@@ -56,7 +33,6 @@ void main() {
           query: 'ubuntu',
           mimetype: 'video',
           onFound: (located) async => const SizedBox.shrink(),
-          ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async {
             requested = req;
             return api.LocateCreateResponse(locate: (req..id = 'locate-1'));
@@ -82,7 +58,6 @@ void main() {
           mimetype: 'video',
           adult: true,
           onFound: (located) async => const SizedBox.shrink(),
-          ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async {
             requested = req;
             return api.LocateCreateResponse(locate: (req..id = 'locate-1'));
@@ -102,7 +77,6 @@ void main() {
           query: 'ubuntu',
           mimetype: 'video',
           onFound: (located) async => const SizedBox.shrink(),
-          ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) => Future.error('boom'),
         ),
       );
@@ -120,7 +94,6 @@ void main() {
           query: 'ubuntu',
           mimetype: 'video',
           onFound: (located) async => const SizedBox.shrink(),
-          ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) async {
             lookupCalls++;
@@ -160,7 +133,6 @@ void main() {
               child: KnownMediaLocator.future(Future.value(found)),
             );
           },
-          ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) async {
             lookupCalls++;
@@ -203,7 +175,6 @@ void main() {
           query: 'ubuntu',
           mimetype: 'video',
           onFound: (located) async => Text('failed to load ${located.locatedTorrentId}'),
-          ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) async {
             lookupCalls++;
@@ -234,7 +205,6 @@ void main() {
           query: 'ubuntu',
           mimetype: 'video',
           onFound: (located) async => const SizedBox.shrink(),
-          ensureP2P: (context, {options = const []}) async => true,
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: (req..id = 'locate-1')),
           lookup: (id, {options = const []}) {
             lookupCalls++;

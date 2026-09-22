@@ -5,7 +5,6 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/library/api.dart' as api;
-import 'locate.p2p.prompt.dart' as p2p;
 
 // SearchButton requests the peer-to-peer network locate media matching the
 // current library search state - the free-text analog of KnownMediaLocator,
@@ -29,24 +28,18 @@ class SearchButton extends StatefulWidget {
   State<SearchButton> createState() => _SearchButtonState();
 }
 
-class _SearchButtonState extends State<SearchButton> {
+class _SearchButtonState extends State<SearchButton> with ds.LoadingState {
   bool _queued = false;
-  Widget _cause = ds.Error.zero;
 
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
+  @override
+  void initState() {
+    super.initState();
+    loading = false;
   }
 
   Future<void> _onPressed() async {
     setState(() {
-      _cause = ds.Error.zero;
+      cause = ds.Error.zero;
     });
 
     final query = widget.search.next.query.trim();
@@ -54,10 +47,8 @@ class _SearchButtonState extends State<SearchButton> {
     if (query.isEmpty || mimetype.isEmpty) return;
 
     final options = [authn.request(authn.AuthzCache.meta(context))];
-    final proceed = await p2p.ensureP2P(context, options: options);
-    if (!proceed) return;
 
-    widget
+    await widget
         .locate(
           api.Locate.create()
             ..query = query
@@ -71,7 +62,7 @@ class _SearchButtonState extends State<SearchButton> {
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: reseterr);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         });
   }
@@ -103,7 +94,7 @@ class _SearchButtonState extends State<SearchButton> {
 
     return ds.Help(
       ds.Loading(
-        cause: _cause,
+        cause: cause,
         btn,
       ),
       ds.Hint(Text("adds the search to background discovery to generate recommendations")),

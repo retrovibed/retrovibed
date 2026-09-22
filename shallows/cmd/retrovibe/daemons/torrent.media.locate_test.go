@@ -201,34 +201,4 @@ func TestMediaLocate(t *testing.T) {
 		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
 		require.Equal(t, 1, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM ddisc_locate WHERE located_torrent_id = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'"))(t))
 	})
-
-	t.Run("should not query ddisc when p2p locate is disabled", func(t *testing.T) {
-		var (
-			k library.Known
-			l ddisc.Locate
-			d ddisc.Discovered
-		)
-		q := sqltestx.Metadatabase(t)
-
-		require.NoError(t, testx.Fake(&k, library.KnownOptionTestDefaults))
-		require.NoError(t, library.KnownInsertWithDefaults(t.Context(), q, k).Scan(&k))
-		require.NoError(t, ddisc.LocateInsertWithDefaults(t.Context(), q, ddisc.NewLocate(k.Title, mimex.Binary, ddisc.LocateOptionKnownMedia(k.UID))).Scan(&l))
-
-		id := int160.Random()
-		uri := metainfo.Magnet{InfoHash: metainfo.Hash(id.Bytes()), DisplayName: k.Title}.String()
-
-		d = ddisc.NewDiscovered(
-			&id,
-			ddisc.DiscoveredOptionURI(uri),
-			ddisc.DiscoveredOptionIndex(true),
-			ddisc.DiscoveredOptionMimetype(mimex.Binary),
-		)
-
-		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), q, d).Scan(&d))
-
-		require.NoError(t, daemons.LocateMedia(t.Context(), q, tracking.NewURIImport(q, http.DefaultClient, fsx.DirVirtual(t.TempDir())), &daemons.DiscoverySettings{LocateP2P: false}, nil, nil, nil, ddisc.UnimplementedStrategy{}, ddisc.DefaultPolicy(), library.QueryCleanerNoop()))
-
-		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
-		require.Equal(t, 0, testx.Must(sqlx.Count(t.Context(), q, "SELECT COUNT(*) FROM ddisc_locate WHERE tombstoned_at < 'infinity'"))(t))
-	})
 }

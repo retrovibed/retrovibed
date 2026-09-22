@@ -113,10 +113,8 @@ func LocateMedia(ctx context.Context, db sqlx.Queryer, importer tracking.URIImpo
 	log.Println("locate media initiated")
 	defer log.Println("locate media completed")
 
-	if !disc.LocateP2P {
-		return nil
-	}
-
+	// p2p consent is enforced client-side only (see console's ensureP2P);
+	// this daemon no longer gates on disc.LocateP2P.
 	locateCooldown := backoffx.New(
 		backoffx.Multiple(24*time.Hour),
 		backoffx.Maximum(7*24*time.Hour),

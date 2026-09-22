@@ -1,5 +1,9 @@
 void fnNoop<T>(T v) {}
 
+Future<T> fnAsyncPassthrough<T>(T v) {
+  return Future.value(v);
+}
+
 Future<void> fnAsyncNoop() {
   return Future.value();
 }

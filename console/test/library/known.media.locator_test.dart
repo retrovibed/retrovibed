@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/ddisc.dart' as ddisc;
+import 'package:retrovibed/discovery/locate.p2p.prompt.dart' as p2p;
 import 'package:retrovibed/library/known.media.locator.dart';
 import 'package:retrovibed/library/known.media.card.dart';
 import 'package:retrovibed/library/api.dart' as api;
@@ -35,7 +36,7 @@ void main() {
       await tester.pumpApp(
         KnownMediaLocator(
           item,
-          ensureP2P: (context, {options = const []}) async => true,
+          ensureP2P: (context, {options = const []}) async {},
           locate: (req, {options = const []}) async {
             requested = req;
             return api.LocateCreateResponse(locate: req);
@@ -49,13 +50,61 @@ void main() {
       expect(requested?.knownMediaId, equals(item.uid));
     });
 
+    testWidgets('locate does not prompt for p2p consent', (tester) async {
+      api.Locate? requested;
+      bool ensureP2PCalled = false;
+      final item = api.Known(id: 'row-1', uid: 'known-1', description: 'Test', summary: 'summary');
+      await tester.pumpApp(
+        KnownMediaLocator(
+          item,
+          ensureP2P: (context, {options = const []}) {
+            ensureP2PCalled = true;
+            return Future.error(const p2p.P2PConsentDeclined());
+          },
+          locate: (req, {options = const []}) async {
+            requested = req;
+            return api.LocateCreateResponse(locate: req);
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(KnownMediaCard));
+      await tester.pumpAndSettle();
+
+      expect(ensureP2PCalled, isFalse);
+      expect(requested?.knownMediaId, equals(item.uid));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('a declined p2p consent blocks download and shows no error', (tester) async {
+      bool downloadCalled = false;
+      final item =
+          api.Known(id: 'known-1', uid: 'known-1', description: 'Test', summary: 'summary', source: ddisc.sources.discovered);
+      await tester.pumpApp(
+        KnownMediaLocator(
+          item,
+          ensureP2P: (context, {options = const []}) => Future.error(const p2p.P2PConsentDeclined()),
+          download: (id, {options = const []}) async {
+            downloadCalled = true;
+            return ddisc.DiscoveryDownloadResponse.create();
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(KnownMediaCard));
+      await tester.pumpAndSettle();
+
+      expect(downloadCalled, isFalse);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('tapping forwards the known item adult flag', (tester) async {
       api.Locate? requested;
       final item = api.Known(id: 'row-1', uid: 'known-1', description: 'Test', summary: 'summary', adult: true);
       await tester.pumpApp(
         KnownMediaLocator(
           item,
-          ensureP2P: (context, {options = const []}) async => true,
+          ensureP2P: (context, {options = const []}) async {},
           locate: (req, {options = const []}) async {
             requested = req;
             return api.LocateCreateResponse(locate: req);
@@ -74,7 +123,7 @@ void main() {
       await tester.pumpApp(
         KnownMediaLocator(
           item,
-          ensureP2P: (context, {options = const []}) async => true,
+          ensureP2P: (context, {options = const []}) async {},
           locate: (req, {options = const []}) => Future.error('boom'),
         ),
       );
@@ -92,7 +141,7 @@ void main() {
         KnownMediaLocator(
           item,
           onChange: (v) => onChangeCalled = true,
-          ensureP2P: (context, {options = const []}) async => true,
+          ensureP2P: (context, {options = const []}) async {},
           locate: (req, {options = const []}) async => api.LocateCreateResponse(locate: req),
           delete: (id, {options = const []}) => Future.error(http.Response('', 404)),
         ),
@@ -113,7 +162,7 @@ void main() {
       await tester.pumpApp(
         KnownMediaLocator(
           item,
-          ensureP2P: (context, {options = const []}) async => true,
+          ensureP2P: (context, {options = const []}) async {},
           download: (id, {options = const []}) async {
             downloadedId = id;
             return ddisc.DiscoveryDownloadResponse.create();
@@ -146,7 +195,7 @@ void main() {
       await tester.pumpApp(
         KnownMediaLocator(
           item,
-          ensureP2P: (context, {options = const []}) async => true,
+          ensureP2P: (context, {options = const []}) async {},
           download: (id, {options = const []}) async {
             downloadedId = id;
             return ddisc.DiscoveryDownloadResponse.create();
@@ -173,7 +222,7 @@ void main() {
         KnownMediaLocator(
           item,
           onChange: (v) => onChangeCalled = true,
-          ensureP2P: (context, {options = const []}) async => true,
+          ensureP2P: (context, {options = const []}) async {},
           download: (id, {options = const []}) async => ddisc.DiscoveryDownloadResponse.create(),
           delete: (id, {options = const []}) => Future.error(http.Response('', 404)),
         ),

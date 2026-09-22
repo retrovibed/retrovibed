@@ -11,7 +11,7 @@ class KnownMediaLocator extends StatefulWidget {
   final api.Known current;
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
   final Future<ddisc.DiscoveryDownloadResponse> Function(String id, {List<httpx.Option> options}) download;
-  final Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P;
+  final Future<void> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P;
   final Future<api.RecommendationDeleteResponse> Function(String id, {List<httpx.Option> options}) delete;
   final void Function(api.Known? v) onChange;
   final IconData icon;
@@ -37,7 +37,7 @@ class KnownMediaLocator extends StatefulWidget {
     Future<api.Known> pending, {
     Key? key,
     void Function(api.Known? v) onChange = ds.fnNoop,
-    Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P = disc.ensureP2P,
+    Future<void> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P = disc.ensureP2P,
     Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate = api.locate.create,
     Future<ddisc.DiscoveryDownloadResponse> Function(String id, {List<httpx.Option> options}) download =
         ddisc.api.download,
@@ -94,75 +94,71 @@ class _KnownMediaLocator extends State<KnownMediaLocator> with ds.LoadingState {
     });
 
     final options = [authn.request(authn.AuthzCache.meta(context))];
-    widget
-        .ensureP2P(context, options: options)
-        .then((proceed) {
-          if (!proceed) {
+
+    Future<void> complete(Future<void> Function() request) {
+      return httpx
+          .withRetry(request)
+          .then((v) {
+            return widget
+                .delete(widget.current.id, options: options)
+                .catchError((e) => api.RecommendationDeleteResponse.create(), test: httpx.ErrorsTest.err404);
+          })
+          .then((v) {
+            widget.onChange(null);
             setState(() {
+              _queued = true;
               loading = false;
             });
-            return null;
-          }
+          });
+    }
 
-          switch (widget.current.source) {
-            case ddisc.sources.discovered:
-            case ddisc.sources.searchplugin:
-              return httpx.withRetry(
-                () => widget
-                    .download(
-                      widget.current.uid,
-                      options: options,
-                    )
-                    .then((v) {
-                      return widget
-                          .delete(widget.current.id, options: options)
-                          .catchError((e) => api.RecommendationDeleteResponse.create(), test: httpx.ErrorsTest.err404);
-                    })
-                    .then((v) {
-                      widget.onChange(null);
-                      setState(() {
-                        _queued = true;
-                        loading = false;
-                      });
-                    }),
-              );
-            default:
-              return httpx.withRetry(
-                () => widget
-                    .locate(
-                      api.Locate.create()
-                        ..knownMediaId = widget.current.uid
-                        ..mimetype = widget.current.mimetype
-                        ..adult = widget.current.adult,
-                      options: options,
-                    )
-                    .then((v) {
-                      return widget
-                          .delete(widget.current.id, options: options)
-                          .catchError((e) => api.RecommendationDeleteResponse.create(), test: httpx.ErrorsTest.err404);
-                    })
-                    .then((v) {
-                      widget.onChange(null);
-                      setState(() {
-                        _queued = true;
-                        loading = false;
-                      });
-                    }),
-              );
-          }
-        })
-        .catchError((e) {
-          setState(() {
-            loading = false;
-            cause = ds.Errors.httpauto(e, onTap: reseterr);
-          });
-        }, test: httpx.ErrorsTest.httpauto)
-        .catchError((e) {
-          setState(() {
-            loading = false;
-            cause = ds.Error.unknown(e, onTap: reseterr);
-          });
-        });
+    switch (widget.current.source) {
+      case ddisc.sources.discovered:
+      case ddisc.sources.searchplugin:
+        widget
+            .ensureP2P(context, options: options)
+            .then((_) => complete(() => widget.download(widget.current.uid, options: options)))
+            .catchError((e) {
+              setState(() {
+                loading = false;
+              });
+            }, test: disc.consentDeclined)
+            .catchError((e) {
+              setState(() {
+                loading = false;
+                cause = ds.Errors.httpauto(e, onTap: reseterr);
+              });
+            }, test: httpx.ErrorsTest.httpauto)
+            .catchError((e) {
+              setState(() {
+                loading = false;
+                cause = ds.Error.unknown(e, onTap: reseterr);
+              });
+            });
+        break;
+      default:
+        complete(
+              () => widget.locate(
+                api.Locate.create()
+                  ..knownMediaId = widget.current.uid
+                  ..mimetype = widget.current.mimetype
+                  ..adult = widget.current.adult,
+                options: options,
+              ),
+            )
+            .catchError((e) {
+              setState(() {
+                loading = false;
+                cause = ds.Errors.httpauto(e, onTap: reseterr);
+              });
+            }, test: httpx.ErrorsTest.httpauto)
+            .catchError((e) {
+              setState(() {
+                loading = false;
+                cause = ds.Error.unknown(e, onTap: reseterr);
+              });
+            });
+    }
   }
 
   void _onPress() async {

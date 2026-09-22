@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
-import 'package:retrovibed/discovery.dart' as disc;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import './api.dart' as api;
 
@@ -16,7 +15,6 @@ class DiscoveryLocator extends StatefulWidget {
   final bool adult;
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
   final Future<api.LocateLookupResponse> Function(String id, {List<httpx.Option> options}) lookup;
-  final Future<bool> Function(BuildContext context, {List<httpx.Option> options}) ensureP2P;
   final Future<Widget> Function(api.Locate located) onFound;
   final Widget help;
 
@@ -28,7 +26,6 @@ class DiscoveryLocator extends StatefulWidget {
     required this.onFound,
     this.locate = api.locate.create,
     this.lookup = api.locate.get,
-    this.ensureP2P = disc.ensureP2P,
     this.help = const ds.Hint(
       Text(
         "searches the peer-to-peer network and your search plugins for this title. "
@@ -43,63 +40,46 @@ class DiscoveryLocator extends StatefulWidget {
 
 enum _LocateState { idle, loading, pending, found }
 
-class _DiscoveryLocator extends State<DiscoveryLocator> {
+class _DiscoveryLocator extends State<DiscoveryLocator> with ds.LoadingState {
   _LocateState _state = _LocateState.idle;
   String _locateId = '';
   Duration _interval = Duration.zero;
-  Widget _cause = ds.Error.zero;
   Future<Widget>? _foundContent;
 
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
+  @override
+  void initState() {
+    super.initState();
+    loading = false;
   }
 
   void _onTap() async {
     setState(() {
       _state = _LocateState.loading;
-      _cause = ds.Error.zero;
+      cause = ds.Error.zero;
     });
 
     final options = [authn.request(authn.AuthzCache.meta(context))];
 
-    widget
-        .ensureP2P(context, options: options)
-        .then((proceed) {
-          if (!proceed) {
-            setState(() {
-              _state = _LocateState.idle;
-            });
-            return null;
-          }
-
-          return widget
-              .locate(
-                api.Locate.create()
-                  ..autodownload = false
-                  ..query = widget.query
-                  ..mimetype = widget.mimetype
-                  ..adult = widget.adult,
-                options: options,
-              )
-              .then((v) {
-                _locateId = v.locate.id;
-                setState(() {
-                  _state = _LocateState.pending;
-                  _interval = const Duration(seconds: 10);
-                });
-              });
+    return widget
+        .locate(
+          api.Locate.create()
+            ..autodownload = false
+            ..query = widget.query
+            ..mimetype = widget.mimetype
+            ..adult = widget.adult,
+          options: options,
+        )
+        .then((v) {
+          _locateId = v.locate.id;
+          setState(() {
+            _state = _LocateState.pending;
+            _interval = const Duration(seconds: 10);
+          });
         })
         .catchError((e) {
           setState(() {
             _state = _LocateState.idle;
-            _cause = ds.Error.unknown(e, onTap: reseterr);
+            cause = ds.Error.unknown(e, onTap: reseterr);
           });
         });
   }
@@ -183,7 +163,7 @@ class _DiscoveryLocator extends State<DiscoveryLocator> {
 
     return ds.Loading(
       loading: _state == _LocateState.loading,
-      cause: _cause,
+      cause: cause,
       ds.Poll(
         Column(
           children: [

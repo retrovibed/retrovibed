@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/forms.dart' as forms;
+import 'package:retrovibed/design.kit/stateful.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 
 const String _disclaimerCacheId = 'discovery.p2p';
@@ -22,21 +24,21 @@ we takes no responsibility for such content.
 By enabling P2P discovery of available content. You take responsibility for your
 activities and for obeying the laws within your region.''';
   final api.DiscoverySettings defaults;
-  final Future<api.DiscoverySettings> Function(api.DiscoverySettings)? onChange;
+  final Future<api.DiscoverySettings> Function(api.DiscoverySettings) onChange;
   final bool Function(String)? disclaimer;
   final void Function(String)? acknowledge;
 
   LocateSettings(
     this.defaults, {
     super.key,
-    this.onChange,
+    this.onChange = ds.fnAsyncPassthrough,
     this.disclaimer,
     this.acknowledge,
   });
 
   static FutureBuilder<api.DiscoverySettings> future(
     Future<api.DiscoverySettings> pending, {
-    Future<api.DiscoverySettings> Function(api.DiscoverySettings)? onChange,
+    Future<api.DiscoverySettings> Function(api.DiscoverySettings) onChange = ds.fnAsyncPassthrough,
   }) {
     return ds.future(LocateSettings.zero, pending, (snapshot) {
       return ds.ErrorScreen(
@@ -51,46 +53,69 @@ activities and for obeying the laws within your region.''';
   }
 
   @override
-  State<LocateSettings> createState() => _LocateEditView(this.defaults);
+  State<LocateSettings> createState() => _LocateEditView();
 }
 
-class _LocateEditView extends State<LocateSettings> {
-  api.DiscoverySettings current;
+class _LocateEditView extends State<LocateSettings> with LoadingState {
+  api.DiscoverySettings current = api.DiscoverySettings();
 
-  _LocateEditView(this.current);
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
+  @override
+  void initState() {
+    super.initState();
+    loading = false;
+    current = widget.defaults;
   }
 
   void _update(api.DiscoverySettings updated) {
-    setState(() => current = updated);
-    widget.onChange?.call(current);
+    setState(() => loading = true);
+
+    Future.sync(() => widget.onChange(updated))
+        .then((v) {
+          setState(() {
+            current = v;
+            loading = false;
+          });
+        })
+        .catchError((error) {
+          setState(() {
+            loading = false;
+            cause = ds.Errors.httpauto(error, onTap: reseterr);
+          });
+        }, test: httpx.ErrorsTest.httpauto)
+        .catchError((error) {
+          setState(() {
+            loading = false;
+            cause = ds.Error.unknown(error, onTap: reseterr);
+          });
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ds.DisclaimerIntercept(
-      forms.Checkbox(
-        const Text("p2p"),
-        dense: true,
-        value: current.locateP2p,
-        help: ds.Hint(
-          const Text("locate media via the distributed p2p discovery network, disabled by default"),
+    return forms.Container(
+      cause: cause,
+      loading: loading,
+      ds.DisclaimerIntercept(
+        forms.Checkbox(
+          const Text("p2p"),
+          dense: true,
+          value: current.locateP2p,
+          help: ds.Hint(
+            const Text("locate media via the distributed p2p discovery network, disabled by default"),
+          ),
+          onChanged: loading ? null : (v) => _update(current..locateP2p = v ?? !current.locateP2p),
         ),
-        onChanged: (v) => _update(current..locateP2p = v ?? !current.locateP2p),
-      ),
-      cacheid: _disclaimerCacheId,
-      cached: widget.disclaimer ?? ds.Disclaimer.disclaimerpath,
-      acknowledge: widget.acknowledge ?? ds.Disclaimer.acknowledge,
-      overlay: (complete) => ds.Confirmation.yesNo(
-        content: const Text(LocateSettings.disclaimerText),
-        onConfirm: (_) {
-          complete(true);
-          _update(current..locateP2p = !current.locateP2p);
-        },
-        onCancel: (_) => complete(false),
+        cacheid: _disclaimerCacheId,
+        cached: widget.disclaimer ?? ds.Disclaimer.disclaimerpath,
+        acknowledge: widget.acknowledge ?? ds.Disclaimer.acknowledge,
+        overlay: (complete) => ds.Confirmation.yesNo(
+          content: const Text(LocateSettings.disclaimerText),
+          onConfirm: (_) {
+            complete(true);
+            _update(current..locateP2p = !current.locateP2p);
+          },
+          onCancel: (_) => complete(false),
+        ),
       ),
     );
   }
