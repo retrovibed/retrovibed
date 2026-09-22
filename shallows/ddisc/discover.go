@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"iter"
+	"runtime/trace"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
@@ -238,7 +239,11 @@ type discoverSeq struct {
 
 func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 	return func(yield func(Discovered) bool) {
+		trace.Logf(ctx, "input", "known_media_id: %q query: %q", t.req.KnownMediaID, t.req.Query)
+
 		for _, strategy := range t.strategies {
+			trace.Logf(ctx, "strategy", "%T", strategy)
+
 			seq := strategy.Discover(ctx, t.req)
 			seq = iterx.Filter(seq, t.filter)
 			seq = iterx.NotFound(seq)
@@ -247,6 +252,7 @@ func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 
 			for d := range seq.Each(ctx) {
 				if err := t.policy.Rank(&d); err != nil {
+					trace.Logf(ctx, "error", "%v", err)
 					t.err = err
 					return
 				}
@@ -259,6 +265,7 @@ func (t *discoverSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			if err := seq.Err(); errors.Is(err, iterx.ErrNotFound) {
 				continue
 			} else if err != nil {
+				trace.Logf(ctx, "error", "%v", err)
 				t.err = errorsx.Wrapf(err, "%T failed", strategy)
 				return
 			}

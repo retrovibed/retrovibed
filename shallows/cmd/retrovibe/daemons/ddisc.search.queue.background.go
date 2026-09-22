@@ -3,6 +3,7 @@ package daemons
 import (
 	"context"
 	"log"
+	"runtime/trace"
 	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
@@ -17,6 +18,10 @@ import (
 )
 
 func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
+	var task *trace.Task
+	ctx, task = trace.NewTask(ctx, "ddisc.search_queue_background_run")
+	defer task.End()
+
 	// SearchQueueBackgroundRun drains ddisc_search_queue: for each pending
 	// known-media-id, ask the external search strategies (wasm plugins,
 	// PeerTube/SepiaSearch) for candidates and persist whatever they find, or
@@ -29,7 +34,8 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searc
 	// turn up on every drain. maxAge bounds how long a known-media-id stays
 	// queued for external discovery before it's given up on and purged.
 	const maxAge = 30 * 24 * time.Hour
-	errorsx.Log(sqlx.Discard(sqlx.Scan(ddisc.SearchQueuePurge(ctx, q, maxAge))))
+	discarded := errorsx.Zero(sqlx.Discarded(sqlx.Scan(ddisc.SearchQueuePurge(ctx, q, maxAge))))
+	trace.Logf(ctx, "purged", "records: %d, max_age: %s", discarded, maxAge)
 
 	s := sqlx.Scan(ddisc.SearchQueuePending(ctx, q))
 	for entry := range s.Iter() {
@@ -40,6 +46,7 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searc
 		}
 
 		sctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+		trace.Logf(sctx, "entry", "known_media_id: %q title: %q", entry.KnownMediaID, known.Title)
 		req := ddisc.DiscoverRequestFromKnown(known)
 		options := []ddisc.DiscoverOption{
 			ddisc.DiscoverOptionFilter(ddisc.NewTitleFilter(q, req).Match),
@@ -71,6 +78,7 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searc
 		} else {
 			log.Println("search queue: no candidates found", entry.KnownMediaID, known.Title)
 		}
+		trace.Logf(ctx, "outcome", "known_media_id: %q found: %v err: %v", entry.KnownMediaID, found, err)
 
 		// we don't care *what* error occurs here (if any) — cool down on
 		// any failure to find a candidate, same as a clean not-found.
