@@ -132,7 +132,7 @@ func Main(args ...string) {
 			"env_discovery_index_ratio":         env.DDiscIndexRatio,
 			"env_discovery_p2p_locate":          env.DDiscP2PLocate,
 			"env_auto_identify_media":           env.AutoIdentifyMedia,
-			"env_auto_locate_media":             env.AutoIdentifyMedia,
+			"env_auto_locate_media":             env.AutoLocateMedia,
 			"env_auto_archive":                  env.AutoArchive,
 			"env_auto_backup":                   env.AutoBackup,
 			"env_backup_frequency":              env.BackupFrequency,
