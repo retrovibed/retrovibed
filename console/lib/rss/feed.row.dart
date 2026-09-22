@@ -16,20 +16,7 @@ class FeedRow extends StatefulWidget {
   State<FeedRow> createState() => _FeedRowState();
 }
 
-class _FeedRowState extends State<FeedRow> {
-  Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _resetCause() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
-
+class _FeedRowState extends State<FeedRow> with ds.LoadingState {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
@@ -73,7 +60,7 @@ class _FeedRowState extends State<FeedRow> {
                   })
                   .catchError((cause) {
                     setState(() {
-                      _cause = ds.Error.unknown(cause, onTap: _resetCause);
+                      this.cause = ds.Error.unknown(cause, onTap: reseterr);
                     });
                   });
             },
@@ -104,9 +91,9 @@ class _FeedRowState extends State<FeedRow> {
                             )
                             .catchError((cause) {
                               setState(() {
-                                _cause = ds.Error.unknown(
+                                this.cause = ds.Error.unknown(
                                   cause,
-                                  onTap: _resetCause,
+                                  onTap: reseterr,
                                 );
                               });
                             })
@@ -124,7 +111,7 @@ class _FeedRowState extends State<FeedRow> {
         ],
         icon: Icon(Icons.expand_more_rounded),
       ),
-      cause: _cause,
+      cause: cause,
       tint: defaults.dangerTint,
       borderRadius: defaults.borderRadius,
     );

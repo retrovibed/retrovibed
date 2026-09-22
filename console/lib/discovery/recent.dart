@@ -22,22 +22,8 @@ class Recent extends StatefulWidget {
   State<Recent> createState() => _RecentState();
 }
 
-class _RecentState extends State<Recent> {
-  Widget _cause = ds.Error.zero;
-  bool _loading = true;
-
+class _RecentState extends State<Recent> with ds.LoadingState {
   media.RecentSearchResponse _result = media.RecentSearchResponse();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   @override
   void initState() {
@@ -54,7 +40,7 @@ class _RecentState extends State<Recent> {
   }
 
   Future<void> _load(BuildContext context) async {
-    setState(() => _loading = true);
+    setState(() => loading = true);
     return httpx
         .withRetry(
           () => widget.latest(
@@ -65,24 +51,24 @@ class _RecentState extends State<Recent> {
         .then(
           (resp) => setState(() {
             _result = resp;
-            _loading = false;
+            loading = false;
           }),
         )
         .catchError((cause) {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         }, test: httpx.ErrorsTest.notimplemented)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -127,8 +113,8 @@ class _RecentState extends State<Recent> {
           ),
         );
       }).toList(),
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
     );
   }
 }

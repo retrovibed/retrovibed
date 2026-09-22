@@ -27,20 +27,8 @@ class DirectoryCreate extends StatefulWidget {
   State<StatefulWidget> createState() => _DirectoryCreate();
 }
 
-class _DirectoryCreate extends State<DirectoryCreate> {
+class _DirectoryCreate extends State<DirectoryCreate> with ds.LoadingState {
   final _name = TextEditingController();
-  Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   @override
   void dispose() {
@@ -62,12 +50,12 @@ class _DirectoryCreate extends State<DirectoryCreate> {
         .then((v) => widget.onCreated(v.media))
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unauthorized(cause, onTap: reseterr);
+            this.cause = ds.Error.unauthorized(cause, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: reseterr);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         });
   }
@@ -79,7 +67,7 @@ class _DirectoryCreate extends State<DirectoryCreate> {
       trailing: [IconButton(icon: const Icon(Icons.close), onPressed: widget.onCancel)],
       forms.Container(
         forms.Field(
-          cause: _cause,
+          cause: cause,
           input: TextField(
             autofocus: true,
             controller: _name,

@@ -43,11 +43,9 @@ class Authenticated extends StatefulWidget {
   State<Authenticated> createState() => _AuthenticatedState();
 }
 
-class _AuthenticatedState extends State<Authenticated> {
-  Widget _cause = ds.Error.zero;
+class _AuthenticatedState extends State<Authenticated> with ds.LoadingState {
   DateTime _expires = DateTime.timestamp();
   api.Session _current = _zeroSession();
-  bool _loading = true;
 
   api.Session syncCurrent() {
     return _current;
@@ -87,13 +85,13 @@ class _AuthenticatedState extends State<Authenticated> {
     current()
         .then((v) {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((cause) {
           setState(() {
-            _loading = false;
-            _cause = ds.Errors.httpauto(cause, onTap: _reseterr);
+            loading = false;
+            this.cause = ds.Errors.httpauto(cause, onTap: _reseterr);
           });
         });
   }
@@ -101,13 +99,8 @@ class _AuthenticatedState extends State<Authenticated> {
   void _reseterr() {
     _refresh();
     setState(() {
-      _cause = ds.Error.zero;
+      cause = ds.Error.zero;
     });
-  }
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
   }
 
   @override
@@ -120,8 +113,8 @@ class _AuthenticatedState extends State<Authenticated> {
   Widget build(BuildContext context) {
     return ds.LoadingBoundary(
       widget.child,
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       origin: '_AuthenticatedState',
     );
   }

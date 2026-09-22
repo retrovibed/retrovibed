@@ -14,23 +14,10 @@ class ListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _ListDisplay();
 }
 
-class _ListDisplay extends State<ListDisplay> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
   api.PluginSearchResponse _res = api.plugins.response(
     next: api.plugins.request(limit: 32),
   );
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   Future<void> refresh(BuildContext context, api.PluginSearchRequest req) {
     return api.plugins
@@ -38,24 +25,24 @@ class _ListDisplay extends State<ListDisplay> {
         .then((v) {
           setState(() {
             _res = v;
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((cause) {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         }, test: httpx.ErrorsTest.err404)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unauthorized(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Error.unauthorized(cause, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -75,7 +62,7 @@ class _ListDisplay extends State<ListDisplay> {
           StreamSink<httpx.UploadProgress>? progress,
         }) {
           setState(() {
-            _loading = true;
+            loading = true;
           });
 
           final uploads = v.files.map((c) {
@@ -102,7 +89,7 @@ class _ListDisplay extends State<ListDisplay> {
                           })
                           .catchError((cause) {
                             setState(() {
-                              _cause = ds.Error.unknown(cause, onTap: reseterr);
+                              this.cause = ds.Error.unknown(cause, onTap: reseterr);
                             });
                           });
                     });
@@ -114,15 +101,15 @@ class _ListDisplay extends State<ListDisplay> {
                 })
                 .whenComplete(
                   () => setState(() {
-                    _loading = false;
+                    loading = false;
                   }),
                 );
           });
         };
 
     return ds.Table(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       padding: defaults.padding / 2,
       leading: ds.SearchTray(
         onSubmitted: (v) => refresh(context, _res.next),

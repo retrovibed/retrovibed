@@ -25,17 +25,10 @@ class DiagnosticsDetails extends StatefulWidget {
   State<DiagnosticsDetails> createState() => _DiagnosticsDetailsState();
 }
 
-class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _DiagnosticsDetailsState extends State<DiagnosticsDetails> with ds.LoadingState {
   torrentx.TorrentMetricsResponse _torrent = torrentx.TorrentMetricsResponse();
   dhtx.DHTMetricsResponse _dht = dhtx.DHTMetricsResponse();
   ddisc.DiscoveryMetricsResponse _discovery = ddisc.DiscoveryMetricsResponse();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {
@@ -45,8 +38,8 @@ class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
 
   void _fetch() {
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     final auth = [authn.request(authn.AuthzCache.meta(context))];
@@ -57,7 +50,7 @@ class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
         ])
         .then((v) {
           setState(() {
-            _loading = false;
+            loading = false;
             _torrent = v[0] as torrentx.TorrentMetricsResponse;
             _dht = v[1] as dhtx.DHTMetricsResponse;
             _discovery = v[2] as ddisc.DiscoveryMetricsResponse;
@@ -65,14 +58,14 @@ class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
         })
         .catchError((e) {
           setState(() {
-            _loading = false;
-            _cause = ds.Errors.httpauto(e, onTap: _fetch);
+            loading = false;
+            cause = ds.Errors.httpauto(e, onTap: _fetch);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((e) {
           setState(() {
-            _loading = false;
-            _cause = ds.Error.unknown(e, onTap: _fetch);
+            loading = false;
+            cause = ds.Error.unknown(e, onTap: _fetch);
           });
         });
   }
@@ -114,7 +107,7 @@ class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
                   onPressed: () async {
                     await Future<void>(() => throw Exception("synthetic diagnostics error")).catchError((e) {
                       setState(() {
-                        _cause = ds.Error.unknown(e, onTap: _fetch);
+                        cause = ds.Error.unknown(e, onTap: _fetch);
                       });
                     });
                   },
@@ -129,7 +122,7 @@ class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
                       }
                     }).catchError((e) {
                       setState(() {
-                        _cause = ds.Error.unknown(e, onTap: _fetch);
+                        cause = ds.Error.unknown(e, onTap: _fetch);
                       });
                     });
                   },
@@ -137,8 +130,8 @@ class _DiagnosticsDetailsState extends State<DiagnosticsDetails> {
               ],
             ),
             ds.Loading(
-              loading: _loading,
-              cause: _cause,
+              loading: loading,
+              cause: cause,
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,

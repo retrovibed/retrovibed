@@ -24,26 +24,13 @@ class DaemonDropdownItem extends StatefulWidget {
   State<DaemonDropdownItem> createState() => _DaemonDropdownItemState();
 }
 
-class _DaemonDropdownItemState extends State<DaemonDropdownItem> {
-  Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
-
+class _DaemonDropdownItemState extends State<DaemonDropdownItem> with ds.LoadingState {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     final isDevice = api.daemons.isLocalDevice(widget.library);
     return ds.ErrorScreen(
-      cause: _cause,
+      cause: cause,
       tint: defaults.dangerTint,
       ds.TableRow.single(
         DaemonTypography(
@@ -83,12 +70,12 @@ class _DaemonDropdownItemState extends State<DaemonDropdownItem> {
               .then((v) => widget.onTap(v))
               .catchError((cause) {
                 setState(() {
-                  _cause = ds.Errors.httpauto(cause, onTap: reseterr);
+                  this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
                 });
               }, test: httpx.ErrorsTest.httpauto)
               .catchError((cause) {
                 setState(() {
-                  _cause = ds.Error.offline(
+                  this.cause = ds.Error.offline(
                     cause,
                     onTap: reseterr,
                   );
@@ -96,7 +83,7 @@ class _DaemonDropdownItemState extends State<DaemonDropdownItem> {
               }, test: ds.ErrorTests.offline)
               .catchError((e) {
                 setState(() {
-                  _cause = ds.Error.unknown(e, onTap: reseterr);
+                  cause = ds.Error.unknown(e, onTap: reseterr);
                 });
               });
         },

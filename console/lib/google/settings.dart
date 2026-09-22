@@ -14,16 +14,9 @@ class Settings extends StatefulWidget {
   State<Settings> createState() => _SettingsState();
 }
 
-class _SettingsState extends State<Settings> {
-  bool _loading = true;
+class _SettingsState extends State<Settings> with ds.LoadingState {
   Timer? _poll;
-  Widget _cause = ds.Error.zero;
   api.YouTubeStatus _youtube = api.YouTubeStatus();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {
@@ -39,8 +32,8 @@ class _SettingsState extends State<Settings> {
 
   void _fetch() {
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     final auth = [authn.request(authn.AuthzCache.meta(context))];
@@ -49,14 +42,14 @@ class _SettingsState extends State<Settings> {
         .then((v) {
           if (v.linked) _poll?.cancel();
           setState(() {
-            _loading = false;
+            loading = false;
             _youtube = v;
           });
         })
         .catchError((e) {
           setState(() {
-            _loading = false;
-            _cause = ds.Error.unknown(e, onTap: _fetch);
+            loading = false;
+            cause = ds.Error.unknown(e, onTap: _fetch);
           });
         });
   }
@@ -68,8 +61,8 @@ class _SettingsState extends State<Settings> {
 
     final auth = [authn.request(authn.AuthzCache.meta(context))];
     return ds.Loading(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       Padding(
         padding: defaults.padding,
         child: Column(
@@ -95,7 +88,7 @@ class _SettingsState extends State<Settings> {
                               .then((_) => _fetch())
                               .catchError((e) {
                                 setState(() {
-                                  _cause = ds.Error.unknown(e, onTap: _fetch);
+                                  cause = ds.Error.unknown(e, onTap: _fetch);
                                 });
                               });
                         },

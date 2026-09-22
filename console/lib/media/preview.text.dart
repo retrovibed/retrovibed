@@ -25,22 +25,9 @@ class PreviewText extends StatefulWidget {
   State<StatefulWidget> createState() => _PreviewText();
 }
 
-class _PreviewText extends State<PreviewText> {
-  bool _loading = true;
+class _PreviewText extends State<PreviewText> with ds.LoadingState {
   bool _truncated = false;
   String _content = "";
-  Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   @override
   void initState() {
@@ -66,19 +53,19 @@ class _PreviewText extends State<PreviewText> {
             // a full read means the file is at least this long, so the reader is looking
             // at a head rather than the document.
             _truncated = body.length >= PreviewText.limit;
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unauthorized(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Error.unauthorized(cause, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -89,8 +76,8 @@ class _PreviewText extends State<PreviewText> {
     final theme = Theme.of(context);
 
     return ds.Loading(
-      cause: _cause,
-      loading: _loading,
+      cause: cause,
+      loading: loading,
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

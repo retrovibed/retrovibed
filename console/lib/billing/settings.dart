@@ -26,17 +26,11 @@ class Settings extends StatefulWidget {
   State<Settings> createState() => _Settings();
 }
 
-class _Settings extends State<Settings> {
-  Widget _cause = ds.Error.zero;
+class _Settings extends State<Settings> with ds.LoadingState {
   RegisteredState? _billing;
   List<(PlanSummary, api.Plan)> _plans = [];
   PlanSummary current = free();
   (PlanSummary, api.Plan) desired = (free(), PlanSummary.plan(free()));
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void refresh() {
     final pid = Registered.of(context).current.planId;
@@ -64,15 +58,9 @@ class _Settings extends State<Settings> {
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _reseterr);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         });
-  }
-
-  void _reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
   }
 
   @override
@@ -112,7 +100,7 @@ class _Settings extends State<Settings> {
       margin: widget.margin,
       padding: widget.padding,
       decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow),
-      cause: _cause,
+      cause: cause,
       Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -145,7 +133,7 @@ class _Settings extends State<Settings> {
                     })
                     .catchError((cause) {
                       setState(() {
-                        _cause = ds.Error.unknown(cause, onTap: _reseterr);
+                        this.cause = ds.Error.unknown(cause, onTap: reseterr);
                       });
                     });
               },

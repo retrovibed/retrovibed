@@ -16,10 +16,8 @@ class CommunityPicker extends StatefulWidget {
   State<CommunityPicker> createState() => _CommunityPickerState();
 }
 
-class _CommunityPickerState extends State<CommunityPicker> {
+class _CommunityPickerState extends State<CommunityPicker> with ds.LoadingState {
   bool _fetched = false;
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
   List<Community> _suggestions = [];
   final Set<String> _selected = {};
 
@@ -35,13 +33,13 @@ class _CommunityPickerState extends State<CommunityPicker> {
         .then((resp) {
           setState(() {
             _suggestions = resp.community;
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: () => setState(() => _cause = ds.Error.zero));
-            _loading = false;
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -63,8 +61,8 @@ class _CommunityPickerState extends State<CommunityPicker> {
       margin: defaults.margin,
       constraints: const BoxConstraints(maxWidth: 512),
       ds.Loading(
-        cause: _cause,
-        loading: _loading,
+        cause: cause,
+        loading: loading,
         Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

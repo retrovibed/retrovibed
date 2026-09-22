@@ -15,21 +15,8 @@ class NewReleases extends StatefulWidget {
   State<NewReleases> createState() => _NewReleasesState();
 }
 
-class _NewReleasesState extends State<NewReleases> {
-  Widget _cause = ds.Error.zero;
-  bool _loading = true;
+class _NewReleasesState extends State<NewReleases> with ds.LoadingState {
   lib.KnownLatestResponse _result = lib.KnownLatestResponse();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   @override
   void initState() {
@@ -46,7 +33,7 @@ class _NewReleasesState extends State<NewReleases> {
   }
 
   Future<void> _load() async {
-    setState(() => _loading = true);
+    setState(() => loading = true);
     final auth = authn.request(authn.AuthzCache.meta(context));
 
     return httpx
@@ -63,24 +50,24 @@ class _NewReleasesState extends State<NewReleases> {
         .then(
           (resp) => setState(() {
             _result = resp;
-            _loading = false;
+            loading = false;
           }),
         )
         .catchError((cause) {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         }, test: httpx.ErrorsTest.notimplemented)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -118,8 +105,8 @@ class _NewReleasesState extends State<NewReleases> {
             ),
           )
           .toList(),
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
     );
   }
 }

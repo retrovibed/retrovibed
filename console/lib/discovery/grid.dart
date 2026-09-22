@@ -22,23 +22,16 @@ class DiscoveryGrid extends StatefulWidget {
   State<DiscoveryGrid> createState() => _DiscoveryGridState();
 }
 
-class _DiscoveryGridState extends State<DiscoveryGrid> {
-  Widget _cause = ds.Error.zero;
-  bool _loading = false;
+class _DiscoveryGridState extends State<DiscoveryGrid> with ds.LoadingState {
   List<ddisc.Discovery> _items = [];
   media.MediaSearchRequest? _lastFetchedNext;
   StreamSubscription<ddisc.Discovery>? _subscription;
   final SplayTreeSet<ddisc.Discovery> _found = SplayTreeSet<ddisc.Discovery>(ddisc.compare);
 
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
+  @override
+  void initState() {
+    super.initState();
+    loading = false;
   }
 
   Future<void> refresh({bool triggered = true}) {
@@ -58,8 +51,8 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
 
     setState(() {
       _items = [];
-      _cause = ds.Error.zero;
-      _loading = widget.search.value.next.query.isNotEmpty;
+      cause = ds.Error.zero;
+      loading = widget.search.value.next.query.isNotEmpty;
     });
 
     return httpx
@@ -76,7 +69,7 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
               _found.add(item);
               setState(() {
                 _items = _found.toList();
-                _loading = false;
+                loading = false;
               });
               widget.search.value = media.MediaSearchState(next: req, count: _found.length);
             },
@@ -88,12 +81,12 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: reseterr);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         })
         .whenComplete(() {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         });
   }
@@ -115,12 +108,12 @@ class _DiscoveryGridState extends State<DiscoveryGrid> {
         }
 
         return ds.ErrorScreen(
-          cause: _cause,
+          cause: cause,
           ds.Grid<ddisc.Discovery>(
             key: ValueKey('discovery.grid'),
             (context, v) => DiscoveredCard(v),
             children: _items,
-            loading: _loading,
+            loading: loading,
             physics: AlwaysScrollableScrollPhysics(),
             leading: widget.leading,
             empty: EmptyResults(SearchButton(search: state)),

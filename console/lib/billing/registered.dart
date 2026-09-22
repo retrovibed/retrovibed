@@ -28,19 +28,12 @@ class Registered extends StatefulWidget {
   State<StatefulWidget> createState() => RegisteredState();
 }
 
-class RegisteredState extends State<Registered> {
+class RegisteredState extends State<Registered> with ds.LoadingState {
   final ValueNotifier<api.Billing> refresh = ValueNotifier(api.Billing());
   api.Billing current = api.Billing(subscriptionEndedAt: timex.inf.toIso8601String());
   api.Plan plan = PlanSummary.plan(free());
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
   int attributionCount = 0;
   int attributionRate = 0;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void replace(api.BillingLookupResponse upd) {
     setState(() {
@@ -48,12 +41,6 @@ class RegisteredState extends State<Registered> {
       plan = upd.plan;
     });
     refresh.value = upd.billing;
-  }
-
-  void _reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
   }
 
   @override
@@ -93,12 +80,12 @@ class RegisteredState extends State<Registered> {
         }, test: httpx.ErrorsTest.err404)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: _reseterr);
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
           });
         })
         .whenComplete(() {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         });
   }
@@ -108,10 +95,10 @@ class RegisteredState extends State<Registered> {
     return RegisteredData(
       state: this,
       child: ds.LoadingBoundary(
-        loading: _loading,
+        loading: loading,
         origin: 'RegisteredState',
         ds.ErrorScreen(
-          cause: _cause,
+          cause: cause,
           widget.child,
         ),
       ),

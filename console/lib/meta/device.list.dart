@@ -30,17 +30,9 @@ class DaemonList extends StatefulWidget {
   State<StatefulWidget> createState() => _DaemonList();
 }
 
-class _DaemonList extends State<DaemonList> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _DaemonList extends State<DaemonList> with ds.LoadingState {
   Widget? _optional = null;
   api.DaemonSearchResponse _res = api.daemons.response();
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   Future<void> refresh(api.DaemonSearchRequest req) {
     return widget
@@ -48,13 +40,13 @@ class _DaemonList extends State<DaemonList> {
         .then((v) {
           setState(() {
             _res = v;
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: reseterr);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -89,8 +81,8 @@ class _DaemonList extends State<DaemonList> {
     final items = widget.remoteonly ? _res.items.where((d) => !api.daemons.isLocalDevice(d)).toList() : _res.items;
 
     return ds.Table(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       children: items,
       empty: const Text("no other devices found"),
       leading: Column(

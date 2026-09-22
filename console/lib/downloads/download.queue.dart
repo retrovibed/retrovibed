@@ -23,9 +23,7 @@ class DownloadQueue extends StatefulWidget {
   State<DownloadQueue> createState() => _DownloadQueue();
 }
 
-class _DownloadQueue extends State<DownloadQueue> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _DownloadQueue extends State<DownloadQueue> with ds.LoadingState {
   List<api.Download> _pending = [];
   int _index = 0;
   final StreamController<api.Download> _updates = StreamController<api.Download>.broadcast();
@@ -34,15 +32,6 @@ class _DownloadQueue extends State<DownloadQueue> {
   void dispose() {
     _updates.close();
     super.dispose();
-  }
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _resetcause() {
-    setState(() => _cause = ds.Error.zero);
   }
 
   void _show(int index) {
@@ -70,15 +59,15 @@ class _DownloadQueue extends State<DownloadQueue> {
           if (!mounted) return;
           setState(() {
             _pending = list;
-            _loading = false;
+            loading = false;
           });
           _show(0);
         })
         .catchError((cause) {
           if (!mounted) return;
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _resetcause);
-            _loading = false;
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -87,8 +76,8 @@ class _DownloadQueue extends State<DownloadQueue> {
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     return ds.Loading(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       ds.ErrorBoundary(
         _index >= _pending.length
             ? const SizedBox.shrink()

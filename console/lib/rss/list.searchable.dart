@@ -15,9 +15,7 @@ class ListSearchable extends StatefulWidget {
   State<ListSearchable> createState() => SearchableView();
 }
 
-class SearchableView extends State<ListSearchable> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class SearchableView extends State<ListSearchable> with ds.LoadingState {
   Widget _overlay = ds.Empty;
   api.Feed _created = api.Feed();
   api.FeedSearchResponse _res = api.FeedSearchResponse(
@@ -28,17 +26,6 @@ class SearchableView extends State<ListSearchable> {
     ),
     items: [],
   );
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   Future<api.FeedSearchResponse> refresh(api.FeedSearchRequest next) {
     return widget
@@ -51,7 +38,7 @@ class SearchableView extends State<ListSearchable> {
         })
         .whenComplete(() {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         });
   }
@@ -62,7 +49,7 @@ class SearchableView extends State<ListSearchable> {
     ds.postframe(() {
       refresh(_res.next).catchError((e) {
         setState(() {
-          _cause = ds.Error.unknown(e, onTap: reseterr);
+          cause = ds.Error.unknown(e, onTap: reseterr);
         });
         return _res;
       });
@@ -71,7 +58,7 @@ class SearchableView extends State<ListSearchable> {
 
   void resetleading() => setState(() {
     _overlay = ds.Empty;
-    _loading = false;
+    loading = false;
     _created = api.Feed();
   });
 
@@ -86,7 +73,7 @@ class SearchableView extends State<ListSearchable> {
   });
 
   void submitfeed(api.Feed n) {
-    setState(() => _loading = true);
+    setState(() => loading = true);
     api
         .create(
           api.FeedCreateRequest(feed: n),
@@ -99,8 +86,8 @@ class SearchableView extends State<ListSearchable> {
         .then((v) => resetleading())
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: reseterr);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -116,8 +103,8 @@ class SearchableView extends State<ListSearchable> {
     );
 
     return ds.Table(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       padding: defaults.padding / 2,
       leading: ds.SearchTray(
         autofocus: defaults.desktop,

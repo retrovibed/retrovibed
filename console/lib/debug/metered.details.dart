@@ -15,15 +15,8 @@ class MeteredDetails extends StatefulWidget {
   State<MeteredDetails> createState() => _MeteredDetailsState();
 }
 
-class _MeteredDetailsState extends State<MeteredDetails> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _MeteredDetailsState extends State<MeteredDetails> with ds.LoadingState {
   api.NetworkMetricsResponse _data = api.NetworkMetricsResponse();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {
@@ -33,8 +26,8 @@ class _MeteredDetailsState extends State<MeteredDetails> {
 
   void _fetch() {
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     final auth = [authn.request(authn.AuthzCache.meta(context))];
@@ -42,20 +35,20 @@ class _MeteredDetailsState extends State<MeteredDetails> {
         .withRetry(() => widget.apinetwork(options: auth))
         .then((v) {
           setState(() {
-            _loading = false;
+            loading = false;
             _data = v;
           });
         })
         .catchError((e) {
           setState(() {
-            _loading = false;
-            _cause = ds.Errors.httpauto(e, onTap: _fetch);
+            loading = false;
+            cause = ds.Errors.httpauto(e, onTap: _fetch);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((e) {
           setState(() {
-            _loading = false;
-            _cause = ds.Error.unknown(e, onTap: _fetch);
+            loading = false;
+            cause = ds.Error.unknown(e, onTap: _fetch);
           });
         });
   }
@@ -84,8 +77,8 @@ class _MeteredDetailsState extends State<MeteredDetails> {
               ],
             ),
             ds.Loading(
-              loading: _loading,
-              cause: _cause,
+              loading: loading,
+              cause: cause,
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
