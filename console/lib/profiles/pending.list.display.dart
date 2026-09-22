@@ -27,22 +27,8 @@ class PendingListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _PendingListDisplay();
 }
 
-class _PendingListDisplay extends State<PendingListDisplay> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _PendingListDisplay extends State<PendingListDisplay> with ds.LoadingState {
   meta.ProfileSearchResponse _res = meta.profiles.pending();
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void resetcause() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   Future<void> refresh(meta.ProfileSearchRequest req) {
     return widget
@@ -50,15 +36,13 @@ class _PendingListDisplay extends State<PendingListDisplay> {
         .then((v) {
           setState(() {
             _res = v;
-            _loading = false;
+            loading = false;
           });
         })
         .catchError((e) {
           setState(() {
-            setState(() {
-              _cause = ds.Error.unknown(e, onTap: resetcause);
-            });
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -74,8 +58,8 @@ class _PendingListDisplay extends State<PendingListDisplay> {
     final defaults = ds.Defaults.of(context);
     return _res.items.length > 0
         ? ds.Table(
-          loading: _loading,
-          cause: _cause,
+          loading: loading,
+          cause: cause,
           children: _res.items,
           leading: Column(
             mainAxisSize: MainAxisSize.min,

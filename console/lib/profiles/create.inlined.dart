@@ -15,36 +15,32 @@ class CreateInlined extends StatefulWidget {
   State<CreateInlined> createState() => _CreateInlinedState();
 }
 
-class _CreateInlinedState extends State<CreateInlined> {
-  bool _loading = false;
-  Widget _cause = ds.Error.zero;
+class _CreateInlinedState extends State<CreateInlined> with ds.LoadingState {
   meta.Profile _profile = meta.Profile();
   meta.Token _token = meta.Token()..libraryRead = true;
   String _publicKey = '';
 
   @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
+  void initState() {
+    super.initState();
+    loading = false;
   }
-
-  void _clearCause() => setState(() => _cause = ds.Error.zero);
 
   Future<void> _submit() {
     if (_publicKey.isEmpty) {
       setState(
         () =>
-            _cause = ds.Error.text(
+            cause = ds.Error.text(
               "Public key is required",
-              onTap: _clearCause,
+              onTap: reseterr,
             ),
       );
       return Future.value();
     }
 
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     final request =
@@ -67,14 +63,14 @@ class _CreateInlinedState extends State<CreateInlined> {
           }),
         )
         .then((profile) {
-          setState(() => _loading = false);
+          setState(() => loading = false);
           widget.onCreated?.call(profile);
           widget.onClose();
         })
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: _clearCause);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -84,8 +80,8 @@ class _CreateInlinedState extends State<CreateInlined> {
     final defaults = ds.Defaults.of(context);
 
     return ds.Loading(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       ds.Container(
         padding: defaults.padding,
         margin: defaults.margin,

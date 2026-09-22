@@ -30,26 +30,12 @@ class ListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _ListDisplay();
 }
 
-class _ListDisplay extends State<ListDisplay> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _ListDisplay extends State<ListDisplay> with ds.LoadingState {
   Widget _create = ds.Empty;
   meta.ProfileSearchResponse _res = meta.profiles.response(
     next: meta.profiles.request(limit: 32),
   );
   VoidCallback? _eventsListener;
-
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void resetcause() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   Future<void> refresh(meta.ProfileSearchRequest req) {
     return widget
@@ -57,14 +43,14 @@ class _ListDisplay extends State<ListDisplay> {
         .then((v) {
           setState(() {
             _res = v;
-            _loading = false;
-            _cause = ds.Error.zero;
+            loading = false;
+            cause = ds.Error.zero;
           });
         })
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: resetcause);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -111,8 +97,8 @@ class _ListDisplay extends State<ListDisplay> {
 
     return ds.Table(
       padding: defaults.padding.copyWith(top: 0, bottom: 0) / 2,
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       children: _res.items,
       overlay: _create,
       leading: Column(

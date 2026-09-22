@@ -25,17 +25,10 @@ class Card extends StatefulWidget {
   State<Card> createState() => _CardState();
 }
 
-class _CardState extends State<Card> {
+class _CardState extends State<Card> with ds.LoadingState {
   String _fallbackUsername = retro.username();
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
   authn.Session _session = authn.Session();
   meta.Authn _authn = meta.Authn();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {
@@ -45,8 +38,8 @@ class _CardState extends State<Card> {
 
   void _fetch() {
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     Future.wait([
@@ -55,15 +48,15 @@ class _CardState extends State<Card> {
         ])
         .then((results) {
           setState(() {
-            _loading = false;
+            loading = false;
             _session = results[0] as authn.Session;
             _authn = results[1] as meta.Authn;
           });
         })
         .catchError((e) {
           setState(() {
-            _loading = false;
-            _cause = ds.Error.unknown(e, onTap: _fetch);
+            loading = false;
+            cause = ds.Error.unknown(e, onTap: _fetch);
           });
         });
   }
@@ -85,7 +78,7 @@ class _CardState extends State<Card> {
           })
           .catchError((e) {
             setState(() {
-              _cause = ds.Error.unknown(e, onTap: _fetch);
+              cause = ds.Error.unknown(e, onTap: _fetch);
             });
           });
     };
@@ -97,8 +90,8 @@ class _CardState extends State<Card> {
       onTap: tap,
       help: ds.Hint(const Text("manage user profiles")),
       ds.Loading(
-        loading: _loading,
-        cause: _cause,
+        loading: loading,
+        cause: cause,
         Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           spacing: defaults.spacing / 4,

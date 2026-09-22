@@ -12,47 +12,40 @@ class Current extends StatefulWidget {
   }
 }
 
-class _CurrentState extends State<Current> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _CurrentState extends State<Current> with ds.LoadingState {
   authn.Session current = authn.Session();
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   void refresh() {
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     authn.Authenticated.session(context)
         .then((session) {
           setState(() {
-            _loading = false;
+            loading = false;
             current = session;
           });
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.offline(cause, onTap: refresh);
+            this.cause = ds.Error.offline(cause, onTap: refresh);
           });
         }, test: ds.ErrorTests.offline)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.connectivity(cause, onTap: refresh);
+            this.cause = ds.Error.connectivity(cause, onTap: refresh);
           });
         }, test: ds.ErrorTests.connectivity)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: refresh);
+            this.cause = ds.Error.unknown(cause, onTap: refresh);
           });
         })
         .whenComplete(() {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         });
   }
@@ -68,8 +61,8 @@ class _CurrentState extends State<Current> {
     final defaults = ds.Defaults.of(context);
     return forms.Container(
       padding: defaults.padding,
-      cause: _cause,
-      loading: _loading,
+      cause: cause,
+      loading: loading,
       Column(
         mainAxisSize: MainAxisSize.min,
         spacing: defaults.spacing,
@@ -95,7 +88,7 @@ class _CurrentState extends State<Current> {
                         })
                         .catchError((cause) {
                           setState(() {
-                            _cause = ds.Error.unknown(cause, onTap: refresh);
+                            this.cause = ds.Error.unknown(cause, onTap: refresh);
                           });
                         });
                   },
