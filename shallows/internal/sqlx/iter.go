@@ -108,3 +108,11 @@ func Discard[T any](s Iter[T]) (err error) {
 
 	return s.Err()
 }
+
+func Discarded[T any](s Iter[T]) (c uint64, err error) {
+	for range s.Iter() {
+		c += 1
+	}
+
+	return c, s.Err()
+}
