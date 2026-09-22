@@ -121,7 +121,7 @@ func LocateInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Locate) NewLocateScannerStaticRow,
 ) {
-	gql.Into("ddisc_locate").Default("created_at", "updated_at", "tombstoned_at", "located_torrent_id").Conflict(
+	gql.Into("ddisc_locate").Default("created_at", "updated_at", "tombstoned_at", "located_torrent_id", "attempts", "next_check_at").Conflict(
 		"ON CONFLICT (id) DO UPDATE SET updated_at = NOW(), tombstoned_at = EXCLUDED.tombstoned_at, located_torrent_id = EXCLUDED.located_torrent_id, adult = EXCLUDED.adult, autodownload = EXCLUDED.autodownload",
 	)
 }
@@ -149,6 +149,14 @@ func LocateCompleted(
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewLocateScannerStaticRow,
 ) {
 	gql = gql.Query(`UPDATE ddisc_locate SET updated_at = NOW(), tombstoned_at = NOW() WHERE "id" = {id} RETURNING ` + LocateScannerStaticColumns)
+}
+
+// LocateCooldown prevents frequent attempts by blocking with a cooldown.
+func LocateCooldown(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, nextAt time.Time) NewLocateScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE ddisc_locate SET updated_at = NOW(), attempts = attempts + 1, next_check_at = {nextAt} WHERE "id" = {id} RETURNING ` + LocateScannerStaticColumns)
 }
 
 func SearchQueue(

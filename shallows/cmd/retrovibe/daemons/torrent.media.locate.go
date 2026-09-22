@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht"
+	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
@@ -101,15 +103,27 @@ func DiscoveredDownload(ctx context.Context, db sqlx.Queryer, importer tracking.
 func LocateMedia(ctx context.Context, db sqlx.Queryer, importer tracking.URIImport, disc *DiscoverySettings, dhts *dht.Server, partitions *ddisc.Partition, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, policy ddisc.Policy, mc library.QueryCleaner) error {
 	log.Println("locate media initiated")
 	defer log.Println("locate media completed")
+
 	if !disc.LocateP2P {
 		return nil
 	}
 
+	locateCooldown := backoffx.New(
+		backoffx.Multiple(24*time.Hour),
+		backoffx.Maximum(7*24*time.Hour),
+		backoffx.JitterRandom(15*time.Minute),
+	)
 	q := ddisc.LocateSearchBuilder().Where(ddisc.LocateQueryPending())
 	s := sqlx.Scan(ddisc.LocateSearch(ctx, db, q))
 
 	for loc := range s.Iter() {
 		log.Println("locating initiated", loc.ID, loc.Query)
+
+		nextCheckAt := time.Now().Add(locateCooldown.Backoff(int(loc.Attempts)))
+		if err := ddisc.LocateCooldown(ctx, db, loc.ID, nextCheckAt).Scan(&loc); err != nil {
+			errorsx.Log(err)
+			continue
+		}
 
 		d, err := Locate(ctx, db, disc, dhts, partitions, plugins, peertube, policy, mc, loc)
 		if errors.Is(err, ddisc.ErrNoCandidate) {

@@ -14,7 +14,10 @@ import (
 type LocateOption func(*Locate)
 
 func LocateQueryPending() squirrel.Sqlizer {
-	return squirrel.Expr("ddisc_locate.tombstoned_at = 'infinity'::timestamptz")
+	return squirrel.And{
+		squirrel.Expr("ddisc_locate.tombstoned_at = 'infinity'::timestamptz"),
+		squirrel.Expr("ddisc_locate.next_check_at <= NOW()"),
+	}
 }
 
 func LocateSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) LocateScanner {
@@ -35,11 +38,16 @@ func NewLocate(query, mimetype string, options ...LocateOption) (l Locate) {
 		Query:        query,
 		Mimetype:     mimetype,
 		KnownMediaID: uuid.Nil.String(),
+		ProfileID:    uuid.Nil.String(),
 	}, options...)
 }
 
 func LocateOptionKnownMedia(id string) LocateOption {
 	return func(l *Locate) { l.KnownMediaID = id }
+}
+
+func LocateOptionProfile(id string) LocateOption {
+	return func(l *Locate) { l.ProfileID = id }
 }
 
 func LocateOptionAutoDownload(v bool) LocateOption {
