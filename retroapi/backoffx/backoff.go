@@ -293,3 +293,33 @@ func (t frequency) Backoff(attempt int) time.Duration {
 	d = nts.Sub(ts)
 	return d
 }
+
+// Multiple implements a linear backoff: fq * attempt. attempt 0 always
+// returns 0.
+func Multiple(fq time.Duration) Strategy {
+	if fq == 0 {
+		panic("multiple backoff can't be scaled by 0")
+	}
+
+	return multiple{fq: fq}
+}
+
+type multiple struct {
+	fq time.Duration
+}
+
+func (t multiple) Backoff(attempt int) time.Duration {
+	if attempt <= 0 {
+		return 0
+	}
+
+	hi, lo := bits.Mul64(uint64(attempt), uint64(t.fq))
+
+	// check if we overflowed into hi bits, or if the low bits
+	// are negative.
+	if hi != 0 || (lo)&(1<<63) == (1<<63) {
+		return time.Duration(math.MaxInt64)
+	}
+
+	return time.Duration(lo)
+}
