@@ -81,6 +81,8 @@ func (t KnownIdentifier) Identify(ctx context.Context, i string) (res KnownScore
 	trace.Logf(ctx, "lucene", "%q", terms)
 	trace.Logf(ctx, "stripped", "%q | %q", squery, ssubquery)
 
+	log.Printf("extracted mode: %T title: %q subtitle: %q episode: %q release: %q\n", t.cleaner, query, subquery, episode, release)
+
 	// nothing to search with (i.e. the cleaner detected a messy input), an empty lucene query would
 	// match the entire catalog.
 	if stringsx.Blank(terms) {
