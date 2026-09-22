@@ -27,7 +27,7 @@ class CommunityContentDisplay extends StatefulWidget {
   State<CommunityContentDisplay> createState() => _CommunityContentDisplayState();
 }
 
-class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
+class _CommunityContentDisplayState extends State<CommunityContentDisplay> with ds.LoadingState {
   api.PublishedContentSearchResponse _resp = api.PublishedContentSearchResponse(
     next: api.PublishedContentSearchRequest(
       offset: ds.Int64(0),
@@ -35,19 +35,6 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
       query: "",
     ),
   );
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _clearCause() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   @override
   void initState() {
@@ -57,8 +44,8 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
 
   Future<void> _load(Future<api.PublishedContentSearchResponse> Function() fn) {
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     return httpx
@@ -70,17 +57,17 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: _clearCause);
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _clearCause);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         })
         .whenComplete(() {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         });
   }
@@ -125,8 +112,8 @@ class _CommunityContentDisplayState extends State<CommunityContentDisplay> {
               : null,
         ),
       ),
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       children: _resp.items,
       leading: ds.SearchTray(
         decoration: InputDecoration(hintText: "search content"),
