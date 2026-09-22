@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"runtime/trace"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
@@ -37,6 +38,8 @@ import (
 // scan is what notices those (and any previously-imported winner) on a
 // later pass.
 func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts *dht.Server, partitions *ddisc.Partition, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, policy ddisc.Policy, mc library.QueryCleaner, loc ddisc.Locate) (ddisc.Discovered, error) {
+	trace.Logf(ctx, "input", "known_media_id: %q query: %q", loc.KnownMediaID, loc.Query)
+
 	strategies := []ddisc.DiscoverStrategy{}
 	// the DHT partition strategy, the local fallback strategy, and the
 	// partition's peer-side responder all key strictly off known_media_id
@@ -59,12 +62,14 @@ func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts 
 	best, err := ddisc.Select(func(yield func(ddisc.Discovered) bool) {
 		for v := range seq.Each(ctx) {
 			log.Println("located", v.Title, v.PolicyRank, v.PolicyRejection)
+			trace.Logf(ctx, "candidate", "title: %q rank: %v rejection: %q", v.Title, v.PolicyRank, v.PolicyRejection)
 			if !yield(v) {
 				return
 			}
 		}
 	})
 	if serr := seq.Err(); serr != nil {
+		trace.Logf(ctx, "error", "%v", serr)
 		return ddisc.Discovered{}, serr
 	}
 
@@ -101,6 +106,10 @@ func DiscoveredDownload(ctx context.Context, db sqlx.Queryer, importer tracking.
 // LocateMedia drains pending ddisc_locate rows, locating and downloading
 // the best candidate for each.
 func LocateMedia(ctx context.Context, db sqlx.Queryer, importer tracking.URIImport, disc *DiscoverySettings, dhts *dht.Server, partitions *ddisc.Partition, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, policy ddisc.Policy, mc library.QueryCleaner) error {
+	var task *trace.Task
+	ctx, task = trace.NewTask(ctx, "ddisc.locate_media")
+	defer task.End()
+
 	log.Println("locate media initiated")
 	defer log.Println("locate media completed")
 
@@ -118,6 +127,7 @@ func LocateMedia(ctx context.Context, db sqlx.Queryer, importer tracking.URIImpo
 
 	for loc := range s.Iter() {
 		log.Println("locating initiated", loc.ID, loc.Query)
+		trace.Logf(ctx, "entry", "known_media_id: %q query: %q", loc.KnownMediaID, loc.Query)
 
 		nextCheckAt := time.Now().Add(locateCooldown.Backoff(int(loc.Attempts)))
 		if err := ddisc.LocateCooldown(ctx, db, loc.ID, nextCheckAt).Scan(&loc); err != nil {
@@ -127,22 +137,27 @@ func LocateMedia(ctx context.Context, db sqlx.Queryer, importer tracking.URIImpo
 
 		d, err := Locate(ctx, db, disc, dhts, partitions, plugins, peertube, policy, mc, loc)
 		if errors.Is(err, ddisc.ErrNoCandidate) {
+			trace.Logf(ctx, "outcome", "known_media_id: %q status: no_candidate", loc.KnownMediaID)
 			continue
 		} else if err != nil {
 			errorsx.Log(err)
+			trace.Logf(ctx, "outcome", "known_media_id: %q status: error err: %v", loc.KnownMediaID, err)
 			continue
 		}
 
 		if err := DiscoveredDownload(ctx, db, importer, loc, d); err != nil {
 			errorsx.Log(err)
+			trace.Logf(ctx, "outcome", "known_media_id: %q status: download_error err: %v", loc.KnownMediaID, err)
 			continue
 		}
 
 		if err := ddisc.LocateCompleted(ctx, db, loc.ID).Scan(&loc); err != nil {
 			errorsx.Log(err)
+			trace.Logf(ctx, "outcome", "known_media_id: %q status: complete_error err: %v", loc.KnownMediaID, err)
 			continue
 		}
 
+		trace.Logf(ctx, "outcome", "known_media_id: %q status: completed", loc.KnownMediaID)
 		log.Println("locating completed", loc.ID, loc.Query)
 	}
 
