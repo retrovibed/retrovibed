@@ -89,21 +89,16 @@ class PublishContainer extends StatefulWidget {
   State<PublishContainer> createState() => _PublishContainerState();
 }
 
-class _PublishContainerState extends State<PublishContainer> {
+class _PublishContainerState extends State<PublishContainer> with ds.LoadingState {
   int _step = 0;
   Download? _download;
   Known? _known;
   Community? _community;
-  Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
 
   @override
   void initState() {
     super.initState();
+    loading = false;
     _community = widget.community;
   }
 
@@ -187,7 +182,7 @@ class _PublishContainerState extends State<PublishContainer> {
           SizedBox(height: defaults.spacing * 2),
           Expanded(
             child: SingleChildScrollView(
-              child: ds.ErrorScreen(content, cause: _cause),
+              child: ds.ErrorScreen(content, cause: cause),
             ),
           ),
         ],

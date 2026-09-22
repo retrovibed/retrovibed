@@ -38,15 +38,14 @@ class PublishConfirmation extends StatefulWidget {
   State<PublishConfirmation> createState() => _PublishConfirmationState();
 }
 
-class _PublishConfirmationState extends State<PublishConfirmation> {
+class _PublishConfirmationState extends State<PublishConfirmation> with ds.LoadingState {
   late PublishContentRequest _request;
   String _oauthGoogleId = '';
-  bool _loading = false;
-  Widget _cause = ds.Error.zero;
 
   @override
   void initState() {
     super.initState();
+    loading = false;
     _request = PublishContentRequest(
       publishMode: widget.community?.defaultPublishMode ?? PublishMode.UNLISTED,
       publishedContent: PublishedContent(),
@@ -65,27 +64,16 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
           })
           .catchError((e) {
             setState(() {
-              _cause = ds.Errors.httpauto(e, onTap: _reseterr);
+              cause = ds.Errors.httpauto(e, onTap: reseterr);
             });
           }, test: httpx.ErrorsTest.httpauto);
     });
   }
 
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
-
   void _publish() {
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     _request.publishedContent
@@ -104,17 +92,17 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
         .then((_) => widget.onPublished())
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: _reseterr);
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _reseterr);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         })
         .whenComplete(() {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         });
   }
@@ -126,8 +114,8 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
     final isVideo = mimex.isVideo(widget.download?.media.mimetype ?? '');
 
     return ds.Loading(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -175,9 +163,9 @@ class _PublishConfirmationState extends State<PublishConfirmation> {
             SizedBox(height: defaults.spacing * 2),
             Center(
               child: ElevatedButton(
-                onPressed: _loading ? null : _publish,
+                onPressed: loading ? null : _publish,
                 child:
-                    _loading
+                    loading
                         ? SizedBox(
                           width: 20,
                           height: 20,

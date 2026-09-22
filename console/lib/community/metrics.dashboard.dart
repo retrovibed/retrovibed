@@ -44,22 +44,9 @@ class MetricsDashboard extends StatefulWidget {
   State<MetricsDashboard> createState() => _MetricsDashboardState();
 }
 
-class _MetricsDashboardState extends State<MetricsDashboard> {
+class _MetricsDashboardState extends State<MetricsDashboard> with ds.LoadingState {
   communityapi.CommunityMetricsResponse _metrics = communityapi.CommunityMetricsResponse();
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
   timex.Range _selected = _defaultSegments().first;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _clearCause() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   @override
   void initState() {
@@ -70,8 +57,8 @@ class _MetricsDashboardState extends State<MetricsDashboard> {
 
   Future<void> _syncAndLoad() {
     setState(() {
-      _loading = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     final auth = [authn.request(authn.AuthzCache.meta(context))];
@@ -81,17 +68,17 @@ class _MetricsDashboardState extends State<MetricsDashboard> {
         .then((_) => _loadMetrics())
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: _clearCause);
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _clearCause);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         })
         .whenComplete(() {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         });
   }
@@ -115,17 +102,17 @@ class _MetricsDashboardState extends State<MetricsDashboard> {
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: _clearCause);
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _clearCause);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         })
         .whenComplete(() {
           setState(() {
-            _loading = false;
+            loading = false;
           });
         });
   }
@@ -188,8 +175,8 @@ class _MetricsDashboardState extends State<MetricsDashboard> {
             : emptyState;
 
     return ds.Loading(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

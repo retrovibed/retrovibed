@@ -29,30 +29,18 @@ class PublishMetadata extends StatefulWidget {
   State<PublishMetadata> createState() => _PublishMetadataState();
 }
 
-class _PublishMetadataState extends State<PublishMetadata> {
+class _PublishMetadataState extends State<PublishMetadata> with ds.LoadingState {
   Known _formData = Known(
     released: DateTime.now().toIso8601String().split('T').first,
     adult: false,
   );
   String _dirty = uuidx.min();
-  bool _loadingMetadata = false;
   bool _hasExistingMetadata = false;
-  Widget _cause = ds.Error.zero;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _clearCause() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
+    loading = false;
     _initializeForm();
   }
 
@@ -72,8 +60,8 @@ class _PublishMetadataState extends State<PublishMetadata> {
     }
 
     setState(() {
-      _loadingMetadata = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     ds.postframe(() {
@@ -99,7 +87,7 @@ class _PublishMetadataState extends State<PublishMetadata> {
           })
           .whenComplete(() {
             setState(() {
-              _loadingMetadata = false;
+              loading = false;
             });
           });
     });
@@ -123,8 +111,8 @@ class _PublishMetadataState extends State<PublishMetadata> {
     }
 
     setState(() {
-      _loadingMetadata = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     final authOptions = [authn.request(authn.AuthzCache.meta(context))];
@@ -141,12 +129,12 @@ class _PublishMetadataState extends State<PublishMetadata> {
         .then((_) => widget.onConfirm(known))
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _clearCause);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         })
         .whenComplete(() {
           setState(() {
-            _loadingMetadata = false;
+            loading = false;
           });
         });
   }
@@ -154,7 +142,7 @@ class _PublishMetadataState extends State<PublishMetadata> {
   void _submit() {
     if (_formData.description.isEmpty) {
       setState(() {
-        _cause = ds.Error.unknown('Title is required', onTap: _clearCause);
+        cause = ds.Error.unknown('Title is required', onTap: reseterr);
       });
       return;
     }
@@ -165,8 +153,8 @@ class _PublishMetadataState extends State<PublishMetadata> {
     }
 
     setState(() {
-      _loadingMetadata = true;
-      _cause = ds.Error.zero;
+      loading = true;
+      cause = ds.Error.zero;
     });
 
     final authOptions = [authn.request(authn.AuthzCache.meta(context))];
@@ -180,12 +168,12 @@ class _PublishMetadataState extends State<PublishMetadata> {
         .then((response) => _sync(response.known))
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _clearCause);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         })
         .whenComplete(() {
           setState(() {
-            _loadingMetadata = false;
+            loading = false;
           });
         });
   }
@@ -194,11 +182,11 @@ class _PublishMetadataState extends State<PublishMetadata> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
-    final isLoading = _loadingMetadata;
+    final isLoading = loading;
     return forms.Container(
       padding: EdgeInsets.zero,
       decoration: BoxDecoration(borderRadius: defaults.borderRadius),
-      cause: _cause,
+      cause: cause,
       loading: isLoading,
       Column(
         mainAxisSize: MainAxisSize.min,

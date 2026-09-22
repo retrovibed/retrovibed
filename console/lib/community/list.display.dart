@@ -28,51 +28,37 @@ class ListDisplay extends StatefulWidget {
   State<ListDisplay> createState() => _ListDisplayState();
 }
 
-class _ListDisplayState extends State<ListDisplay> {
+class _ListDisplayState extends State<ListDisplay> with ds.LoadingState {
   CommunitySearchResponse _resp = CommunitySearchResponse(
     next: CommunitySearchRequest(
       offset: ds.Int64(0),
       limit: ds.Int64(20),
     ),
   );
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
   Widget _overlay = ds.Empty;
 
-  @override
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void _resetCause() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
-
   Future<void> _refresh(CommunitySearchRequest req) {
-    setState(() => _loading = true);
+    setState(() => loading = true);
     return httpx
         .withRetry(() => widget.search(req, options: [authn.request(authn.AuthzCache.meta(context))]))
         .then((response) {
           setState(() {
             _resp = response;
-            _cause = ds.Error.zero;
+            cause = ds.Error.zero;
           });
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: _resetCause);
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unknown(cause, onTap: _resetCause);
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
           });
         })
         .whenComplete(() {
-          setState(() => _loading = false);
+          setState(() => loading = false);
         });
   }
 
@@ -113,8 +99,8 @@ class _ListDisplayState extends State<ListDisplay> {
       reset: _resetoverlay,
     );
     return ds.Table(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       children: _resp.items,
       overlay: _overlay,
       empty: Center(child: Text('No communities found')),
