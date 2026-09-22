@@ -122,7 +122,7 @@ func LocateInsertWithDefaults(
 	pattern func(ctx context.Context, q sqlx.Queryer, a Locate) NewLocateScannerStaticRow,
 ) {
 	gql.Into("ddisc_locate").Default("created_at", "updated_at", "tombstoned_at", "located_torrent_id", "attempts", "next_check_at").Conflict(
-		"ON CONFLICT (id) DO UPDATE SET updated_at = NOW(), tombstoned_at = EXCLUDED.tombstoned_at, located_torrent_id = EXCLUDED.located_torrent_id, adult = EXCLUDED.adult, autodownload = EXCLUDED.autodownload",
+		"ON CONFLICT (id) DO UPDATE SET updated_at = NOW(), tombstoned_at = EXCLUDED.tombstoned_at, located_torrent_id = EXCLUDED.located_torrent_id, adult = EXCLUDED.adult, autodownload = EXCLUDED.autodownload, attempts = EXCLUDED.attempts, next_check_at = EXCLUDED.next_check_at",
 	)
 }
 
@@ -188,7 +188,7 @@ func SearchQueuePending(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer) NewSearchQueueScannerStatic,
 ) {
-	gql = gql.Query(`SELECT ` + SearchQueueScannerStaticColumns + ` FROM ddisc_search_queue WHERE next_check_at <= NOW()`)
+	gql = gql.Query(`SELECT ` + SearchQueueScannerStaticColumns + ` FROM ddisc_search_queue WHERE next_check_at <= NOW() LIMIT 32`)
 }
 
 // SearchQueueResolve removes a known_media_id from the queue once at least
