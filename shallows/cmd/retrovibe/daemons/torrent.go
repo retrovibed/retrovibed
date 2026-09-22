@@ -566,7 +566,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 	}
 
 	if t.plugins != nil || t.peertube != nil {
-		errorsx.Log(SearchQueueBackground(dctx, t.db, importer, t.plugins, t.peertube, t.mc))
+		errorsx.Log(SearchQueueBackground(dctx, t.db, t.plugins, t.peertube, t.mc))
 	}
 
 	if disc.Enabled && disc.Ratio > 0 {

@@ -32,11 +32,15 @@ func DownloadDiscovered(ctx context.Context, db sqlx.Queryer, importer tracking.
 
 	// import resolved the real infohash (parsed from the magnet, or hashed
 	// from the actually-fetched .torrent bytes) - persist d now, correcting
-	// whatever placeholder infohash it carried until this point.
+	// whatever placeholder infohash it carried until this point. It also
+	// clears d's default-private flag (see NewDiscoveredFromImport) to
+	// whatever the fetched torrent's info dict actually says - the only
+	// point BEP 27 privacy becomes known.
 	d = langx.Clone(
 		d,
 		DiscoveredOptionAcquisitionState(acquisition),
 		DiscoveredOptionInfoHash(lmd.Infohash),
+		DiscoveredOptionPrivate(lmd.Private),
 		langx.Compose(options...),
 	)
 	if err = DiscoveredInsertWithDefaults(ctx, db, d).Scan(&d); err != nil {

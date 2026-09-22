@@ -157,7 +157,11 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 		require.Equal(t, "magnet:?xt=urn:btih:1111111111111111111111111111111111111111", blank.URI, "an empty incoming uri leaves the stored one untouched")
 	})
 
-	t.Run("on conflict private is sticky - a later non-private write can never downgrade it", func(t *testing.T) {
+	t.Run("on conflict private is whatever the most recent write says - not sticky", func(t *testing.T) {
+		// this is what lets ddisc.DownloadDiscovered clear the
+		// default-private flag NewDiscoveredFromImport sets on every
+		// unresolved candidate, once the real torrent's info dict says
+		// it's actually public.
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -186,7 +190,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 		reinserted := private
 		reinserted.Private = false
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, reinserted).Scan(&reinserted))
-		require.True(t, reinserted.Private, "a less-informed writer must never downgrade an already-private record")
+		require.False(t, reinserted.Private, "the most recent write's private value wins, even to clear it")
 	})
 
 	t.Run("rejects corrupted titles from syncing instead of failing the insert", func(t *testing.T) {

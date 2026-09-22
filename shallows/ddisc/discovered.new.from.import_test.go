@@ -95,4 +95,35 @@ func TestNewDiscoveredFromImport(t *testing.T) {
 		)
 		require.Equal(t, mimex.Video, d.Mimetype)
 	})
+
+	t.Run("defaults to private since its real BEP 27 privacy isn't known until resolved", func(t *testing.T) {
+		// covers both the http-uri (placeholder infohash) and magnet
+		// (real infohash, but content still unfetched) shapes - neither
+		// has actually seen the torrent's info dict yet, so neither can
+		// know its real privacy. Only ddisc.DownloadDiscovered, once it
+		// resolves the candidate, is entitled to clear this.
+		httpCandidate := ddisc.NewDiscoveredFromImport(&ddiscapi.Import{Uri: "https://tracker.example/download/1.torrent"})
+		require.True(t, httpCandidate.Private)
+
+		magnetInfohash := []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}
+		magnet := metainfo.NewMagnetFromInfohash(magnetInfohash).String()
+		magnetCandidate := ddisc.NewDiscoveredFromImport(&ddiscapi.Import{Uri: magnet})
+		require.True(t, magnetCandidate.Private)
+	})
+
+	t.Run("resolving a candidate is what's marked by content mime and uri scheme, not by its infohash", func(t *testing.T) {
+		// a caller (e.g. tracking.URIImport.Resolve) decides how to fetch a
+		// row's real metadata from URI + Contentmime alone (magnet: parsed
+		// locally, http(s) fetched) - never by comparing Infohash against
+		// its placeholder value.
+		httpCandidate := ddisc.NewDiscoveredFromImport(&ddiscapi.Import{Uri: "https://tracker.example/download/1.torrent"})
+		require.Equal(t, mimex.Bittorrent, httpCandidate.Contentmime)
+		require.Equal(t, "https://tracker.example/download/1.torrent", httpCandidate.URI)
+
+		magnetInfohash := []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}
+		magnet := metainfo.NewMagnetFromInfohash(magnetInfohash).String()
+		magnetCandidate := ddisc.NewDiscoveredFromImport(&ddiscapi.Import{Uri: magnet})
+		require.Equal(t, mimex.Bittorrent, magnetCandidate.Contentmime)
+		require.Equal(t, magnet, magnetCandidate.URI)
+	})
 }

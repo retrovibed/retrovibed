@@ -344,6 +344,13 @@ func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...Discove
 // placeholder until the real infohash is resolved - which only happens
 // once this row is actually selected and handed to an importer (see
 // daemons.DiscoveredDownload), not for every candidate up front.
+//
+// Its BEP 27 privacy is unknown until that same resolution happens - the
+// torrent's info dict, where the private flag actually lives, isn't
+// fetched for every candidate up front either. So every candidate starts
+// Private (see DiscoveredOptionPrivate below), and DownloadDiscovered
+// corrects it once the real info dict is in hand. This is a deliberately
+// conservative default, not something a plugin can opt out of.
 func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) (m Discovered) {
 	id := md5x.FormatUUID(md5x.Digest(imp.Uri))
 	infohash := int160.FromHashedBytes([]byte(imp.Uri))
@@ -376,6 +383,7 @@ func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) 
 		ReleasedAt:             timex.NegInf(),
 		TombstonedAt:           time.Now().Add(3 * time.Hour),
 		PolicyRank:             math.MaxUint16,
+		Private:                true,
 	},
 		DiscoveredOptionAcquisitionState(AcquisitionStateEphemeral),
 		langx.Compose(options...),

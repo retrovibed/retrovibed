@@ -29,7 +29,12 @@ func DiscoveredInsertWithDefaults(
 	gql genieql.Insert,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Discovered) NewDiscoveredScannerStaticRow,
 ) {
-	gql.Into("ddisc_media").Default("created_at", "updated_at", "released_at", "next_check_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, title = COALESCE(NULLIF(EXCLUDED.title, ''), ddisc_media.title), uri = COALESCE(NULLIF(EXCLUDED.uri, ''), ddisc_media.uri), infohash = EXCLUDED.infohash, policy_rank = EXCLUDED.policy_rank, policy_rejection = EXCLUDED.policy_rejection, private = ddisc_media.private OR EXCLUDED.private")
+	// private is whatever the caller most recently wrote - not sticky.
+	// NewDiscoveredFromImport defaults every unresolved candidate to
+	// private, and ddisc.DownloadDiscovered overwrites it with the real
+	// value once the torrent's info dict is actually fetched, so a plain
+	// overwrite here is what lets that correction take effect.
+	gql.Into("ddisc_media").Default("created_at", "updated_at", "released_at", "next_check_at").Conflict("ON CONFLICT (id) DO UPDATE SET updated_at = DEFAULT, title = COALESCE(NULLIF(EXCLUDED.title, ''), ddisc_media.title), uri = COALESCE(NULLIF(EXCLUDED.uri, ''), ddisc_media.uri), infohash = EXCLUDED.infohash, policy_rank = EXCLUDED.policy_rank, policy_rejection = EXCLUDED.policy_rejection, private = EXCLUDED.private")
 }
 
 func DiscoveredFindByID(

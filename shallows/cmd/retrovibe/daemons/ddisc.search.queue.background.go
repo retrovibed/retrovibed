@@ -12,19 +12,22 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
-	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
+func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
 	// SearchQueueBackgroundRun drains ddisc_search_queue: for each pending
 	// known-media-id, ask the external search strategies (wasm plugins,
-	// PeerTube/SepiaSearch) for candidates, resolve each candidate's real
-	// infohash (without importing/downloading it - see
-	// tracking.URIImport.Resolve) and persist whatever they find, or push the
-	// entry's cooldown out if nothing turned up. maxAge bounds how long a
-	// known-media-id stays queued for external discovery before it's given
-	// up on and purged.
+	// PeerTube/SepiaSearch) for candidates and persist whatever they find, or
+	// push the entry's cooldown out if nothing turned up. Candidates are
+	// persisted as-is (placeholder infohash, Private defaulted true - see
+	// ddisc.NewDiscoveredFromImport) with no network fetch of the candidate's
+	// .torrent: resolving the real infohash and BEP 27 privacy only happens
+	// once a candidate is actually selected for download (see
+	// ddisc.DownloadDiscovered), not for every candidate the plugins/peertube
+	// turn up on every drain. maxAge bounds how long a known-media-id stays
+	// queued for external discovery before it's given up on and purged.
 	const maxAge = 30 * 24 * time.Hour
 	errorsx.Log(sqlx.Discard(sqlx.Scan(ddisc.SearchQueuePurge(ctx, q, maxAge))))
 
@@ -47,22 +50,18 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer trac
 
 		found := false
 		for d := range seq.Each(sctx) {
-			found = true
-
-			if resolved, rerr := importer.Resolve(sctx, d.URI); rerr != nil {
-				errorsx.Log(errorsx.Wrap(rerr, "unable to resolve discovered candidate"))
+			// a candidate the policy has already rejected (cam, ts, etc.)
+			// isn't worth persisting - see ddisc.Policy.Rank.
+			if stringsx.Present(d.PolicyRejection) {
 				continue
-			} else {
-				d.Infohash = resolved.Infohash
-				// private torrents stay usable to this node but must never be
-				// served to other peers (see ddisc.FindMedia and the sync queries).
-				d.Private = d.Private || resolved.Private
 			}
 
 			if err := ddisc.DiscoveredInsertWithDefaults(sctx, q, d).Scan(&d); err != nil {
 				errorsx.Log(errorsx.Wrap(err, "unable to persist discovered candidate"))
 				continue
 			}
+
+			found = true
 		}
 		err := seq.Err()
 		cancel()
@@ -88,7 +87,7 @@ func SearchQueueBackgroundRun(ctx context.Context, q sqlx.Queryer, importer trac
 
 // SearchQueueBackground drains the queue, then polls for new entries on an
 // exponential backoff that maxes out at an hour.
-func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, importer tracking.URIImport, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
+func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, plugins searchplugin.T, peertube ddisc.DiscoverStrategy, mc library.QueryCleaner) error {
 	wakeup := asyncx.NewWakeup(ctx)
 	defer wakeup.Broadcast() // kick off an initial drain
 	s := backoffx.New(
@@ -100,7 +99,7 @@ func SearchQueueBackground(ctx context.Context, q sqlx.Queryer, importer trackin
 	go asyncx.Periodic(ctx, wakeup, s, "ddisc search queue drain")
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, wakeup, func(ctx context.Context) error {
-			return SearchQueueBackgroundRun(ctx, q, importer, plugins, peertube, mc)
+			return SearchQueueBackgroundRun(ctx, q, plugins, peertube, mc)
 		}))
 	})
 
