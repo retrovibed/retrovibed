@@ -29,22 +29,9 @@ class Grid extends StatefulWidget {
   State<Grid> createState() => _GridState();
 }
 
-class _GridState extends State<Grid> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _GridState extends State<Grid> with ds.LoadingState {
   List<media.Media> _items = [];
   media.MediaSearchRequest? _lastFetchedNext;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   media.Media _replace(media.Media v) {
     setState(() {
@@ -62,20 +49,20 @@ class _GridState extends State<Grid> {
         .then((v) {
           setState(() {
             _items = v.items;
-            _loading = false;
+            loading = false;
           });
           widget.search.value = media.MediaSearchState(next: req, count: v.items.length);
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Errors.httpauto(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.httpauto)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: reseterr);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -95,8 +82,8 @@ class _GridState extends State<Grid> {
 
         return ds.Grid<media.Media>(
           children: _items,
-          loading: _loading,
-          cause: _cause,
+          loading: loading,
+          cause: cause,
           physics: AlwaysScrollableScrollPhysics(),
           leading: [
             ...widget.leading,
@@ -130,7 +117,7 @@ class _GridState extends State<Grid> {
                         })
                         .catchError((cause) {
                           setState(() {
-                            _cause = ds.Error.unknown(cause, onTap: reseterr);
+                            this.cause = ds.Error.unknown(cause, onTap: reseterr);
                           });
                         });
                   },

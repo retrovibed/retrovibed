@@ -121,24 +121,11 @@ class KnownMediaDropdown extends StatefulWidget {
   State<StatefulWidget> createState() => _KnownMediaDropdown();
 }
 
-class _KnownMediaDropdown extends State<KnownMediaDropdown> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _KnownMediaDropdown extends State<KnownMediaDropdown> with ds.LoadingState {
   api.KnownSearchResponse _res = api.known.response(
     next: api.known.request(limit: 4),
   );
   api.Known? current = null;
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   Future<void> refresh(api.KnownSearchRequest req) {
     return widget
@@ -146,21 +133,21 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
         .then((v) {
           setState(() {
             _res = v;
-            _loading = false;
+            loading = false;
           });
           widget.focus?.requestFocus();
           ds.textediting.refocus(widget.controller);
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unauthorized(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Error.unauthorized(cause, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: reseterr);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -271,8 +258,8 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> {
           forms.Container(
             ds.Grid(
               children: _res.items,
-              loading: _loading,
-              cause: _cause,
+              loading: loading,
+              cause: cause,
               leading: [],
               (context, v) {
                 return KnownMediaCard(

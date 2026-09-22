@@ -28,23 +28,10 @@ class AvailableListDisplay extends StatefulWidget {
   State<StatefulWidget> createState() => _AvailableListDisplay();
 }
 
-class _AvailableListDisplay extends State<AvailableListDisplay> {
-  bool _loading = true;
-  Widget _cause = ds.Error.zero;
+class _AvailableListDisplay extends State<AvailableListDisplay> with ds.LoadingState {
   media.MediaSearchResponse _res = media.media.response(
     next: media.media.request(limit: 32),
   );
-
-  void setState(VoidCallback fn) {
-    if (!mounted) return;
-    super.setState(fn);
-  }
-
-  void reseterr() {
-    setState(() {
-      _cause = ds.Error.zero;
-    });
-  }
 
   Future<void> refresh(media.MediaSearchRequest req) {
     return widget
@@ -52,7 +39,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         .then((v) {
           setState(() {
             _res = v;
-            _loading = false;
+            loading = false;
           });
 
           widget.focus?.requestFocus();
@@ -60,14 +47,14 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
         })
         .catchError((cause) {
           setState(() {
-            _cause = ds.Error.unauthorized(cause, onTap: reseterr);
-            _loading = false;
+            this.cause = ds.Error.unauthorized(cause, onTap: reseterr);
+            loading = false;
           });
         }, test: httpx.ErrorsTest.unauthorized)
         .catchError((e) {
           setState(() {
-            _cause = ds.Error.unknown(e, onTap: reseterr);
-            _loading = false;
+            cause = ds.Error.unknown(e, onTap: reseterr);
+            loading = false;
           });
         });
   }
@@ -88,7 +75,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
           StreamSink<httpx.UploadProgress>? progress,
         }) {
           setState(() {
-            _loading = true;
+            loading = true;
           });
 
           final multiparts = v.files.map((c) {
@@ -111,7 +98,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                           })
                           .catchError((cause) {
                             setState(() {
-                              _cause = ds.Error.unknown(cause, onTap: reseterr);
+                              this.cause = ds.Error.unknown(cause, onTap: reseterr);
                             });
                           });
                     });
@@ -123,15 +110,15 @@ class _AvailableListDisplay extends State<AvailableListDisplay> {
                 })
                 .whenComplete(
                   () => setState(() {
-                    _loading = false;
+                    loading = false;
                   }),
                 );
           });
         };
 
     return ds.Table(
-      loading: _loading,
-      cause: _cause,
+      loading: loading,
+      cause: cause,
       leading: ds.SearchTray(
         autofocus: defaults.desktop,
         decoration: InputDecoration(hintText: "search the library"),
