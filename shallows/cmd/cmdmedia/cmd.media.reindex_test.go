@@ -169,6 +169,131 @@ func TestReindexRun(t *testing.T) {
 		require.Contains(t, gotUnindexed.Description, files[1].Path)
 	})
 
+	t.Run("reidentify flag marks records for reidentification", func(t *testing.T) {
+		ctx := t.Context()
+		db := sqltestx.Metadatabase(t)
+
+		info := testx.Must(torrenttest.Tree(t.TempDir(), rand.Reader, 16*bytesx.KiB, 64*bytesx.KiB, []string{"file1.mkv"}))(t)
+		md, err := torrent.NewFromInfo(info)
+		require.NoError(t, err)
+
+		torrentdir := t.TempDir()
+		raw := metainfo.MetaInfo{InfoBytes: md.InfoBytes}
+		require.NoError(t, os.WriteFile(filepath.Join(torrentdir, md.ID.String()+tracking.TorrentSuffix), testx.Must(metainfo.Encode(raw))(t), 0600))
+
+		tmd := tracking.NewMetadata(new(md.ID), tracking.MetadataOptionFromInfo(info), tracking.MetadataOptionAutoDescription)
+		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, db, tmd).Scan(&tmd))
+
+		var files []metainfo.File
+		for f := range metainfo.Files(info) {
+			files = append(files, f)
+		}
+		require.Len(t, files, 1)
+
+		mediastore := fsx.DirVirtual(t.TempDir())
+
+		lmdID := uuid.Must(uuid.NewV4()).String()
+		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(lmdID)))
+		lmd := library.NewMetadata(lmdID,
+			library.MetadataOptionDescription(files[0].Path),
+			library.MetadataOptionBytes(files[0].Length),
+			library.MetadataOptionOffset(files[0].Offset),
+			library.MetadataOptionTorrentID(tmd.ID),
+			library.MetadataOptionKnownMediaID(uuid.Must(uuid.NewV4()).String()),
+		)
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
+
+		require.NoError(t, reindex{Identification: true, DryRun: false}.run(ctx, db, library.QueryCleanerNoop(), mediastore))
+
+		var got library.Metadata
+		require.NoError(t, library.MetadataFindByID(ctx, db, lmd.ID).Scan(&got))
+		require.Equal(t, uuid.Max.String(), got.KnownMediaID)
+	})
+
+	t.Run("without reidentify flag the known media id is preserved", func(t *testing.T) {
+		ctx := t.Context()
+		db := sqltestx.Metadatabase(t)
+
+		info := testx.Must(torrenttest.Tree(t.TempDir(), rand.Reader, 16*bytesx.KiB, 64*bytesx.KiB, []string{"file1.mkv"}))(t)
+		md, err := torrent.NewFromInfo(info)
+		require.NoError(t, err)
+
+		torrentdir := t.TempDir()
+		raw := metainfo.MetaInfo{InfoBytes: md.InfoBytes}
+		require.NoError(t, os.WriteFile(filepath.Join(torrentdir, md.ID.String()+tracking.TorrentSuffix), testx.Must(metainfo.Encode(raw))(t), 0600))
+
+		tmd := tracking.NewMetadata(new(md.ID), tracking.MetadataOptionFromInfo(info), tracking.MetadataOptionAutoDescription)
+		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, db, tmd).Scan(&tmd))
+
+		var files []metainfo.File
+		for f := range metainfo.Files(info) {
+			files = append(files, f)
+		}
+		require.Len(t, files, 1)
+
+		mediastore := fsx.DirVirtual(t.TempDir())
+
+		kid := uuid.Must(uuid.NewV4()).String()
+		lmdID := uuid.Must(uuid.NewV4()).String()
+		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(lmdID)))
+		lmd := library.NewMetadata(lmdID,
+			library.MetadataOptionDescription(files[0].Path),
+			library.MetadataOptionBytes(files[0].Length),
+			library.MetadataOptionOffset(files[0].Offset),
+			library.MetadataOptionTorrentID(tmd.ID),
+			library.MetadataOptionKnownMediaID(kid),
+		)
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
+
+		require.NoError(t, reindex{Identification: false, DryRun: false}.run(ctx, db, library.QueryCleanerNoop(), mediastore))
+
+		var got library.Metadata
+		require.NoError(t, library.MetadataFindByID(ctx, db, lmd.ID).Scan(&got))
+		require.Equal(t, kid, got.KnownMediaID)
+	})
+
+	t.Run("reidentify flag is ignored during a dry run", func(t *testing.T) {
+		ctx := t.Context()
+		db := sqltestx.Metadatabase(t)
+
+		info := testx.Must(torrenttest.Tree(t.TempDir(), rand.Reader, 16*bytesx.KiB, 64*bytesx.KiB, []string{"file1.mkv"}))(t)
+		md, err := torrent.NewFromInfo(info)
+		require.NoError(t, err)
+
+		torrentdir := t.TempDir()
+		raw := metainfo.MetaInfo{InfoBytes: md.InfoBytes}
+		require.NoError(t, os.WriteFile(filepath.Join(torrentdir, md.ID.String()+tracking.TorrentSuffix), testx.Must(metainfo.Encode(raw))(t), 0600))
+
+		tmd := tracking.NewMetadata(new(md.ID), tracking.MetadataOptionFromInfo(info), tracking.MetadataOptionAutoDescription)
+		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, db, tmd).Scan(&tmd))
+
+		var files []metainfo.File
+		for f := range metainfo.Files(info) {
+			files = append(files, f)
+		}
+		require.Len(t, files, 1)
+
+		mediastore := fsx.DirVirtual(t.TempDir())
+
+		kid := uuid.Must(uuid.NewV4()).String()
+		lmdID := uuid.Must(uuid.NewV4()).String()
+		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(lmdID)))
+		lmd := library.NewMetadata(lmdID,
+			library.MetadataOptionDescription(files[0].Path),
+			library.MetadataOptionBytes(files[0].Length),
+			library.MetadataOptionOffset(files[0].Offset),
+			library.MetadataOptionTorrentID(tmd.ID),
+			library.MetadataOptionKnownMediaID(kid),
+		)
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
+
+		require.NoError(t, reindex{Identification: true, DryRun: true}.run(ctx, db, library.QueryCleanerNoop(), mediastore))
+
+		var got library.Metadata
+		require.NoError(t, library.MetadataFindByID(ctx, db, lmd.ID).Scan(&got))
+		require.Equal(t, kid, got.KnownMediaID)
+	})
+
 	t.Run("record with no matching tracking metadata is skipped without failing", func(t *testing.T) {
 		ctx := t.Context()
 		db := sqltestx.Metadatabase(t)

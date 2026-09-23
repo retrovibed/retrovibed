@@ -1,11 +1,12 @@
 package cmdmedia
 
 type Commands struct {
-	Import  importFilesystem `cmd:"" help:"import files and directories"`
-	Export  exportFilesystem `cmd:"" help:"export media to a directory"`
-	Reindex reindex          `cmd:"" help:"run the indexing process on media contents, this can take a bit"`
-	Known   Known            `cmd:"" help:"functionality for managing known media"`
-	Inspect Inspect          `cmd:"" help:"inspect a file to identify its metadata"`
+	Import   importFilesystem `cmd:"" help:"import files and directories"`
+	Export   exportFilesystem `cmd:"" help:"export media to a directory"`
+	Reindex  reindex          `cmd:"" help:"run the indexing process on media contents, this can take a bit"`
+	Identify identify         `cmd:"" help:"identify known media for library media that needs identification"`
+	Known    Known            `cmd:"" help:"functionality for managing known media"`
+	Inspect  Inspect          `cmd:"" help:"inspect a file to identify its metadata"`
 }
 
 type Known struct {
