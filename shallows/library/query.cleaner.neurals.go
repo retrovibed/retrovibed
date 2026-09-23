@@ -46,6 +46,11 @@ func NewQueryerCleanerV0(path string, options ...func(*neurals.Text)) *QueryerCl
 		return nil
 	}
 
+	if envx.Boolean(false, env.MediaIdentificationDisabled) {
+		log.Println("media identification disabled", path, "not attempting to load")
+		return nil
+	}
+
 	log.Println("neural located at", path, "loading...")
 
 	return &QueryerCleanerV0{text: neurals.NewText(path, options...)}
