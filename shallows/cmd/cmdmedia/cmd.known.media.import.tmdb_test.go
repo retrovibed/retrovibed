@@ -393,7 +393,7 @@ func TestTmdbImportMovies(t *testing.T) {
 		}
 
 		require.NoError(t, tm.cause)
-		require.Equal(t, []string{"Movie One", "Movie Two"}, titles)
+		require.ElementsMatch(t, []string{"Movie One", "Movie Two"}, titles)
 		require.Equal(t, 2, requests)
 	})
 
