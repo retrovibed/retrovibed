@@ -102,7 +102,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 	queries := asynccompute.New(func(ctx context.Context, rec input) (err error) {
 		var res library.KnownScored
 
-		if res, err = identifier.Identify(ctx, rec.Query); err != nil {
+		if res, err = identifier.Identify(ctx, "", rec.Query); err != nil {
 			return err
 		}
 

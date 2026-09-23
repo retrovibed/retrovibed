@@ -26,14 +26,15 @@ func IdentifyLibraryMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 	log.Println("attempting to identify library media initiated")
 	defer log.Println("attempting to identify library media completed")
 
+	identifier := library.NewKnownIdentifier(db, mc)
+
 	for md := range iter.Iter() {
 		var (
 			err   error
 			known library.KnownScored
 		)
 
-		identifier := library.NewKnownIdentifier(db, mc, library.KnownIdentifierOptionMimetype(mimex.Category(stringsx.FirstNonBlank(md.Mimetype, mimex.Binary))))
-		if known, err = identifier.Identify(ctx, md.Description); err != nil {
+		if known, err = identifier.Identify(ctx, mimex.Category(stringsx.FirstNonBlank(md.Mimetype, mimex.Binary)), md.Description); err != nil {
 			log.Println("unable to detect known media for library media", md.ID, md.Description, "|", err)
 			continue
 		}

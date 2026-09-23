@@ -19,13 +19,6 @@ type KnownScored struct {
 	Relevance float64
 }
 
-// KnownIdentifierOptionMimetype restricts identification to the given mimetype category.
-func KnownIdentifierOptionMimetype(v string) func(*KnownIdentifier) {
-	return func(t *KnownIdentifier) {
-		t.Mimetype = v
-	}
-}
-
 func NewKnownIdentifier(q sqlx.Queryer, c QueryCleaner, options ...func(*KnownIdentifier)) *KnownIdentifier {
 	return new(langx.Clone(KnownIdentifier{
 		q:            q,
@@ -45,11 +38,10 @@ type KnownIdentifier struct {
 	MinRelevance float64
 	Limit        uint
 	Explicit     bool
-	// Mimetype restricts candidates to a mimetype category, blank does not restrict.
-	Mimetype string
 }
 
-func (t KnownIdentifier) Identify(ctx context.Context, i string) (res KnownScored, err error) {
+// Identify the known media for the input, mimetype restricts candidates to a mimetype category, blank does not restrict.
+func (t KnownIdentifier) Identify(ctx context.Context, mimetype string, i string) (res KnownScored, err error) {
 	var (
 		cleaned, query, subquery, release, episode string
 		task                                       *trace.Task
@@ -91,7 +83,7 @@ func (t KnownIdentifier) Identify(ctx context.Context, i string) (res KnownScore
 
 	q := KnownSearchBuilder().Where(squirrel.And{
 		KnownQueryExplicit(t.Explicit),
-		KnownQueryMimetype(t.Mimetype),
+		KnownQueryMimetype(mimetype),
 		lucenex.Query(duckdbx.NewLucene(), terms, lucenex.WithDefaultField("auto_description")),
 	}).
 		OrderByClause(KnownOrderCollationNearest(collation)).

@@ -29,7 +29,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		identifier.Cutoff = library.KnownMatchCutoff
 		identifier.Threshold = library.KnownMatchCutoff
 
-		res, err := identifier.Identify(ctx, "Inception")
+		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, known.UID, res.UID)
 		require.Greater(t, res.Relevance, 0.0)
@@ -50,7 +50,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		identifier.Cutoff = library.KnownMatchCutoff
 		identifier.Threshold = library.KnownMatchCutoff
 
-		res, err := identifier.Identify(ctx, "xyzzy")
+		res, err := identifier.Identify(ctx, "", "xyzzy")
 		require.NoError(t, err)
 		require.Equal(t, uuid.Nil.String(), res.UID)
 		require.Zero(t, res.Relevance)
@@ -65,7 +65,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		identifier.Cutoff = library.KnownMatchCutoff
 		identifier.Threshold = library.KnownMatchCutoff
 
-		res, err := identifier.Identify(ctx, "Inception")
+		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, uuid.Nil.String(), res.UID)
 	})
@@ -91,7 +91,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		identifier.Cutoff = library.KnownMatchCutoff
 		identifier.Threshold = library.KnownMatchCutoff
 
-		res, err := identifier.Identify(ctx, "Inception")
+		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, exact.UID, res.UID)
 	})
@@ -113,7 +113,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		identifier.Cutoff = library.KnownMatchCutoff
 		identifier.Threshold = library.KnownMatchCutoff
 
-		res, err := identifier.Identify(ctx, "Inception")
+		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, uuid.Nil.String(), res.UID)
 	})
@@ -134,12 +134,12 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		identifier.Cutoff = library.KnownMatchCutoff
 		identifier.Threshold = library.KnownMatchCutoff
 
-		res, err := identifier.Identify(ctx, "Inception")
+		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, uuid.Nil.String(), res.UID)
 
 		identifier.Explicit = true
-		res, err = identifier.Identify(ctx, "Inception")
+		res, err = identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, known.UID, res.UID)
 	})
@@ -162,7 +162,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		identifier.Cutoff = library.KnownMatchCutoff
 		identifier.Threshold = library.KnownMatchCutoff
 
-		res, err := identifier.Identify(ctx, "Inception")
+		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, known.UID, res.UID)
 	})
@@ -184,7 +184,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		identifier.Threshold = library.KnownMatchCutoff
 
 		// the raw input carries release noise that would never match the catalog on its own.
-		res, err := identifier.Identify(ctx, "Inception 1080p x264 GROUP")
+		res, err := identifier.Identify(ctx, "", "Inception 1080p x264 GROUP")
 		require.NoError(t, err)
 		require.Equal(t, known.UID, res.UID)
 	})
@@ -211,7 +211,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		identifier.Cutoff = library.KnownMatchCutoff
 		identifier.Threshold = library.KnownMatchCutoff
 
-		res, err := identifier.Identify(ctx, "Inception S01E02")
+		res, err := identifier.Identify(ctx, "", "Inception S01E02")
 		require.NoError(t, err)
 		require.Equal(t, expected.UID, res.UID)
 	})
@@ -224,17 +224,14 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		require.Equal(t, 0.85, identifier.MinRelevance)
 		require.Equal(t, uint(8), identifier.Limit)
 		require.False(t, identifier.Explicit)
-		require.Empty(t, identifier.Mimetype)
 	})
 
 	t.Run("options override the defaults", func(t *testing.T) {
 		identifier := library.NewKnownIdentifier(nil, library.QueryCleanerNoop(), func(t *library.KnownIdentifier) {
 			t.Limit = 2
-			t.Mimetype = mimex.Audio
 		})
 
 		require.Equal(t, uint(2), identifier.Limit)
-		require.Equal(t, mimex.Audio, identifier.Mimetype)
 		require.Equal(t, float32(0.7), identifier.Cutoff)
 	})
 
@@ -251,18 +248,15 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		identifier := library.NewKnownIdentifier(db, library.QueryCleanerNoop())
 
-		identifier.Mimetype = mimex.Application
-		res, err := identifier.Identify(ctx, "Inception")
+		res, err := identifier.Identify(ctx, mimex.Application, "Inception")
 		require.NoError(t, err)
 		require.Equal(t, known.UID, res.UID)
 
-		identifier.Mimetype = mimex.Audio
-		res, err = identifier.Identify(ctx, "Inception")
+		res, err = identifier.Identify(ctx, mimex.Audio, "Inception")
 		require.NoError(t, err)
 		require.Equal(t, uuid.Nil.String(), res.UID)
 
-		identifier.Mimetype = ""
-		res, err = identifier.Identify(ctx, "Inception")
+		res, err = identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, known.UID, res.UID)
 	})
@@ -292,20 +286,14 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		identifier := library.NewKnownIdentifier(db, library.QueryCleanerNoop())
 
-		res, err := identifier.Identify(ctx, "Inception")
+		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, uuid.Nil.String(), res.UID)
 
 		identifier.Limit = 9
-		res, err = identifier.Identify(ctx, "Inception")
+		res, err = identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, best.UID, res.UID)
-	})
-
-	t.Run("mimetype option restricts candidates to the mimetype", func(t *testing.T) {
-		identifier := library.NewKnownIdentifier(nil, library.QueryCleanerNoop(), library.KnownIdentifierOptionMimetype(mimex.Video))
-
-		require.Equal(t, mimex.Video, identifier.Mimetype)
 	})
 
 	t.Run("does not search when the cleaner blanks the input", func(t *testing.T) {
@@ -316,7 +304,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 		// the nil queryer fails any attempt to query the catalog.
 		identifier := library.NewKnownIdentifier(nil, cleaner)
 
-		res, err := identifier.Identify(ctx, "Inception")
+		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, uuid.Nil.String(), res.UID)
 	})
@@ -342,7 +330,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		identifier := library.NewKnownIdentifier(db, library.QueryCleanerNoop())
 
-		res, err := identifier.Identify(ctx, "Inception")
+		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
 		require.Equal(t, best.UID, res.UID)
 	})

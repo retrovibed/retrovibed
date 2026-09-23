@@ -128,15 +128,15 @@ type knownMediaDetectSeq struct {
 
 func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 	return func(yield func(Discovered) bool) {
+		identifier := library.NewKnownIdentifier(t.q, t.mc)
+
 		identify := func(d Discovered) (Discovered, error) {
 			if stringsx.Blank(d.Title) {
 				return d, errorsx.Errorf("unable to identify media missing title")
 			}
 
 			// known media stores the coarse mimetype category, see Generalize.
-			identifier := library.NewKnownIdentifier(t.q, t.mc, library.KnownIdentifierOptionMimetype(mimex.Category(Generalize(d.Mimetype))))
-
-			known, err := identifier.Identify(ctx, d.Title)
+			known, err := identifier.Identify(ctx, mimex.Category(Generalize(d.Mimetype)), d.Title)
 			if err != nil {
 				return d, errorsx.Wrap(err, "unable to detect known media")
 			}

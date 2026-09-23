@@ -45,13 +45,12 @@ func (t knowndetect) run(ctx context.Context, in io.Reader, db sqlx.Queryer, cle
 	}
 
 	var count int
+	identifier := library.NewKnownIdentifier(db, cleaner)
 	seq := jsonl.Iter[input](jsonl.NewDecoder(in))
 	for rec := range seq.Each(ctx) {
 		count++
 
-		identifier := library.NewKnownIdentifier(db, cleaner, library.KnownIdentifierOptionMimetype(mimex.Category(rec.Mimetype)))
-
-		result, err := identifier.Identify(ctx, rec.Query)
+		result, err := identifier.Identify(ctx, mimex.Category(rec.Mimetype), rec.Query)
 		if err != nil {
 			return err
 		}

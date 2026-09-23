@@ -73,6 +73,14 @@ func MetadataUpdateDescriptionByID(
 	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), description = {description} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
+// reindexed media metadata, resets the known media id.
+func MetadataUpdateReindexByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, description string, autodescription string, kid string) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), description = {description}, auto_description = {autodescription}, known_media_id = {kid} WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
 func MetadataFindByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,

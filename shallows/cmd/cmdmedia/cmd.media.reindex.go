@@ -8,20 +8,23 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/unsafepretty"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
 type reindex struct {
-	Database  string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
-	Unindexed bool   `flag:"" name:"unindexed" help:"only run against records that havent been indexed" default:"false"`
-	DryRun    bool   `flag:"" name:"dry-run" help:"dont actually update" negatable:"" default:"true"`
+	Database       string `flag:"" name:"database" help:"database to read" default:"${vars_user_configuration_directory}/meta.db"`
+	Unindexed      bool   `flag:"" name:"unindexed" help:"only run against records that havent been indexed" default:"false"`
+	Identification bool   `flag:"" name:"reidentify" help:"mark the records for reidentification"`
+	DryRun         bool   `flag:"" name:"dry-run" help:"dont actually update" negatable:"" default:"true"`
 }
 
 func (t reindex) Run(gctx *cmdopts.Global) (err error) {
@@ -56,6 +59,11 @@ func (t reindex) run(ctx context.Context, db *sql.DB, c library.QueryCleaner, me
 
 	log.Println("records", errorsx.Zero(sqlx.Count(ctx, db, "SELECT COUNT(*) FROM library_metadata")))
 
+	kid := ""
+	if t.Identification {
+		kid = uuid.Max.String()
+	}
+
 	s := sqlx.Scan(library.MetadataSearch(ctx, db, query))
 	for md := range s.Iter() {
 		if uuid.FromStringOrNil(md.TorrentID).IsNil() {
@@ -83,20 +91,20 @@ func (t reindex) run(ctx context.Context, db *sql.DB, c library.QueryCleaner, me
 			continue
 		}
 
-		_, desc, auto := tracking.GenerateDescription(finfo.Path, &tmd)
+		o, desc, auto := tracking.GenerateDescription(finfo.Path, &tmd)
+
+		log.Println("---------------------------------------------")
+		log.Println("unmodified", o)
 		log.Println("resetting description", md.ID, md.Description, "->", desc)
 		log.Println("resetting autodescription", md.ID, md.AutoDescription, "->", auto)
-		log.Println("neural result", desc, "->", errorsx.Zero(c.Clean(ctx, desc)))
+		log.Println("neural result", o, "->", unsafepretty.Print(errorsx.Zero(c.Clean(ctx, o)), unsafepretty.OptionNewlineRunes()))
+		log.Println("---------------------------------------------")
 
 		if t.DryRun {
 			continue
 		}
 
-		if err = library.MetadataUpdateDescriptionByID(ctx, db, md.ID, desc).Scan(&md); err != nil {
-			return err
-		}
-
-		if err = library.MetadataUpdateAutodescriptionByID(ctx, db, md.ID, library.NormalizedDescription(md.Description)).Scan(&md); err != nil {
+		if err = library.MetadataUpdateReindexByID(ctx, db, md.ID, desc, library.NormalizedDescription(md.Description), stringsx.FirstNonBlank(kid, md.KnownMediaID)).Scan(&md); err != nil {
 			return err
 		}
 	}

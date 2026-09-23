@@ -29,6 +29,7 @@ func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 	defer log.Println("attempting to locate unidentified media completed")
 
 	ts := time.Now()
+	identifier := library.NewKnownIdentifier(db, mc)
 
 	for md := range iter.Iter() {
 		var (
@@ -36,8 +37,7 @@ func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 			known library.KnownScored
 		)
 
-		identifier := library.NewKnownIdentifier(db, mc, library.KnownIdentifierOptionMimetype(mimex.Category(md.Mimetype)))
-		if known, err = identifier.Identify(ctx, md.Description); err != nil {
+		if known, err = identifier.Identify(ctx, mimex.Category(md.Mimetype), md.Description); err != nil {
 			log.Println("unable to detect media for torrent", md.ID, md.Description, "|", err)
 			continue
 		}

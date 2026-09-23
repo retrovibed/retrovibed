@@ -33,6 +33,7 @@ func (t cmdKnownMedia) Run(ctx *cmdopts.Global) (err error) {
 	})
 
 	cleaner := library.NewQueryerCleanerAuto()
+	identifier := library.NewKnownIdentifier(db, cleaner)
 
 	iter := sqlx.Scan(tracking.MetadataSearch(ctx.Context, db, q))
 	for md := range iter.Iter() {
@@ -40,8 +41,7 @@ func (t cmdKnownMedia) Run(ctx *cmdopts.Global) (err error) {
 			known library.KnownScored
 		)
 
-		identifier := library.NewKnownIdentifier(db, cleaner, library.KnownIdentifierOptionMimetype(mimex.Category(md.Mimetype)))
-		if known, err = identifier.Identify(ctx.Context, md.Description); err != nil {
+		if known, err = identifier.Identify(ctx.Context, mimex.Category(md.Mimetype), md.Description); err != nil {
 			log.Println("failed to detect known media", err)
 			continue
 		}
