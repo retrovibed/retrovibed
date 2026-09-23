@@ -265,7 +265,7 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 
 		var updated community.Community
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&updated))
-		require.WithinDuration(t, syncedAt, updated.LastSyncAt, time.Second)
+		require.WithinDuration(t, syncedAt.Add(time.Hour), updated.NextSyncAt, time.Second)
 	})
 
 	t.Run("returns 503 when no http client configured", func(t *testing.T) {
@@ -403,7 +403,7 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
-		// community must exist for CommunityUpdateLastSyncAt to succeed
+		// community must exist for CommunityUpdateNextSyncAt to succeed
 		com := community.Community{ID: communityID}
 		require.NoError(t, community.CommunityUpsertAutoDownload(ctx, q, com).Scan(&com))
 
@@ -467,9 +467,9 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 		// content metrics stored
 		require.Equal(t, 1, sqltestx.Count(t, q, "SELECT COUNT(*) FROM published_cas_metrics WHERE published_content_id = '"+publishedContent.ID+"'"))
 
-		// last_sync_at updated on community
+		// next_sync_at updated on community
 		var updated community.Community
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&updated))
-		require.WithinDuration(t, syncedAt, updated.LastSyncAt, time.Second)
+		require.WithinDuration(t, syncedAt.Add(time.Hour), updated.NextSyncAt, time.Second)
 	})
 }

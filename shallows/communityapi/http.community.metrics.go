@@ -232,7 +232,7 @@ func (t *HTTPMetrics) storeMetrics(ctx context.Context, communityID string, resp
 		return errorsx.Wrap(err, "failed to decode synced at")
 	}
 
-	if err = community.CommunityUpdateLastSyncAt(ctx, t.q, community.Community{ID: communityID, LastSyncAt: syncedAt}).Scan(&syncState); err != nil {
+	if err = community.CommunityUpdateNextSyncAt(ctx, t.q, community.Community{ID: communityID, NextSyncAt: syncedAt.Add(time.Hour)}).Scan(&syncState); err != nil {
 		return errorsx.Wrap(err, "failed to update sync state")
 	}
 

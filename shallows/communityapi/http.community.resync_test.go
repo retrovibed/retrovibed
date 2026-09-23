@@ -66,7 +66,7 @@ func TestResyncEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		before := time.Now().Add(-time.Hour)
-		sub = community.Community{ID: communityID, AccountID: uuid.Nil.String(), LastSyncAt: before}
+		sub = community.Community{ID: communityID, AccountID: uuid.Nil.String(), NextSyncAt: before}
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, sub).Scan(&sub))
 
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
@@ -104,7 +104,7 @@ func TestResyncEndpoint(t *testing.T) {
 		var updated community.Community
 		require.NoError(t, community.CommunityFindByID(ctx, q, communityID).Scan(&updated))
 		require.Equal(t, "https://resynced.community.retrovibe.space", updated.URL)
-		require.True(t, updated.LastSyncAt.After(before))
+		require.True(t, updated.NextSyncAt.After(time.Now()))
 	})
 
 	t.Run("hands back a cursor that skips its own results", func(t *testing.T) {
@@ -124,7 +124,7 @@ func TestResyncEndpoint(t *testing.T) {
 		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
-		sub = community.Community{ID: communityID, AccountID: uuid.Nil.String(), LastSyncAt: time.Now().Add(-time.Hour)}
+		sub = community.Community{ID: communityID, AccountID: uuid.Nil.String(), NextSyncAt: time.Now().Add(-time.Hour)}
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, sub).Scan(&sub))
 
 		for range 2 {

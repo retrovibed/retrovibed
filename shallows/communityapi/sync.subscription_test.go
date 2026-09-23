@@ -11,6 +11,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -208,7 +209,7 @@ func TestSyncSubscriptions(t *testing.T) {
 			ID:                         uuid.Must(uuid.NewV7()).String(),
 			AccountID:                  uuid.Nil.String(),
 			SyncCursorPublishedContent: uuid.Nil.String(),
-			LastSyncAt:                 time.Now(),
+			NextSyncAt:                 time.Now(),
 		}
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, sub).Scan(&sub))
 
@@ -221,10 +222,10 @@ func TestSyncSubscriptions(t *testing.T) {
 			}
 		}))
 
-		require.NoError(t, syncSubscriptions(ctx, q, client))
+		require.NoError(t, syncSubscriptions(ctx, q, backoffx.Constant(time.Hour), client))
 	})
 
-	t.Run("updates last_sync_at after syncing", func(t *testing.T) {
+	t.Run("updates next_sync_at after syncing", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -235,7 +236,7 @@ func TestSyncSubscriptions(t *testing.T) {
 			ID:                         uuid.Must(uuid.NewV7()).String(),
 			AccountID:                  uuid.Nil.String(),
 			SyncCursorPublishedContent: uuid.Nil.String(),
-			LastSyncAt:                 before,
+			NextSyncAt:                 before,
 		}
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, sub).Scan(&sub))
 
@@ -248,10 +249,43 @@ func TestSyncSubscriptions(t *testing.T) {
 			}
 		}))
 
-		require.NoError(t, syncSubscriptions(ctx, q, client))
+		require.NoError(t, syncSubscriptions(ctx, q, backoffx.Constant(time.Hour), client))
 
 		var updated community.Community
 		require.NoError(t, community.CommunityFindByID(ctx, q, sub.ID).Scan(&updated))
-		require.True(t, updated.LastSyncAt.After(before))
+		require.True(t, updated.NextSyncAt.After(time.Now()))
+	})
+
+	t.Run("does not refresh a community again within the backoff", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		q := sqltestx.Metadatabase(t)
+
+		sub := community.Community{
+			ID:                         uuid.Must(uuid.NewV7()).String(),
+			AccountID:                  uuid.Nil.String(),
+			SyncCursorPublishedContent: uuid.Nil.String(),
+			NextSyncAt:                 time.Now().Add(-time.Hour),
+		}
+		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, sub).Scan(&sub))
+
+		requests := 0
+		client := NewDeeppoolPublished(httptestx.NewTestClient(func(req *http.Request) *http.Response {
+			requests++
+			body, _ := json.Marshal(&PublishedContentSearchResponse{})
+			return &http.Response{
+				StatusCode: http.StatusOK,
+				Body:       io.NopCloser(strings.NewReader(string(body))),
+				Header:     make(http.Header),
+			}
+		}))
+
+		require.NoError(t, syncSubscriptions(ctx, q, backoffx.Constant(time.Hour), client))
+		require.Equal(t, 1, requests)
+
+		// second pass lands inside the backoff window, so the community must be skipped.
+		require.NoError(t, syncSubscriptions(ctx, q, backoffx.Constant(time.Hour), client))
+		require.Equal(t, 1, requests)
 	})
 }

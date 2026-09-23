@@ -11,11 +11,11 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
 
-Community _testCommunity({String? lastSyncAt}) => Community(
+Community _testCommunity({String? nextSyncAt}) => Community(
   id: 'community-1',
   url: 'https://testdomain.community.retrovibe.space',
   description: 'A test community',
-  lastSyncAt: lastSyncAt ?? DateTime.now().toUtc().toIso8601String(),
+  nextSyncAt: nextSyncAt ?? DateTime.now().toUtc().add(const Duration(hours: 1)).toIso8601String(),
 );
 
 Future<PublishedContentSearchResponse> _empty(
@@ -340,7 +340,7 @@ void main() {
           physicalSize: const Size(1280, 720),
           ContentDisplayReadOnly(
             community: _testCommunity(
-              lastSyncAt: DateTime.now().toUtc().subtract(const Duration(hours: 2)).toIso8601String(),
+              nextSyncAt: DateTime.now().toUtc().subtract(const Duration(hours: 1)).toIso8601String(),
             ),
             apipublished: failPublished,
             apiresync: _withContent,
@@ -368,7 +368,7 @@ void main() {
           physicalSize: const Size(1280, 720),
           ContentDisplayReadOnly(
             community: _testCommunity(
-              lastSyncAt: DateTime.now().toUtc().subtract(const Duration(minutes: 10)).toIso8601String(),
+              nextSyncAt: DateTime.now().toUtc().add(const Duration(minutes: 50)).toIso8601String(),
             ),
             apipublished: _withContent,
             apiresync: failResync,
@@ -381,7 +381,7 @@ void main() {
         expect(tester.takeException(), isNull);
       });
 
-      testWidgets('never-synced community (empty last_sync_at) triggers apiresync', (tester) async {
+      testWidgets('never-synced community (empty next_sync_at) triggers apiresync', (tester) async {
         bool apiresyncCalled = false;
         Future<PublishedContentSearchResponse> captureResync(
           String id, {
@@ -395,7 +395,7 @@ void main() {
         await tester.pumpApp(
           physicalSize: const Size(1280, 720),
           ContentDisplayReadOnly(
-            community: _testCommunity(lastSyncAt: ''),
+            community: _testCommunity(nextSyncAt: ''),
             apipublished: _noop,
             apiresync: captureResync,
           ),

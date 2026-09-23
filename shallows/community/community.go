@@ -48,8 +48,8 @@ func CommunitySearchBuilder() squirrel.SelectBuilder {
 	return squirrelx.PSQL.Select(sqlx.Columns(CommunityScannerStaticColumns)...).From("community")
 }
 
-func CommunityQueryNotTombstoned() squirrel.Sqlizer {
-	return squirrel.Expr("community.tombstoned_at = 'infinity'")
+func CommunityQueryNeedsSync() squirrel.Sqlizer {
+	return squirrel.Expr("community.next_sync_at < NOW()")
 }
 
 // CommunityQueryAccountID matches communities owned by accountID; uuid.Nil

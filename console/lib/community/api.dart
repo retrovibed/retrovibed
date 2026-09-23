@@ -15,8 +15,8 @@ export 'community.metrics.pb.dart';
 export 'community.publish.pb.dart';
 export 'community.social.pb.dart';
 
-bool isStale(Community c, {Duration threshold = const Duration(hours: 1)}) {
-  return timex.now().difference(timex.iso8601(c.lastSyncAt)) > threshold;
+bool isStale(Community c) {
+  return timex.now().isAfter(timex.iso8601(c.nextSyncAt));
 }
 
 typedef FnSubscribe = Future<CommunitySubscribeResponse> Function(String communityId, {List<httpx.Option> options});

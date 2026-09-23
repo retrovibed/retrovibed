@@ -38,7 +38,7 @@ class Community extends $pb.GeneratedMessage {
     $core.bool? adult,
     $fixnum.Int64? defaultTtl,
     $core.String? defaultLanguage,
-    $core.String? lastSyncAt,
+    $core.String? nextSyncAt,
   }) {
     final result = Community._();
     if (id != null) result.id = id;
@@ -57,7 +57,7 @@ class Community extends $pb.GeneratedMessage {
     if (adult != null) result.adult = adult;
     if (defaultTtl != null) result.defaultTtl = defaultTtl;
     if (defaultLanguage != null) result.defaultLanguage = defaultLanguage;
-    if (lastSyncAt != null) result.lastSyncAt = lastSyncAt;
+    if (nextSyncAt != null) result.nextSyncAt = nextSyncAt;
     return result;
   }
 
@@ -94,7 +94,7 @@ class Community extends $pb.GeneratedMessage {
         16, _omitFieldNames ? '' : 'default_ttl', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..aOS(17, _omitFieldNames ? '' : 'default_language')
-    ..aOS(1000, _omitFieldNames ? '' : 'last_sync_at')
+    ..aOS(1000, _omitFieldNames ? '' : 'next_sync_at')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -254,13 +254,13 @@ class Community extends $pb.GeneratedMessage {
 
   /// private fields for retrovibed use only, not populated by clients.
   @$pb.TagNumber(1000)
-  $core.String get lastSyncAt => $_getSZ(15);
+  $core.String get nextSyncAt => $_getSZ(15);
   @$pb.TagNumber(1000)
-  set lastSyncAt($core.String value) => $_setString(15, value);
+  set nextSyncAt($core.String value) => $_setString(15, value);
   @$pb.TagNumber(1000)
-  $core.bool hasLastSyncAt() => $_has(15);
+  $core.bool hasNextSyncAt() => $_has(15);
   @$pb.TagNumber(1000)
-  void clearLastSyncAt() => $_clearField(1000);
+  void clearNextSyncAt() => $_clearField(1000);
 }
 
 class CommunitySearchRequest extends $pb.GeneratedMessage {

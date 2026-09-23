@@ -91,15 +91,16 @@ func NewSubscriptionSync(ctx context.Context, q sqlx.Queryer, client DeeppoolPub
 	go asyncx.Periodic(ctx, async, s, "subscription sync initiated")
 
 	return asyncx.Run(ctx, async, func(ctx context.Context) error {
-		return syncSubscriptions(ctx, q, client)
+		return syncSubscriptions(ctx, q, backoffx.New(backoffx.Constant(24*time.Hour), backoffx.JitterRandom(time.Minute)), client)
 	})
 }
 
-func syncSubscriptions(ctx context.Context, q sqlx.Queryer, client DeeppoolPublished) error {
-	subs := sqlx.Scan(community.CommunitySearch(ctx, q, community.CommunitySearchBuilder()))
+func syncSubscriptions(ctx context.Context, q sqlx.Queryer, bs backoffx.Strategy, client DeeppoolPublished) error {
+	subs := sqlx.Scan(community.CommunitySearch(ctx, q, community.CommunitySearchBuilder().Where(
+		community.CommunityQueryNeedsSync(),
+	)))
 	for sub := range subs.Iter() {
-		autodownload := sub.AutoDownload != 0
-		synced, err := SyncContentFromDeeppool(ctx, q, client, sub.ID, autodownload, 0)
+		synced, err := SyncContentFromDeeppool(ctx, q, client, sub.ID, sub.AutoDownload != 0, 0)
 		if err != nil {
 			log.Println(errorsx.Wrap(err, "subscription sync failed for "+sub.ID))
 			continue
@@ -109,10 +110,10 @@ func syncSubscriptions(ctx context.Context, q sqlx.Queryer, client DeeppoolPubli
 			log.Printf("subscription sync: imported %d items for %s", synced, sub.ID)
 		}
 
-		sub.LastSyncAt = time.Now()
+		sub.NextSyncAt = time.Now().Add(bs.Backoff(0))
 
-		if err = community.CommunityUpdateLastSyncAt(ctx, q, sub).Scan(&sub); err != nil {
-			log.Println(errorsx.Wrapf(err, "failed to update last_sync_at for %s", sub.ID))
+		if err = community.CommunityUpdateNextSyncAt(ctx, q, sub).Scan(&sub); err != nil {
+			log.Println(errorsx.Wrapf(err, "failed to update next_sync_at for %s", sub.ID))
 			continue
 		}
 	}

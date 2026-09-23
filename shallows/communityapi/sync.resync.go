@@ -28,9 +28,9 @@ func ResyncOne(ctx context.Context, q sqlx.Queryer, httpc *http.Client, cid stri
 		return nil, errorsx.Wrap(err, "unable to sync published content from deeppool")
 	}
 
-	existing.LastSyncAt = time.Now()
-	if err := community.CommunityUpdateLastSyncAt(ctx, q, existing).Scan(&existing); err != nil {
-		return nil, errorsx.Wrap(err, "unable to update last sync time")
+	existing.NextSyncAt = time.Now().Add(time.Hour)
+	if err := community.CommunityUpdateNextSyncAt(ctx, q, existing).Scan(&existing); err != nil {
+		return nil, errorsx.Wrap(err, "unable to update next sync time")
 	}
 
 	return &existing, nil

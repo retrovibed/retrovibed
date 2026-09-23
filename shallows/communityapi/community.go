@@ -18,7 +18,7 @@ func NewCommunity(opts ...func(*Community)) *Community {
 }
 
 // CommunityFromDeeppool converts a deeppool Community proto to the local DB model.
-// Sync-only fields (AutoDownload, LastSyncAt, SyncFeedAt, SyncCursorPublishedContent)
+// Sync-only fields (AutoDownload, NextSyncAt, SyncFeedAt, SyncCursorPublishedContent)
 // are left as zero values — they come from local state, not deeppool.
 func CommunityFromDeeppool(c *Community) community.Community {
 	return community.Community{
@@ -58,7 +58,7 @@ func CommunityOptionFromDB(c community.Community) func(*Community) {
 		p.Adult = c.Adult
 		p.DefaultTtl = uint64(c.DefaultTTL)
 		p.DefaultLanguage = c.DefaultLanguage
-		p.LastSyncAt = grpcx.EncodeTime(c.LastSyncAt)
+		p.NextSyncAt = grpcx.EncodeTime(c.NextSyncAt)
 	}
 }
 
