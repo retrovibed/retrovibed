@@ -79,11 +79,6 @@ class _SearchState extends State<Search> {
                   onModeChanged: widget.onModeChanged,
                   apiupload: widget.apiupload,
                   onDownloadingChanged: widget.onDownloadingChanged,
-                  help: ds.Hint(
-                    const Text(
-                      "filter by mimetype, upload files, torrents, magnet links, or switch to library search",
-                    ),
-                  ),
                 ),
               ),
             ],

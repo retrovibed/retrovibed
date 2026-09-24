@@ -572,10 +572,10 @@ class _State extends State<Connect> with LoadingState {
                 ds.CompactingMenu.pinned(
                   ValueListenableBuilder<media.MediaSearchState>(
                     valueListenable: _search,
-                    builder: (context, state, _) => lib.DropdownUpload(
+                    builder: (context, state, _) => lib.DropdownNavMenu(
                       icon: lib.SearchMimetypeDropdown.icon(mimex.checksum(state.next.mimetypes)),
                       help: ds.HelpScope.None,
-                      items: lib.SearchMimetypeDropdown.menuItems(_search.value, (upd) {
+                      items: lib.SearchMimetypeDropdown.menuItems(media.SearchMode.library, _search.value, (upd) {
                         _search.value = upd;
                       }),
                     ),

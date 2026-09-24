@@ -64,7 +64,8 @@ class _Searches {
 }
 
 Widget _harness(_Searches searches) => filesystem.FilesystemBrowser(
-  search: searches.call,
+  apisearch: searches.call,
+  search: ValueNotifier(media.MediaSearchState(next: media.MediaSearchRequest())),
   mode: ValueNotifier(media.SearchMode.filesystem),
   onModeChanged: (_) {},
 );

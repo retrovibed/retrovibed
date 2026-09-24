@@ -33,22 +33,23 @@ class SearchMimetypeDropdown extends StatelessWidget {
   }
 
   static List<PopupMenuEntry<String>> menuItems(
+    media.SearchMode mode,
     media.MediaSearchState search,
     Function(media.MediaSearchState) onChange,
   ) {
     return [
-      _menuOption(search, mimex.checksumfor(mimex.icoaudio), onChange),
-      _menuOption(search, mimex.checksumfor(mimex.icomovie), onChange),
-      _menuOption(search, mimex.checksumfor(mimex.icobinary), onChange),
+      _menuOption(mode, search, mimex.checksumfor(mimex.icoaudio), onChange),
+      _menuOption(mode, search, mimex.checksumfor(mimex.icomovie), onChange),
     ];
   }
 
   static PopupMenuItem<String> _menuOption(
+    media.SearchMode mode,
     media.MediaSearchState search,
     int checksum,
     Function(media.MediaSearchState) onChange,
   ) {
-    final selected = mimex.checksum(search.next.mimetypes) == checksum;
+    final selected = mode == media.SearchMode.library && mimex.checksum(search.next.mimetypes) == checksum;
     return PopupMenuItem<String>(
       enabled: !selected,
       mouseCursor: selected ? SystemMouseCursors.basic : SystemMouseCursors.click,
@@ -99,13 +100,6 @@ class SearchMimetypeDropdown extends StatelessWidget {
             child: Tooltip(
               message: "Movies",
               child: Icon(Icons.movie_filter),
-            ),
-          ),
-          PopupMenuItem(
-            value: mimex.checksumfor(mimex.icobinary),
-            child: Tooltip(
-              message: "Files",
-              child: Icon(Icons.file_open_rounded),
             ),
           ),
         ],

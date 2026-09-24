@@ -14,19 +14,21 @@ import 'socials.details.dart';
 class SocialHome extends StatefulWidget {
   final ValueNotifier<media.SearchMode> mode;
   final void Function(media.SearchMode) onModeChanged;
-  final FnCommunitySearch search;
-  final FnSocialsSearch details;
-  final FnSocialsEnable enable;
-  final FnSocialsDisable disable;
+  final ValueNotifier<media.MediaSearchState> search;
+  final FnCommunitySearch apisearch;
+  final FnSocialsSearch apidetails;
+  final FnSocialsEnable apienable;
+  final FnSocialsDisable apidisable;
 
   const SocialHome({
     super.key,
     required this.mode,
     required this.onModeChanged,
-    this.search = communities.search,
-    this.details = socials.search,
-    this.enable = socials.enable,
-    this.disable = socials.disable,
+    required this.search,
+    this.apisearch = communities.search,
+    this.apidetails = socials.search,
+    this.apienable = socials.enable,
+    this.apidisable = socials.disable,
   });
 
   @override
@@ -45,7 +47,7 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
   Future<void> _refresh() {
     setState(() => loading = true);
     return httpx
-        .withRetry(() => widget.search(_resp.next, options: [authn.request(authn.AuthzCache.meta(context))]))
+        .withRetry(() => widget.apisearch(_resp.next, options: [authn.request(authn.AuthzCache.meta(context))]))
         .then((response) {
           setState(() {
             _resp = response;
@@ -96,32 +98,11 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
           empty: ds.Int64(_resp.items.length) < _resp.next.limit,
           leading: [
             ds.CompactingMenu.pinned(
-              lib.DropdownUpload(
+              lib.DropdownNavMenu.options(
                 icon: const Icon(Icons.share),
-                help: ds.Hint(const Text("switch to library, discover, or downloads mode")),
-                items: [
-                  media.SearchModeToggle(
-                    mode: media.SearchMode.library,
-                    current: widget.mode,
-                    icon: Icons.video_library,
-                    label: "Library",
-                    onSelect: widget.onModeChanged,
-                  ),
-                  media.SearchModeToggle(
-                    mode: media.SearchMode.discovery,
-                    current: widget.mode,
-                    icon: Icons.travel_explore,
-                    label: "Discover",
-                    onSelect: widget.onModeChanged,
-                  ),
-                  media.SearchModeToggle(
-                    mode: media.SearchMode.downloads,
-                    current: widget.mode,
-                    icon: Icons.download,
-                    label: "Downloads",
-                    onSelect: widget.onModeChanged,
-                  ),
-                ],
+                search: widget.search,
+                mode: widget.mode,
+                onModeChanged: widget.onModeChanged,
               ),
             ),
           ],
@@ -141,9 +122,9 @@ class _SocialHomeState extends State<SocialHome> with ds.LoadingState {
                         padding: defaults.padding.copyWith(top: 0, bottom: 0),
                         SocialCommunityDetails(
                           v,
-                          search: widget.details,
-                          enable: widget.enable,
-                          disable: widget.disable,
+                          search: widget.apidetails,
+                          enable: widget.apienable,
+                          disable: widget.apidisable,
                         ),
                       );
               }),

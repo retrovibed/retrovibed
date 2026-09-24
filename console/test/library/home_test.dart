@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/discovery.dart' as disc;
-import 'package:retrovibed/library/dropdown.upload.dart';
+import 'package:retrovibed/library/dropdown.nav.menu.dart';
 import 'package:retrovibed/library/home.dart';
 import 'package:retrovibed/library/known.media.display.dart';
 import 'package:retrovibed/media.dart' as media;
@@ -10,12 +10,9 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
-IconData _searchMenuItemIcon(WidgetTester tester) {
-  final icon = find.descendant(
-    of: find.ancestor(of: find.text('Discover'), matching: find.byType(Row)),
-    matching: find.byType(Icon),
-  );
-  return tester.widget<Icon>(icon).icon!;
+bool _searchMenuItemEnabled(WidgetTester tester) {
+  final item = find.ancestor(of: find.text('Discover'), matching: find.byType(PopupMenuItem<String>));
+  return tester.widget<PopupMenuItem<String>>(item).enabled;
 }
 
 final _resolutions = Resolutions.variant();
@@ -56,7 +53,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(KnownMediaDisplay), findsOneWidget);
 
-      await tester.tap(find.byType(DropdownUpload));
+      await tester.tap(find.byType(DropdownNavMenu));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Discover'));
       await tester.tap(find.text('Discover'));
@@ -65,7 +62,7 @@ void main() {
       expect(find.byType(KnownMediaDisplay), findsNothing);
     }, variant: _resolutions);
 
-    testWidgets('reflects discovery mode in the check icon when the menu is reopened', (
+    testWidgets('reflects discovery mode in the menu when it is reopened', (
       WidgetTester tester,
     ) async {
       final entry = _resolutions.currentValue!;
@@ -85,28 +82,29 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(DropdownUpload));
+      await tester.tap(find.byType(DropdownNavMenu));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Discover'));
       await tester.tap(find.text('Discover'));
       await tester.pumpAndSettle();
 
       // Selecting the mode item closes the menu; reopen it to confirm the
-      // check icon now reflects discovery mode.
-      await tester.tap(find.byType(DropdownUpload));
+      // menu now reflects discovery mode.
+      await tester.tap(find.byType(DropdownNavMenu));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Discover'));
-      expect(_searchMenuItemIcon(tester), equals(Icons.check));
+      expect(_searchMenuItemEnabled(tester), isFalse);
 
-      // Selecting the mode item again switches back to library mode and
-      // closes the menu; reopen it to confirm the icon reverted.
-      await tester.tap(find.text('Discover'));
+      // Selecting a mimetype item switches back to library mode and
+      // closes the menu; reopen it to confirm the menu reverted.
+      await tester.ensureVisible(find.text('Movies'));
+      await tester.tap(find.text('Movies'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(DropdownUpload));
+      await tester.tap(find.byType(DropdownNavMenu));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Discover'));
-      expect(_searchMenuItemIcon(tester), equals(Icons.travel_explore));
+      expect(_searchMenuItemEnabled(tester), isTrue);
     }, variant: _resolutions);
 
     testWidgets('switches to discovery mode when the empty-results discover button is tapped', (
@@ -138,10 +136,10 @@ void main() {
 
       expect(find.byType(disc.DiscoveryGrid), findsOneWidget);
 
-      await tester.tap(find.byType(DropdownUpload));
+      await tester.tap(find.byType(DropdownNavMenu));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Discover'));
-      expect(_searchMenuItemIcon(tester), equals(Icons.check));
+      expect(_searchMenuItemEnabled(tester), isFalse);
 
       expect(tester.takeException(), isNull);
     }, variant: _resolutions);
@@ -175,7 +173,7 @@ void main() {
 
       expect(traySearchButton, findsNothing);
 
-      await tester.tap(find.byType(DropdownUpload));
+      await tester.tap(find.byType(DropdownNavMenu));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Discover'));
       await tester.tap(find.text('Discover'));
@@ -194,10 +192,10 @@ void main() {
 
       expect(traySearchButton, findsOneWidget);
 
-      await tester.tap(find.byType(DropdownUpload));
+      await tester.tap(find.byType(DropdownNavMenu));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Discover'));
-      await tester.tap(find.text('Discover'));
+      await tester.ensureVisible(find.text('Movies'));
+      await tester.tap(find.text('Movies'));
       await tester.pumpAndSettle();
 
       expect(traySearchButton, findsNothing);

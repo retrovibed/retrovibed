@@ -49,8 +49,9 @@ class _Deletes {
 // ds.modals.of returns null and the push is silently dropped.
 Widget _harness(_Deletes deletes) => ds.Node(
   filesystem.FilesystemBrowser(
-    search: _search,
-    remove: deletes.call,
+    apisearch: _search,
+    apiremove: deletes.call,
+    search: ValueNotifier(media.MediaSearchState(next: media.MediaSearchRequest())),
     mode: ValueNotifier(media.SearchMode.filesystem),
     onModeChanged: (_) {},
   ),

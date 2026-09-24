@@ -13,10 +13,12 @@ PopupMenuItem<String> SearchModeToggle({
 }) {
   final selected = mode == current.value;
   return PopupMenuItem<String>(
+    enabled: !selected,
+    mouseCursor: selected ? SystemMouseCursors.basic : SystemMouseCursors.click,
     onTap: () => onSelect(selected ? SearchMode.library : mode),
     child: Row(
       children: [
-        Icon(selected ? Icons.check : icon),
+        Icon(icon),
         const SizedBox(width: 12),
         Text(label),
       ],

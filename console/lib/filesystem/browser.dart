@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:retrovibed/filesystem/api.dart' as api;
-import 'package:retrovibed/library/dropdown.upload.dart';
+import 'package:retrovibed/library/dropdown.nav.menu.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -17,10 +17,11 @@ import 'row.dart';
 // variation on it: the two share the Media row and nothing else, because the library grid
 // is flat by definition and never shows a directory.
 class FilesystemBrowser extends StatefulWidget {
-  final api.FnFilesystemSearch search;
-  final api.FnFilesystemCreate create;
-  final api.FnFilesystemDelete remove;
-  final media.FnUploadRequest upload;
+  final ValueNotifier<media.MediaSearchState> search;
+  final api.FnFilesystemSearch apisearch;
+  final api.FnFilesystemCreate apicreate;
+  final api.FnFilesystemDelete apiremove;
+  final media.FnUploadRequest apiupload;
   final TextEditingController? controller;
   final FocusNode? focus;
   final ValueNotifier<media.SearchMode> mode;
@@ -28,12 +29,13 @@ class FilesystemBrowser extends StatefulWidget {
 
   const FilesystemBrowser({
     super.key,
+    required this.search,
     required this.mode,
     required this.onModeChanged,
-    this.search = api.filesystem.search,
-    this.create = api.filesystem.create,
-    this.remove = api.filesystem.delete,
-    this.upload = media.media.upload,
+    this.apisearch = api.filesystem.search,
+    this.apicreate = api.filesystem.create,
+    this.apiremove = api.filesystem.delete,
+    this.apiupload = media.media.upload,
     this.controller,
     this.focus,
   });
@@ -64,7 +66,7 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
 
   Future<void> refresh(api.FilesystemSearchRequest req) {
     return widget
-        .search(req, options: [authn.request(authn.AuthzCache.meta(context))])
+        .apisearch(req, options: [authn.request(authn.AuthzCache.meta(context))])
         .then((v) {
           setState(() {
             _res = v;
@@ -177,7 +179,7 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
 
           httpx
               .withRetry(
-                () => widget.remove(v.id, options: [authn.request(authn.AuthzCache.meta(context))]),
+                () => widget.apiremove(v.id, options: [authn.request(authn.AuthzCache.meta(context))]),
               )
               .then((_) => refresh(_res.next))
               .catchError((e) {
@@ -205,7 +207,7 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
         return Future.wait(
               multiparts.map(
                 (fv) => fv.then(
-                  (v) => widget.upload((req) {
+                  (v) => widget.apiupload((req) {
                     // files dropped onto the listing belong to the directory on screen.
                     req.fields["directory_id"] = directory;
                     req.files.add(v);
@@ -246,35 +248,20 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
         empty: ds.Int64(_res.items.length) < _res.next.limit,
         leading: [
           ds.CompactingMenu.pinned(
-            DropdownUpload(
+            DropdownNavMenu.options(
               icon: Icon(mimex.icofolder),
-              help: ds.Hint(const Text("create a directory, or switch to library or discover mode")),
-              items: [
+              help: ds.Hint(
+                const Text(
+                  "filter by mimetype, create a directory, or switch between library, files, discover, and downloads mode",
+                ),
+              ),
+              search: widget.search,
+              mode: widget.mode,
+              onModeChanged: widget.onModeChanged,
+              options: [
                 PopupMenuItem<String>(
                   onTap: mkdir,
-                  child: ListTile(leading: Icon(mimex.icofolder), title: const Text("New Directory")),
-                ),
-                const PopupMenuDivider(),
-                media.SearchModeToggle(
-                  mode: media.SearchMode.library,
-                  current: widget.mode,
-                  icon: Icons.video_library,
-                  label: "Library",
-                  onSelect: widget.onModeChanged,
-                ),
-                media.SearchModeToggle(
-                  mode: media.SearchMode.discovery,
-                  current: widget.mode,
-                  icon: Icons.travel_explore,
-                  label: "Discover",
-                  onSelect: widget.onModeChanged,
-                ),
-                media.SearchModeToggle(
-                  mode: media.SearchMode.downloads,
-                  current: widget.mode,
-                  icon: Icons.download,
-                  label: "Downloads",
-                  onSelect: widget.onModeChanged,
+                  child: ListTile(leading: Icon(mimex.icofolder), title: const Text("New Folder")),
                 ),
               ],
             ),
@@ -296,7 +283,7 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
       context,
       DirectoryCreate(
         parent: directory,
-        create: widget.create,
+        create: widget.apicreate,
         onCancel: () => ds.modals.push(context, null),
         onCreated: (created) {
           ds.modals.push(context, null);

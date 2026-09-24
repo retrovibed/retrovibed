@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/community/social.home.dart' as social;
-import 'dropdown.upload.dart';
+import 'dropdown.nav.menu.dart';
 import 'package:retrovibed/filesystem.dart' as filesystem;
 import 'search.dart';
 
@@ -74,7 +73,8 @@ class _HomeState extends State<Home> with ds.LoadingState {
           onDownloadingChanged: (w) => setState(() => _downloading = w),
         ),
         media.SearchMode.filesystem => filesystem.FilesystemBrowser(
-          upload: widget.apiupload,
+          search: widget.search,
+          apiupload: widget.apiupload,
           controller: widget.controller,
           focus: widget.focus,
           mode: _mode,
@@ -85,33 +85,11 @@ class _HomeState extends State<Home> with ds.LoadingState {
             downloads.Display(
               leading: [
                 ds.CompactingMenu.pinned(
-                  DropdownUpload(
+                  DropdownNavMenu.options(
                     icon: const Icon(Icons.download),
-                    help: ds.Hint(const Text("switch to library, discover, or social mode")),
-                    items: [
-                      media.SearchModeToggle(
-                        mode: media.SearchMode.library,
-                        current: _mode,
-                        icon: Icons.video_library,
-                        label: "Library",
-                        onSelect: _switchToMode,
-                      ),
-                      media.SearchModeToggle(
-                        mode: media.SearchMode.discovery,
-                        current: _mode,
-                        icon: Icons.travel_explore,
-                        label: "Discover",
-                        onSelect: _switchToMode,
-                      ),
-                      if (authn.developer(context).alpha)
-                        media.SearchModeToggle(
-                          mode: media.SearchMode.social,
-                          current: _mode,
-                          icon: Icons.share,
-                          label: "Social",
-                          onSelect: _switchToMode,
-                        ),
-                    ],
+                    search: widget.search,
+                    mode: _mode,
+                    onModeChanged: _switchToMode,
                   ),
                 ),
               ],
@@ -119,6 +97,7 @@ class _HomeState extends State<Home> with ds.LoadingState {
           ),
         ),
         media.SearchMode.social => social.SocialHome(
+          search: widget.search,
           mode: _mode,
           onModeChanged: _switchToMode,
         ),

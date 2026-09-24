@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/library/search.dart';
-import 'package:retrovibed/library/dropdown.upload.dart';
+import 'package:retrovibed/library/dropdown.nav.menu.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -184,7 +184,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(DropdownUpload));
+      await tester.tap(find.byType(DropdownNavMenu));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('Discover'));
       await tester.tap(find.text('Discover'));
