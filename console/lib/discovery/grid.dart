@@ -111,7 +111,7 @@ class _DiscoveryGridState extends State<DiscoveryGrid> with ds.LoadingState {
           cause: cause,
           ds.Grid<ddisc.Discovery>(
             key: ValueKey('discovery.grid'),
-            (context, v) => DiscoveredCard(v),
+            (context, v) => DiscoveredCard(v, key: ValueKey(v.id)),
             children: _items,
             loading: loading,
             physics: AlwaysScrollableScrollPhysics(),
