@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/netip"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
@@ -97,6 +98,7 @@ type Command struct {
 	DiscoveryLocateP2P       bool             `flag:"" name:"discovery-locate-p2p" help:"enable discovering media with peers, since we can't control what media people share you are legally responsible for any media you download and share from index" default:"false" negatable:"" env:"${env_discovery_p2p_locate}"`
 	HTTP                     cmdopts.Listener `flag:"" name:"http-address" help:"address to serve daemon api from" default:"tcp://:9998" env:"${env_daemon_socket}"`
 	SelfSignedHosts          []string         `flag:"" name:"self-signed-hosts" help:"comma seperated list of hosts to add to the sign signed certificate" env:"${env_self_signed_hosts}"`
+	SearchFirewallAllow      []netip.Prefix   `flag:"" name:"search-firewall-allow" help:"cidr ranges search plugins may connect to despite being blocked by default (private, loopback, link-local, multicast), e.g. 127.0.0.1/32"`
 }
 
 func (t Command) torrentsettings() *TorrentSettings {
@@ -314,7 +316,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 			distributionringDialer,
 			netx.UnsupportedListenConfig{},
 			distributionringResolver,
-			wnetruntime.PublicFirewall(),
+			wnetruntime.PublicFirewall(wnetruntime.FirewallOptionAllow(t.SearchFirewallAllow...)),
 		),
 	)
 	if err != nil {

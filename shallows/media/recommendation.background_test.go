@@ -2,6 +2,7 @@ package media_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -33,7 +34,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionMimetype("video/mp4"), ddisc.DiscoveredOptionTestDefaults, ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
-		require.NoError(t, media.RecommendationsBackgroundRun(ctx, q, w))
+		require.NoError(t, media.RecommendationsBackgroundRun(ctx, q, w, 24*time.Hour))
 
 		require.Equal(t, 2, w.Len())
 		var videoProfileID string
@@ -64,7 +65,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 		d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(known.UID), ddisc.DiscoveredOptionMimetype("audio/mpeg"), ddisc.DiscoveredOptionTestDefaults, ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 
-		require.NoError(t, media.RecommendationsBackgroundRun(ctx, q, w))
+		require.NoError(t, media.RecommendationsBackgroundRun(ctx, q, w, 24*time.Hour))
 
 		require.Equal(t, 2, w.Len())
 		var audioProfileID string
@@ -94,7 +95,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 		require.NoError(t, testx.Fake(&rec, library.RecommendationOptionTestDefaults))
 		require.NoError(t, library.RecommendationInsertWithDefaults(ctx, q, rec).Scan(&rec))
 
-		require.NoError(t, media.RecommendationsBackgroundRun(ctx, q, w))
+		require.NoError(t, media.RecommendationsBackgroundRun(ctx, q, w, 24*time.Hour))
 		require.Zero(t, w.Len())
 	})
 
@@ -105,7 +106,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		w := pqueuetestx.NewQueue()
 
-		require.NoError(t, media.RecommendationsBackgroundRun(ctx, q, w))
+		require.NoError(t, media.RecommendationsBackgroundRun(ctx, q, w, 24*time.Hour))
 		require.Equal(t, 2, w.Len())
 	})
 
@@ -116,7 +117,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		w := pqueuetestx.NewQueue()
 
-		require.NoError(t, media.RecommendationsBackgroundRun(ctx, q, w))
+		require.NoError(t, media.RecommendationsBackgroundRun(ctx, q, w, 24*time.Hour))
 
 		require.Equal(t, 2, w.Len())
 		mimetypes := map[string]bool{}

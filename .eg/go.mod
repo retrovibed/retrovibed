@@ -4,7 +4,7 @@ go 1.27.0
 
 require (
 	github.com/egdaemon/eg v0.0.0-20260908095007-e0ba32d7efd2
-	github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
+	github.com/egdaemon/wasinet/wasinet v0.0.0-20260928194155-07f223337a8d
 	golang.org/x/net v0.59.0
 	google.golang.org/api v0.280.0
 )

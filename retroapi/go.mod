@@ -6,8 +6,8 @@ require (
 	github.com/alecthomas/kong v1.16.0
 	github.com/brianvoe/gofakeit/v7 v7.15.0
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
-	github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
-	github.com/egdaemon/wasinet/wazeronet v0.0.0-20260714114633-11ce19bcbeeb
+	github.com/egdaemon/wasinet/wasinet v0.0.0-20260928194155-07f223337a8d
+	github.com/egdaemon/wasinet/wazeronet v0.0.0-20260928194155-07f223337a8d
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/go-playground/form/v4 v4.3.0
 	github.com/gofrs/uuid/v5 v5.5.1

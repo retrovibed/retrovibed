@@ -5,6 +5,8 @@ package wnetruntime
 import (
 	"context"
 	"encoding/binary"
+	"errors"
+	"io"
 	"net"
 	"strconv"
 	"sync"
@@ -411,7 +413,9 @@ func (t *virtual) RecvFrom(ctx context.Context, fd int, vecs [][]byte, oob []byt
 	conn.SetReadDeadline(time.Now().Add(nonblockingPollWindow))
 	n, err := conn.Read(vecs[0])
 	conn.SetReadDeadline(time.Time{})
-	if err != nil {
+	// io.EOF is the peer's orderly shutdown, which recvfrom reports as a successful
+	// read of whatever arrived alongside it (0 bytes signals EOF to the guest).
+	if err != nil && !errors.Is(err, io.EOF) {
 		return 0, 0, nil, translateTimeout(err)
 	}
 

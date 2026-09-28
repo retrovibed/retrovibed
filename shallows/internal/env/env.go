@@ -48,6 +48,7 @@ const (
 	AutoReclaim                 = "RETROVIBED_MEDIA_AUTO_RECLAIM"               // enable/disable automatic reclaiming of disk space for media that has been archived.
 	AutoIdentifyMedia           = "RETROVIBED_MEDIA_AUTO_IDENTIFY"              // enable/disable automatically identified media.
 	AutoLocateMedia             = "RETROVIBED_MEDIA_AUTO_LOCATE"                // enable/disable automatically locate and download media.
+	RecommendationFrequency     = "RETROVIBED_MEDIA_RECOMMENDATION_FREQUENCY"   // how often random recommendations are regenerated. time.ParseDuration
 	AutoDiscovery               = "RETROVIBED_TORRENT_AUTO_DISCOVERY"           // enable/disable automatically discovering torrents from peers.
 	AutoPeerTube                = "RETROVIBED_AUTO_PEERTUBE"                    // enable/disable the built-in PeerTube/SepiaSearch discovery strategy.
 	AutoSubscriptions           = "RETROVIBED_AUTO_SUBSCRIPTIONS"               // enable/disable auto subscription setup, primarily used for retrokiosk since they are low powered devices

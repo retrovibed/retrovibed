@@ -18,7 +18,7 @@ require (
 	github.com/duckdb/duckdb-go/v2 v2.10505.0
 	github.com/egdaemon/gdx v0.0.0-20260824162813-84291833ef44
 	github.com/egdaemon/gdx/konggdx v0.0.0-20260824162813-84291833ef44
-	github.com/egdaemon/wasinet/wasinet v0.0.0-20260714114633-11ce19bcbeeb
+	github.com/egdaemon/wasinet/wasinet v0.0.0-20260928194155-07f223337a8d
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/gabriel-vasile/mimetype v1.4.13
 	github.com/go-playground/form/v4 v4.3.0
@@ -98,7 +98,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/ebitengine/purego v0.10.0 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
-	github.com/egdaemon/wasinet/wazeronet v0.0.0-20260714114633-11ce19bcbeeb // indirect
+	github.com/egdaemon/wasinet/wazeronet v0.0.0-20260928194155-07f223337a8d // indirect
 	github.com/ericlagergren/decimal v0.0.0-20240411145413-00de7ca16731 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect

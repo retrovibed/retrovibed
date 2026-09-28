@@ -14,16 +14,18 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
+	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/pqueuex"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
-func RecommendationsBackgroundRun(ctx context.Context, q sqlx.Queryer, wq pqueue.Queue) error {
+func RecommendationsBackgroundRun(ctx context.Context, q sqlx.Queryer, wq pqueue.Queue, frequency time.Duration) error {
 	if last, err := library.RecommendationLastGeneratedAt(ctx, q, library.RecommendationSourceRandom); err != nil {
 		return errorsx.Wrap(err, "recommendations background failed to get last generated at")
-	} else if time.Since(last) < 24*time.Hour {
+	} else if time.Since(last) < frequency {
 		log.Println("random recommendation last ran", time.Since(last), "ago at", last)
 		return nil
 	}
@@ -53,17 +55,21 @@ func RecommendationsBackgroundRun(ctx context.Context, q sqlx.Queryer, wq pqueue
 }
 
 func RecommendationsBackground(ctx context.Context, seed string, q sqlx.Queryer, wq pqueue.Queue, p searchplugin.R) error {
+	// recommendationFrequency how often random recommendations are regenerated.
+	const recommendationFrequencyDefault = 24 * time.Hour
+
+	recommendationFreq := envx.Duration(recommendationFrequencyDefault, env.RecommendationFrequency)
 	wakeup := asyncx.NewWakeup(ctx)
 	s := backoffx.New(
-		backoffx.Frequency(12*time.Hour, seed),
-		backoffx.JitterRandom(time.Minute),
+		backoffx.Frequency(recommendationFreq, seed),
+		backoffx.JitterRandom(5*time.Second),
 	)
 
 	go contextx.RunContext(ctx, pqueuex.NewWorker(wq, NewRecommendationBackgroundWorker(q, p)).Consume)
 	go asyncx.Periodic(ctx, wakeup, s, "recommendations background")
 	contextx.Run(ctx, func() {
 		errorsx.Log(asyncx.Run(ctx, wakeup, func(ctx context.Context) error {
-			return RecommendationsBackgroundRun(ctx, q, wq)
+			return RecommendationsBackgroundRun(ctx, q, wq, recommendationFreq)
 		}))
 	})
 
