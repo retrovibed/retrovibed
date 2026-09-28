@@ -97,7 +97,7 @@ func (t reindex) run(ctx context.Context, db *sql.DB, c library.QueryCleaner, me
 		log.Println("unmodified", o)
 		log.Println("resetting description", md.ID, md.Description, "->", desc)
 		log.Println("resetting autodescription", md.ID, md.AutoDescription, "->", auto)
-		log.Println("neural result", o, "->", unsafepretty.Print(errorsx.Zero(c.Clean(ctx, o)), unsafepretty.OptionNewlineRunes()))
+		log.Println("neural result", o, "->", unsafepretty.Print(errorsx.Zero(c.Clean(ctx, o))))
 		log.Println("---------------------------------------------")
 
 		if t.DryRun {
