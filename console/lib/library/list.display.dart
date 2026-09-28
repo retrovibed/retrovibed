@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
@@ -78,30 +80,31 @@ class _AvailableListDisplay extends State<AvailableListDisplay> with ds.LoadingS
             loading = true;
           });
 
-          final multiparts = v.files.map((c) {
-            return media.media.uploadable(c.path, c.name, c.mimeType!);
-          });
+          final tracked = meta.UploadNode.of(context).progress;
 
           return Future.microtask(() {
             return Future.wait(
-                  multiparts.map((fv) {
-                    return fv.then((v) {
-                      return widget
-                          .upload((req) {
-                            req..files.add(v);
-                            return req;
-                          })
-                          .then((uploaded) {
-                            setState(() {
-                              _res.items.add(uploaded.media);
-                            });
-                          })
-                          .catchError((cause) {
-                            setState(() {
-                              this.cause = ds.Error.unknown(cause, onTap: reseterr);
-                            });
+                  v.files.map((c) {
+                    final abort = Completer<void>();
+                    return media.media
+                        .uploadable(c.path, c.name, c.mimeType!, progress: tracked, abort: abort)
+                        .then((v) {
+                          return widget.upload(
+                            (method, url) =>
+                                http.AbortableMultipartRequest(method, url, abortTrigger: abort.future)..files.add(v),
+                          );
+                        })
+                        .then((uploaded) {
+                          setState(() {
+                            _res.items.add(uploaded.media);
                           });
-                    });
+                        })
+                        .catchError((_) {}, test: httpx.ErrorsTest.aborted)
+                        .catchError((cause) {
+                          setState(() {
+                            this.cause = ds.Error.unknown(cause, onTap: reseterr);
+                          });
+                        });
                   }),
                 )
                 .then((v) => ds.NullWidget)
@@ -119,43 +122,50 @@ class _AvailableListDisplay extends State<AvailableListDisplay> with ds.LoadingS
     return ds.Table(
       loading: loading,
       cause: cause,
-      leading: ds.SearchTray(
-        autofocus: defaults.desktop,
-        decoration: InputDecoration(hintText: "search the library"),
-        controller: widget.controller,
-        focus: widget.focus,
-        onSubmitted: (v) {
-          setState(() {
-            _res.next.query = v.trim();
-            _res.next.offset = ds.Int64(0);
-          });
-          return refresh(_res.next);
-        },
-        next: (i) {
-          setState(() {
-            _res.next.offset = i;
-          });
-          refresh(_res.next);
-        },
-        current: _res.next.offset,
-        empty: ds.Int64(_res.items.length) < _res.next.limit,
-        leading: [
-          ds.CompactingMenu.pinned(
-            SearchMimetypeDropdown(
-              _res.next,
-              onChange: (upd) {
-                setState(() {
-                  _res.next = upd;
-                });
-                refresh(_res.next);
-              },
-            ),
+      leading: Column(
+        mainAxisSize: MainAxisSize.min,
+        verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+        children: [
+          ds.SearchTray(
+            autofocus: defaults.desktop,
+            decoration: InputDecoration(hintText: "search the library"),
+            controller: widget.controller,
+            focus: widget.focus,
+            onSubmitted: (v) {
+              setState(() {
+                _res.next.query = v.trim();
+                _res.next.offset = ds.Int64(0);
+              });
+              return refresh(_res.next);
+            },
+            next: (i) {
+              setState(() {
+                _res.next.offset = i;
+              });
+              refresh(_res.next);
+            },
+            current: _res.next.offset,
+            empty: ds.Int64(_res.items.length) < _res.next.limit,
+            leading: [
+              ds.CompactingMenu.pinned(
+                SearchMimetypeDropdown(
+                  _res.next,
+                  onChange: (upd) {
+                    setState(() {
+                      _res.next = upd;
+                    });
+                    refresh(_res.next);
+                  },
+                ),
+              ),
+              ds.FileDropWell.icon(
+                upload,
+                mimetypes: _res.next.mimetypes,
+                help: ds.Hint(const Text("drag and drop files onto the grid to add media to your library")),
+              ),
+            ],
           ),
-          ds.FileDropWell.icon(
-            upload,
-            mimetypes: _res.next.mimetypes,
-            help: ds.Hint(const Text("drag and drop files onto the grid to add media to your library")),
-          ),
+          meta.UploadsRow(margin: defaults.margin.copyWith(top: 0, bottom: 0) * 2),
         ],
       ),
       children: _res.items,

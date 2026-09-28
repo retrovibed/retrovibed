@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:retrovibed/filesystem/api.dart' as api;
 import 'package:retrovibed/library/dropdown.nav.menu.dart';
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/httpx.dart' as httpx;
@@ -126,80 +128,90 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     final upload = (FilesEvent v, {StreamSink<httpx.UploadProgress>? progress}) {
-      setState(() {
-        loading = true;
-      });
-
-      final multiparts = v.files.map((c) => media.media.uploadable(c.path, c.name, c.mimeType!));
+      final tracked = meta.UploadNode.of(context).progress;
 
       return Future.microtask(() {
         return Future.wait(
-              multiparts.map(
-                (fv) => fv.then(
-                  (v) => widget.apiupload((req) {
-                    // files dropped onto the listing belong to the directory on screen.
-                    req.fields["directory_id"] = directory;
-                    req.files.add(v);
-                    return req;
-                  }),
-                ),
-              ),
+              v.files.map((c) {
+                final abort = Completer<void>();
+                return media.media
+                    .uploadable(c.path, c.name, c.mimeType!, progress: tracked, abort: abort)
+                    .then(
+                      (v) => widget.apiupload(
+                        (method, url) => http.AbortableMultipartRequest(method, url, abortTrigger: abort.future)
+                          // files dropped onto the listing belong to the directory on screen.
+                          ..fields["directory_id"] = directory
+                          ..files.add(v),
+                      ),
+                    )
+                    .catchError((_) => media.MediaUploadResponse(), test: httpx.ErrorsTest.aborted);
+              }),
             )
             .then((_) => refresh(_res.next))
             .then((_) => ds.NullWidget)
             .catchError((e) => ds.Error.unknown(e, onTap: reseterr));
-      }).whenComplete(() => setState(() => loading = false));
+      });
     };
 
     return ds.Table(
       loading: loading,
       cause: cause,
-      leading: ds.SearchTray(
-        autofocus: defaults.desktop,
-        decoration: InputDecoration(hintText: location),
-        controller: widget.controller,
-        focus: widget.focus,
-        onSubmitted: (v) {
-          setState(() {
-            _res.next
-              ..query = v
-              ..offset = ds.Int64(0);
-          });
-          return refresh(_res.next);
-        },
-        next: (i) {
-          setState(() {
-            _res.next.offset = i;
-          });
-          refresh(_res.next);
-        },
-        current: _res.next.offset,
-        empty: ds.Int64(_res.items.length) < _res.next.limit,
-        leading: [
-          ds.CompactingMenu.pinned(
-            DropdownNavMenu.options(
-              icon: Icon(mimex.icofolder),
-              help: ds.Hint(
-                const Text(
-                  "filter by mimetype, create a directory, or switch between library, files, discover, and downloads mode",
+      empty: ds.FileDropWell(
+        upload,
+        shape: RoundedRectangleBorder(borderRadius: defaults.borderRadius),
+      ),
+      leading: Column(
+        mainAxisSize: MainAxisSize.min,
+        verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+        children: [
+          ds.SearchTray(
+            autofocus: defaults.desktop,
+            decoration: InputDecoration(hintText: location),
+            controller: widget.controller,
+            focus: widget.focus,
+            onSubmitted: (v) {
+              setState(() {
+                _res.next
+                  ..query = v
+                  ..offset = ds.Int64(0);
+              });
+              return refresh(_res.next);
+            },
+            next: (i) {
+              setState(() {
+                _res.next.offset = i;
+              });
+              refresh(_res.next);
+            },
+            current: _res.next.offset,
+            empty: ds.Int64(_res.items.length) < _res.next.limit,
+            leading: [
+              ds.CompactingMenu.pinned(
+                DropdownNavMenu.options(
+                  icon: Icon(mimex.icofolder),
+                  help: ds.Hint(
+                    const Text(
+                      "filter by mimetype, create a directory, or switch between library, files, discover, and downloads mode",
+                    ),
+                  ),
+                  search: widget.search,
+                  mode: widget.mode,
+                  onModeChanged: widget.onModeChanged,
+                  options: [
+                    PopupMenuItem<String>(
+                      onTap: mkdir,
+                      child: ListTile(leading: Icon(mimex.icofolder), title: const Text("New Folder")),
+                    ),
+                  ],
                 ),
               ),
-              search: widget.search,
-              mode: widget.mode,
-              onModeChanged: widget.onModeChanged,
-              options: [
-                PopupMenuItem<String>(
-                  onTap: mkdir,
-                  child: ListTile(leading: Icon(mimex.icofolder), title: const Text("New Folder")),
-                ),
-              ],
-            ),
+              ds.FileDropWell.icon(
+                upload,
+                help: ds.Hint(const Text("drag and drop files to add them to this directory")),
+              ),
+            ],
           ),
-          ds.FileDropWell.icon(
-            upload,
-            shape: RoundedRectangleBorder(borderRadius: defaults.borderRadius),
-            help: ds.Hint(const Text("drag and drop files to add them to this directory")),
-          ),
+          meta.UploadsRow(margin: defaults.margin.copyWith(top: 0, bottom: 0) * 2),
         ],
       ),
       children: items,
@@ -257,7 +269,6 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
           );
         },
       ),
-      empty: ds.FileDropWell(upload),
     );
   }
 

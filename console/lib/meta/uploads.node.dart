@@ -21,7 +21,8 @@ class UploadNode extends StatefulWidget {
 // handed out by UploadNode.of(context): pass `progress` into httpx.uploadable (or a
 // wrapper) to report an upload, and read `uploading` to see every upload in flight,
 // keyed by id, as of the last progress event. `remove` drops an entry from `uploading`
-// (e.g. to dismiss it from the UI); it does not cancel the underlying HTTP request.
+// (e.g. to dismiss it from the UI); it does not cancel the underlying HTTP request, the
+// progress event's `cancel` does that.
 class UploadState {
   final StreamSink<httpx.UploadProgress> progress;
   final Map<String, httpx.UploadProgress> uploading;

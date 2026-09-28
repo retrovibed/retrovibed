@@ -91,8 +91,10 @@ abstract class mimetypes {
   }
 }
 
-// (id, name, mimetype, uploaded, total) emitted per chunk read for a single upload.
-typedef UploadProgress = (String id, String name, String mimetype, int uploaded, int total);
+// (id, name, mimetype, uploaded, total, cancel) emitted per chunk read for a single upload.
+// cancel completes the abort completer given to uploadable, which is meant to be the
+// abortTrigger of the http.AbortableMultipartRequest carrying the upload.
+typedef UploadProgress = (String id, String name, String mimetype, int uploaded, int total, void Function() cancel);
 
 // max uint64 bit pattern (stored as -1 in Dart's signed 64-bit int); pass this as `total`
 // when the caller cannot determine the file's size ahead of time.
@@ -105,16 +107,20 @@ Future<http.MultipartFile> uploadable(
   int total, {
   String field = 'content',
   StreamSink<UploadProgress>? progress,
+  Completer<void>? abort,
 }) async {
   final id = uuidx.md5x(path);
   var uploaded = 0;
+  void cancel() {
+    if (abort != null && !abort.isCompleted) abort.complete();
+  }
 
   // Create a stream with progress tracking
   final fileStream = File(path).openRead().transform(
     StreamTransformer<List<int>, List<int>>.fromHandlers(
       handleData: (chunk, sink) {
         uploaded += chunk.length;
-        progress?.add((id, name, mimetype, uploaded, total));
+        progress?.add((id, name, mimetype, uploaded, total, cancel));
         sink.add(chunk.cast<int>());
       },
     ),
@@ -159,6 +165,9 @@ Future<HttpClientRequest> dart_io_request(HttpClientRequest v) {
 }
 
 class ErrorsTest {
+  // a request deliberately aborted, e.g. an upload cancelled by the user.
+  static bool aborted(Object obj) => obj is http.RequestAbortedException;
+
   static int statusCode(Object obj) {
     if (obj is http.Response) return obj.statusCode;
     if (obj is HttpClientResponse) return obj.statusCode;

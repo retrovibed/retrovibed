@@ -46,7 +46,7 @@ typedef FnMediaDownload =
 
 typedef FnUploadRequest =
     Future<MediaUploadResponse> Function(
-      http.MultipartRequest Function(http.MultipartRequest req) mkreq,
+      http.AbortableMultipartRequest Function(String method, Uri url) mkreq,
     );
 
 abstract class media {
@@ -244,15 +244,18 @@ abstract class media {
     String name,
     String mimetype, {
     StreamSink<httpx.UploadProgress>? progress,
+    Completer<void>? abort,
   }) {
-    return File(path).length().then((total) => httpx.uploadable(path, name, mimetype, total, progress: progress));
+    return File(
+      path,
+    ).length().then((total) => httpx.uploadable(path, name, mimetype, total, progress: progress, abort: abort));
   }
 
-  static Future<MediaUploadResponse> upload(http.MultipartRequest Function(http.MultipartRequest req) mkreq) async {
+  static Future<MediaUploadResponse> upload(
+    http.AbortableMultipartRequest Function(String method, Uri url) mkreq,
+  ) async {
     final client = http.Client();
-    final req = mkreq(
-      http.MultipartRequest("POST", Uri.https(httpx.host(), "/m/")),
-    );
+    final req = mkreq("POST", Uri.https(httpx.host(), "/m/"));
     req.headers["Authorization"] = httpx.auto_bearer_host();
 
     return client.send(req).then((v) {
@@ -349,12 +352,10 @@ abstract class discovered {
   }
 
   static Future<MediaUploadResponse> upload(
-    http.MultipartRequest Function(http.MultipartRequest req) mkreq,
+    http.AbortableMultipartRequest Function(String method, Uri url) mkreq,
   ) async {
     final client = http.Client();
-    final req = mkreq(
-      http.MultipartRequest("POST", Uri.https(httpx.host(), "/d/")),
-    );
+    final req = mkreq("POST", Uri.https(httpx.host(), "/d/"));
     req.headers["Authorization"] = httpx.auto_bearer_host();
 
     return client.send(req).then((v) {

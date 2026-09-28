@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:retrovibed/authn.dart' as authn;
@@ -9,6 +10,7 @@ import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'api.dart';
 
@@ -61,13 +63,13 @@ class SocialActionPhoto extends StatelessWidget {
     String mimetype, {
     StreamSink<httpx.UploadProgress>? progress,
   }) {
+    final abort = Completer<void>();
     return media.media
-        .uploadable(path, name, mimetype, progress: progress)
+        .uploadable(path, name, mimetype, progress: progress, abort: abort)
         .then((f) {
-          return apiupload((req) {
-            req..files.add(f);
-            return req;
-          });
+          return apiupload(
+            (method, url) => http.AbortableMultipartRequest(method, url, abortTrigger: abort.future)..files.add(f),
+          );
         })
         .then((resp) {
           final req = PublishContentRequest(
@@ -79,7 +81,9 @@ class SocialActionPhoto extends StatelessWidget {
           );
 
           return httpx.withRetry(() => apipublish(community.id, req, options: auth));
-        });
+        })
+        .then<void>((_) {})
+        .catchError((_) {}, test: httpx.ErrorsTest.aborted);
   }
 
   @override
@@ -103,8 +107,13 @@ class SocialActionPhoto extends StatelessWidget {
               // the user backed out of the camera without taking anything.
               if (photo == null) return null;
               return _mimetype(photo).then(
-                (mimetype) =>
-                    _publish([authn.request(authn.AuthzCache.meta(context))], photo.path, photo.name, mimetype),
+                (mimetype) => _publish(
+                  [authn.request(authn.AuthzCache.meta(context))],
+                  photo.path,
+                  photo.name,
+                  mimetype,
+                  progress: meta.UploadNode.of(context).progress,
+                ),
               );
             });
           });
@@ -121,7 +130,7 @@ class SocialActionPhoto extends StatelessWidget {
               f.path,
               f.name,
               f.mimeType!,
-              progress: progress,
+              progress: meta.UploadNode.of(context).progress,
             ),
           ),
         ).then((_) => null);

@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:retrovibed/design.kit/file.drop.well.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'api.dart' as api;
@@ -16,12 +19,15 @@ Future<void> uploadfiles(
   return FileDropWell.files(mimetypes: mimetypes).then((evt) {
     return Future.wait(
       evt.files.map((c) {
-        return api.media.uploadable(c.path, c.name, c.mimeType!, progress: progress).then((v) {
-          return apiupload((req) {
-            req..files.add(v);
-            return req;
-          });
-        });
+        final abort = Completer<void>();
+        return api.media
+            .uploadable(c.path, c.name, c.mimeType!, progress: progress, abort: abort)
+            .then((v) {
+              return apiupload(
+                (method, url) => http.AbortableMultipartRequest(method, url, abortTrigger: abort.future)..files.add(v),
+              );
+            })
+            .catchError((_) => api.MediaUploadResponse(), test: httpx.ErrorsTest.aborted);
       }),
     ).then((_) {
       final freshNext = search.value.next.clone();

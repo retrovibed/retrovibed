@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/library/search.dropdown.dart';
 import 'grid.dart';
 import 'search.button.dart';
@@ -85,6 +86,7 @@ class _SearchState extends State<Search> {
             help: ds.Hint(const Text("discover content over the network, use @ to access advanced filtering")),
           ),
         ),
+        meta.UploadsRow(margin: defaults.margin.copyWith(top: 0, bottom: 0) * 2),
         Expanded(
           child: DiscoveryGrid(
             search: widget.search,

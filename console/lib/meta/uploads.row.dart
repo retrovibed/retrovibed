@@ -41,7 +41,7 @@ class _UploadChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final (id, name, mimetype, uploaded, total) = upload;
+    final (id, name, mimetype, uploaded, total, cancel) = upload;
     final fraction = _fraction(uploaded, total);
     final completed = total != httpx.unknownFileSize && uploaded >= total;
     final detail = fraction == null
@@ -71,6 +71,18 @@ class _UploadChip extends StatelessWidget {
                 onPressed: () => UploadNode.of(context).remove(id),
               ),
               ds.Hint(Text("clear the upload from the list")),
+            )
+          else
+            ds.Help(
+              IconButton(
+                icon: const Icon(Icons.cancel_outlined, size: 16.0),
+                visualDensity: VisualDensity.compact,
+                onPressed: () {
+                  cancel();
+                  UploadNode.of(context).remove(id);
+                },
+              ),
+              ds.Hint(Text("cancel the upload")),
             ),
         ],
       ),

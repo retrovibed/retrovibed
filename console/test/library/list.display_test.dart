@@ -70,7 +70,7 @@ Future<media.MediaSearchResponse> _mockSearchWithLongNames(
 }
 
 Future<media.MediaUploadResponse> _mockUpload(
-  http.MultipartRequest Function(http.MultipartRequest req) mkreq,
+  http.AbortableMultipartRequest Function(String method, Uri url) mkreq,
 ) async {
   return media.MediaUploadResponse(
     media: media.Media(

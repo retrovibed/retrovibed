@@ -8,7 +8,7 @@ import 'package:retrovibed/testing/widget_tester_extensions.dart';
 const _removalDelay = Duration(milliseconds: 50);
 
 httpx.UploadProgress _event(String id, String name, {required int uploaded, required int total}) =>
-    (id, name, "video/mp4", uploaded, total);
+    (id, name, "video/mp4", uploaded, total, () {});
 
 void main() {
   group('UploadsRow', () {
