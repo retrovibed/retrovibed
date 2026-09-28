@@ -10,7 +10,6 @@ void main() {
     // Create a test classifier using proper UUID patterns
     final testClassifier = seed.Classifier(
       community: uuidx.withSuffix(1),
-      personal: uuidx.withSuffix(2),
     );
 
     testWidgets('renders correctly without onChange callback', (
@@ -180,7 +179,7 @@ void main() {
                 classifier: testClassifier,
               ),
               seed_typography.SeedTypography(
-                uuidx.withSuffix(2), // personal seed
+                uuidx.withSuffix(2), // unique seed
                 classifier: testClassifier,
               ),
               seed_typography.SeedTypography(
@@ -193,7 +192,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('community'), findsOneWidget);
-        expect(find.text('personal'), findsOneWidget);
+        expect(find.text('private'), findsOneWidget);
         expect(find.text('global'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
@@ -315,21 +314,6 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('community'), findsOneWidget);
-        expect(tester.takeException(), isNull);
-      });
-
-      testWidgets('renders personal seed correctly', (
-        WidgetTester tester,
-      ) async {
-        await tester.pumpApp(
-          seed_typography.SeedTypography(
-            uuidx.withSuffix(2), // personal seed
-            classifier: testClassifier,
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.text('personal'), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
 

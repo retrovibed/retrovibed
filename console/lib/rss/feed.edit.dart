@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/storage.dart' as storage;
-import 'package:retrovibed/uuidx.dart' as uuidx;
 import './rss.pb.dart';
 
 class Edit extends StatelessWidget {
@@ -33,7 +32,6 @@ class Edit extends StatelessWidget {
             current.encryptionSeed,
             classifier: storage.Classifier(
               community: current.encryptionSeed,
-              personal: uuidx.max(),
             ),
             onChange: (v) => onChange?.call(current..encryptionSeed = v.id),
           ),

@@ -208,35 +208,37 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
       },
       icon: mimex.icon(widget.media.mimetype),
       trailing: [
-        ds.layout(
-          (context, constraints) {
-            final defaults = ds.Defaults.of(context);
-            return Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (constraints.maxWidth >= 260) ds.Rating(rating: current.rating),
-                Flexible(child: KnownMediaSource(current)),
-                _media.ButtonArchive(current: widget.media, onChange: widget.onChange),
-                ds.LoadingIconButton(
-                  tooltip: "download this file to your downloads folder",
-                  onPressed: _media.DownloadAction(context, widget.media),
-                  icon: Icon(Icons.download),
-                ),
-                ds.LoadingIconButton(
-                  tooltip: "file information and management",
-                  onPressed: ds.LoadingIconButton.convert(widget.onSettings),
-                  icon: Icon(Icons.tune),
-                ),
-                if (defaults.mobile)
-                  ds.LoadingIconButton.info(
-                    tooltip: "show media details",
-                    toggled: hovered.value,
-                    onPressed: () async => setState(() => hovered.value = !hovered.value),
+        Flexible(
+          child: ds.layout(
+            (context, constraints) {
+              final defaults = ds.Defaults.of(context);
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (constraints.maxWidth >= 260) ds.Rating(rating: current.rating),
+                  Flexible(child: KnownMediaSource(current)),
+                  _media.ButtonArchive(current: widget.media, onChange: widget.onChange),
+                  ds.LoadingIconButton(
+                    tooltip: "download this file to your downloads folder",
+                    onPressed: _media.DownloadAction(context, widget.media),
+                    icon: Icon(Icons.download),
                   ),
-                ...widget.trailing,
-              ],
-            );
-          },
+                  ds.LoadingIconButton(
+                    tooltip: "file information and management",
+                    onPressed: ds.LoadingIconButton.convert(widget.onSettings),
+                    icon: Icon(Icons.tune),
+                  ),
+                  if (defaults.mobile)
+                    ds.LoadingIconButton.info(
+                      tooltip: "show media details",
+                      toggled: hovered.value,
+                      onPressed: () async => setState(() => hovered.value = !hovered.value),
+                    ),
+                  ...widget.trailing,
+                ],
+              );
+            },
+          ),
         ),
       ],
     );

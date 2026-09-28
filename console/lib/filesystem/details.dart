@@ -5,6 +5,8 @@ import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
+import 'package:retrovibed/storage.dart' as storage;
+import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
 
 // deleting a directory deletes what it holds, which is not recoverable from this screen,
@@ -66,6 +68,25 @@ class FilesystemDetails extends StatelessWidget {
             trailing: [
               // a directory has no content of its own to fetch.
               if (!directory) ...[
+                storage.SeedButton(
+                  current.encryptionSeed,
+                  // the seed keys the archived copy, so it is fixed once archival has started.
+                  onChange: !uuidx.isMin(uuidx.fromString(current.archiveId))
+                      ? null
+                      : (v) {
+                          httpx
+                              .withRetry(
+                                () => media.media.update(
+                                  current.id,
+                                  current..encryptionSeed = v.id,
+                                  options: [authn.request(authn.AuthzCache.meta(context))],
+                                ),
+                              )
+                              .then((resp) {
+                                onChange(resp.media);
+                              });
+                        },
+                ),
                 media.ButtonArchive(current: current, onChange: onChange),
                 ds.LoadingIconButton(
                   onPressed: media.DownloadAction(context, current),
@@ -95,6 +116,14 @@ class FilesystemDetails extends StatelessWidget {
             ),
             forms.Field(label: const Text("created"), input: ds.Timestamp.iso8601(current.createdAt)),
             forms.Field(label: const Text("updated"), input: ds.Timestamp.iso8601(current.updatedAt)),
+            forms.Field(
+              label: const Text("encryption seed"),
+              input: ds.Copyable(
+                Text(current.encryptionSeed, overflow: TextOverflow.ellipsis, maxLines: 1),
+                help: ds.Hint(const Text("copy encryption seed to clipboard")),
+                onPressed: ds.Copyable.copy(current.encryptionSeed),
+              ),
+            ),
           ],
         ],
       ),

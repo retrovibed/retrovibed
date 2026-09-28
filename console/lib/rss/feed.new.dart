@@ -42,7 +42,6 @@ class FeedNew extends StatelessWidget {
             current.encryptionSeed,
             classifier: storage.Classifier(
               community: community,
-              personal: uuidx.max(),
             ),
             onChange: (v) => onChange?.call(current..encryptionSeed = v.id),
           ),

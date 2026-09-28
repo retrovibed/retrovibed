@@ -3,7 +3,6 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/storage.dart' as storage;
-import 'package:retrovibed/uuidx.dart' as uuidx;
 import './api.dart' as api;
 
 class FeedRow extends StatefulWidget {
@@ -41,7 +40,6 @@ class _FeedRowState extends State<FeedRow> with ds.LoadingState {
             widget.current.encryptionSeed,
             classifier: storage.Classifier(
               community: widget.current.encryptionSeed,
-              personal: uuidx.max(),
             ),
           ),
           ds.LoadingIconButton(

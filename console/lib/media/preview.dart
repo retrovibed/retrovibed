@@ -14,7 +14,7 @@ abstract class Preview {
   // actions beside close.
   static void Function()? modal(BuildContext context, Media current, {List<Widget> trailing = const []}) {
     final Widget body;
-    print("DERP DERP ${mimex.isText(current.mimetype)} - ${current.mimetype}");
+
     if (mimex.isImage(current.mimetype)) {
       body = PreviewImage(current: current);
     } else if (current.mimetype == mimex.pdf) {

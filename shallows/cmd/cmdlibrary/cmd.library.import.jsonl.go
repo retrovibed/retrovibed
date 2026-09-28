@@ -115,9 +115,10 @@ func (t importJSONL) importItem(ctx context.Context, c *http.Client, endpoint st
 
 	patch, err := jsonx.Marshal(&media.MediaUpdateRequest{
 		Media: &media.Media{
-			Description:  trailer.Metadata.Description,
-			KnownMediaId: trailer.Metadata.KnownMediaID,
-			ArchiveId:    trailer.Metadata.ArchiveID,
+			Description:    trailer.Metadata.Description,
+			KnownMediaId:   trailer.Metadata.KnownMediaID,
+			ArchiveId:      trailer.Metadata.ArchiveID,
+			EncryptionSeed: trailer.Metadata.EncryptionSeed,
 		},
 	})
 

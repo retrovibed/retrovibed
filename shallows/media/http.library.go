@@ -192,7 +192,7 @@ func (t *HTTPLibrary) patch(w http.ResponseWriter, r *http.Request) {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return
 	} else if err != nil {
-		log.Println(errorsx.Wrap(err, "unable to tombstone metadata"))
+		log.Println(errorsx.Wrap(err, "unable to update metadata"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}

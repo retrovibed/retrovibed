@@ -63,18 +63,20 @@ class _DirectoryCreate extends State<DirectoryCreate> with ds.LoadingState {
   @override
   Widget build(BuildContext context) {
     return ds.Card(
-      leading: [ds.Heading(const Text("new directory"))],
-      trailing: [IconButton(icon: const Icon(Icons.close), onPressed: widget.onCancel)],
+      leading: [ds.Heading(const Text("new folder"))],
+      trailing: [
+            ds.LoadingIconButton(onPressed: submit, icon: const Icon(Icons.check)),
+            IconButton(icon: const Icon(Icons.close), onPressed: widget.onCancel),
+      ],
       forms.Container(
         forms.Field(
           cause: cause,
           input: TextField(
             autofocus: true,
             controller: _name,
-            decoration: InputDecoration(hintText: "directory name", icon: Icon(mimex.icofolder)),
+            decoration: InputDecoration(hintText: "name", icon: Icon(mimex.icofolder)),
             onSubmitted: (_) => submit(),
           ),
-          trailing: [ds.LoadingIconButton(onPressed: submit, icon: const Icon(Icons.check))],
         ),
       ),
     );

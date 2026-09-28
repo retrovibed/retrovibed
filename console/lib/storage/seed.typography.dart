@@ -27,7 +27,6 @@ class SeedTypography extends StatelessWidget {
     return _SeedDropdown(
       current: _current,
       community: classifer.community,
-      personal: classifer.personal,
       onChange: onChange!,
     );
   }
@@ -36,13 +35,11 @@ class SeedTypography extends StatelessWidget {
 class _SeedDropdown extends StatefulWidget {
   final seed.Seed current;
   final String community;
-  final String personal;
   final void Function(seed.Seed) onChange;
 
   const _SeedDropdown({
     required this.current,
     required this.community,
-    required this.personal,
     required this.onChange,
   });
 
@@ -60,9 +57,11 @@ class _SeedDropdownState extends State<_SeedDropdown> {
     _selected = widget.current;
     _options = [
       seed.Seed.global(),
-      seed.Seed.community(widget.community),
-      // seed.Seed.personal(widget.personal), // TODO
+      // a nil community means there is no community seed to offer.
+      if (!uuidx.isMin(uuidx.fromString(widget.community))) seed.Seed.community(widget.community),
       seed.Seed.unique(uuidx.random()),
+      if (!uuidx.isMinMax(uuidx.fromString(widget.current.id)) && widget.current.id != widget.community)
+        widget.current,
     ];
   }
 
@@ -92,44 +91,43 @@ class _SeedDropdownState extends State<_SeedDropdown> {
             setState(() => _selected = selected);
             widget.onChange(selected);
           },
-          items:
-              options.map((s) {
-                final focused = _selected.id == s.id;
-                return DropdownMenuItem<String>(
-                  key: ValueKey(s.id),
-                  value: s.id,
-                  child: Padding(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: defaults.spacing,
-                      children: [
-                        Icon(s.icon),
-                        const SizedBox(), // double the spacing to match checkboxes.
-                        s.label,
-                        const Spacer(),
-                        if (focused) ...[
-                          Expanded(
-                            child: Text(
-                              s.id,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          ds.buttons.copy(
-                            onPressed: () {
-                              services.Clipboard.setData(
-                                services.ClipboardData(text: s.id),
-                              );
-                            },
-                            size: 12,
-                          ),
-                        ],
-                      ],
-                    ),
-                    padding: EdgeInsetsGeometry.only(left: 9, right: 9),
-                  ),
-                );
-              }).toList(),
+          items: options.map((s) {
+            final focused = _selected.id == s.id;
+            return DropdownMenuItem<String>(
+              key: ValueKey(s.id),
+              value: s.id,
+              child: Padding(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: defaults.spacing,
+                  children: [
+                    Icon(s.icon),
+                    const SizedBox(), // double the spacing to match checkboxes.
+                    s.label,
+                    const Spacer(),
+                    if (focused) ...[
+                      Expanded(
+                        child: Text(
+                          s.id,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      ds.buttons.copy(
+                        onPressed: () {
+                          services.Clipboard.setData(
+                            services.ClipboardData(text: s.id),
+                          );
+                        },
+                        size: 12,
+                      ),
+                    ],
+                  ],
+                ),
+                padding: EdgeInsetsGeometry.only(left: 9, right: 9),
+              ),
+            );
+          }).toList(),
         ),
       ),
     );

@@ -536,7 +536,7 @@ func DownloadInto(ctx context.Context, q sqlx.Queryer, vfs fsx.Virtual, mc libra
 		bytes = uint64(i.TotalLength())
 	}
 
-	log.Println("DERP download stats", spew.Sdump(stats))
+	log.Println("download stats", spew.Sdump(stats))
 	if err := MetadataCompleteByID(ctx, q, md.ID, 0, bytes, uint64(stats.Downloaded), uint64(stats.Downloaded)).Scan(md); err != nil {
 		return errorsx.Wrap(err, "unable to mark completed")
 	}

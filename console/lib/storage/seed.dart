@@ -18,15 +18,6 @@ class Seed {
     icon: Icons.group,
   );
 
-  // personal isnt implemented yet.
-  static Seed personal(String id) => Seed(
-    id: id,
-    label: const Text("personal"),
-    description: const Text("Private to you"),
-    tooltip: "your personal seed, used for information you want to keep private",
-    icon: Icons.person,
-  );
-
   static Seed unique(String id) => Seed(
     id: id,
     label: const Text("private"),
@@ -51,9 +42,7 @@ class Seed {
 
 class Classifier {
   final String community;
-  final String personal;
-
-  const Classifier({required this.community, required this.personal});
+  const Classifier({required this.community});
 
   Seed classify(String seed) {
     if (seed == uuidx.min() || seed.isEmpty) {
@@ -62,10 +51,6 @@ class Classifier {
 
     if (seed == community) {
       return Seed.community(seed);
-    }
-
-    if (seed == personal) {
-      return Seed.personal(seed);
     }
 
     return Seed.unique(seed);
