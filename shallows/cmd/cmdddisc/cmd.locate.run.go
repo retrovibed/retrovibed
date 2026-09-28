@@ -37,11 +37,11 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 )
 
-// errLocateFound stops the retry loop in cmdMediaLocate.Run once the queued
+// errLocateFound stops the retry loop in cmdLocateRun.Run once the queued
 // locate request has had a candidate ranked and selected.
 var errLocateFound = errorsx.String("locate: candidate found")
 
-type cmdMediaLocate struct {
+type cmdLocateRun struct {
 	Database      string        `flag:"" name:"database" help:"database to read/write" default:"${vars_user_configuration_directory}/meta.db"`
 	CacheDatabase string        `flag:"" name:"cache-database" help:"cache database to read/write" default:"${vars_user_cache_directory}/cache.db"`
 	Query         string        `arg:"" name:"query" help:"title or free-text search to locate media for"`
@@ -57,7 +57,7 @@ type cmdMediaLocate struct {
 	DHTPeers      []string      `flag:"" name:"dht-peers" help:"use these dht peers as the sole bootstrap nodes instead of the public network" hidden:"true"`
 }
 
-func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
+func (t cmdLocateRun) Run(gctx *cmdopts.Global) (err error) {
 	db, err := cmdopts.DatabaseCustom(gctx.Context, t.Database, t.CacheDatabase)
 	if err != nil {
 		return err
@@ -145,7 +145,7 @@ func (t cmdMediaLocate) Run(gctx *cmdopts.Global) (err error) {
 // daemons.ResumeDownloads, which fires the equivalent work off in a
 // goroutine for a long-running daemon to track asynchronously, this is a
 // one-shot CLI invocation and --download means "wait for it".
-func (t cmdMediaLocate) awaitDownload(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl, md tracking.Metadata) error {
+func (t cmdLocateRun) awaitDownload(ctx context.Context, db sqlx.Queryer, rootstore fsx.Virtual, tclient *torrent.Client, tstore storage.ClientImpl, md tracking.Metadata) error {
 	infopath := rootstore.Path(env.TorrentDirName, fmt.Sprintf("%s.torrent", metainfo.Hash(md.Infohash)))
 
 	metadata, err := torrent.New(
@@ -180,7 +180,7 @@ func (t cmdMediaLocate) awaitDownload(ctx context.Context, db sqlx.Queryer, root
 	return nil
 }
 
-func (t cmdMediaLocate) torrentClient(db sqlx.Queryer) (dhts *dht.Server, tclient *torrent.Client, tstore storage.ClientImpl, err error) {
+func (t cmdLocateRun) torrentClient(db sqlx.Queryer) (dhts *dht.Server, tclient *torrent.Client, tstore storage.ClientImpl, err error) {
 	var (
 		globalbootstrap dht.Option = dht.OptionNoop
 	)

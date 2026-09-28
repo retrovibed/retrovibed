@@ -29,6 +29,8 @@ class Locate extends $pb.GeneratedMessage {
     $core.String? tombstonedAt,
     $core.bool? autodownload,
     $core.bool? adult,
+    $core.int? attempts,
+    $core.String? nextCheckAt,
   }) {
     final result = Locate._();
     if (id != null) result.id = id;
@@ -41,6 +43,8 @@ class Locate extends $pb.GeneratedMessage {
     if (tombstonedAt != null) result.tombstonedAt = tombstonedAt;
     if (autodownload != null) result.autodownload = autodownload;
     if (adult != null) result.adult = adult;
+    if (attempts != null) result.attempts = attempts;
+    if (nextCheckAt != null) result.nextCheckAt = nextCheckAt;
     return result;
   }
 
@@ -67,6 +71,8 @@ class Locate extends $pb.GeneratedMessage {
     ..aOS(8, _omitFieldNames ? '' : 'tombstoned_at')
     ..aOB(9, _omitFieldNames ? '' : 'autodownload')
     ..aOB(10, _omitFieldNames ? '' : 'adult')
+    ..aI(11, _omitFieldNames ? '' : 'attempts', fieldType: $pb.PbFieldType.OU3)
+    ..aOS(12, _omitFieldNames ? '' : 'next_check_at')
     ..hasRequiredFields = false;
 
   @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
@@ -178,16 +184,44 @@ class Locate extends $pb.GeneratedMessage {
   $core.bool hasAdult() => $_has(9);
   @$pb.TagNumber(10)
   void clearAdult() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.int get attempts => $_getIZ(10);
+  @$pb.TagNumber(11)
+  set attempts($core.int value) => $_setUnsignedInt32(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasAttempts() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearAttempts() => $_clearField(11);
+
+  @$pb.TagNumber(12)
+  $core.String get nextCheckAt => $_getSZ(11);
+  @$pb.TagNumber(12)
+  set nextCheckAt($core.String value) => $_setString(11, value);
+  @$pb.TagNumber(12)
+  $core.bool hasNextCheckAt() => $_has(11);
+  @$pb.TagNumber(12)
+  void clearNextCheckAt() => $_clearField(12);
 }
 
 class LocateSearchRequest extends $pb.GeneratedMessage {
   factory LocateSearchRequest({
     $core.String? query,
+    $core.Iterable<$core.String>? id,
+    $fixnum.Int64? attemptsMin,
+    $fixnum.Int64? attemptsMax,
+    $core.bool? pending,
+    $core.bool? completed,
     $fixnum.Int64? offset,
     $fixnum.Int64? limit,
   }) {
     final result = LocateSearchRequest._();
     if (query != null) result.query = query;
+    if (id != null) result.id.addAll(id);
+    if (attemptsMin != null) result.attemptsMin = attemptsMin;
+    if (attemptsMax != null) result.attemptsMax = attemptsMax;
+    if (pending != null) result.pending = pending;
+    if (completed != null) result.completed = completed;
     if (offset != null) result.offset = offset;
     if (limit != null) result.limit = limit;
     return result;
@@ -207,6 +241,15 @@ class LocateSearchRequest extends $pb.GeneratedMessage {
       package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
       createEmptyInstance: LocateSearchRequest.$_createMessage)
     ..aOS(1, _omitFieldNames ? '' : 'query')
+    ..pPS(2, _omitFieldNames ? '' : 'id')
+    ..a<$fixnum.Int64>(
+        3, _omitFieldNames ? '' : 'attempts_min', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..a<$fixnum.Int64>(
+        4, _omitFieldNames ? '' : 'attempts_max', $pb.PbFieldType.OU6,
+        defaultOrMaker: $fixnum.Int64.ZERO)
+    ..aOB(5, _omitFieldNames ? '' : 'pending')
+    ..aOB(6, _omitFieldNames ? '' : 'completed')
     ..a<$fixnum.Int64>(
         900, _omitFieldNames ? '' : 'offset', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
@@ -246,21 +289,60 @@ class LocateSearchRequest extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   void clearQuery() => $_clearField(1);
 
+  @$pb.TagNumber(2)
+  $pb.PbList<$core.String> get id => $_getList(1);
+
+  @$pb.TagNumber(3)
+  $fixnum.Int64 get attemptsMin => $_getI64(2);
+  @$pb.TagNumber(3)
+  set attemptsMin($fixnum.Int64 value) => $_setInt64(2, value);
+  @$pb.TagNumber(3)
+  $core.bool hasAttemptsMin() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearAttemptsMin() => $_clearField(3);
+
+  @$pb.TagNumber(4)
+  $fixnum.Int64 get attemptsMax => $_getI64(3);
+  @$pb.TagNumber(4)
+  set attemptsMax($fixnum.Int64 value) => $_setInt64(3, value);
+  @$pb.TagNumber(4)
+  $core.bool hasAttemptsMax() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearAttemptsMax() => $_clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.bool get pending => $_getBF(4);
+  @$pb.TagNumber(5)
+  set pending($core.bool value) => $_setBool(4, value);
+  @$pb.TagNumber(5)
+  $core.bool hasPending() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearPending() => $_clearField(5);
+
+  @$pb.TagNumber(6)
+  $core.bool get completed => $_getBF(5);
+  @$pb.TagNumber(6)
+  set completed($core.bool value) => $_setBool(5, value);
+  @$pb.TagNumber(6)
+  $core.bool hasCompleted() => $_has(5);
+  @$pb.TagNumber(6)
+  void clearCompleted() => $_clearField(6);
+
   @$pb.TagNumber(900)
-  $fixnum.Int64 get offset => $_getI64(1);
+  $fixnum.Int64 get offset => $_getI64(6);
   @$pb.TagNumber(900)
-  set offset($fixnum.Int64 value) => $_setInt64(1, value);
+  set offset($fixnum.Int64 value) => $_setInt64(6, value);
   @$pb.TagNumber(900)
-  $core.bool hasOffset() => $_has(1);
+  $core.bool hasOffset() => $_has(6);
   @$pb.TagNumber(900)
   void clearOffset() => $_clearField(900);
 
   @$pb.TagNumber(901)
-  $fixnum.Int64 get limit => $_getI64(2);
+  $fixnum.Int64 get limit => $_getI64(7);
   @$pb.TagNumber(901)
-  set limit($fixnum.Int64 value) => $_setInt64(2, value);
+  set limit($fixnum.Int64 value) => $_setInt64(7, value);
   @$pb.TagNumber(901)
-  $core.bool hasLimit() => $_has(2);
+  $core.bool hasLimit() => $_has(7);
   @$pb.TagNumber(901)
   void clearLimit() => $_clearField(901);
 }
@@ -545,6 +627,185 @@ class LocateCreateResponse extends $pb.GeneratedMessage {
       $pb.GeneratedMessage.$_defaultFor<LocateCreateResponse>(
           LocateCreateResponse.$_createMessage);
   static LocateCreateResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Locate get locate => $_getN(0);
+  @$pb.TagNumber(1)
+  set locate(Locate value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasLocate() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearLocate() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Locate ensureLocate() => $_ensure(0);
+}
+
+class LocateDeleteResponse extends $pb.GeneratedMessage {
+  factory LocateDeleteResponse({
+    Locate? locate,
+  }) {
+    final result = LocateDeleteResponse._();
+    if (locate != null) result.locate = locate;
+    return result;
+  }
+
+  LocateDeleteResponse._();
+
+  factory LocateDeleteResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      LocateDeleteResponse()..mergeFromBuffer(data, registry);
+  factory LocateDeleteResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      LocateDeleteResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'LocateDeleteResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
+      createEmptyInstance: LocateDeleteResponse.$_createMessage)
+    ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate',
+        subBuilder: Locate.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LocateDeleteResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LocateDeleteResponse copyWith(void Function(LocateDeleteResponse) updates) =>
+      super.copyWith((message) => updates(message as LocateDeleteResponse))
+          as LocateDeleteResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated(
+      'Use LocateDeleteResponse() / LocateDeleteResponse.new instead')
+  static LocateDeleteResponse create() => LocateDeleteResponse._();
+  static $pb.GeneratedMessage $_createMessage() => LocateDeleteResponse._();
+  @$core.override
+  LocateDeleteResponse createEmptyInstance() => LocateDeleteResponse._();
+  @$core.pragma('dart2js:noInline')
+  static LocateDeleteResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<LocateDeleteResponse>(
+          LocateDeleteResponse.$_createMessage);
+  static LocateDeleteResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  Locate get locate => $_getN(0);
+  @$pb.TagNumber(1)
+  set locate(Locate value) => $_setField(1, value);
+  @$pb.TagNumber(1)
+  $core.bool hasLocate() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearLocate() => $_clearField(1);
+  @$pb.TagNumber(1)
+  Locate ensureLocate() => $_ensure(0);
+}
+
+class LocateRetryRequest extends $pb.GeneratedMessage {
+  factory LocateRetryRequest({
+    $core.bool? resetAttempts,
+  }) {
+    final result = LocateRetryRequest._();
+    if (resetAttempts != null) result.resetAttempts = resetAttempts;
+    return result;
+  }
+
+  LocateRetryRequest._();
+
+  factory LocateRetryRequest.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      LocateRetryRequest()..mergeFromBuffer(data, registry);
+  factory LocateRetryRequest.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      LocateRetryRequest()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'LocateRetryRequest',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
+      createEmptyInstance: LocateRetryRequest.$_createMessage)
+    ..aOB(1, _omitFieldNames ? '' : 'reset_attempts')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LocateRetryRequest clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LocateRetryRequest copyWith(void Function(LocateRetryRequest) updates) =>
+      super.copyWith((message) => updates(message as LocateRetryRequest))
+          as LocateRetryRequest;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use LocateRetryRequest() / LocateRetryRequest.new instead')
+  static LocateRetryRequest create() => LocateRetryRequest._();
+  static $pb.GeneratedMessage $_createMessage() => LocateRetryRequest._();
+  @$core.override
+  LocateRetryRequest createEmptyInstance() => LocateRetryRequest._();
+  @$core.pragma('dart2js:noInline')
+  static LocateRetryRequest getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<LocateRetryRequest>(
+          LocateRetryRequest.$_createMessage);
+  static LocateRetryRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get resetAttempts => $_getBF(0);
+  @$pb.TagNumber(1)
+  set resetAttempts($core.bool value) => $_setBool(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasResetAttempts() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearResetAttempts() => $_clearField(1);
+}
+
+class LocateRetryResponse extends $pb.GeneratedMessage {
+  factory LocateRetryResponse({
+    Locate? locate,
+  }) {
+    final result = LocateRetryResponse._();
+    if (locate != null) result.locate = locate;
+    return result;
+  }
+
+  LocateRetryResponse._();
+
+  factory LocateRetryResponse.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      LocateRetryResponse()..mergeFromBuffer(data, registry);
+  factory LocateRetryResponse.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      LocateRetryResponse()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'LocateRetryResponse',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'ddisc'),
+      createEmptyInstance: LocateRetryResponse.$_createMessage)
+    ..aOM<Locate>(1, _omitFieldNames ? '' : 'locate',
+        subBuilder: Locate.$_createMessage)
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LocateRetryResponse clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  LocateRetryResponse copyWith(void Function(LocateRetryResponse) updates) =>
+      super.copyWith((message) => updates(message as LocateRetryResponse))
+          as LocateRetryResponse;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core
+      .Deprecated('Use LocateRetryResponse() / LocateRetryResponse.new instead')
+  static LocateRetryResponse create() => LocateRetryResponse._();
+  static $pb.GeneratedMessage $_createMessage() => LocateRetryResponse._();
+  @$core.override
+  LocateRetryResponse createEmptyInstance() => LocateRetryResponse._();
+  @$core.pragma('dart2js:noInline')
+  static LocateRetryResponse getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<LocateRetryResponse>(
+          LocateRetryResponse.$_createMessage);
+  static LocateRetryResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
   Locate get locate => $_getN(0);

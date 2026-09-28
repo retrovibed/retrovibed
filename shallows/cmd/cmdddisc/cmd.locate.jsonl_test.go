@@ -61,13 +61,13 @@ func newLocateServer(t *testing.T, q *sql.DB) (*http.Client, *httptest.Server) {
 	}, srv
 }
 
-func TestMediaLocateJSONL(t *testing.T) {
+func TestLocateJSONL(t *testing.T) {
 	t.Run("handles empty input", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		cmd := cmdMediaLocateJSONL{}
+		cmd := cmdLocateJSONL{}
 
 		c, srv := newLocateServer(t, q)
 		require.NoError(t, cmd.run(ctx, c, srv.URL, &bytes.Buffer{}))
@@ -79,7 +79,7 @@ func TestMediaLocateJSONL(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		cmd := cmdMediaLocateJSONL{}
+		cmd := cmdLocateJSONL{}
 
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))
@@ -105,7 +105,7 @@ func TestMediaLocateJSONL(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		cmd := cmdMediaLocateJSONL{Workers: 8, Backlog: 8}
+		cmd := cmdLocateJSONL{Workers: 8, Backlog: 8}
 
 		var buf bytes.Buffer
 		enc := jsonl.NewEncoder(&buf)
@@ -128,7 +128,7 @@ func TestMediaLocateJSONL(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		cmd := cmdMediaLocateJSONL{}
+		cmd := cmdLocateJSONL{}
 
 		buf := bytes.NewBufferString("not valid json\n")
 
@@ -143,7 +143,7 @@ func TestMediaLocateJSONL(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		cmd := cmdMediaLocateJSONL{}
+		cmd := cmdLocateJSONL{}
 
 		var known library.Known
 		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults))

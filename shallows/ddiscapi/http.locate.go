@@ -1,9 +1,12 @@
 package ddiscapi
 
 import (
+	"io"
 	"log"
+	"math"
 	"net/http"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
@@ -23,6 +26,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/numericx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )
 
 type HTTPLocateOption func(*HTTPLocate)
@@ -75,6 +79,85 @@ func (t *HTTPLocate) Bind(r *mux.Router) {
 		httpauth.AuthenticateWithToken(t.jwtsecret),
 		httpx.Timeout2s(),
 	).ThenFunc(t.find))
+
+	r.Path("/{id}").Methods(http.MethodDelete).Handler(alice.New(
+		httpx.ContextBufferPool1024(),
+		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeer),
+		httpx.Timeout2s(),
+	).ThenFunc(t.delete))
+
+	r.Path("/{id}/retry").Methods(http.MethodPost).Handler(alice.New(
+		httpx.ContextBufferPool1024(),
+		metaapi.AuthzTokenHTTP(t.jwtsecret, AuthzPermPeer),
+		httpx.Timeout2s(),
+	).ThenFunc(t.retry))
+}
+
+func (t *HTTPLocate) delete(w http.ResponseWriter, r *http.Request) {
+	var (
+		l  ddisc.Locate
+		id = mux.Vars(r)["id"]
+	)
+
+	if err := ddisc.LocateDeleteByID(r.Context(), t.q, id).Scan(&l); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find locate record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to delete locate record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &LocateDeleteResponse{
+		Locate: new(
+			langx.Clone(
+				Locate{},
+				LocateOptionFromDdiscLocate(langx.Clone(l, timex.JSONSafeEncodeOption)),
+			),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
+}
+
+func (t *HTTPLocate) retry(w http.ResponseWriter, r *http.Request) {
+	var (
+		l   ddisc.Locate
+		msg LocateRetryRequest
+		id  = mux.Vars(r)["id"]
+	)
+
+	if err := jsonx.UnmarshalRead(r.Body, &msg); err != nil && err != io.EOF {
+		log.Println(errorsx.Wrap(err, "unable to decode request"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
+		return
+	}
+
+	if err := ddisc.LocateRetry(r.Context(), t.q, id, msg.ResetAttempts).Scan(&l); sqlx.ErrNoRows(err) != nil {
+		log.Println(errorsx.Wrap(err, "unable to find locate record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
+		return
+	} else if err != nil {
+		log.Println(errorsx.Wrap(err, "unable to retry locate record"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
+		return
+	}
+
+	t.locate.Broadcast()
+
+	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &LocateRetryResponse{
+		Locate: new(
+			langx.Clone(
+				Locate{},
+				LocateOptionFromDdiscLocate(langx.Clone(l, timex.JSONSafeEncodeOption)),
+			),
+		),
+	}); err != nil {
+		log.Println(errorsx.Wrap(err, "unable to write response"))
+		return
+	}
 }
 
 func (t *HTTPLocate) search(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +165,8 @@ func (t *HTTPLocate) search(w http.ResponseWriter, r *http.Request) {
 		err error
 		msg = LocateSearchResponse{
 			Next: &LocateSearchRequest{
-				Limit: 100,
+				Limit:       100,
+				AttemptsMax: math.MaxInt64,
 			},
 		}
 	)
@@ -94,7 +178,21 @@ func (t *HTTPLocate) search(w http.ResponseWriter, r *http.Request) {
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
 
-	q := sqlx.Scan(ddisc.LocateSearch(r.Context(), t.q, ddisc.LocateSearchBuilder().OrderBy("id ASC").Offset(msg.Next.Offset*msg.Next.Limit).Limit(msg.Next.Limit)))
+	where := squirrel.And{
+		ddisc.LocateQueryByIDs(msg.Next.Id...),
+		ddisc.LocateQueryText(msg.Next.Query),
+		ddisc.LocateQueryAttemptsRange(msg.Next.AttemptsMin, msg.Next.AttemptsMax),
+	}
+
+	if msg.Next.Pending {
+		where = append(where, ddisc.LocateQueryPending())
+	}
+
+	if msg.Next.Completed {
+		where = append(where, ddisc.LocateQueryCompleted())
+	}
+
+	q := sqlx.Scan(ddisc.LocateSearch(r.Context(), t.q, ddisc.LocateSearchBuilder().Where(where).OrderBy("id ASC").Offset(msg.Next.Offset*msg.Next.Limit).Limit(msg.Next.Limit)))
 
 	for v := range q.Iter() {
 		tmp := langx.Clone(Locate{}, LocateOptionFromDdiscLocate(langx.Clone(v, timex.JSONSafeEncodeOption)))

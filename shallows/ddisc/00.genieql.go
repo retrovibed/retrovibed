@@ -133,6 +133,22 @@ func LocateFindByID(
 	gql = gql.Query(`SELECT ` + LocateScannerStaticColumns + ` FROM ddisc_locate WHERE "id" = {id}`)
 }
 
+func LocateDeleteByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewLocateScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM ddisc_locate WHERE "id" = {id} RETURNING ` + LocateScannerStaticColumns)
+}
+
+// LocateRetry clears the tombstone and cooldown so the request is picked up
+// on the daemon's next pass, optionally resetting the backoff attempts.
+func LocateRetry(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, resetAttempts bool) NewLocateScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE ddisc_locate SET updated_at = NOW(), tombstoned_at = 'infinity', next_check_at = NOW(), attempts = CASE WHEN {resetAttempts} THEN 0 ELSE attempts END WHERE "id" = {id} RETURNING ` + LocateScannerStaticColumns)
+}
+
 // LocateLocated records which torrent was picked for this request. Does not
 // close the request out - a better candidate may still show up later.
 func LocateLocated(

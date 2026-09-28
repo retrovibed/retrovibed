@@ -33,6 +33,8 @@ type Locate struct {
 	TombstonedAt     string                 `protobuf:"bytes,8,opt,name=tombstoned_at,proto3" json:"tombstoned_at,omitempty"`
 	Autodownload     bool                   `protobuf:"varint,9,opt,name=autodownload,proto3" json:"autodownload,omitempty"`
 	Adult            bool                   `protobuf:"varint,10,opt,name=adult,proto3" json:"adult,omitempty"`
+	Attempts         uint32                 `protobuf:"varint,11,opt,name=attempts,proto3" json:"attempts,omitempty"`
+	NextCheckAt      string                 `protobuf:"bytes,12,opt,name=next_check_at,proto3" json:"next_check_at,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -137,9 +139,28 @@ func (x *Locate) GetAdult() bool {
 	return false
 }
 
+func (x *Locate) GetAttempts() uint32 {
+	if x != nil {
+		return x.Attempts
+	}
+	return 0
+}
+
+func (x *Locate) GetNextCheckAt() string {
+	if x != nil {
+		return x.NextCheckAt
+	}
+	return ""
+}
+
 type LocateSearchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Query         string                 `protobuf:"bytes,1,opt,name=query,proto3" json:"query,omitempty"`
+	Id            []string               `protobuf:"bytes,2,rep,name=id,proto3" json:"id,omitempty"`
+	AttemptsMin   uint64                 `protobuf:"varint,3,opt,name=attempts_min,proto3" json:"attempts_min,omitempty"`
+	AttemptsMax   uint64                 `protobuf:"varint,4,opt,name=attempts_max,proto3" json:"attempts_max,omitempty"`
+	Pending       bool                   `protobuf:"varint,5,opt,name=pending,proto3" json:"pending,omitempty"`
+	Completed     bool                   `protobuf:"varint,6,opt,name=completed,proto3" json:"completed,omitempty"`
 	Offset        uint64                 `protobuf:"varint,900,opt,name=offset,proto3" json:"offset,omitempty"`
 	Limit         uint64                 `protobuf:"varint,901,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -181,6 +202,41 @@ func (x *LocateSearchRequest) GetQuery() string {
 		return x.Query
 	}
 	return ""
+}
+
+func (x *LocateSearchRequest) GetId() []string {
+	if x != nil {
+		return x.Id
+	}
+	return nil
+}
+
+func (x *LocateSearchRequest) GetAttemptsMin() uint64 {
+	if x != nil {
+		return x.AttemptsMin
+	}
+	return 0
+}
+
+func (x *LocateSearchRequest) GetAttemptsMax() uint64 {
+	if x != nil {
+		return x.AttemptsMax
+	}
+	return 0
+}
+
+func (x *LocateSearchRequest) GetPending() bool {
+	if x != nil {
+		return x.Pending
+	}
+	return false
+}
+
+func (x *LocateSearchRequest) GetCompleted() bool {
+	if x != nil {
+		return x.Completed
+	}
+	return false
 }
 
 func (x *LocateSearchRequest) GetOffset() uint64 {
@@ -417,11 +473,143 @@ func (x *LocateCreateResponse) GetLocate() *Locate {
 	return nil
 }
 
+type LocateDeleteResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Locate        *Locate                `protobuf:"bytes,1,opt,name=locate,proto3" json:"locate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LocateDeleteResponse) Reset() {
+	*x = LocateDeleteResponse{}
+	mi := &file_media_ddisc_locate_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocateDeleteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocateDeleteResponse) ProtoMessage() {}
+
+func (x *LocateDeleteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_media_ddisc_locate_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocateDeleteResponse.ProtoReflect.Descriptor instead.
+func (*LocateDeleteResponse) Descriptor() ([]byte, []int) {
+	return file_media_ddisc_locate_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *LocateDeleteResponse) GetLocate() *Locate {
+	if x != nil {
+		return x.Locate
+	}
+	return nil
+}
+
+type LocateRetryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ResetAttempts bool                   `protobuf:"varint,1,opt,name=reset_attempts,proto3" json:"reset_attempts,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LocateRetryRequest) Reset() {
+	*x = LocateRetryRequest{}
+	mi := &file_media_ddisc_locate_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocateRetryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocateRetryRequest) ProtoMessage() {}
+
+func (x *LocateRetryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_media_ddisc_locate_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocateRetryRequest.ProtoReflect.Descriptor instead.
+func (*LocateRetryRequest) Descriptor() ([]byte, []int) {
+	return file_media_ddisc_locate_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *LocateRetryRequest) GetResetAttempts() bool {
+	if x != nil {
+		return x.ResetAttempts
+	}
+	return false
+}
+
+type LocateRetryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Locate        *Locate                `protobuf:"bytes,1,opt,name=locate,proto3" json:"locate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LocateRetryResponse) Reset() {
+	*x = LocateRetryResponse{}
+	mi := &file_media_ddisc_locate_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LocateRetryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LocateRetryResponse) ProtoMessage() {}
+
+func (x *LocateRetryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_media_ddisc_locate_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LocateRetryResponse.ProtoReflect.Descriptor instead.
+func (*LocateRetryResponse) Descriptor() ([]byte, []int) {
+	return file_media_ddisc_locate_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *LocateRetryResponse) GetLocate() *Locate {
+	if x != nil {
+		return x.Locate
+	}
+	return nil
+}
+
 var File_media_ddisc_locate_proto protoreflect.FileDescriptor
 
 const file_media_ddisc_locate_proto_rawDesc = "" +
 	"\n" +
-	"\x18media/ddisc.locate.proto\x12\x05ddisc\"\xc2\x02\n" +
+	"\x18media/ddisc.locate.proto\x12\x05ddisc\"\x84\x03\n" +
 	"\x06Locate\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -437,11 +625,18 @@ const file_media_ddisc_locate_proto_rawDesc = "" +
 	"\rtombstoned_at\x18\b \x01(\tR\rtombstoned_at\x12\"\n" +
 	"\fautodownload\x18\t \x01(\bR\fautodownload\x12\x14\n" +
 	"\x05adult\x18\n" +
-	" \x01(\bR\x05adult\"j\n" +
+	" \x01(\bR\x05adult\x12\x1a\n" +
+	"\battempts\x18\v \x01(\rR\battempts\x12$\n" +
+	"\rnext_check_at\x18\f \x01(\tR\rnext_check_at\"\xfa\x01\n" +
 	"\x13LocateSearchRequest\x12\x14\n" +
-	"\x05query\x18\x01 \x01(\tR\x05query\x12\x17\n" +
+	"\x05query\x18\x01 \x01(\tR\x05query\x12\x0e\n" +
+	"\x02id\x18\x02 \x03(\tR\x02id\x12\"\n" +
+	"\fattempts_min\x18\x03 \x01(\x04R\fattempts_min\x12\"\n" +
+	"\fattempts_max\x18\x04 \x01(\x04R\fattempts_max\x12\x18\n" +
+	"\apending\x18\x05 \x01(\bR\apending\x12\x1c\n" +
+	"\tcompleted\x18\x06 \x01(\bR\tcompleted\x12\x17\n" +
 	"\x06offset\x18\x84\a \x01(\x04R\x06offset\x12\x15\n" +
-	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\x02\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"k\n" +
+	"\x05limit\x18\x85\a \x01(\x04R\x05limitJ\x05\b\a\x10\x84\aJ\x06\b\x86\a\x10\xe8\a\"k\n" +
 	"\x14LocateSearchResponse\x12.\n" +
 	"\x04next\x18\x01 \x01(\v2\x1a.ddisc.LocateSearchRequestR\x04next\x12#\n" +
 	"\x05items\x18\x02 \x03(\v2\r.ddisc.LocateR\x05items\"\x15\n" +
@@ -451,6 +646,12 @@ const file_media_ddisc_locate_proto_rawDesc = "" +
 	"\x13LocateCreateRequest\x12%\n" +
 	"\x06locate\x18\x01 \x01(\v2\r.ddisc.LocateR\x06locate\"=\n" +
 	"\x14LocateCreateResponse\x12%\n" +
+	"\x06locate\x18\x01 \x01(\v2\r.ddisc.LocateR\x06locate\"=\n" +
+	"\x14LocateDeleteResponse\x12%\n" +
+	"\x06locate\x18\x01 \x01(\v2\r.ddisc.LocateR\x06locate\"<\n" +
+	"\x12LocateRetryRequest\x12&\n" +
+	"\x0ereset_attempts\x18\x01 \x01(\bR\x0ereset_attempts\"<\n" +
+	"\x13LocateRetryResponse\x12%\n" +
 	"\x06locate\x18\x01 \x01(\v2\r.ddisc.LocateR\x06locateb\x06proto3"
 
 var (
@@ -465,7 +666,7 @@ func file_media_ddisc_locate_proto_rawDescGZIP() []byte {
 	return file_media_ddisc_locate_proto_rawDescData
 }
 
-var file_media_ddisc_locate_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_media_ddisc_locate_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_media_ddisc_locate_proto_goTypes = []any{
 	(*Locate)(nil),               // 0: ddisc.Locate
 	(*LocateSearchRequest)(nil),  // 1: ddisc.LocateSearchRequest
@@ -474,6 +675,9 @@ var file_media_ddisc_locate_proto_goTypes = []any{
 	(*LocateLookupResponse)(nil), // 4: ddisc.LocateLookupResponse
 	(*LocateCreateRequest)(nil),  // 5: ddisc.LocateCreateRequest
 	(*LocateCreateResponse)(nil), // 6: ddisc.LocateCreateResponse
+	(*LocateDeleteResponse)(nil), // 7: ddisc.LocateDeleteResponse
+	(*LocateRetryRequest)(nil),   // 8: ddisc.LocateRetryRequest
+	(*LocateRetryResponse)(nil),  // 9: ddisc.LocateRetryResponse
 }
 var file_media_ddisc_locate_proto_depIdxs = []int32{
 	1, // 0: ddisc.LocateSearchResponse.next:type_name -> ddisc.LocateSearchRequest
@@ -481,11 +685,13 @@ var file_media_ddisc_locate_proto_depIdxs = []int32{
 	0, // 2: ddisc.LocateLookupResponse.locate:type_name -> ddisc.Locate
 	0, // 3: ddisc.LocateCreateRequest.locate:type_name -> ddisc.Locate
 	0, // 4: ddisc.LocateCreateResponse.locate:type_name -> ddisc.Locate
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	0, // 5: ddisc.LocateDeleteResponse.locate:type_name -> ddisc.Locate
+	0, // 6: ddisc.LocateRetryResponse.locate:type_name -> ddisc.Locate
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_media_ddisc_locate_proto_init() }
@@ -499,7 +705,7 @@ func file_media_ddisc_locate_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_media_ddisc_locate_proto_rawDesc), len(file_media_ddisc_locate_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
