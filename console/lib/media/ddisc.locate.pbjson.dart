@@ -35,6 +35,8 @@ const Locate$json = {
     {'1': 'tombstoned_at', '3': 8, '4': 1, '5': 9, '10': 'tombstoned_at'},
     {'1': 'autodownload', '3': 9, '4': 1, '5': 8, '10': 'autodownload'},
     {'1': 'adult', '3': 10, '4': 1, '5': 8, '10': 'adult'},
+    {'1': 'attempts', '3': 11, '4': 1, '5': 13, '10': 'attempts'},
+    {'1': 'next_check_at', '3': 12, '4': 1, '5': 9, '10': 'next_check_at'},
   ],
 };
 
@@ -45,26 +47,36 @@ final $typed_data.Uint8List locateDescriptor = $convert.base64Decode(
     'CVIOa25vd25fbWVkaWFfaWQSLgoSbG9jYXRlZF90b3JyZW50X2lkGAUgASgJUhJsb2NhdGVkX3'
     'RvcnJlbnRfaWQSFAoFcXVlcnkYBiABKAlSBXF1ZXJ5EhoKCG1pbWV0eXBlGAcgASgJUghtaW1l'
     'dHlwZRIkCg10b21ic3RvbmVkX2F0GAggASgJUg10b21ic3RvbmVkX2F0EiIKDGF1dG9kb3dubG'
-    '9hZBgJIAEoCFIMYXV0b2Rvd25sb2FkEhQKBWFkdWx0GAogASgIUgVhZHVsdA==');
+    '9hZBgJIAEoCFIMYXV0b2Rvd25sb2FkEhQKBWFkdWx0GAogASgIUgVhZHVsdBIaCghhdHRlbXB0'
+    'cxgLIAEoDVIIYXR0ZW1wdHMSJAoNbmV4dF9jaGVja19hdBgMIAEoCVINbmV4dF9jaGVja19hdA'
+    '==');
 
 @$core.Deprecated('Use locateSearchRequestDescriptor instead')
 const LocateSearchRequest$json = {
   '1': 'LocateSearchRequest',
   '2': [
     {'1': 'query', '3': 1, '4': 1, '5': 9, '10': 'query'},
+    {'1': 'id', '3': 2, '4': 3, '5': 9, '10': 'id'},
+    {'1': 'attempts_min', '3': 3, '4': 1, '5': 4, '10': 'attempts_min'},
+    {'1': 'attempts_max', '3': 4, '4': 1, '5': 4, '10': 'attempts_max'},
+    {'1': 'pending', '3': 5, '4': 1, '5': 8, '10': 'pending'},
+    {'1': 'completed', '3': 6, '4': 1, '5': 8, '10': 'completed'},
     {'1': 'offset', '3': 900, '4': 1, '5': 4, '10': 'offset'},
     {'1': 'limit', '3': 901, '4': 1, '5': 4, '10': 'limit'},
   ],
   '9': [
-    {'1': 2, '2': 900},
+    {'1': 7, '2': 900},
     {'1': 902, '2': 1000},
   ],
 };
 
 /// Descriptor for `LocateSearchRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List locateSearchRequestDescriptor = $convert.base64Decode(
-    'ChNMb2NhdGVTZWFyY2hSZXF1ZXN0EhQKBXF1ZXJ5GAEgASgJUgVxdWVyeRIXCgZvZmZzZXQYhA'
-    'cgASgEUgZvZmZzZXQSFQoFbGltaXQYhQcgASgEUgVsaW1pdEoFCAIQhAdKBgiGBxDoBw==');
+    'ChNMb2NhdGVTZWFyY2hSZXF1ZXN0EhQKBXF1ZXJ5GAEgASgJUgVxdWVyeRIOCgJpZBgCIAMoCV'
+    'ICaWQSIgoMYXR0ZW1wdHNfbWluGAMgASgEUgxhdHRlbXB0c19taW4SIgoMYXR0ZW1wdHNfbWF4'
+    'GAQgASgEUgxhdHRlbXB0c19tYXgSGAoHcGVuZGluZxgFIAEoCFIHcGVuZGluZxIcCgljb21wbG'
+    'V0ZWQYBiABKAhSCWNvbXBsZXRlZBIXCgZvZmZzZXQYhAcgASgEUgZvZmZzZXQSFQoFbGltaXQY'
+    'hQcgASgEUgVsaW1pdEoFCAcQhAdKBgiGBxDoBw==');
 
 @$core.Deprecated('Use locateSearchResponseDescriptor instead')
 const LocateSearchResponse$json = {
@@ -162,3 +174,56 @@ const LocateCreateResponse$json = {
 final $typed_data.Uint8List locateCreateResponseDescriptor = $convert.base64Decode(
     'ChRMb2NhdGVDcmVhdGVSZXNwb25zZRIlCgZsb2NhdGUYASABKAsyDS5kZGlzYy5Mb2NhdGVSBm'
     'xvY2F0ZQ==');
+
+@$core.Deprecated('Use locateDeleteResponseDescriptor instead')
+const LocateDeleteResponse$json = {
+  '1': 'LocateDeleteResponse',
+  '2': [
+    {
+      '1': 'locate',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.ddisc.Locate',
+      '10': 'locate'
+    },
+  ],
+};
+
+/// Descriptor for `LocateDeleteResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List locateDeleteResponseDescriptor = $convert.base64Decode(
+    'ChRMb2NhdGVEZWxldGVSZXNwb25zZRIlCgZsb2NhdGUYASABKAsyDS5kZGlzYy5Mb2NhdGVSBm'
+    'xvY2F0ZQ==');
+
+@$core.Deprecated('Use locateRetryRequestDescriptor instead')
+const LocateRetryRequest$json = {
+  '1': 'LocateRetryRequest',
+  '2': [
+    {'1': 'reset_attempts', '3': 1, '4': 1, '5': 8, '10': 'reset_attempts'},
+  ],
+};
+
+/// Descriptor for `LocateRetryRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List locateRetryRequestDescriptor = $convert.base64Decode(
+    'ChJMb2NhdGVSZXRyeVJlcXVlc3QSJgoOcmVzZXRfYXR0ZW1wdHMYASABKAhSDnJlc2V0X2F0dG'
+    'VtcHRz');
+
+@$core.Deprecated('Use locateRetryResponseDescriptor instead')
+const LocateRetryResponse$json = {
+  '1': 'LocateRetryResponse',
+  '2': [
+    {
+      '1': 'locate',
+      '3': 1,
+      '4': 1,
+      '5': 11,
+      '6': '.ddisc.Locate',
+      '10': 'locate'
+    },
+  ],
+};
+
+/// Descriptor for `LocateRetryResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List locateRetryResponseDescriptor = $convert.base64Decode(
+    'ChNMb2NhdGVSZXRyeVJlc3BvbnNlEiUKBmxvY2F0ZRgBIAEoCzINLmRkaXNjLkxvY2F0ZVIGbG'
+    '9jYXRl');

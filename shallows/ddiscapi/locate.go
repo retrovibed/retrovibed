@@ -18,6 +18,9 @@ func LocateOptionFromDdiscLocate(cc ddisc.Locate) LocateOption {
 		c.Query = cc.Query
 		c.Mimetype = cc.Mimetype
 		c.Adult = cc.Adult
+		c.Autodownload = cc.Autodownload
+		c.Attempts = cc.Attempts
+		c.NextCheckAt = grpcx.EncodeTime(cc.NextCheckAt)
 	}
 }
 

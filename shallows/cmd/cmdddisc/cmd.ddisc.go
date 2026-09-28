@@ -28,15 +28,27 @@ type discovery struct {
 // go -C shallows run ./cmd/retrovibe/... disc media create --insecure --library="eg:9998" --infohash="<hex infohash>" --title="derp"
 // go -C shallows run ./cmd/retrovibe/... disc media delete --insecure --library="eg:9998" --id="<id from ls>"
 // go -C shallows run ./cmd/retrovibe/... disc media query "<known media id>" "127.0.0.1:3196"
-// go -C shallows run ./cmd/retrovibe/... disc media discover "ubuntu" --mimetype=video --insecure --library="eg:9998"
 type media struct {
-	Ls          cmdMediaLs          `cmd:"" help:"list/search discovered media on a library"`
-	Create      cmdMediaCreate      `cmd:"" help:"create a discovered media record on a library"`
-	Delete      cmdMediaDelete      `cmd:"" help:"remove a discovered media record from a library"`
-	Query       cmdMediaQuery       `cmd:"" help:"query the DHT directly for media matching a known-media id"`
-	Discover    cmdMediaDiscover    `cmd:"" help:"submit a locate request to a running daemon; it discovers and downloads in the background"`
-	LocateJSONL cmdMediaLocateJSONL `cmd:"" help:"submit locate requests in bulk from a jsonl stream of known-media records (see 'media known duckdb' export format)"`
-	Locate      cmdMediaLocate      `cmd:"" help:"run the full discover/rank/download pipeline locally for a single query, without a running daemon or its API"`
+	Ls     cmdMediaLs     `cmd:"" help:"list/search discovered media on a library"`
+	Create cmdMediaCreate `cmd:"" help:"create a discovered media record on a library"`
+	Delete cmdMediaDelete `cmd:"" help:"remove a discovered media record from a library"`
+	Query  cmdMediaQuery  `cmd:"" help:"query the DHT directly for media matching a known-media id"`
+}
+
+// locate command examples
+// go -C shallows run ./cmd/retrovibe/... disc locate ls --insecure --library="eg:9998" --pending
+// go -C shallows run ./cmd/retrovibe/... disc locate show --insecure --library="eg:9998" --id="<id from ls>"
+// go -C shallows run ./cmd/retrovibe/... disc locate delete --insecure --library="eg:9998" --id="<id from ls>"
+// go -C shallows run ./cmd/retrovibe/... disc locate retry --insecure --library="eg:9998" --id="<id from ls>" --reset-attempts
+// go -C shallows run ./cmd/retrovibe/... disc locate create "ubuntu" --mimetype=video --insecure --library="eg:9998"
+type locate struct {
+	Ls     cmdLocateList   `cmd:"" help:"list locate requests on a library"`
+	Show   cmdLocateShow   `cmd:"" help:"show a single locate request"`
+	Delete cmdLocateDelete `cmd:"" help:"permanently remove a locate request"`
+	Retry  cmdLocateRetry  `cmd:"" help:"clear the cooldown (and tombstone) so the daemon retries the request on its next pass"`
+	Create cmdLocateCreate `cmd:"" help:"submit a locate request to a running daemon; it discovers and downloads in the background"`
+	JSONL  cmdLocateJSONL  `cmd:"" help:"submit locate requests in bulk from a jsonl stream of known-media records (see 'media known duckdb' export format)"`
+	Run    cmdLocateRun    `cmd:"" help:"run the full discover/rank/download pipeline locally for a single query, without a running daemon or its API"`
 }
 
 // search command examples
@@ -56,6 +68,7 @@ type Commands struct {
 	Peers       peer           `cmd:"" help:"commands for managing library peering"`
 	Discovery   discovery      `cmd:"" help:"commands for managing infohashes currently being investigated"`
 	Media       media          `cmd:"" help:"commands for managing discovered media records"`
+	Locate      locate         `cmd:"" help:"commands for managing locate requests"`
 	Search      search         `cmd:"" help:"commands for managing search plugins"`
 	Diagnostics cmdDiagnostics `cmd:"" help:"show discovery subsystem diagnostics (peers, partitions, identification pipeline)"`
 }

@@ -19,12 +19,12 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
 
-type cmdMediaLocateJSONL struct {
+type cmdLocateJSONL struct {
 	Backlog uint16 `flag:"" name:"backlog" help:"number of batches to allowed to queue up" default:"128"`
 	Workers uint16 `flag:"" name:"workers" help:"number of async database workers to run" default:"1"`
 }
 
-func (t cmdMediaLocateJSONL) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
+func (t cmdLocateJSONL) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopts.SSHID, daemon *cmdopts.Endpoint) (err error) {
 	signer, err := id.Signer()
 	if err != nil {
 		return errorsx.Wrap(err, "failed to create signer")
@@ -36,7 +36,7 @@ func (t cmdMediaLocateJSONL) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, i
 	return t.run(gctx.Context, cc, daemon.Endpoint, os.Stdin)
 }
 
-func (t cmdMediaLocateJSONL) run(ctx context.Context, c *http.Client, endpoint string, r io.Reader) error {
+func (t cmdLocateJSONL) run(ctx context.Context, c *http.Client, endpoint string, r io.Reader) error {
 	inserts := asynccompute.New(func(ctx context.Context, v library.Known) (err error) {
 		if stringsx.Blank(v.Mimetype) {
 			log.Println("skipping locate request, missing mimetype", v.UID, v.Title)

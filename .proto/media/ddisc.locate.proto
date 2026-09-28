@@ -13,11 +13,18 @@ message Locate {
   string tombstoned_at = 8 [ json_name = "tombstoned_at" ];
   bool autodownload = 9 [ json_name = "autodownload" ];
   bool adult = 10 [ json_name = "adult" ];
+  uint32 attempts = 11 [ json_name = "attempts" ];
+  string next_check_at = 12 [ json_name = "next_check_at" ];
 }
 
 message LocateSearchRequest {
   string query = 1 [ json_name = "query" ];
-  reserved 2 to 899;
+  repeated string id = 2 [ json_name = "id" ];
+  uint64 attempts_min = 3 [ json_name = "attempts_min" ];
+  uint64 attempts_max = 4 [ json_name = "attempts_max" ];
+  bool pending = 5 [ json_name = "pending" ];
+  bool completed = 6 [ json_name = "completed" ];
+  reserved 7 to 899;
   uint64 offset = 900 [ json_name = "offset" ];
   uint64 limit = 901 [ json_name = "limit" ];
   reserved 902 to 999;
@@ -37,5 +44,16 @@ message LocateCreateRequest {
   Locate locate = 1 [json_name = "locate" ];
 }
 message LocateCreateResponse {
+  Locate locate = 1 [ json_name = "locate" ];
+}
+
+message LocateDeleteResponse {
+  Locate locate = 1 [ json_name = "locate" ];
+}
+
+message LocateRetryRequest {
+  bool reset_attempts = 1 [ json_name = "reset_attempts" ];
+}
+message LocateRetryResponse {
   Locate locate = 1 [ json_name = "locate" ];
 }

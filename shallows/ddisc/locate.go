@@ -5,7 +5,9 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
@@ -18,6 +20,28 @@ func LocateQueryPending() squirrel.Sqlizer {
 		squirrel.Expr("ddisc_locate.tombstoned_at = 'infinity'::timestamptz"),
 		squirrel.Expr("ddisc_locate.next_check_at <= NOW()"),
 	}
+}
+
+func LocateQueryCompleted() squirrel.Sqlizer {
+	return squirrel.Expr("ddisc_locate.tombstoned_at <= NOW()")
+}
+
+func LocateQueryByIDs(ids ...string) squirrel.Sqlizer {
+	if len(ids) == 0 {
+		return squirrelx.Noop{}
+	}
+	return squirrel.Eq{"ddisc_locate.id": ids}
+}
+
+func LocateQueryAttemptsRange(min, max uint64) squirrel.Sqlizer {
+	return squirrelx.Between("ddisc_locate.attempts", min, max)
+}
+
+func LocateQueryText(query string) squirrel.Sqlizer {
+	if query == "" {
+		return squirrelx.Noop{}
+	}
+	return lucenex.Query(duckdbx.NewLucene(), query, lucenex.WithDefaultField("query"))
 }
 
 func LocateSearch(ctx context.Context, q sqlx.Queryer, b squirrel.SelectBuilder) LocateScanner {
