@@ -54,6 +54,35 @@ void main() {
       expect(deleted, isEmpty);
     });
 
+    testWidgets('deleting a file does not mention contents', (WidgetTester tester) async {
+      await tester.pumpApp(
+        ds.Node(
+          FilesystemDetails(
+            media.Media(
+              id: uuidx.withSuffix(2),
+              description: 'held.bin',
+              mimetype: 'application/octet-stream',
+              createdAt: '2026-01-01T00:00:00Z',
+              archiveId: uuidx.min(),
+              torrentId: uuidx.min(),
+              knownMediaId: uuidx.min(),
+              directoryId: uuidx.min(),
+            ),
+            onChange: (_) {},
+            apiremove: (String id, {List<httpx.Option> options = const []}) async {
+              return filesystem.FilesystemDeleteResponse();
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.delete));
+      await tester.pump();
+
+      expect(find.text('Are you sure you want to permanently delete held.bin?'), findsOneWidget);
+    });
+
     testWidgets('cancelling the warning deletes nothing', (WidgetTester tester) async {
       final deleted = <String>[];
       final changes = <media.Media?>[];

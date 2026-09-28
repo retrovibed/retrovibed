@@ -19,7 +19,9 @@ Future<void> confirmremove(
     context,
     ds.Confirmation.dangerous(
       content: Text(
-        "Delete ${current.description}? Everything inside it is removed from your library too.",
+        current.mimetype == mimex.directory
+            ? "Delete ${current.description}? Everything inside it is removed from your library too."
+            : "Are you sure you want to permanently delete ${current.description}?",
       ),
       onConfirm: (ctx) => httpx
           .withRetry(
@@ -63,16 +65,26 @@ class FilesystemDetails extends StatelessWidget {
             input: Text(current.mimetype),
             trailing: [
               // a directory has no content of its own to fetch.
-              if (!directory)
+              if (!directory) ...[
+                media.ButtonArchive(current: current, onChange: onChange),
                 ds.LoadingIconButton(
                   onPressed: media.DownloadAction(context, current),
                   icon: const Icon(Icons.download),
                   tooltip: "download",
+                  help: ds.Hint(const Text("download this file to your downloads folder")),
                 ),
+              ],
               ds.LoadingIconButton.delete(
                 color: defaults.danger,
                 onPressed: () => confirmremove(context, current, apiremove: apiremove, onChange: onChange),
                 tooltip: "permanently delete",
+                help: ds.Hint(
+                  Text(
+                    directory
+                        ? "permanently delete this directory and everything inside it"
+                        : "permanently delete this file from your library",
+                  ),
+                ),
               ),
             ],
           ),

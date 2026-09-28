@@ -195,44 +195,6 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    final archivable = ds.LoadingIconButton(
-      tooltip: "mark this file to be archived to cloud storage",
-      onPressed: _media.ArchiveAction(
-        context,
-        widget.media,
-        then: (v) {
-          widget.onChange?.call(v);
-          return v;
-        },
-      ),
-      icon: Icon(Icons.upload),
-    );
-    final archiving = ds.LoadingIconButton(
-      tooltip: "this file is marked for archival and is awaiting upload, click to cancel",
-      onPressed: _media.ArchiveCancelAction(
-        context,
-        widget.media,
-        then: (v) {
-          widget.onChange?.call(v);
-          return v;
-        },
-      ),
-      icon: Icon(Icons.pending_outlined),
-    );
-    final purge = ds.LoadingIconButton(
-      tooltip: "purge content from your archive",
-      onPressed: _media.ArchivePurgeAction(
-        context,
-        widget.media,
-        then: (v) {
-          final upd = widget.media..archiveId = uuidx.min();
-          widget.onChange?.call(upd);
-          return upd;
-        },
-      ),
-      icon: Icon(Icons.delete_forever),
-    );
-
     return KnownMediaCard(
       current,
       highlighted: widget.highlighted,
@@ -254,10 +216,7 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> {
               children: [
                 if (constraints.maxWidth >= 260) ds.Rating(rating: current.rating),
                 Flexible(child: KnownMediaSource(current)),
-                Visibility(
-                  visible: (authn.AuthzCache.of(context).meta.current.token.archiveUpload.toInt()) > 0,
-                  child: uuidx.pattern(widget.media.archiveId, archivable, archiving, purge),
-                ),
+                _media.ButtonArchive(current: widget.media, onChange: widget.onChange),
                 ds.LoadingIconButton(
                   tooltip: "download this file to your downloads folder",
                   onPressed: _media.DownloadAction(context, widget.media),

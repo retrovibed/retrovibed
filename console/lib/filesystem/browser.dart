@@ -14,7 +14,6 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'directory.create.dart';
 import 'details.dart';
-import 'row.dart';
 
 // browses the library as a tree. this is a sibling of the library view rather than a
 // variation on it: the two share the Media row and nothing else, because the library grid
@@ -247,9 +246,10 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
             ],
           );
 
-          return FilesystemRow(
-            v,
-            focused: v.id == _focused,
+          return media.RowDisplay(
+            media: v,
+            highlighted: v.id == _focused,
+            leading: [Icon(mimex.icon(v.mimetype))],
             onTap: () {
               if (v.mimetype == mimex.directory) return Future.sync(() => navigate(v.id));
               final play = media.PlayAction(context, v, media.media.response());

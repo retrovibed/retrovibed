@@ -8,6 +8,7 @@ export 'media/player.dart';
 export 'media/button.play.dart';
 export 'media/preview.dart';
 export 'media/button.share.dart';
+export 'media/button.archive.dart';
 export 'media/playlist.dart';
 export 'media/play.queue.dart' show range;
 export 'media/autohelp.dart';
