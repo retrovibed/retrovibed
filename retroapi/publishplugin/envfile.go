@@ -9,7 +9,10 @@ import (
 
 // readEnvFile parses a .env-style file (KEY=VALUE per line; blank lines
 // and lines beginning with # are skipped) into a "KEY=VALUE" pair slice.
-// A missing file is not an error - it yields no pairs.
+// A missing file is not an error - it yields no pairs. A KEY= with a blank
+// value is treated as unset and skipped: the settings form saves every
+// declared variable, and an empty env var would otherwise override the
+// plugin's own default (including values baked in via -ldflags -X).
 func readEnvFile(path string) (pairs []string, err error) {
 	f, err := os.Open(path)
 	if errors.Is(err, os.ErrNotExist) {
@@ -27,7 +30,7 @@ func readEnvFile(path string) (pairs []string, err error) {
 			continue
 		}
 
-		if _, _, ok := strings.Cut(line, "="); ok {
+		if _, v, ok := strings.Cut(line, "="); ok && strings.TrimSpace(v) != "" {
 			pairs = append(pairs, line)
 		}
 	}

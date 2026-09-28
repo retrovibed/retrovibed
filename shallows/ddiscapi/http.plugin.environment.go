@@ -5,10 +5,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/envfile"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
@@ -27,6 +29,11 @@ import (
 // per plugin rather than one file for the whole feature. Comment-derived
 // hints, quoting, etc. are a frontend concern; the server never interprets
 // the content.
+//
+// The one exception: a GET asks the plugin which variables it understands
+// (its "env" command) and fills whatever has been configured in over the
+// top, so the console can render a settings form for a plugin it knows nothing
+// about.
 type HTTPPluginEnvironmentOption func(*HTTPPluginEnvironment)
 
 func HTTPPluginEnvironmentOptionJWTSecret(j jwtx.SecretSource) HTTPPluginEnvironmentOption {
@@ -45,9 +52,10 @@ func HTTPPluginEnvironmentOptionDir(dir string) HTTPPluginEnvironmentOption {
 	}
 }
 
-func NewHTTPPluginEnvironment(options ...HTTPPluginEnvironmentOption) *HTTPPluginEnvironment {
+func NewHTTPPluginEnvironment(reg searchplugin.E, options ...HTTPPluginEnvironmentOption) *HTTPPluginEnvironment {
 	svc := langx.Clone(HTTPPluginEnvironment{
 		dir:       fsx.DirVirtual(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot()))),
+		reg:       reg,
 		jwtsecret: env.JWTSecret,
 	}, options...)
 
@@ -56,6 +64,7 @@ func NewHTTPPluginEnvironment(options ...HTTPPluginEnvironmentOption) *HTTPPlugi
 
 type HTTPPluginEnvironment struct {
 	dir       fsx.Virtual
+	reg       searchplugin.E
 	jwtsecret jwtx.SecretSource
 }
 
@@ -93,6 +102,21 @@ func (t *HTTPPluginEnvironment) path(r *http.Request) (string, error) {
 	return t.dir.Path(name + ".env"), nil
 }
 
+// declared asks the plugin which variables it understands. A plugin that
+// predates the env command, or one that isn't loaded, simply contributes
+// nothing - the saved file is still served, so an operator never loses
+// access to configuration they already wrote.
+func (t *HTTPPluginEnvironment) declared(r *http.Request, envpath string) string {
+	wasmpath := strings.TrimSuffix(envpath, ".env") + ".wasm"
+	content, err := t.reg.Environment(r.Context(), wasmpath)
+	if err != nil {
+		log.Println(errorsx.Wrapf(err, "unable to read declared plugin environment, serving the saved configuration alone: %s", wasmpath))
+		return ""
+	}
+
+	return string(content)
+}
+
 func (t *HTTPPluginEnvironment) get(w http.ResponseWriter, r *http.Request) {
 	path, err := t.path(r)
 	if os.IsNotExist(err) {
@@ -103,15 +127,21 @@ func (t *HTTPPluginEnvironment) get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	content, err := os.ReadFile(path)
+	saved, err := os.ReadFile(path)
 	if fsx.IgnoreIsNotExist(err) != nil {
 		log.Println(errorsx.Wrap(err, "unable to load plugin environment"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 		return
 	}
 
+	// the declaration supplies the keys and their descriptions, the saved
+	// file supplies the values; Apply keeps each declared line's comment
+	// while swapping in what was configured, and appends anything
+	// configured that the plugin never declared.
+	content := envfile.Apply(t.declared(r, path), envfile.Parse(string(saved)))
+
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	if _, err := w.Write(content); err != nil {
+	if _, err := w.Write([]byte(content)); err != nil {
 		log.Println(errorsx.Wrap(err, "unable to write response"))
 		return
 	}

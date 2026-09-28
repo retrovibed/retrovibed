@@ -84,6 +84,31 @@ var source = ""
 var cli struct {
 	Search          searchCmd          `cmd:"" help:"invoked by searchplugin.Registry to run a search"`
 	Recommendations recommendationsCmd `cmd:"" help:"invoked by searchplugin.Registry to emit recommended content, independent of any search query"`
+	Env             envCmd             `cmd:"" help:"invoked by searchplugin.Registry to report the variables this plugin understands"`
+}
+
+// envCmd takes no flags - it is a pure declaration of what this plugin can
+// be configured with, invoked by searchplugin.Registry.Environment as
+// "<binary> env".
+type envCmd struct{}
+
+// environment is this plugin's configuration schema, in the format
+// retroapi/envfile parses: the comment block immediately preceding a
+// KEY=VALUE line (or a trailing "# ..." on the line itself, which wins)
+// becomes that variable's help text. It is what the console renders a
+// settings form from. Declare every value blank - a blank value in the
+// sidecar is treated as unset, so the plugin's own default (or a value
+// baked in via -ldflags -X) still applies; put the default in the comment.
+const environment = `# provenance tag for every result; defaults to whatever was baked in via -X main.source
+NOOP_SOURCE=""
+`
+
+// Run prints the declaration verbatim on stdout. Registry.Environment
+// returns these bytes untouched, so anything else written here would end up
+// in the configuration form.
+func (cmd *envCmd) Run(ctx context.Context) error {
+	_, err := fmt.Fprint(os.Stdout, environment)
+	return err
 }
 
 // searchCmd's flags match Registry's invocation 1:1: repeatable --mimetype,
@@ -93,7 +118,7 @@ var cli struct {
 type searchCmd struct {
 	Mimetype []string `flag:"" name:"mimetype" help:"discovery mimetype to search within (repeatable)"`
 	Query    string   `flag:"" name:"query" help:"search text to query" required:""`
-	Source   string   `flag:"" name:"source" help:"provenance tag for every result (bakeable via -ldflags -X main.source=...)" default:"${source}"`
+	Source   string   `flag:"" name:"source" help:"provenance tag for every result (bakeable via -ldflags -X main.source=...)" default:"${source}" env:"NOOP_SOURCE"`
 	Adult    bool     `flag:"" name:"adult" help:"allow adult content in results (Registry passes this whenever the caller allows it)"`
 	Public   bool     `flag:"" name:"public" help:"only return results a public source could produce (Registry passes this when the caller wants public-only results)"`
 }
@@ -153,7 +178,7 @@ func (cmd *searchCmd) Run(ctx context.Context) error {
 type recommendationsCmd struct {
 	Mimetype []string `flag:"" name:"mimetype" help:"discovery mimetype to recommend content within (repeatable)"`
 	Limit    uint     `flag:"" name:"limit" help:"number of recommended results to emit" default:"5"`
-	Source   string   `flag:"" name:"source" help:"provenance tag for every result (bakeable via -ldflags -X main.source=...)" default:"${source}"`
+	Source   string   `flag:"" name:"source" help:"provenance tag for every result (bakeable via -ldflags -X main.source=...)" default:"${source}" env:"NOOP_SOURCE"`
 	Lang     string   `flag:"" name:"lang" help:"restrict recommended results to this language (Registry passes the caller's locale language)"`
 	Adult    bool     `flag:"" name:"adult" help:"allow adult content in recommended results (Registry passes this whenever the caller allows it)"`
 	Public   bool     `flag:"" name:"public" help:"only return results a public source could produce"`

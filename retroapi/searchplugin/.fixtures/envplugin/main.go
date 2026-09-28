@@ -12,7 +12,18 @@ type result struct {
 	Mimetype string `json:"mimetype"`
 }
 
+// environment is what the "env" subcommand reports: the variables this
+// plugin understands, in the .env-with-comments form retroapi/envfile parses.
+const environment = `# appended to every result's magnet as its display name
+PLUGIN_TOKEN="" # token echoed back in results
+`
+
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "env" {
+		os.Stdout.WriteString(environment)
+		return
+	}
+
 	// os.Args[0] is the program name; os.Args[1] is the "search"
 	// subcommand a real kong-based plugin would consume before parsing
 	// its own flags, so skip it here too.

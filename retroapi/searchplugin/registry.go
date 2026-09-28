@@ -37,11 +37,26 @@ type R interface {
 	Recommend(ctx context.Context, mimetypes []string, limit uint, lang string, adult, public bool) iterx.Seq[*ddiscapi.Import]
 }
 
-// Unimplemented is a safe default T and R: every Search/Recommend fails with
+// E is the interface *Registry satisfies for Environment, kept separate
+// from T and R because its only consumers are the configuration API and
+// CLI, which read a plugin's declared variables and never search.
+type E interface {
+	Environment(ctx context.Context, path string) ([]byte, error)
+}
+
+// Unimplemented is a safe default T, R and E: every Search/Recommend fails with
 // errors.ErrUnsupported instead of silently returning nothing, so callers
 // that haven't wired up a real registry get a clear signal rather than a
 // bare nil interface passed around.
 type Unimplemented struct{}
+
+func (Unimplemented) Environment(ctx context.Context, path string) ([]byte, error) {
+	return nil, errors.ErrUnsupported
+}
+
+// ErrNotLoaded is returned by Environment when path has not been (or is no
+// longer) loaded into the registry.
+const ErrNotLoaded = errorsx.String("search plugin not loaded")
 
 func (Unimplemented) Search(ctx context.Context, mimetypes []string, query string, adult, public bool) iterx.Seq[*ddiscapi.Import] {
 	return unimplementedSeq{}
@@ -249,6 +264,13 @@ func (r *Registry) Unload(path string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	delete(r.modules, path)
+}
+
+func (r *Registry) lookup(path string) (wazero.CompiledModule, bool) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	compiled, ok := r.modules[path]
+	return compiled, ok
 }
 
 func (r *Registry) compiled() map[string]wazero.CompiledModule {

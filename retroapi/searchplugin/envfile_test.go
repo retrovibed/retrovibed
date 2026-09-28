@@ -24,6 +24,15 @@ func TestReadEnvFile(t *testing.T) {
 		require.Equal(t, []string{"FOO=bar", "BAZ=qux"}, pairs)
 	})
 
+	t.Run("skips blank values so plugin defaults apply", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "plugin.env")
+		require.NoError(t, os.WriteFile(path, []byte("FOO=bar\nEMPTY=\nSPACES=   \n"), 0600))
+
+		pairs, err := readEnvFile(path)
+		require.NoError(t, err)
+		require.Equal(t, []string{"FOO=bar"}, pairs)
+	})
+
 	t.Run("skips malformed lines", func(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "plugin.env")
 		require.NoError(t, os.WriteFile(path, []byte("FOO=bar\nnotapair\n"), 0600))

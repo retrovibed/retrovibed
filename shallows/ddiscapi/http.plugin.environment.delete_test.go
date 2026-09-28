@@ -26,6 +26,7 @@ func TestHTTPPluginEnvironmentDelete(t *testing.T) {
 
 	routes := mux.NewRouter()
 	ddiscapi.NewHTTPPluginEnvironment(
+		searchplugin.Unimplemented{},
 		ddiscapi.HTTPPluginEnvironmentOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		ddiscapi.HTTPPluginEnvironmentOptionDir(searchplugin.SearchPluginDir(configDir)),
 	).Bind(routes.PathPrefix("/").Subrouter())

@@ -544,7 +544,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		ddiscapi.HTTPDiscoveryOptionQueryCleaner(mc),
 	).Bind(httpmux.PathPrefix("/ddisc/discovery").Subrouter())
 	ddiscapi.NewHTTPMedia(db).Bind(httpmux.PathPrefix("/ddisc/media").Subrouter())
-	ddiscapi.NewHTTPPluginEnvironment().Bind(httpmux.PathPrefix("/ddisc/plugin/environment").Subrouter())
+	ddiscapi.NewHTTPPluginEnvironment(plugins).Bind(httpmux.PathPrefix("/ddisc/plugin/environment").Subrouter())
 	ddiscapi.NewHTTPPluginManagement(plugins).Bind(httpmux.PathPrefix("/ddisc/plugin").Subrouter())
 	ddiscapi.NewHTTPLocate(db, locatemedia).Bind(httpmux.PathPrefix("/l").Subrouter())
 	ddiscapi.NewHTTPTorrentInfo(db, ddiscapi.HTTPTorrentInfoOptionRootStorage(rootstore)).Bind(httpmux.PathPrefix("/t").Subrouter())

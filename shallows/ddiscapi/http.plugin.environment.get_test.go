@@ -1,6 +1,7 @@
 package ddiscapi_test
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -21,11 +22,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// stubEnvironment stands in for a loaded plugin, returning whatever a test
+// wants that plugin to have declared.
+type stubEnvironment struct {
+	declared []byte
+	err      error
+}
+
+func (t stubEnvironment) Environment(ctx context.Context, path string) ([]byte, error) {
+	return t.declared, t.err
+}
+
 func TestHTTPPluginEnvironmentGet(t *testing.T) {
 	configDir := t.TempDir()
 
 	routes := mux.NewRouter()
 	ddiscapi.NewHTTPPluginEnvironment(
+		searchplugin.Unimplemented{},
 		ddiscapi.HTTPPluginEnvironmentOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		ddiscapi.HTTPPluginEnvironmentOptionDir(searchplugin.SearchPluginDir(configDir)),
 	).Bind(routes.PathPrefix("/").Subrouter())
@@ -35,7 +48,7 @@ func TestHTTPPluginEnvironmentGet(t *testing.T) {
 	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 	token := httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)
 
-	t.Run("returns raw content, comments included", func(t *testing.T) {
+	t.Run("without a declaration serves the configured values", func(t *testing.T) {
 		const content = "FOO=\"bar\" # derp 0\n# derp 1\nBAR=\"baz\"\nBIZ=\"BAN\"\n# derp 2\n"
 
 		require.NoError(t, os.MkdirAll(searchplugin.SearchPluginDir(configDir), 0o700))
@@ -48,7 +61,52 @@ func TestHTTPPluginEnvironmentGet(t *testing.T) {
 		routes.ServeHTTP(resp, req)
 
 		require.NoError(t, httpx.ErrorCode(resp.Result()))
-		require.Equal(t, content, resp.Body.String())
+		require.Equal(t, "FOO=bar\nBAR=baz\nBIZ=BAN\n", resp.Body.String())
+	})
+
+	t.Run("declaration is served when nothing is configured yet", func(t *testing.T) {
+		const declaration = "# api key for requests\nUNIT3D_APIKEY=\"\"\n# base url for the unit3d api\nUNIT3D_DOMAIN=\"\"\n"
+
+		require.NoError(t, os.MkdirAll(searchplugin.SearchPluginDir(configDir), 0o700))
+		require.NoError(t, os.WriteFile(filepath.Join(searchplugin.SearchPluginDir(configDir), "declared.wasm"), []byte("declaredcontent"), 0o600))
+
+		declared := mux.NewRouter()
+		ddiscapi.NewHTTPPluginEnvironment(
+			stubEnvironment{declared: []byte(declaration)},
+			ddiscapi.HTTPPluginEnvironmentOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			ddiscapi.HTTPPluginEnvironmentOptionDir(searchplugin.SearchPluginDir(configDir)),
+		).Bind(declared.PathPrefix("/").Subrouter())
+
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+md5x.String("declared"), nil, httptestx.RequestOptionAuthorization(token))
+		require.NoError(t, err)
+
+		declared.ServeHTTP(resp, req)
+
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
+		require.Equal(t, declaration, resp.Body.String())
+	})
+
+	t.Run("configured values are merged over the declaration, hints intact", func(t *testing.T) {
+		const declaration = "# api key for requests\nUNIT3D_APIKEY=\"\"\n# base url for the unit3d api\nUNIT3D_DOMAIN=\"\"\n"
+
+		require.NoError(t, os.MkdirAll(searchplugin.SearchPluginDir(configDir), 0o700))
+		require.NoError(t, os.WriteFile(filepath.Join(searchplugin.SearchPluginDir(configDir), "merged.wasm"), []byte("mergedcontent"), 0o600))
+		require.NoError(t, os.WriteFile(filepath.Join(searchplugin.SearchPluginDir(configDir), "merged.env"), []byte("UNIT3D_APIKEY=secret\nEXTRA=kept\n"), 0o600))
+
+		merged := mux.NewRouter()
+		ddiscapi.NewHTTPPluginEnvironment(
+			stubEnvironment{declared: []byte(declaration)},
+			ddiscapi.HTTPPluginEnvironmentOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			ddiscapi.HTTPPluginEnvironmentOptionDir(searchplugin.SearchPluginDir(configDir)),
+		).Bind(merged.PathPrefix("/").Subrouter())
+
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+md5x.String("merged"), nil, httptestx.RequestOptionAuthorization(token))
+		require.NoError(t, err)
+
+		merged.ServeHTTP(resp, req)
+
+		require.NoError(t, httpx.ErrorCode(resp.Result()))
+		require.Equal(t, "# api key for requests\nUNIT3D_APIKEY=secret\n# base url for the unit3d api\nUNIT3D_DOMAIN=\"\"\nEXTRA=kept\n", resp.Body.String())
 	})
 
 	t.Run("missing environment returns empty body", func(t *testing.T) {

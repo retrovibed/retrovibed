@@ -155,40 +155,11 @@ func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 		args = append(args, "--public")
 	}
 
-	hostConfigDir := r.PluginConfigDir(id)
-	hostCacheDir := r.PluginCacheDir(id)
-	if err := os.MkdirAll(hostConfigDir, 0700); err != nil {
-		return errorsx.Wrapf(err, "unable to create plugin config directory: %s", hostConfigDir)
-	}
-	if err := os.MkdirAll(hostCacheDir, 0700); err != nil {
-		return errorsx.Wrapf(err, "unable to create plugin cache directory: %s", hostCacheDir)
-	}
-
-	wazerofs := wazero.NewFSConfig().
-		WithDirMount(r.sslCertDir, guestSSLCertDir).
-		WithDirMount(hostConfigDir, guestPluginConfigDir).
-		WithDirMount(hostCacheDir, guestPluginCacheDir)
-	cfg := wazero.NewModuleConfig().
-		WithName(j.path).
-		WithArgs(args...).
-		WithEnv("SSL_CERT_DIR", guestSSLCertDir).
-		WithEnv("CONFIGURATION_DIRECTORY", guestPluginConfigDir).
-		WithEnv("CACHE_DIRECTORY", guestPluginCacheDir).
-		WithFSConfig(wazerofs).
-		WithStdout(stdoutw).
-		WithStderr(os.Stderr).
-		WithSysWalltime().
-		WithSysNanotime()
-
-	envpath := strings.TrimSuffix(j.path, ".wasm") + ".env"
-	envpairs, err := readEnvFile(envpath)
+	cfg, err := r.sandbox(j.path, args...)
 	if err != nil {
-		log.Println("unable to read search plugin configuration", envpath, err)
+		return err
 	}
-	for _, kv := range envpairs {
-		k, v, _ := strings.Cut(kv, "=")
-		cfg = cfg.WithEnv(k, v)
-	}
+	cfg = cfg.WithName(j.path).WithStdout(stdoutw)
 
 	log.Println("running search plugin", j.path)
 
@@ -218,6 +189,49 @@ func (r *Registry) runSearchJob(ctx context.Context, j workload) error {
 	}
 
 	return cause
+}
+
+// sandbox builds the module config every command a plugin exposes runs
+// under - search, recommendations and env alike - so they all see the same
+// host TLS trust store, per-plugin config/cache directories, and .env
+// sidecar variables. args must start with argv[0]; callers set the module
+// name and stdout.
+func (r *Registry) sandbox(path string, args ...string) (wazero.ModuleConfig, error) {
+	id := strings.TrimSuffix(filepath.Base(path), ".wasm")
+	hostConfigDir := r.PluginConfigDir(id)
+	hostCacheDir := r.PluginCacheDir(id)
+	if err := os.MkdirAll(hostConfigDir, 0700); err != nil {
+		return nil, errorsx.Wrapf(err, "unable to create plugin config directory: %s", hostConfigDir)
+	}
+	if err := os.MkdirAll(hostCacheDir, 0700); err != nil {
+		return nil, errorsx.Wrapf(err, "unable to create plugin cache directory: %s", hostCacheDir)
+	}
+
+	wazerofs := wazero.NewFSConfig().
+		WithDirMount(r.sslCertDir, guestSSLCertDir).
+		WithDirMount(hostConfigDir, guestPluginConfigDir).
+		WithDirMount(hostCacheDir, guestPluginCacheDir)
+	cfg := wazero.NewModuleConfig().
+		WithArgs(args...).
+		WithEnv("SSL_CERT_DIR", guestSSLCertDir).
+		WithEnv("CONFIGURATION_DIRECTORY", guestPluginConfigDir).
+		WithEnv("CACHE_DIRECTORY", guestPluginCacheDir).
+		WithFSConfig(wazerofs).
+		WithStderr(os.Stderr).
+		WithSysWalltime().
+		WithSysNanotime()
+
+	envpath := strings.TrimSuffix(path, ".wasm") + ".env"
+	envpairs, err := readEnvFile(envpath)
+	if err != nil {
+		log.Println("unable to read search plugin configuration", envpath, err)
+	}
+	for _, kv := range envpairs {
+		k, v, _ := strings.Cut(kv, "=")
+		cfg = cfg.WithEnv(k, v)
+	}
+
+	return cfg, nil
 }
 
 // scanResults decodes stdout as jsonl and streams each line onto j.results.
