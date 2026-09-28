@@ -56,9 +56,13 @@ func RecommendationsBackgroundRun(ctx context.Context, q sqlx.Queryer, wq pqueue
 
 func RecommendationsBackground(ctx context.Context, seed string, q sqlx.Queryer, wq pqueue.Queue, p searchplugin.R) error {
 	// recommendationFrequency how often random recommendations are regenerated.
-	const recommendationFrequencyDefault = 24 * time.Hour
+	// const recommendationFrequencyDefault = 24 * time.Hour
+	const recommendationFrequencyDefault = 30 * time.Second
 
 	recommendationFreq := envx.Duration(recommendationFrequencyDefault, env.RecommendationFrequency)
+
+	log.Println("DERP DERP", recommendationFreq)
+
 	wakeup := asyncx.NewWakeup(ctx)
 	s := backoffx.New(
 		backoffx.Frequency(recommendationFreq, seed),
