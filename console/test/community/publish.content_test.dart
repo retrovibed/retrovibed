@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/community/publish.content.dart';
 import 'package:retrovibed/media/media.pb.dart';
+import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
@@ -55,6 +56,28 @@ void main() {
 
       expect(received, isNotNull);
       expect(received!.media.description, equals('My Video'));
+    });
+
+    testWidgets('directories are not offered', (tester) async {
+      await tester.pumpApp(
+        PublishContent(
+          onSelect: (_) {},
+          search: (req, {host, options = const []}) => Future.value(
+            MediaSearchResponse(
+              next: MediaSearchRequest(),
+              items: [
+                Media(description: 'photos', mimetype: mimex.directory),
+                Media(description: 'My Video', mimetype: 'video/mp4'),
+              ],
+            ),
+          ),
+          upload: (_) => Future.value(MediaUploadResponse()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('photos'), findsNothing);
+      expect(find.text('My Video'), findsOneWidget);
     });
   });
 }

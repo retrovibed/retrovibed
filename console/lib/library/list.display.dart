@@ -17,6 +17,11 @@ class AvailableListDisplay extends StatefulWidget {
   final TextEditingController? controller;
   final FocusNode? focus;
   final Widget Function(media.Media)? row;
+  // the mimetypes the initial search is filtered to.
+  final List<String> mimetypes;
+  // rendered before and after the rows.
+  final List<Widget> leading;
+  final List<Widget> trailing;
   const AvailableListDisplay({
     super.key,
     this.search = media.media.search,
@@ -24,6 +29,9 @@ class AvailableListDisplay extends StatefulWidget {
     this.controller,
     this.focus,
     this.row,
+    this.mimetypes = const [],
+    this.leading = const [],
+    this.trailing = const [],
   });
 
   @override
@@ -64,7 +72,9 @@ class _AvailableListDisplay extends State<AvailableListDisplay> with ds.LoadingS
   @override
   void initState() {
     super.initState();
-    _res.next..query = widget.controller?.text ?? "";
+    _res.next
+      ..query = widget.controller?.text ?? ""
+      ..mimetypes.addAll(widget.mimetypes);
     ds.postframe(() => refresh(_res.next));
   }
 
@@ -147,17 +157,18 @@ class _AvailableListDisplay extends State<AvailableListDisplay> with ds.LoadingS
             current: _res.next.offset,
             empty: ds.Int64(_res.items.length) < _res.next.limit,
             leading: [
-              ds.CompactingMenu.pinned(
-                SearchMimetypeDropdown(
-                  _res.next,
-                  onChange: (upd) {
-                    setState(() {
-                      _res.next = upd;
-                    });
-                    refresh(_res.next);
-                  },
+              if (widget.mimetypes.isEmpty)
+                ds.CompactingMenu.pinned(
+                  SearchMimetypeDropdown(
+                    _res.next,
+                    onChange: (upd) {
+                      setState(() {
+                        _res.next = upd;
+                      });
+                      refresh(_res.next);
+                    },
+                  ),
                 ),
-              ),
               ds.FileDropWell.icon(
                 upload,
                 mimetypes: _res.next.mimetypes,
@@ -166,6 +177,7 @@ class _AvailableListDisplay extends State<AvailableListDisplay> with ds.LoadingS
             ],
           ),
           meta.UploadsRow(margin: defaults.margin.copyWith(top: 0, bottom: 0) * 2),
+          ...widget.leading,
         ],
       ),
       children: _res.items,
@@ -178,7 +190,11 @@ class _AvailableListDisplay extends State<AvailableListDisplay> with ds.LoadingS
               onTap: media.PlayAction(context, v, _res),
             ),
       ),
-      empty: ds.FileDropWell(upload),
+      trailing: Column(mainAxisSize: MainAxisSize.min, children: widget.trailing),
+      empty: ds.FileDropWell(
+        upload,
+        shape: RoundedRectangleBorder(borderRadius: defaults.borderRadius),
+      ),
     );
   }
 }

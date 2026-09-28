@@ -138,6 +138,7 @@ class Table<T> extends StatelessWidget {
   static Widget Function(List<T> i) expanded<T>(
     Widget Function(T i) render, {
     List<Widget> leading = const [],
+    List<Widget> trailing = const [],
   }) {
     return (List<T> items) {
       return Builder(
@@ -148,7 +149,7 @@ class Table<T> extends StatelessWidget {
             reverse: defaults.isCompact,
             child: Column(
               mainAxisSize: MainAxisSize.max,
-              children: [...leading, ...list],
+              children: [...leading, ...list, ...trailing],
             ),
           );
         },

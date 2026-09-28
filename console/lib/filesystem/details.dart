@@ -8,6 +8,7 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/storage.dart' as storage;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as api;
+import 'button.file.move.dart';
 
 // deleting a directory deletes what it holds, which is not recoverable from this screen,
 // so the user is told before it happens rather than after.
@@ -95,6 +96,7 @@ class FilesystemDetails extends StatelessWidget {
                   help: ds.Hint(const Text("download this file to your downloads folder")),
                 ),
               ],
+              ButtonFileMove(current: current, onChange: onChange),
               ds.LoadingIconButton.delete(
                 color: defaults.danger,
                 onPressed: () => confirmremove(context, current, apiremove: apiremove, onChange: onChange),

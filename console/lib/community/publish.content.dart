@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/library.dart' as lib;
+import 'package:retrovibed/mimex.dart' as mimex;
 
 class PublishContent extends StatelessWidget {
   final void Function(media.Download) onSelect;
@@ -20,11 +21,13 @@ class PublishContent extends StatelessWidget {
     return lib.AvailableListDisplay(
       search: search,
       upload: upload,
-      row:
-          (v) => LibraryRow(
-            item: media.Download(media: v),
-            onTap: () => onSelect(media.Download(media: v)),
-          ),
+      // a directory has no content of its own to publish.
+      row: (v) => v.mimetype == mimex.directory
+          ? ds.Empty
+          : LibraryRow(
+              item: media.Download(media: v),
+              onTap: () => onSelect(media.Download(media: v)),
+            ),
     );
   }
 }

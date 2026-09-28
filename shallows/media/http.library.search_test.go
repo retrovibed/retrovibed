@@ -723,7 +723,7 @@ func TestLibrarySearch(t *testing.T) {
 		}
 	})
 
-	t.Run("directories never appear in the media grid", func(t *testing.T) {
+	t.Run("unfiltered search includes directories", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -733,9 +733,23 @@ func TestLibrarySearch(t *testing.T) {
 		held := testfile(t, ctx, q, top.ID, "held.bin")
 		loose := testfile(t, ctx, q, uuid.Nil.String(), "loose.bin")
 
-		// a directory is organization rather than media. its contents still are.
 		result := testsearch(t, routes, token, &media.MediaSearchRequest{Limit: 10})
-		require.ElementsMatch(t, []string{held.ID, loose.ID}, testresultids(result))
+		require.ElementsMatch(t, []string{top.ID, held.ID, loose.ID}, testresultids(result))
+	})
+
+	t.Run("directory mimetype returns only directories", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		routes, token, q := testlibrary(t, ctx)
+
+		top := testdirectory(t, ctx, q, uuid.Nil.String(), "photos")
+		nested := testdirectory(t, ctx, q, top.ID, "2026")
+		testfile(t, ctx, q, top.ID, "held.bin")
+		testfile(t, ctx, q, uuid.Nil.String(), "loose.bin")
+
+		result := testsearch(t, routes, token, &media.MediaSearchRequest{Limit: 10, Mimetypes: []string{mimex.Directory}})
+		require.ElementsMatch(t, []string{top.ID, nested.ID}, testresultids(result))
 	})
 }
 

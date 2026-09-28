@@ -8,22 +8,21 @@ class SearchMimetypeDropdown extends StatelessWidget {
   final void Function(media.MediaSearchRequest r) onChange;
   SearchMimetypeDropdown(this.current, {super.key, required this.onChange});
 
+  // the library is always filtered to a playable category; browsing everything, directories
+  // included, is the filesystem browser's job.
   static Icon icon(int checksum) {
     if (checksum == mimex.checksumfor(mimex.icomovie)) return Icon(Icons.movie_filter);
-    if (checksum == mimex.checksumfor(mimex.icoaudio)) return Icon(Icons.music_note);
-    return Icon(Icons.file_open_rounded);
+    return Icon(Icons.music_note);
   }
 
   static String label(int checksum) {
     if (checksum == mimex.checksumfor(mimex.icomovie)) return "Movies";
-    if (checksum == mimex.checksumfor(mimex.icoaudio)) return "Music";
-    return "Files";
+    return "Music";
   }
 
   static List<String> mimetypesFor(int checksum) {
     if (checksum == mimex.checksumfor(mimex.icomovie)) return mimex.of(mimex.icomovie);
-    if (checksum == mimex.checksumfor(mimex.icoaudio)) return mimex.of(mimex.icoaudio);
-    return const [];
+    return mimex.of(mimex.icoaudio);
   }
 
   static void select(media.MediaSearchRequest current, int checksum) {
@@ -104,7 +103,7 @@ class SearchMimetypeDropdown extends StatelessWidget {
           ),
         ],
       ),
-      ds.Hint(const Text("dropdown to filter by movies, audio, documents, or images")),
+      ds.Hint(const Text("dropdown to filter by movies or music")),
     );
   }
 }

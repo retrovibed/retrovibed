@@ -395,13 +395,10 @@ func (t *HTTPLibrary) search(w http.ResponseWriter, r *http.Request) {
 		ordering = "description ASC"
 	}
 
-	// a directory is organization rather than media and has no place in this grid; the
-	// filesystem endpoint is what lists them.
 	q := library.MetadataSearchBuilder().Where(squirrel.And{
 		library.MetadataQueryNotTombstoned(),
 		library.MetadataQueryHidden(msg.Next.Hidden),
 		library.MetadataQueryMimetypes(msg.Next.Mimetypes...),
-		library.MetadataQueryIsDirectory(false),
 		lucenex.Query(t.fts, msg.Next.Query, lucenex.WithDefaultField("auto_description")),
 	}).OrderBy(ordering).Offset(msg.Next.Offset * msg.Next.Limit).Limit(msg.Next.Limit)
 
