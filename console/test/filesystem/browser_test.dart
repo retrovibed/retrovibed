@@ -114,6 +114,46 @@ void main() {
     expect(find.text('loose.mp3'), findsOneWidget);
   });
 
+  testWidgets('the info button toggles a file\'s details', (WidgetTester tester) async {
+    final searches = _Searches();
+    await tester.pumpApp(_harness(searches));
+    await tester.pumpAndSettle();
+
+    expect(find.text('audio/mp3'), findsNothing);
+
+    // rows render in listing order: photos, then loose.mp3.
+    await tester.tap(find.byIcon(Icons.info_outline).last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('audio/mp3'), findsOneWidget);
+    expect(find.byIcon(Icons.download), findsOneWidget);
+    expect(find.text('created'), findsOneWidget);
+    expect(find.text('updated'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.info_outline).last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('audio/mp3'), findsNothing);
+  });
+
+  testWidgets('a directory\'s details carry only its type and actions', (WidgetTester tester) async {
+    final searches = _Searches();
+    await tester.pumpApp(_harness(searches));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.info_outline).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text(mimex.directory), findsOneWidget);
+    expect(find.byIcon(Icons.delete), findsOneWidget);
+    expect(find.byIcon(Icons.download), findsNothing);
+    expect(find.text('created'), findsNothing);
+    expect(find.text('updated'), findsNothing);
+
+    // opening details does not navigate into the directory.
+    expect(searches.directories, [uuidx.min()]);
+  });
+
   testWidgets('the path appears in the search hint', (WidgetTester tester) async {
     final searches = _Searches();
     await tester.pumpApp(_harness(searches));

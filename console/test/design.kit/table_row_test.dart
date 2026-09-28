@@ -85,4 +85,88 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('TableRow onTap precedence', () {
+    testWidgets('onTap wins over expand toggle', (tester) async {
+      int taps = 0;
+
+      await tester.pumpApp(
+        ds.TableRow.single(
+          Text('row'),
+          expanded: Text('panel'),
+          onTap: () => taps++,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(InkWell));
+      await tester.pumpAndSettle();
+
+      expect(taps, 1);
+      expect(find.text('panel'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('onTap does not collapse an autoexpanded panel', (tester) async {
+      int taps = 0;
+
+      await tester.pumpApp(
+        ds.TableRow.single(
+          Text('row'),
+          expanded: Text('panel'),
+          autoexpand: true,
+          onTap: () => taps++,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(InkWell));
+      await tester.pumpAndSettle();
+
+      expect(taps, 1);
+      expect(find.text('panel'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('no onTap and no expanded panel is not tappable', (tester) async {
+      await tester.pumpApp(
+        ds.TableRow.single(
+          Text('row'),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final inkwell = tester.widget<InkWell>(find.byType(InkWell));
+      expect(inkwell.onTap, isNull);
+      expect(inkwell.mouseCursor, isNull);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('parent controlled expansion via onTap', (tester) async {
+      bool focused = false;
+
+      await tester.pumpApp(
+        StatefulBuilder(
+          builder: (context, setState) => ds.TableRow.single(
+            Text('row'),
+            autoexpand: true,
+            onTap: () => setState(() => focused = !focused),
+            expanded: focused ? Text('panel') : ds.Empty,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('panel'), findsNothing);
+
+      await tester.tap(find.byType(InkWell));
+      await tester.pumpAndSettle();
+      expect(find.text('panel'), findsOneWidget);
+
+      await tester.tap(find.byType(InkWell));
+      await tester.pumpAndSettle();
+      expect(focused, isFalse);
+      expect(find.text('panel'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  });
 }

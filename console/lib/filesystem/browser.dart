@@ -11,6 +11,7 @@ import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'directory.create.dart';
+import 'details.dart';
 import 'row.dart';
 
 // browses the library as a tree. this is a sibling of the library view rather than a
@@ -45,7 +46,8 @@ class FilesystemBrowser extends StatefulWidget {
 }
 
 class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
-  String _highlighted = "";
+  // the entry whose details are open; only the info button sets it.
+  String _focused = "";
   api.FilesystemSearchResponse _res = api.filesystem.response(
     next: api.filesystem.request(limit: 32),
   );
@@ -90,10 +92,15 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
         });
   }
 
+  // toggles the details for the entry.
+  void Function() focus(media.Media v) {
+    return () => setState(() => _focused = _focused == v.id ? "" : v.id);
+  }
+
   void navigate(String id) {
     setState(() {
       loading = true;
-      _highlighted = "";
+      _focused = "";
       _res.next
         ..directoryId = id
         ..offset = ds.Int64(0);
@@ -113,84 +120,6 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
   List<media.Media> get items {
     if (uuidx.fromString(directory) == uuidx.fromString(uuidx.min())) return _res.items;
     return [media.Media(id: ancestor, description: "..", mimetype: mimex.directory), ..._res.items];
-  }
-
-  Widget row(media.Media v) {
-    if (v.mimetype == mimex.directory) {
-      return FilesystemRow(
-        current: v,
-        highlighted: v.id == _highlighted,
-        trailing: [
-          Visibility(
-            visible: v.description != "..",
-            child: IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: () => confirmremove(v),
-            ),
-          ),
-        ],
-        onTap: () => Future.sync(() => navigate(v.id)),
-      );
-    }
-
-    return FilesystemRow(
-      current: v,
-      highlighted: v.id == _highlighted,
-      trailing: [media.ButtonShare(current: v)],
-      // playback owns audio and video; everything else the reader can inspect without
-      // pulling the whole file down first.
-      onTap: media.PlayAction(context, v, media.media.response()) ?? preview(v),
-    );
-  }
-
-  Future<void> Function() preview(media.Media v) {
-    final constraints = ds.Defaults.modal(context);
-
-    return () => Future.sync(
-      () => ds.modals.push(
-        context,
-        ds.Card(
-          constraints: constraints,
-          leading: [ds.Heading(Text(v.description))],
-          trailing: [
-            IconButton(icon: const Icon(Icons.close), onPressed: () => ds.modals.push(context, null)),
-          ],
-          media.Preview(current: v),
-        ),
-      ),
-    );
-  }
-
-  // deleting a directory deletes what it holds, which is not recoverable from this screen,
-  // so the user is told before it happens rather than after.
-  void confirmremove(media.Media v) {
-    final modal = ds.modals.of(context);
-    modal?.push(
-      ds.Confirmation.yesNo(
-        content: Text(
-          "Delete ${v.description}? Everything inside it is removed from your library too.",
-        ),
-        onCancel: (_) => modal.push(null),
-        onConfirm: (_) {
-          modal.push(null);
-          setState(() {
-            loading = true;
-          });
-
-          httpx
-              .withRetry(
-                () => widget.apiremove(v.id, options: [authn.request(authn.AuthzCache.meta(context))]),
-              )
-              .then((_) => refresh(_res.next))
-              .catchError((e) {
-                setState(() {
-                  cause = ds.Error.unknown(e, onTap: reseterr);
-                  loading = false;
-                });
-              });
-        },
-      ),
-    );
   }
 
   @override
@@ -268,12 +197,66 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
           ),
           ds.FileDropWell.icon(
             upload,
+            shape: RoundedRectangleBorder(borderRadius: defaults.borderRadius),
             help: ds.Hint(const Text("drag and drop files to add them to this directory")),
           ),
         ],
       ),
       children: items,
-      ds.Table.expanded<media.Media>(row),
+      ds.Table.expanded<media.Media>(
+        (v) {
+          final onChange = (media.Media? upd) {
+            setState(() {
+              _res = api.FilesystemSearchResponse(
+                next: _res.next,
+                breadcrumb: _res.breadcrumb,
+                items: ds.fnOnChange(_res.items, upd, (o) => o.id == v.id),
+              );
+            });
+          };
+
+          final preview = (BuildContext context, media.Media v) => media.Preview.modal(
+            context,
+            v,
+            trailing: [
+              ds.LoadingIconButton(
+                icon: const Icon(Icons.delete_outline),
+                onPressed: () => confirmremove(
+                  context,
+                  v,
+                  apiremove: widget.apiremove,
+                  onChange: (upd) {
+                    // close the preview before the row is dropped from the listing.
+                    ds.modals.push(context, null);
+                    onChange(upd);
+                  },
+                ),
+              ),
+            ],
+          );
+
+          return FilesystemRow(
+            v,
+            focused: v.id == _focused,
+            onTap: () {
+              if (v.mimetype == mimex.directory) return Future.sync(() => navigate(v.id));
+              final play = media.PlayAction(context, v, media.media.response());
+              // nothing to play or preview: open the details instead.
+              return Future.sync(play ?? preview(context, v) ?? focus(v));
+            },
+            trailing: [
+              ds.Help(
+                IconButton(
+                  icon: const Icon(Icons.info_outline),
+                  onPressed: focus(v),
+                ),
+                ds.Hint(const Text("show or hide details: type, timestamps, and actions like delete")),
+              ),
+            ],
+            expanded: v.id == _focused ? FilesystemDetails(v, onChange: onChange) : ds.Empty,
+          );
+        },
+      ),
       empty: ds.FileDropWell(upload),
     );
   }
@@ -287,9 +270,6 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
         onCancel: () => ds.modals.push(context, null),
         onCreated: (created) {
           ds.modals.push(context, null);
-          setState(() {
-            _highlighted = created.id;
-          });
           refresh(_res.next);
         },
       ),

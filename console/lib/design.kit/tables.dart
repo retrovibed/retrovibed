@@ -72,7 +72,7 @@ class _TableRowState extends State<TableRow> {
   Widget build(BuildContext context) {
     final themex = Theme.of(context);
     final defaults = Defaults.of(context);
-    final onTap = widget.expanded != Empty ? _toggle : widget.onTap;
+    final onTap = widget.onTap ?? (widget.expanded != Empty ? _toggle : null);
     final row = Material(
       // Ensure Material doesn't block underlying colors
       color: Colors.transparent,

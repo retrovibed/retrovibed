@@ -21,23 +21,16 @@ class PreviewUnsupported extends StatelessWidget {
     final defaults = ds.Defaults.of(context);
     final theme = Theme.of(context);
 
-    return Padding(
+    return ds.Container(
       padding: defaults.padding,
-      child: Row(
+      Row(
         spacing: defaults.spacing,
         children: [
           Icon(mimex.icon(current.mimetype)),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(current.description, overflow: TextOverflow.ellipsis),
-                DefaultTextStyle(
-                  style: theme.textTheme.bodySmall!.copyWith(color: theme.hintColor),
-                  child: description == ds.Empty ? Text(current.mimetype) : description,
-                ),
-              ],
+            child: DefaultTextStyle(
+              style: theme.textTheme.bodySmall!.copyWith(color: theme.hintColor),
+              child: description == ds.Empty ? Text(current.mimetype) : description,
             ),
           ),
           ds.LoadingIconButton(

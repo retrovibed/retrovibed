@@ -8,6 +8,8 @@ class Heading extends StatelessWidget {
   final MainAxisAlignment mainAxisAlignment;
   final EdgeInsets margin;
   final EdgeInsets? padding;
+  final List<Widget> leading;
+  final List<Widget> trailing;
   const Heading(
     Widget this.child, {
     super.key,
@@ -15,6 +17,8 @@ class Heading extends StatelessWidget {
     this.mainAxisAlignment = MainAxisAlignment.center,
     this.margin = EdgeInsets.zero,
     this.padding,
+    this.leading = const [],
+    this.trailing = const [],
   });
 
   @override
@@ -26,7 +30,11 @@ class Heading extends StatelessWidget {
       Row(
         mainAxisSize: mainAxisSize,
         mainAxisAlignment: mainAxisAlignment,
-        children: [child],
+        children: [
+          ...leading,
+          Expanded(child: child),
+          ...trailing,
+        ],
       ),
     );
   }
