@@ -42,8 +42,10 @@ func (t *Pool[T]) init() *Pool[T] {
 		go func() {
 			defer t.shutdown.Done()
 			for pending := range t.queued {
-				cause := errorsx.LogErr(pending.workload())
-				t.failed.CompareAndSwap(nil, &cause)
+				// only record failures, a successful workload must not mask a later error.
+				if cause := errorsx.LogErr(pending.workload()); cause != nil {
+					t.failed.CompareAndSwap(nil, &cause)
+				}
 			}
 		}()
 	}

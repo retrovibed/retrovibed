@@ -49,6 +49,21 @@ func TestPoolClose(t *testing.T) {
 		require.ErrorIs(t, p.Close(), expected)
 	})
 
+	t.Run("successful workload does not mask a later failure", func(t *testing.T) {
+		expected := errors.New("workload failed")
+		p := asynccompute.New(func(ctx context.Context, w int) error {
+			if w == 0 {
+				return nil
+			}
+			return expected
+		}, asynccompute.Workers[int](1))
+
+		require.NoError(t, p.Run(t.Context(), 0))
+		require.NoError(t, p.Run(t.Context(), 1))
+
+		require.ErrorIs(t, p.Close(), expected)
+	})
+
 	t.Run("concurrent close does not panic", func(t *testing.T) {
 		p := asynccompute.New(func(ctx context.Context, w int) error { return nil })
 
