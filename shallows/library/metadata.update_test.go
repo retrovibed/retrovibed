@@ -28,4 +28,39 @@ func TestMetadataUpdate(t *testing.T) {
 		require.NoError(t, library.MetadataUpdate(ctx, db, tmp.ID, tmp).Scan(&tmp))
 		require.Equal(t, uuid.Max.String(), tmp.ArchiveID)
 	})
+
+	t.Run("should allow updating the encryption_seed when not archived", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+		var tmp = library.Metadata{
+			Description: "Example",
+		}
+
+		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
+		require.Equal(t, uuid.Nil.String(), tmp.ArchiveID)
+
+		seed := uuid.Must(uuid.NewV4()).String()
+		tmp = langx.Clone(tmp, library.MetadataOptionEncryptionSeed(seed))
+		require.NoError(t, library.MetadataUpdate(ctx, db, tmp.ID, tmp).Scan(&tmp))
+		require.Equal(t, seed, tmp.EncryptionSeed)
+	})
+
+	t.Run("should ignore encryption_seed updates once archived", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+		var tmp = library.Metadata{
+			Description: "Example",
+		}
+
+		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionArchiveID(uuid.Max.String())))
+		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
+		original := tmp.EncryptionSeed
+
+		tmp = langx.Clone(tmp, library.MetadataOptionEncryptionSeed(uuid.Must(uuid.NewV4()).String()))
+		require.NoError(t, library.MetadataUpdate(ctx, db, tmp.ID, tmp).Scan(&tmp))
+		require.Equal(t, original, tmp.EncryptionSeed)
+	})
 }

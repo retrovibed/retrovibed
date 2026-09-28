@@ -184,6 +184,7 @@ func (t *HTTPLibrary) patch(w http.ResponseWriter, r *http.Request) {
 		library.MetadataOptionDescription(req.Media.Description),
 		library.MetadataOptionKnownMediaID(req.Media.KnownMediaId),
 		library.MetadataOptionArchiveID(req.Media.ArchiveId),
+		library.MetadataOptionEncryptionSeed(req.Media.EncryptionSeed),
 	)
 
 	if err := library.MetadataUpdate(r.Context(), t.q, id, md).Scan(&md); sqlx.ErrNoRows(err) != nil {
