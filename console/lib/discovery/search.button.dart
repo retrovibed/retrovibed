@@ -10,7 +10,7 @@ import 'package:retrovibed/library/api.dart' as api;
 // current library search state - the free-text analog of KnownMediaLocator,
 // which locates a specific already-catalogued item.
 class SearchButton extends StatefulWidget {
-  static const Widget _help = ds.Hint(Text("queue the search for automatic discovery and recommendation"));
+  static const Widget _help = ds.Hint(Text("continuously scan the network for this search and feed matches into recommendations"));
   final media.MediaSearchState search;
   final Future<api.LocateCreateResponse> Function(api.Locate req, {List<httpx.Option> options}) locate;
   final Widget? label;
@@ -73,13 +73,13 @@ class _SearchButtonState extends State<SearchButton> with ds.LoadingState {
     final mimetype = mimex.category(widget.search.next.mimetypes);
     if (query.isEmpty || mimetype.isEmpty) return ds.Empty;
 
-    final label = widget.label ?? Text(_queued ? "queued" : "discover");
-    final icon = Icon(_queued ? Icons.query_builder_rounded : Icons.travel_explore_rounded);
+    final label = widget.label ?? Text(_queued ? "monitoring" : "monitor");
+    final icon = Icon(_queued ? Icons.radar_rounded : Icons.travel_explore_rounded);
     final btn = label == ds.Empty
         ? ds.LoadingIconButton(
             onPressed: _onPressed,
             icon: icon,
-            tooltip: _queued ? "queued" : "discover",
+            tooltip: _queued ? "monitoring" : "monitor",
             disabled: _queued,
           )
         : ds.LoadingButton(
@@ -97,7 +97,7 @@ class _SearchButtonState extends State<SearchButton> with ds.LoadingState {
         cause: cause,
         btn,
       ),
-      ds.Hint(Text("adds the search to background discovery to generate recommendations")),
+      ds.Hint(Text("continuously scans the network for this search and feeds matches into recommendations")),
     );
   }
 }
