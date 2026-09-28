@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:ffi/ffi.dart' as ffi;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/widgets.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:retrovibed/retrovibed/gen.dart' as lib;
@@ -181,6 +182,9 @@ void daemon({bool smoke = false}) {
     "--no-mdns-advertise",
     "--mdns-discovery",
     "--remote-control",
+    "--no-auto-peertube",
+    // allow search plugins to reach local dev services.
+    if (kDebugMode) "--search-firewall-allow=127.0.0.1/32",
   ]);
   bridge.egdaemon(args.toNativeUtf8().cast<Char>(), smoke ? 1 : 0);
 }
