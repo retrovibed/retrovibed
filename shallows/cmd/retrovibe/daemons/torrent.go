@@ -517,7 +517,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		torrent.ClientConfigPeerLimits(cfg.Peers.Min, cfg.Peers.Max),
 		torrent.ClientConfigUploadLimit(rate.NewLimiter(rate.Limit(cfg.Upload.Rate), int(cfg.Upload.Burst))),
 		torrent.ClientConfigDownloadLimit(rate.NewLimiter(rate.Limit(cfg.Download.Rate), int(cfg.Download.Burst))),
-		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
+		torrent.ClientConfigHTTPUserAgent(env.TorrentHTTPAgentString()),
 		torrent.ClientConfigExtension(ddisctorrent.ExtensionName),
 		torrent.ClientConfigConnectionClosed(func(ih int160.T, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {

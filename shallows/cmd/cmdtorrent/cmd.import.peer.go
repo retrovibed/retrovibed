@@ -190,7 +190,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 		torrent.ClientConfigInfoLogger(torrentlogging),
 		torrent.ClientConfigDebugLogger(torrentlogging),
 		torrent.ClientConfigMaxOutstandingRequests(2048),
-		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
+		torrent.ClientConfigHTTPUserAgent(env.TorrentHTTPAgentString()),
 		torrent.ClientConfigConnectionClosed(func(ih int160.T, stats torrent.ConnStats, remaining int) {
 			if stats.BytesWrittenData.Uint64() == 0 {
 				return

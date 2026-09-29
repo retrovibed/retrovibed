@@ -25,6 +25,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
+	retroenv "github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -219,7 +220,7 @@ func (t cmdLocateRun) torrentClient(db sqlx.Queryer) (dhts *dht.Server, tclient 
 		torrent.ClientConfigExtension(ddisctorrent.ExtensionName),
 		torrent.ClientConfigSeed(false),
 		torrent.ClientConfigPEX(false),
-		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
+		torrent.ClientConfigHTTPUserAgent(retroenv.TorrentHTTPAgentString()),
 	)
 
 	if tclient, err = tnetwork.Bind(torrent.NewClient(torconfig)); err != nil {

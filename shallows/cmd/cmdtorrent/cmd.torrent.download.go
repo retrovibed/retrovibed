@@ -18,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/dhtx"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
@@ -93,7 +94,7 @@ func (t cmdDownload) Run(gctx *cmdopts.Global) error {
 		torrent.ClientConfigPEX(true),
 		torrent.ClientConfigSeed(true),
 		torrent.ClientConfigDialTimeouts(4*time.Second, 3*time.Minute),
-		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
+		torrent.ClientConfigHTTPUserAgent(env.TorrentHTTPAgentString()),
 		torrent.ClientConfigConnectionClosed(func(id int160.T, stats torrent.ConnStats, remaining int) {
 			log.Println("connection closed", id, remaining, spew.Sdump(stats))
 		}),

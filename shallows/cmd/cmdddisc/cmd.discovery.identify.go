@@ -18,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
+	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/netipx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
@@ -156,7 +157,7 @@ func (t cmdDiscoveryIdentify) torrentClient() (dhts *dht.Server, tclient *torren
 		torrent.ClientConfigCacheDirectory(cachedir),
 		torrent.ClientConfigSeed(false),
 		torrent.ClientConfigPEX(false),
-		torrent.ClientConfigHTTPUserAgent("retrovibed/0.0"),
+		torrent.ClientConfigHTTPUserAgent(env.TorrentHTTPAgentString()),
 	)
 
 	if tclient, err = tnetwork.Bind(torrent.NewClient(torconfig)); err != nil {

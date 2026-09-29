@@ -3,6 +3,7 @@ package env
 import (
 	"path/filepath"
 
+	"github.com/retrovibed/retrovibed/retroapi/internal/envx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 )
 
@@ -21,6 +22,10 @@ const (
 
 func RootStorageDir(rel ...string) string {
 	return userx.DefaultDataDirectory(userx.DefaultRelRoot(), filepath.Join(rel...))
+}
+
+func TorrentHTTPAgentString(keys ...string) string {
+	return envx.String("retrovibed/0.0", keys...)
 }
 
 func MediaDir() string {

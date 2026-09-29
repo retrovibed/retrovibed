@@ -9,6 +9,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 )
 
+func TorrentHTTPAgentString() string      { return env.TorrentHTTPAgentString(TorrentHTTPAgent) }
 func MediaDir() string                    { return env.MediaDir() }
 func TorrentDir() string                  { return env.TorrentDir() }
 func PrivateKeyPath() string              { return env.PrivateKeyPath(userx.DefaultRelRoot()) }
@@ -54,6 +55,7 @@ const (
 	AutoSubscriptions           = "RETROVIBED_AUTO_SUBSCRIPTIONS"               // enable/disable auto subscription setup, primarily used for retrokiosk since they are low powered devices
 	PeerTubeDomain              = "PEERTUBE_DOMAIN"                             // base url of the PeerTube/SepiaSearch instance to search.
 	AutoBootstrap               = "RETROVIBED_TORRENT_AUTO_BOOTSTRAP"           // enable/disable the predefined set of public swarms to bootstrap from.
+	TorrentHTTPAgent            = "RETROVIBED_TORRENT_HTTP_AGENT"               // specify the http agent for torrents
 	TorrentPort                 = "RETROVIBED_TORRENT_PORT"                     // specify the port to listen to torrents on
 	TorrentPublicIP4            = "RETROVIBED_TORRENT_PUBLIC_IP4"               // specify the public ipv4 address the torrent service.
 	TorrentPublicIP6            = "RETROVIBED_TORRENT_PUBLIC_IP6"               // specify the public ipv6 address the torrent service.
