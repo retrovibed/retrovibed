@@ -23,6 +23,7 @@ type Known struct {
 	Genquery        knowngenquery  `cmd:"" help:"generate query jsonl from args and write to stdout"`
 	Import          knownimport    `cmd:"" help:"processes a file or stdin to import media metadata records directly into the database"`
 	Archive         knownarchive   `cmd:"" help:"processes stdin and creates a directory of files of media metadata"`
+	Reindex         knownreindex   `cmd:"" help:"reset and rerun the known media import against previously downloaded media metadata archives"`
 }
 
 type Inspect struct {

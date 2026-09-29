@@ -119,6 +119,13 @@ func MetadataImportedByID(
 	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), imported_at = NOW() WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
+func MetadataImportResetByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewMetadataScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE torrents_metadata SET updated_at = NOW(), imported_at = 'infinity' WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+}
+
 func MetadataVerifyByID(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string, peers uint16, downloaded uint64, available uint64) NewMetadataScannerStaticRow,
