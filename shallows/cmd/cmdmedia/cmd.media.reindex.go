@@ -92,12 +92,14 @@ func (t reindex) run(ctx context.Context, db *sql.DB, c library.QueryCleaner, me
 		}
 
 		o, desc, auto := tracking.GenerateDescription(finfo.Path, &tmd)
-
+		neuraled := errorsx.Zero(c.Clean(ctx, o))
+		title, subtitle, release, episode := library.ParseReleaseEpisode(neuraled)
 		log.Println("---------------------------------------------")
 		log.Println("unmodified", o)
 		log.Println("resetting description", md.ID, md.Description, "->", desc)
 		log.Println("resetting autodescription", md.ID, md.AutoDescription, "->", auto)
-		log.Println("neural result", o, "->", unsafepretty.Print(errorsx.Zero(c.Clean(ctx, o))))
+		log.Println("neural result", o, "->", unsafepretty.Print(neuraled, unsafepretty.OptionNewlineRunes('|')))
+		log.Println("neural parsed", title, "|", episode, "|", subtitle, "|", release)
 		log.Println("---------------------------------------------")
 
 		if t.DryRun {
