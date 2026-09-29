@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/authn.dart' as authn;
@@ -18,39 +17,32 @@ class KnownMediaDropdown extends StatefulWidget {
   final FocusNode? focus;
   final String current;
   final String mimetype;
-  final void Function(api.Known? k)? onChange;
+  final Future<api.Known?> Function(api.Known? k) onChange;
   const KnownMediaDropdown({
     super.key,
     this.search = api.known.search,
     this.controller,
     this.focus,
     this.current = "",
-    this.onChange,
+    this.onChange = ds.fnAsyncPassthrough,
     this.mimetype = "",
   });
 
-  // Applies [known] to [current] and fires the appropriate metadatasync
+  // Applies [known] to [current] and fires the library metadatasync
   // endpoint, returning the server-updated [Media].  When [known] is null
   // and [current] has no known-media ID to clear (deactivation with nothing
   // ever selected), returns the unmodified [current].
-  // [authOptions] must be pre-captured by the caller while the context is
-  // still valid — _sync itself has no BuildContext dependency.
-  // Both sync functions default to the real API and can be replaced in tests.
   static Future<_media.Media> _sync(
     List<httpx.Option> authOptions,
     _media.Media current,
     api.Known? known, {
     api.FnLibraryMetadataSync libraryMetadataSync = _media.media.metadatasync,
-    api.FnDiscoveredMetadataSync discoveredMetadataSync = _media.discovered.metadatasync,
   }) {
-    if (known == null && uuidx.isMin(uuidx.fromString(current.knownMediaId))) {
+    if (known == null && uuidx.isMinMax(uuidx.fromString(current.knownMediaId))) {
       return Future.value(current);
     }
     final updated = current..knownMediaId = known?.uid ?? uuidx.min();
-    if (uuidx.isMin(uuidx.fromString(current.torrentId))) {
-      return libraryMetadataSync(updated.id, updated, options: authOptions).then((v) => v.media);
-    }
-    return discoveredMetadataSync(updated.torrentId, updated, options: authOptions).then((v) => v.media);
+    return libraryMetadataSync(updated.id, updated, options: authOptions).then((v) => v.media);
   }
 
   static Future<void> Function() modal(
@@ -58,6 +50,8 @@ class KnownMediaDropdown extends StatefulWidget {
     _media.Media current, {
     String mimetype = "",
     void Function(_media.Media) onChange = ds.fnNoop,
+    api.FnKnownSearch search = api.known.search,
+    api.FnLibraryMetadataSync libraryMetadataSync = _media.media.metadatasync,
   }) {
     return () {
       // Capture auth while the caller's context is still valid (modal opening).
@@ -69,52 +63,26 @@ class KnownMediaDropdown extends StatefulWidget {
           child: KnownMediaDropdown(
             current: current.knownMediaId,
             mimetype: mimetype,
+            search: search,
             onChange: (known) {
-              _sync(
-                authOptions,
-                current,
-                known,
-              ).then<void>(onChange).then(completion.complete).catchError(completion.completeError);
+              return _sync(
+                    authOptions,
+                    current,
+                    known,
+                    libraryMetadataSync: libraryMetadataSync,
+                  )
+                  .then<void>(onChange)
+                  .then(
+                    // dismissing the modal completes it before the deactivate triggered sync resolves.
+                    (_) => completion.isCompleted ? null : completion.complete(),
+                    onError: (e) => completion.isCompleted ? null : completion.completeError(e),
+                  )
+                  .then((_) => known);
             },
           ),
         ),
       );
     };
-  }
-
-  /// Returns a [KnownMediaDropdown] widget configured to synchronise metadata
-  /// when the user selects a known-media entry.  Routing mirrors [modal]:
-  /// - no torrent → calls [apiLibraryMetadataSync] (`/m/:id/metadatasync`)
-  /// - with torrent → calls [apiDiscoveredMetadataSync] (`/d/:id/metadatasync`)
-  ///
-  /// Both sync functions are injectable so they can be replaced in tests.
-  static Widget inline(
-    BuildContext context,
-    _media.Media current, {
-    String mimetype = "",
-    void Function(_media.Media)? onChange,
-    api.FnKnownSearch search = api.known.search,
-    api.FnLibraryMetadataSync apiLibraryMetadataSync = _media.media.metadatasync,
-    api.FnDiscoveredMetadataSync apiDiscoveredMetadataSync = _media.discovered.metadatasync,
-  }) {
-    // Capture auth while the caller's context is still valid (widget build time),
-    // mirroring the modal approach.  The onChange closure may fire during
-    // deactivate() when dependOnInheritedWidgetOfExactType is no longer safe.
-    final authOptions = [authn.request(authn.AuthzCache.meta(context))];
-    return KnownMediaDropdown(
-      current: current.knownMediaId,
-      mimetype: mimetype,
-      search: search,
-      onChange: (known) {
-        _sync(
-          authOptions,
-          current,
-          known,
-          libraryMetadataSync: apiLibraryMetadataSync,
-          discoveredMetadataSync: apiDiscoveredMetadataSync,
-        ).then<void>((v) => onChange?.call(v));
-      },
-    );
   }
 
   @override
@@ -126,6 +94,7 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> with ds.LoadingState
     next: api.known.request(limit: 4),
   );
   api.Known? current = null;
+  bool loaded = false;
 
   Future<void> refresh(api.KnownSearchRequest req) {
     return widget
@@ -140,10 +109,15 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> with ds.LoadingState
         })
         .catchError((cause) {
           setState(() {
-            this.cause = ds.Error.unauthorized(cause, onTap: reseterr);
             loading = false;
           });
-        }, test: httpx.ErrorsTest.unauthorized)
+        }, test: httpx.ErrorsTest.err404)
+        .catchError((cause) {
+          setState(() {
+            this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
+            loading = false;
+          });
+        }, test: httpx.ErrorsTest.httpauto)
         .catchError((e) {
           setState(() {
             cause = ds.Error.unknown(e, onTap: reseterr);
@@ -171,17 +145,35 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> with ds.LoadingState
           )
           .then(
             (w) => setState(() {
+              loaded = true;
               current = w.known;
             }),
           )
-          .whenComplete(() => refresh(_res.next));
+          .catchError((cause) {
+            setState(() {
+              loading = false;
+            });
+          }, test: httpx.ErrorsTest.err404)
+          .then((_) => refresh(_res.next))
+          .catchError((cause) {
+            setState(() {
+              this.cause = ds.Errors.httpauto(cause, onTap: reseterr);
+              loading = false;
+            });
+          }, test: httpx.ErrorsTest.httpauto)
+          .catchError((e) {
+            setState(() {
+              cause = ds.Error.unknown(e, onTap: reseterr);
+              loading = false;
+            });
+          });
     });
   }
 
   @override
   void deactivate() {
-    if (current == null) {
-      widget.onChange?.call(current);
+    if (loaded && widget.current != current?.uid) {
+      widget.onChange(current);
     }
     super.deactivate();
   }
@@ -250,33 +242,31 @@ class _KnownMediaDropdown extends State<KnownMediaDropdown> with ds.LoadingState
             current: _res.next.offset,
             empty: ds.Grid.int64(_res.items.length) < _res.next.limit,
             autofocus: defaults.desktop,
-          ),
-        ),
-        ds.Loading(
-          loading: _res.items.isEmpty,
-          overlay: ds.Empty,
-          forms.Container(
-            ds.Grid(
-              children: _res.items,
-              loading: loading,
-              cause: cause,
-              leading: [],
-              (context, v) {
-                return KnownMediaCard(
-                  v,
-                  icon: Icons.search,
-                  onTap: widget.onChange == null
-                      ? null
-                      : () {
-                          setState(() {
-                            current = v;
-                          });
-                          widget.onChange!(v);
-                        },
-                );
+            tuning: ds.LoadingIconButton.close(
+              onPressed: () async {
+                widget.onChange(current);
               },
             ),
           ),
+        ),
+        ds.Grid(
+          padding: EdgeInsets.zero,
+          children: _res.items,
+          loading: loading,
+          cause: cause,
+          leading: [],
+          (context, v) {
+            return KnownMediaCard(
+              v,
+              icon: Icons.search,
+              onTap: () {
+                setState(() {
+                  current = v;
+                });
+                widget.onChange(v);
+              },
+            );
+          },
         ),
       ],
     );

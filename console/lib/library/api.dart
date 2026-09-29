@@ -114,6 +114,14 @@ abstract class known {
   static KnownSearchResponse response({KnownSearchRequest? next}) =>
       KnownSearchResponse(next: next ?? request(limit: 100), items: []);
 
+  static Known frommedia(Media m) => Known(
+    id: "",
+    description: m.description,
+    summary: "",
+    rating: 0.0,
+    image: m.image,
+  );
+
   static Future<Known> autodetect(
     Media m, {
     String? host,

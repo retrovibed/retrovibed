@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/library/known.media.dropdown.dart';
 import 'package:retrovibed/library/known.media.card.dart';
+import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/library/api.dart' as api;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -21,29 +22,11 @@ Future<api.KnownSearchResponse> _mockSearch(
   List<httpx.Option> options = const [],
 }) async => api.KnownSearchResponse(items: [_knownItem], next: req);
 
-// Gives the inline widget a valid context and enough scroll room to avoid
-// overflow errors from the search grid.
-Widget _wrap(Widget Function(BuildContext) builder) => Builder(
-  builder: (ctx) => SingleChildScrollView(child: builder(ctx)),
-);
-
 void main() {
-  group('KnownMediaDropdown.inline', () {
+  group('KnownMediaDropdown', () {
     testWidgets('renders without overflow', (tester) async {
-      final current = media.Media(
-        id: uuidx.withSuffix(1),
-        description: 'Test',
-        mimetype: 'video/mp4',
-        createdAt: DateTime.now().toIso8601String(),
-        archiveId: uuidx.min(),
-        torrentId: uuidx.min(),
-        knownMediaId: uuidx.min(),
-      );
-
       await tester.pumpApp(
-        _wrap(
-          (ctx) => KnownMediaDropdown.inline(ctx, current, search: _mockSearch),
-        ),
+        SingleChildScrollView(child: KnownMediaDropdown(search: _mockSearch)),
       );
       await tester.pumpAndSettle();
 
@@ -51,39 +34,15 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    group('selection routing', () {
-      testWidgets('calls libraryMetadataSync when torrentId is min', (tester) async {
-        bool libraryCalled = false;
-        bool discoveredCalled = false;
-        media.Media? resultMedia;
-
-        final current = media.Media(
-          id: uuidx.withSuffix(1),
-          description: 'Test',
-          mimetype: 'video/mp4',
-          createdAt: DateTime.now().toIso8601String(),
-          archiveId: uuidx.min(),
-          torrentId: uuidx.min(), // min → library path
-          knownMediaId: uuidx.min(),
-        );
-
-        final synced = current.deepCopy()..knownMediaId = _knownItem.uid;
+    group('selection', () {
+      testWidgets('calls onChange with the tapped known media', (tester) async {
+        api.Known? selected;
 
         await tester.pumpApp(
-          _wrap(
-            (ctx) => KnownMediaDropdown.inline(
-              ctx,
-              current,
+          SingleChildScrollView(
+            child: KnownMediaDropdown(
               search: _mockSearch,
-              onChange: (v) => resultMedia = v,
-              apiLibraryMetadataSync: (id, m, {options = const []}) async {
-                libraryCalled = true;
-                return media.MediaUpdateResponse(media: synced);
-              },
-              apiDiscoveredMetadataSync: (id, m, {options = const []}) async {
-                discoveredCalled = true;
-                return media.MetadataSyncResponse(media: synced);
-              },
+              onChange: (k) async => selected = k,
             ),
           ),
         );
@@ -92,16 +51,47 @@ void main() {
         await tester.tap(find.byType(KnownMediaCard).first);
         await tester.pumpAndSettle();
 
-        expect(libraryCalled, isTrue);
-        expect(discoveredCalled, isFalse);
-        expect(resultMedia?.knownMediaId, equals(synced.knownMediaId));
+        expect(selected?.uid, equals(_knownItem.uid));
         expect(tester.takeException(), isNull);
       });
 
-      testWidgets('calls discoveredMetadataSync when torrentId is valid', (tester) async {
-        bool libraryCalled = false;
-        bool discoveredCalled = false;
+      testWidgets('does not call onChange on deactivate with no selection', (tester) async {
+        bool called = false;
+        api.Known? selected = _knownItem;
+
+        await tester.pumpApp(
+          SingleChildScrollView(
+            child: KnownMediaDropdown(
+              search: _mockSearch,
+              onChange: (k) async {
+                called = true;
+                selected = k;
+                return k;
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        // Explicitly deactivate — triggers _KnownMediaDropdown.deactivate
+        // which has no loaded known media to clear.
+        await tester.pumpWidget(
+          const MaterialApp(home: Scaffold(body: Text('gone'))),
+        );
+        await tester.pump();
+
+        expect(called, isFalse);
+        expect(selected, equals(_knownItem));
+        expect(tester.takeException(), isNull);
+      });
+    });
+
+    group('modal', () {
+      testWidgets('syncs the selected known media through the library endpoint', (tester) async {
+        String? syncedId;
+        String? syncedKnownId;
         media.Media? resultMedia;
+        Future<void>? pending;
 
         final current = media.Media(
           id: uuidx.withSuffix(1),
@@ -109,43 +99,50 @@ void main() {
           mimetype: 'video/mp4',
           createdAt: DateTime.now().toIso8601String(),
           archiveId: uuidx.min(),
-          torrentId: uuidx.withSuffix(5), // valid → discovered path
+          torrentId: uuidx.withSuffix(5), // library media imported from a torrent
           knownMediaId: uuidx.min(),
         );
 
-        final synced = current.deepCopy()..knownMediaId = _knownItem.uid;
-
         await tester.pumpApp(
-          _wrap(
-            (ctx) => KnownMediaDropdown.inline(
-              ctx,
-              current,
-              search: _mockSearch,
-              onChange: (v) => resultMedia = v,
-              apiLibraryMetadataSync: (id, m, {options = const []}) async {
-                libraryCalled = true;
-                return media.MediaUpdateResponse(media: synced);
-              },
-              apiDiscoveredMetadataSync: (id, m, {options = const []}) async {
-                discoveredCalled = true;
-                return media.MetadataSyncResponse(media: synced);
-              },
+          ds.Node(
+            Builder(
+              builder: (ctx) => TextButton(
+                onPressed: () => pending = KnownMediaDropdown.modal(
+                  ctx,
+                  current,
+                  search: _mockSearch,
+                  onChange: (v) => resultMedia = v,
+                  libraryMetadataSync: (id, m, {options = const []}) async {
+                    syncedId = id;
+                    syncedKnownId = m.knownMediaId;
+                    return media.MediaUpdateResponse(media: m.deepCopy());
+                  },
+                )(),
+                child: const Text('identify'),
+              ),
             ),
           ),
         );
+
+        await tester.tap(find.text('identify'));
         await tester.pumpAndSettle();
 
         await tester.tap(find.byType(KnownMediaCard).first);
         await tester.pumpAndSettle();
+        await pending;
 
-        expect(discoveredCalled, isTrue);
-        expect(libraryCalled, isFalse);
-        expect(resultMedia?.knownMediaId, equals(synced.knownMediaId));
+        expect(syncedId, equals(current.id));
+        expect(syncedKnownId, equals(_knownItem.uid));
+        expect(resultMedia?.id, equals(current.id));
+        expect(resultMedia?.knownMediaId, equals(_knownItem.uid));
+        expect(find.byType(KnownMediaDropdown), findsNothing);
         expect(tester.takeException(), isNull);
       });
 
-      testWidgets('does not crash or call onChange on deactivate with no selection', (tester) async {
+      testWidgets('dismissing with nothing selected skips the sync', (tester) async {
+        bool synced = false;
         media.Media? resultMedia;
+        Future<void>? pending;
 
         final current = media.Media(
           id: uuidx.withSuffix(1),
@@ -158,31 +155,35 @@ void main() {
         );
 
         await tester.pumpApp(
-          _wrap(
-            (ctx) => KnownMediaDropdown.inline(
-              ctx,
-              current,
-              search: _mockSearch,
-              onChange: (v) => resultMedia = v,
-              apiLibraryMetadataSync: (id, m, {options = const []}) async => media.MediaUpdateResponse(media: m),
-              apiDiscoveredMetadataSync: (id, m, {options = const []}) async => media.MetadataSyncResponse(media: m),
+          ds.Node(
+            Builder(
+              builder: (ctx) => TextButton(
+                onPressed: () => pending = KnownMediaDropdown.modal(
+                  ctx,
+                  current,
+                  search: _mockSearch,
+                  onChange: (v) => resultMedia = v,
+                  libraryMetadataSync: (id, m, {options = const []}) async {
+                    synced = true;
+                    return media.MediaUpdateResponse(media: m);
+                  },
+                )(),
+                child: const Text('identify'),
+              ),
             ),
           ),
         );
+
+        await tester.tap(find.text('identify'));
         await tester.pumpAndSettle();
+        expect(find.byType(KnownMediaDropdown), findsOneWidget);
 
-        // Explicitly deactivate — triggers _KnownMediaDropdown.deactivate
-        // which calls onChange(null). Without the guard in _sync this would
-        // crash with "looking up a deactivated widget's ancestor".
-        await tester.pumpWidget(
-          const MaterialApp(home: Scaffold(body: Text('gone'))),
-        );
-        await tester.pump();
+        tester.state<ds.NodeState>(find.byType(ds.Node)).reset();
+        await tester.pumpAndSettle();
+        await pending;
 
-        // onChange fires with the unmodified current (no API call, no context
-        // access) — the important assertion is that no exception was thrown.
-        expect(resultMedia?.id, equals(current.id));
-        expect(resultMedia?.knownMediaId, equals(uuidx.min()));
+        expect(synced, isFalse);
+        expect(resultMedia, isNull);
         expect(tester.takeException(), isNull);
       });
     });
@@ -191,21 +192,9 @@ void main() {
       testWidgets('search error surfaces as an unknown-error state instead of crashing', (tester) async {
         api.KnownSearchRequest? capturedReq;
 
-        final current = media.Media(
-          id: uuidx.withSuffix(1),
-          description: 'Test',
-          mimetype: 'video/mp4',
-          createdAt: DateTime.now().toIso8601String(),
-          archiveId: uuidx.min(),
-          torrentId: uuidx.min(),
-          knownMediaId: uuidx.min(),
-        );
-
         await tester.pumpApp(
-          _wrap(
-            (ctx) => KnownMediaDropdown.inline(
-              ctx,
-              current,
+          SingleChildScrollView(
+            child: KnownMediaDropdown(
               search: (req, {options = const []}) async {
                 capturedReq = req;
                 throw Exception('boom');
