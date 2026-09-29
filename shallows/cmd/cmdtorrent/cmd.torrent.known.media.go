@@ -8,7 +8,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -49,10 +48,6 @@ func (t cmdKnownMedia) Run(ctx *cmdopts.Global) (err error) {
 		if err = tracking.MetadataAssignKnownMediaID(ctx.Context, db, md.ID, known.UID).Scan(&md); err != nil {
 			log.Println("failed to assign known media", md.ID, known.UID)
 		}
-	}
-
-	if err := sqlx.Discard(sqlx.Scan(library.MetadataTransferKnownMediaIDFromTorrent(ctx.Context, db, t.Timestamp))); err != nil {
-		return errorsx.Wrap(iter.Err(), "failed to associate known media with upstream library")
 	}
 
 	return err

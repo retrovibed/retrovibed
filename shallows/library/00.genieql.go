@@ -5,7 +5,6 @@ package library
 
 import (
 	"context"
-	"time"
 
 	genieql "github.com/james-lawrence/genieql/ginterp"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -145,7 +144,6 @@ func MetadataUpdate(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string, md Metadata) NewMetadataScannerStaticRow,
 ) {
-	// the seed keys the archived copy, so it is only editable while nothing has been archived.
 	gql = gql.Query(`UPDATE library_metadata SET description = {md.Description}, known_media_id = {md.KnownMediaID}, archive_id = {md.ArchiveID}, encryption_seed = CASE WHEN archive_id = '00000000-0000-0000-0000-000000000000' THEN {md.EncryptionSeed} ELSE encryption_seed END WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
@@ -164,21 +162,6 @@ func MetadataSetTorrentID(
 	pattern func(ctx context.Context, q sqlx.Queryer, id, tid string) NewMetadataScannerStaticRow,
 ) {
 	gql = gql.Query(`UPDATE library_metadata SET torrent_id = {tid} WHERE "id" = {id} AND torrent_id = '00000000-0000-0000-0000-000000000000' RETURNING ` + MetadataScannerStaticColumns)
-}
-
-func MetadataTransferKnownMediaIDFromTorrent(
-	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, ts time.Time) NewMetadataScannerStatic,
-) {
-	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), known_media_id = t.known_media_id FROM torrents_metadata AS t WHERE t.id = library_metadata.torrent_id AND t."updated_at" >= {ts} AND library_metadata.known_media_id = 'ffffffff-ffff-ffff-ffff-ffffffffffff' AND t.known_media_id NOT IN ('ffffffff-ffff-ffff-ffff-ffffffffffff', '00000000-0000-0000-0000-000000000000') RETURNING ` + MetadataScannerStaticColumns)
-}
-
-// used to sync known media idea from a known torrent.metadata to every media with that torrent.metadata.
-func MetadataSyncKnownMediaIDFromTorrent(
-	gql genieql.Function,
-	pattern func(ctx context.Context, q sqlx.Queryer, tid string) NewMetadataScannerStatic,
-) {
-	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), known_media_id = torrents_metadata.known_media_id FROM torrents_metadata WHERE torrents_metadata."id" = {tid} AND torrents_metadata."id" = library_metadata.torrent_id RETURNING ` + MetadataScannerStaticColumns)
 }
 
 func MetadataForTorrentArchiveRetrieval(

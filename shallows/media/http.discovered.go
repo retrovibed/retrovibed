@@ -899,12 +899,6 @@ func (t *HTTPDiscovered) metadatasync(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := sqlx.Discard(sqlx.Scan(library.MetadataSyncKnownMediaIDFromTorrent(r.Context(), t.q, id))); sqlx.IgnoreNoRows(err) != nil {
-		log.Println(errorsx.Wrap(err, "unable to sync media metadata"))
-		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
-		return
-	}
-
 	if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &MetadataSyncResponse{
 		Media: new(
 			langx.Clone(

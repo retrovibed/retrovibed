@@ -3,7 +3,6 @@ package daemons
 import (
 	"context"
 	"log"
-	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gofrs/uuid/v5"
@@ -28,7 +27,6 @@ func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 	log.Println("attempting to locate unidentified media initiated")
 	defer log.Println("attempting to locate unidentified media completed")
 
-	ts := time.Now()
 	identifier := library.NewKnownIdentifier(db, mc)
 
 	for md := range iter.Iter() {
@@ -60,10 +58,6 @@ func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 
 	if err := iter.Err(); err != nil {
 		return errorsx.Wrap(iter.Err(), "failed to mark known media torrents")
-	}
-
-	if err := sqlx.Discard(sqlx.Scan(library.MetadataTransferKnownMediaIDFromTorrent(ctx, db, ts))); err != nil {
-		return errorsx.Wrap(iter.Err(), "failed to associate known media with upstream library")
 	}
 
 	return nil

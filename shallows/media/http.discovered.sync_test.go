@@ -100,6 +100,5 @@ func TestDownloadSyncMetadata(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, resp.Result().StatusCode)
 	require.Equal(t, m.ID, testx.Must(sqlx.String(ctx, q, "SELECT known_media_id::text FROM torrents_metadata WHERE id = ?", tmd.ID))(t))
-	require.Equal(t, 2, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata WHERE known_media_id = ?", m.ID))(t))
-
+	require.Equal(t, 0, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata WHERE known_media_id = ?", m.ID))(t))
 }
