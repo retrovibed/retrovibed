@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:retrovibed/library/known.media.display.dart';
 import 'package:retrovibed/library/known.media.source.dart';
 import 'package:retrovibed/library/api.dart' as api;
@@ -135,6 +138,19 @@ void main() {
       await tester.tap(find.byType(KnownMediaDisplay));
       await tester.pump();
       expect(tapped, isTrue);
+    });
+  });
+
+  group('KnownMediaDisplay pending', () {
+    testWidgets('falls back to media when known media 404s', (tester) async {
+      final media = _media();
+      final pending = Completer<api.Known>();
+      await tester.pumpApp(KnownMediaDisplay(pending.future, media: media));
+      pending.completeError(http.Response('not found', 404));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Test Media'), findsOneWidget);
     });
   });
 

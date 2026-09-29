@@ -103,8 +103,7 @@ class KnownMediaDisplay extends StatefulWidget {
               options: [authn.request(authz)],
             ),
           )
-          .then((w) => (w.known..description = m.description))
-          .catchError((_) => Future.value(api.known.frommedia(m)), test: httpx.ErrorsTest.err404),
+          .then((w) => (w.known..description = m.description)),
       media: m,
       key: resolvedKey,
       onTap: onTap,
@@ -184,6 +183,12 @@ class _KnownMediaDisplayState extends State<KnownMediaDisplay> with ds.LoadingSt
             loading = false;
           });
         })
+        .catchError((cause) {
+          setState(() {
+            current = api.known.frommedia(widget.media);
+            loading = false;
+          });
+        }, test: httpx.ErrorsTest.err404)
         .catchError((cause) {
           setState(() {
             this.cause = ds.Error.unknown(cause, onTap: reseterr);
