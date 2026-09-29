@@ -170,18 +170,11 @@ class _State extends State<Connect> with LoadingState {
     });
   }
 
-  // temporary hack fix until we fix the listener (and its deployed).
-  // problem was when the device was serving its own content it sent localhost
-  // as the library over the sync protocol. resulting in the wrong token used
-  // against the wrong host. the longterm fix is to have golang ffi return the proper hostname.
-  // see DaemonFromHost.
-  String get _hostname =>
-      meta.daemons.isLocalDevice(_latest.sync.library) ? _endpoint.value.hostname : _latest.sync.library.hostname;
   media.FnMediaSearch get _apisearch =>
-      widget.apisearch(_hostname, [httpx.Request.bearer(() => Future.value(_latest.sync.token))]);
+      widget.apisearch(_latest.sync.library.hostname, [httpx.Request.bearer(() => Future.value(_latest.sync.token))]);
   media.FnMediaFind get _apirandom => (req, {List<httpx.Option> options = const []}) async {
     if (!_autoplay.isCompleted) await _autoplay.future;
-    return widget.apirandom(_hostname, [httpx.Request.bearer(() => Future.value(_latest.sync.token))])(
+    return widget.apirandom(_latest.sync.library.hostname, [httpx.Request.bearer(() => Future.value(_latest.sync.token))])(
       req,
       options: options,
     );
@@ -281,7 +274,7 @@ class _State extends State<Connect> with LoadingState {
             position: playback.position,
             duration: playback.duration,
           ),
-          host: _hostname,
+          host: _latest.sync.library.hostname,
           options: [httpx.Request.bearer(() => Future.value(_latest.sync.token))],
         )
         .then((v) {})
@@ -295,7 +288,7 @@ class _State extends State<Connect> with LoadingState {
     widget
         .apirecenthistory(
           lib.WatchHistoryRecordRequest(record: record),
-          host: _hostname,
+          host: _latest.sync.library.hostname,
           options: [httpx.Request.bearer(() => Future.value(_latest.sync.token))],
         )
         .then((v) {
@@ -521,7 +514,7 @@ class _State extends State<Connect> with LoadingState {
                     padding: defaults.padding / 2,
                     category,
                     latest: widget.apirecentlatest,
-                    host: _hostname,
+                    host: _latest.sync.library.hostname,
                     authz: httpx.Request.bearer(() => Future.value(_latest.sync.token)),
                     onTap: _onRecentTap,
                   ),

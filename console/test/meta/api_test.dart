@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta/api.dart' as api;
 import 'package:retrovibed/retrovibed.dart' as retro;
 
@@ -23,6 +24,31 @@ void main() {
 
     test('matches the localhost:9998 fallback regardless of the local device hostname', () {
       final library = api.Daemon(hostname: 'localhost:9998');
+      expect(api.daemons.isLocalDevice(library), isTrue);
+    });
+
+    test('does not match a different hostname that shares the local device hostname as a prefix', () {
+      final library = api.Daemon(hostname: '$localHost-nas:9998');
+      expect(api.daemons.isLocalDevice(library), isFalse);
+    });
+
+    test('matches localhost on a non-default port', () {
+      final library = api.Daemon(hostname: 'localhost:9999');
+      expect(api.daemons.isLocalDevice(library), isTrue);
+    });
+
+    test('matches the ipv4 loopback address', () {
+      final library = api.Daemon(hostname: '127.0.0.1:9998');
+      expect(api.daemons.isLocalDevice(library), isTrue);
+    });
+
+    test('matches the ipv6 loopback address', () {
+      final library = api.Daemon(hostname: '[::1]:9998');
+      expect(api.daemons.isLocalDevice(library), isTrue);
+    });
+
+    test('matches the configured local daemon host', () {
+      final library = api.Daemon(hostname: httpx.localhost());
       expect(api.daemons.isLocalDevice(library), isTrue);
     });
   });
