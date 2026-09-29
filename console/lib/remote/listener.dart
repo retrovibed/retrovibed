@@ -68,8 +68,9 @@ class _State extends State<RemoteControlListener> {
   // whenever the token cache actually refreshes.
   Future<void> _echoSync() async {
     final queue = _queue;
-    final library = _library.value;
+    final library = _library.value.deepCopy();
     library..hostname = meta.daemons.isLocalDevice(library) ? widget.localDevice().hostname : library.hostname;
+
     final msg = remote.messages.sync(
       // this envelope isn't issued on behalf of any particular Connect
       // session - it's the listener's own unsolicited/replied report - so

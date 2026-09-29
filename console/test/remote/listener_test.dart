@@ -379,6 +379,36 @@ void main() {
       expectFullyPopulatedSync(fakeSocket.sent.last, library: otherDaemon);
     });
 
+    testWidgets('rewriting a local library hostname does not mutate the shared endpoint daemon', (tester) async {
+      final fakeSocket = _FakeRemoteControlSocket();
+      late BuildContext capturedContext;
+
+      await tester.pumpApp(
+        authzCurrent: fixedAuth,
+        meta.EndpointAuto(
+          latest: mockLatest,
+          connectable: mockConnectable,
+          backoff: httpx.Backoff.constant(Duration.zero),
+          media.Playlist(
+            RemoteControlListener(
+              connect: ({List<httpx.Option> options = const []}) async => fakeSocket,
+              localDevice: () => meta.Daemon(hostname: "tv:9998"),
+              Builder(
+                builder: (context) {
+                  capturedContext = context;
+                  return const SizedBox();
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+      await _settle(tester);
+
+      expect(fakeSocket.sent.last.sync.library.hostname, "tv:9998");
+      expect(meta.EndpointAuto.of(capturedContext)!.changed.value.hostname, "localhost:9998");
+    });
+
     testWidgets('refreshing the auth token sends a fully populated sync', (tester) async {
       final (fakeSocket, capturedContext) = await mount(tester);
       final before = fakeSocket.sent.length;
