@@ -24,6 +24,41 @@ void main() {
     });
   });
 
+  group('category individual mime types', () {
+    for (final m in mimex.videos) {
+      test('returns video for $m', () {
+        expect(mimex.category([m]), equals('video'));
+      });
+    }
+
+    for (final m in mimex.audios) {
+      test('returns audio for $m', () {
+        expect(mimex.category([m]), equals('audio'));
+      });
+    }
+
+    for (final m in mimex.images) {
+      test('returns image for $m', () {
+        expect(mimex.category([m]), equals('image'));
+      });
+    }
+
+    for (final m in [
+      mimex.binary,
+      mimex.directory,
+      mimex.pdf,
+      mimex.bittorrent,
+      mimex.mediaarchive,
+      mimex.text.plain,
+      "application/json",
+      "",
+    ]) {
+      test('returns empty string for "$m"', () {
+        expect(mimex.category([m]), equals(''));
+      });
+    }
+  });
+
   group('category consistency with predicates', () {
     test('all video mimes satisfy isVideo', () {
       expect(mimex.videos.every(mimex.isVideo), isTrue);

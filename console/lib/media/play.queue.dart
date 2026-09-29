@@ -199,12 +199,18 @@ class PlayableMedia {
   // remote-control provenance (search taps, autoqueue/range() fills).
   final String profileId;
   final String sessionId;
+  // whether this media is already traced elsewhere
+  // (e.g. by the remote controller) and shouldn't
+  // be recorded locally, typically all local media
+  // is recorded and remote playback isnt.
+  final bool traced;
 
   const PlayableMedia(
     this.current, {
     this.pos = const Duration(milliseconds: 0),
     required this.profileId,
     required this.sessionId,
+    this.traced = false,
   });
 
   Known get known => Known(

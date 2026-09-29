@@ -72,7 +72,7 @@ class Playlist extends StatefulWidget {
     BuildContext ctx,
     api.MediaSearchRequest q,
     String historyId,
-    String id,
+    playqueue.PlayableMedia m,
     Duration watched,
     Duration pos,
     Duration dur,
@@ -87,7 +87,7 @@ class Playlist extends StatefulWidget {
     BuildContext ctx,
     api.MediaSearchRequest query,
     String historyId,
-    String id,
+    playqueue.PlayableMedia m,
     Duration watched,
     Duration position,
     Duration duration,
@@ -362,11 +362,12 @@ class _PlaylistState extends State<Playlist> implements PlaylistControl {
 
     player.stream.position.throttle(const Duration(seconds: 3), trailing: true).listen((pos) {
       final id = known.id;
-      if (id == uuidx.min()) return;
+      final m = _queue.current.value;
+      if (id == uuidx.min() || m == null) return;
 
       final record = _history.tick(id, playing: player.state.playing);
 
-      widget.tracing(context, search.value.next, record.id, id, _history.watched, pos, player.state.duration);
+      widget.tracing(context, search.value.next, record.id, m, _history.watched, pos, player.state.duration);
     });
 
     player.stream.completed.listen((completed) {

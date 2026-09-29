@@ -213,7 +213,12 @@ class _State extends State<RemoteControlListener> {
 
   Future<void> _applyQueue(remote.Stream msg) async {
     _playlistControl.maybeNext(
-      playqueue.PlayableMedia(msg.queue.media, profileId: msg.profileId, sessionId: msg.sessionId),
+      playqueue.PlayableMedia(
+        msg.queue.media,
+        profileId: msg.profileId,
+        sessionId: msg.sessionId,
+        traced: true,
+      ),
     );
   }
 

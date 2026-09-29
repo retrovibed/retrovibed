@@ -269,19 +269,20 @@ class _State extends State<Connect> with LoadingState {
     if (!mounted) return;
     if (!msg.playback.media.hasId()) return;
     if (msg.sessionId != _sessionID) return;
-    if (_sessionQuery.query.trim().isEmpty) return;
+
     final playback = msg.playback;
+
     widget
         .apirecentrecord(
           lib.RecentRecordRequest(
-            media: playback.media,
+            media: lib.Media(id: playback.media.id),
             query: _sessionQuery,
-            mimetype: mimex.category(_sessionQuery.mimetypes),
+            mimetype: mimex.category([playback.media.mimetype]),
             position: playback.position,
             duration: playback.duration,
           ),
-          host: _endpoint.value.hostname,
-          options: [authn.request(authn.AuthedEndpoint.token(context))],
+          host: _hostname,
+          options: [httpx.Request.bearer(() => Future.value(_latest.sync.token))],
         )
         .then((v) {})
         .catchError((cause) {
@@ -294,8 +295,8 @@ class _State extends State<Connect> with LoadingState {
     widget
         .apirecenthistory(
           lib.WatchHistoryRecordRequest(record: record),
-          host: _endpoint.value.hostname,
-          options: [authn.request(authn.AuthedEndpoint.token(context))],
+          host: _hostname,
+          options: [httpx.Request.bearer(() => Future.value(_latest.sync.token))],
         )
         .then((v) {
           print("recorded remote watch history ${_history.id}/${_history.mediaId}/${_history.watched}");
@@ -520,7 +521,7 @@ class _State extends State<Connect> with LoadingState {
                     padding: defaults.padding / 2,
                     category,
                     latest: widget.apirecentlatest,
-                    host: _latest.sync.library.hostname,
+                    host: _hostname,
                     authz: httpx.Request.bearer(() => Future.value(_latest.sync.token)),
                     onTap: _onRecentTap,
                   ),

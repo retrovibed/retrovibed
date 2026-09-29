@@ -136,15 +136,16 @@ class Retrovibed extends StatelessWidget {
                         authn.LocalOnlyGuard(
                           DeepLink(
                             media.Playlist(
-                              tracing: (ctx, q, hid, id, watched, pos, dur) {
+                              tracing: (ctx, q, hid, m, watched, pos, dur) {
+                                if (m.traced) return; // dont double count traced media.
                                 medialib.recent
                                     .record(
                                       medialib.RecentRecordRequest(
-                                        media: medialib.Media(id: id),
+                                        media: medialib.Media(id: m.current.id),
                                         position: ds.Int64(pos.inMilliseconds),
                                         duration: ds.Int64(dur.inMilliseconds),
                                         query: q,
-                                        mimetype: mimex.category(q.mimetypes),
+                                        mimetype: mimex.category([m.current.mimetype]),
                                       ),
                                       options: [authn.request(authn.AuthzCache.meta(ctx))],
                                     )
@@ -161,7 +162,7 @@ class Retrovibed extends StatelessWidget {
                                       medialib.WatchHistoryRecordRequest(
                                         record: medialib.WatchHistoryRecord(
                                           id: hid,
-                                          mediaId: id,
+                                          mediaId: m.current.id,
                                           duration: ds.Int64(watched.inMilliseconds),
                                         ),
                                       ),
@@ -169,12 +170,12 @@ class Retrovibed extends StatelessWidget {
                                     )
                                     .then((v) {
                                       print(
-                                        "recorded watch history ${hid}/${id}/${watched}",
+                                        "recorded watch history ${hid}/${m}/${watched}",
                                       );
                                     })
                                     .catchError((cause) {
                                       print(
-                                        "failed to record watch history ${hid}/${id}/${watched} - ${cause}",
+                                        "failed to record watch history ${hid}/${m}/${watched} - ${cause}",
                                       );
                                     })
                                     .ignore();

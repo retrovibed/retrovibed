@@ -161,9 +161,9 @@ bool isText(String mimetype) =>
 String category(List<String> mimes) {
   final sum = checksum(mimes);
   return switch (sum) {
-    _ when sum == checksumfor(icomovie) => "video",
-    _ when sum == checksumfor(icoaudio) => "audio",
-    _ when sum == checksumfor(icoimage) => "image",
+    _ when sum == checksumfor(icomovie) || mimes.any(isVideo) => "video",
+    _ when sum == checksumfor(icoaudio) || mimes.any(isAudio) => "audio",
+    _ when sum == checksumfor(icoimage) || mimes.any(isImage) => "image",
     _ => "",
   };
 }
