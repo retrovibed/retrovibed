@@ -144,7 +144,7 @@ func MetadataUpdate(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, id string, md Metadata) NewMetadataScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE library_metadata SET description = {md.Description}, known_media_id = {md.KnownMediaID}, archive_id = {md.ArchiveID}, encryption_seed = CASE WHEN archive_id = '00000000-0000-0000-0000-000000000000' THEN {md.EncryptionSeed} ELSE encryption_seed END WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
+	gql = gql.Query(`UPDATE library_metadata SET updated_at = NOW(), description = {md.Description}, known_media_id = {md.KnownMediaID}, archive_id = {md.ArchiveID}, encryption_seed = CASE WHEN archive_id = '00000000-0000-0000-0000-000000000000' THEN {md.EncryptionSeed} ELSE encryption_seed END WHERE "id" = {id} RETURNING ` + MetadataScannerStaticColumns)
 }
 
 // a parent drawn from the row's own subtree builds a directory_id cycle, and every recursive
