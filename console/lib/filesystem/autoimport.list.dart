@@ -5,94 +5,35 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'autoimport.api.dart' as api;
 import 'autoimport.edit.dart';
 
-String _debounce(ds.Int64 seconds) {
-  final d = Duration(seconds: seconds.toInt());
-  if (d.inMinutes < 60) return "${d.inMinutes}m";
-  final minutes = d.inMinutes % 60;
-  return minutes == 0 ? "${d.inHours}h" : "${d.inHours}h${minutes}m";
-}
-
-class AutoimportRow extends StatefulWidget {
+class AutoImportRow extends StatelessWidget {
   final api.AutoimportDirectory current;
-  final void Function(api.AutoimportDirectory? upd) onChange;
-  final api.FnAutoimportDelete delete;
 
-  const AutoimportRow({
-    super.key,
-    required this.current,
-    this.onChange = ds.fnNoop,
-    this.delete = api.autoimport.delete,
-  });
+  const AutoImportRow({super.key, required this.current});
 
-  @override
-  State<AutoimportRow> createState() => _AutoimportRowState();
-}
-
-class _AutoimportRowState extends State<AutoimportRow> with ds.LoadingState {
   @override
   Widget build(BuildContext context) {
-    final defaults = ds.Defaults.of(context);
-
-    return ds.ErrorScreen(
-      ds.CompactingMenu(
-        [
-          ds.CompactingMenu.expanded(
-            Text(widget.current.path, maxLines: 1, overflow: TextOverflow.ellipsis),
+    return ds.CompactingMenu(
+      [
+        ds.CompactingMenu.expanded(
+          Text(
+            current.description.isNotEmpty ? current.description : current.path,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          if (widget.current.description.isNotEmpty)
-            Text(widget.current.description, maxLines: 1, overflow: TextOverflow.ellipsis),
-          ds.CompactingMenu.pinned(Text(api.autoimportModeLabel(widget.current.mode))),
-          ds.CompactingMenu.pinned(Text(_debounce(widget.current.debounce))),
-          ds.LoadingIconButton(
-            icon: const Icon(Icons.delete_outline),
-            tooltip: "stop monitoring directory",
-            onPressed: () async {
-              // the confirmation is mounted by the modal root, above the local daemon's
-              // authorization cache, resolve the credentials from this row's context.
-              final authz = authn.request(authn.AuthzCache.meta(context));
-              ds.modals
-                  .of(context)
-                  ?.push(
-                    ds.Confirmation.yesNo(
-                      content: Text("Are you sure you want to stop monitoring ${widget.current.path}?"),
-                      onConfirm: (context) {
-                        httpx
-                            .withRetry(() => widget.delete(widget.current.id, options: [authz]))
-                            .then((resp) => widget.onChange(null))
-                            .catchError((cause) => widget.onChange(null), test: httpx.ErrorsTest.err404)
-                            .catchError((cause) {
-                              setState(() {
-                                this.cause = ds.Error.unknown(cause, onTap: reseterr);
-                              });
-                            })
-                            .whenComplete(() {
-                              ds.modals.of(context)?.push(null);
-                            });
-                      },
-                      onCancel: (context) {
-                        ds.modals.of(context)?.push(null);
-                      },
-                    ),
-                  );
-            },
-          ),
-        ],
-        icon: const Icon(Icons.expand_more_rounded),
-      ),
-      cause: cause,
-      tint: defaults.dangerTint,
-      borderRadius: defaults.borderRadius,
+        ),
+      ],
+      icon: const Icon(Icons.expand_more_rounded),
     );
   }
 }
 
-class AutoimportItem extends StatefulWidget {
+class AutoImportItem extends StatefulWidget {
   final api.AutoimportDirectory current;
   final void Function(api.AutoimportDirectory? upd) onChange;
   final api.FnAutoimportUpdate update;
   final api.FnAutoimportDelete delete;
 
-  const AutoimportItem({
+  const AutoImportItem({
     super.key,
     required this.current,
     this.onChange = ds.fnNoop,
@@ -101,15 +42,15 @@ class AutoimportItem extends StatefulWidget {
   });
 
   @override
-  State<AutoimportItem> createState() => _AutoimportItemState();
+  State<AutoImportItem> createState() => _AutoImportItemState();
 }
 
-class _AutoimportItemState extends State<AutoimportItem> with ds.LoadingState {
+class _AutoImportItemState extends State<AutoImportItem> with ds.LoadingState {
   // edits are applied to a copy so an abandoned edit never leaks into the listing.
   late api.AutoimportDirectory _edited = widget.current.deepCopy();
 
   @override
-  void didUpdateWidget(covariant AutoimportItem old) {
+  void didUpdateWidget(covariant AutoImportItem old) {
     super.didUpdateWidget(old);
     if (old.current != widget.current) _edited = widget.current.deepCopy();
   }
@@ -131,22 +72,51 @@ class _AutoimportItemState extends State<AutoimportItem> with ds.LoadingState {
         });
   }
 
+  Future<void> remove() {
+    // the confirmation is mounted by the modal root, above the local daemon's authorization
+    // cache, so the credentials are resolved from this item's context.
+    final authz = authn.request(authn.AuthzCache.meta(context));
+    return ds.modals
+        .asyncfn(
+          context,
+          ds.Confirmation.dangerous(
+            content: Text("Are you sure you want to stop monitoring ${widget.current.path}?"),
+            onConfirm: (_) => httpx
+                .withRetry(() => widget.delete(widget.current.id, options: [authz]))
+                .then((_) => widget.onChange(null))
+                .catchError((_) => widget.onChange(null), test: httpx.ErrorsTest.err404),
+          ),
+        )
+        .catchError((cause) {
+          setState(() {
+            this.cause = ds.Error.unknown(cause, onTap: reseterr);
+          });
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final defaults = ds.Defaults.of(context);
 
     return ds.TableRow.single(
-      AutoimportRow(current: widget.current, onChange: widget.onChange, delete: widget.delete),
-      expanded: Container(
-        padding: theme.buttonTheme.padding,
-        child: ds.ErrorScreen(
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: defaults.spacing,
-            children: [
-              AutoimportEdit(current: _edited, onChange: (v) => setState(() => _edited = v)),
-              ds.LoadingButton(const Text("save"), onPressed: save),
+      AutoImportRow(current: widget.current),
+      expanded: ds.Container(
+        padding: defaults.padding,
+        ds.ErrorScreen(
+          AutoImportEdit(
+            current: _edited,
+            onChange: (v) => setState(() => _edited = v),
+            actions: [
+              ds.LoadingIconButton(
+                icon: const Icon(Icons.save),
+                tooltip: "save changes",
+                onPressed: save,
+              ),
+              ds.LoadingIconButton(
+                icon: const Icon(Icons.delete_outline),
+                tooltip: "stop monitoring directory",
+                onPressed: remove,
+              ),
             ],
           ),
           cause: cause,

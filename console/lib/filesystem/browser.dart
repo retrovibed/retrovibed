@@ -209,7 +209,7 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
                       onTap: () => overlay(AutoimportSearch(onClose: () => overlay(ds.Empty))),
                       child: const ListTile(
                         leading: Icon(Icons.drive_folder_upload_outlined),
-                        title: Text("Monitored Directories"),
+                        title: Text("Automatic Archival"),
                       ),
                     ),
                   ],

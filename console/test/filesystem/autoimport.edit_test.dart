@@ -10,7 +10,7 @@ void main() {
     testWidgets('renders without overflow', (WidgetTester tester) async {
       await tester.pumpApp(
         Scaffold(
-          body: AutoimportEdit(
+          body: AutoImportEdit(
             current: api.AutoimportDirectory(path: '/tmp/inbox', description: 'inbox', debounce: ds.Int64(3600)),
           ),
         ),
@@ -29,7 +29,7 @@ void main() {
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 300, maxHeight: 400),
           child: SingleChildScrollView(
-            child: AutoimportEdit(
+            child: AutoImportEdit(
               current: api.AutoimportDirectory(path: '/tmp/inbox', debounce: ds.Int64(3600)),
             ),
           ),
@@ -43,7 +43,7 @@ void main() {
     testWidgets('path is read only when editing an existing directory', (WidgetTester tester) async {
       await tester.pumpApp(
         Scaffold(
-          body: AutoimportEdit(
+          body: AutoImportEdit(
             current: api.AutoimportDirectory(path: '/tmp/inbox', debounce: ds.Int64(3600)),
           ),
         ),
@@ -58,7 +58,7 @@ void main() {
       api.AutoimportDirectory? changed;
       await tester.pumpApp(
         Scaffold(
-          body: AutoimportEdit(pathEditable: true, onChange: (v) => changed = v),
+          body: AutoImportEdit(pathEditable: true, onChange: (v) => changed = v),
         ),
       );
       await tester.pumpAndSettle();
@@ -71,7 +71,7 @@ void main() {
       api.AutoimportDirectory? changed;
       await tester.pumpApp(
         Scaffold(
-          body: AutoimportEdit(
+          body: AutoImportEdit(
             current: api.AutoimportDirectory(path: '/tmp/inbox', debounce: ds.Int64(3600)),
             onChange: (v) => changed = v,
           ),
@@ -96,7 +96,7 @@ void main() {
       api.AutoimportDirectory? changed;
       await tester.pumpApp(
         Scaffold(
-          body: AutoimportEdit(
+          body: AutoImportEdit(
             current: api.AutoimportDirectory(path: '/tmp/inbox', debounce: ds.Int64(3600)),
             onChange: (v) => changed = v,
           ),

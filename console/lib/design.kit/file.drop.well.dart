@@ -8,9 +8,13 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_selector/file_selector.dart';
 
 class FilesEvent {
-  final List<DropItemFile> files;
+  // DropItemFile for files, DropItemDirectory for directories.
+  final List<DropItem> files;
   const FilesEvent({required this.files});
 }
+
+// a well that only accepts directories, e.g. mimetypes: mimex.folders.
+bool _foldersonly(List<String> mimetypes) => mimetypes.isNotEmpty && mimetypes.every((m) => m == mimex.directory);
 
 class FileDropWell extends StatefulWidget {
   static Widget textual(String text) {
@@ -63,10 +67,48 @@ class FileDropWell extends StatefulWidget {
     this.shape,
   });
 
+  // resolves dropped items: directories are detected directly rather than sniffed (desktop_drop
+  // only reports directories on macOS) and are kept only when the mimetypes accept them. a
+  // folders only well discards files, every other well passes files through unfiltered.
+  static Future<FilesEvent> resolve(List<XFile> items, {List<String> mimetypes = const []}) {
+    final directories = mimetypes.contains(mimex.directory);
+    final foldersonly = _foldersonly(mimetypes);
+
+    final resolved = items.map((c) {
+      if (FileSystemEntity.isDirectorySync(c.path)) {
+        if (!directories) return Future<DropItem?>.value(null);
+        return Future<DropItem?>.value(DropItemDirectory(c.path, const [], name: c.name, mimeType: mimex.directory));
+      }
+
+      if (foldersonly) return Future<DropItem?>.value(null);
+
+      return c.openRead(0, mimex.defaultMagicNumbersMaxLength).first.then((v) => v.toList()).then((bits) {
+        return DropItemFile(
+          c.path,
+          name: c.name,
+          mimeType: mimex.fromFile(c.name, magicbits: bits).toString(),
+        );
+      });
+    });
+
+    return Future.wait(resolved).then((files) => FilesEvent(files: files.nonNulls.toList()));
+  }
+
   static Future<FilesEvent> files({
     List<String> mimetypes = const [],
     List<String> extensions = const [],
   }) {
+    if (_foldersonly(mimetypes)) {
+      return getDirectoryPath().then((path) {
+        if (path == null) return const FilesEvent(files: []);
+        return FilesEvent(
+          files: [
+            DropItemDirectory(path, const [], name: path.split(Platform.pathSeparator).last, mimeType: mimex.directory),
+          ],
+        );
+      });
+    }
+
     final XTypeGroup filter = XTypeGroup(
       label: "Select File(s)",
       extensions: extensions,
@@ -157,7 +199,12 @@ class _FileDropWell extends State<FileDropWell> {
     Future<void> onPress() {
       return FileDropWell.files(mimetypes: widget.mimetypes, extensions: widget.extensions)
           .then((resolved) {
-            final total = resolved.files.fold<int>(0, (acc, f) => acc + File(f.path).lengthSync());
+            if (resolved.files.isEmpty) return null;
+            // directories have no length of their own.
+            final total = resolved.files.whereType<DropItemFile>().fold<int>(
+              0,
+              (acc, f) => acc + File(f.path).lengthSync(),
+            );
             setState(() {
               _uploaded.clear();
               _total = total;
@@ -178,29 +225,19 @@ class _FileDropWell extends State<FileDropWell> {
             setState(() {
               _loading = true;
             });
-            Future.wait(
-                  evt.files.map((c) {
-                    return c.openRead(0, mimex.defaultMagicNumbersMaxLength).first.then((v) => v.toList()).then((
-                      bits,
-                    ) {
-                      return new DropItemFile(
-                        c.path,
-                        name: c.name,
-                        mimeType: mimex.fromFile(c.name, magicbits: bits).toString(),
-                      );
-                    });
-                  }),
-                )
-                .then((files) {
-                  final resolved = FilesEvent(files: files);
-                  widget.onDropped(resolved).whenComplete(() {
-                    setState(() {
-                      _loading = false;
-                    });
-                  });
+            FileDropWell.resolve(evt.files, mimetypes: widget.mimetypes)
+                .then((resolved) {
+                  if (resolved.files.isEmpty) return null;
+                  return widget.onDropped(resolved);
                 })
                 .catchError((cause) {
                   print("failed to open file dialog ${cause}");
+                  return null;
+                })
+                .whenComplete(() {
+                  setState(() {
+                    _loading = false;
+                  });
                 });
           },
           onDragEntered: (detail) {

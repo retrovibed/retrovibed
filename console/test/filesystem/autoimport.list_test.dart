@@ -12,7 +12,7 @@ void main() {
     testWidgets('row shows path, description, mode, and debounce', (WidgetTester tester) async {
       await tester.pumpApp(
         SingleChildScrollView(
-          child: AutoimportItem(
+          child: AutoImportItem(
             current: api.AutoimportDirectory(
               id: 'dir-1',
               path: '/tmp/inbox',
@@ -25,18 +25,16 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('/tmp/inbox'), findsOneWidget);
       expect(find.text('movies'), findsOneWidget);
-      expect(find.text('move'), findsOneWidget);
-      expect(find.text('1h30m'), findsOneWidget);
-      expect(find.byType(AutoimportEdit), findsNothing);
+      expect(find.text('/tmp/inbox'), findsNothing);
+      expect(find.byType(AutoImportEdit), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('tapping the row expands the edit form', (WidgetTester tester) async {
       await tester.pumpApp(
         SingleChildScrollView(
-          child: AutoimportItem(
+          child: AutoImportItem(
             current: api.AutoimportDirectory(id: 'dir-1', path: '/tmp/inbox', debounce: ds.Int64(3600)),
           ),
         ),
@@ -46,8 +44,8 @@ void main() {
       await tester.tap(find.byType(ds.TableRow).first);
       await tester.pumpAndSettle();
 
-      expect(find.byType(AutoimportEdit), findsOneWidget);
-      expect(find.text('save'), findsOneWidget);
+      expect(find.byType(AutoImportEdit), findsOneWidget);
+      expect(find.byIcon(Icons.save), findsOneWidget);
     });
 
     testWidgets('save sends the edits and propagates the result', (WidgetTester tester) async {
@@ -57,7 +55,7 @@ void main() {
 
       await tester.pumpApp(
         SingleChildScrollView(
-          child: AutoimportItem(
+          child: AutoImportItem(
             current: api.AutoimportDirectory(id: 'dir-1', path: '/tmp/inbox', debounce: ds.Int64(3600)),
             onChange: (v) => changed = v,
             update: (id, req, {List<httpx.Option> options = const []}) async {
@@ -74,7 +72,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextFormField).at(1), 'movies');
-      await tester.tap(find.text('save'));
+      await tester.tap(find.byIcon(Icons.save));
       await tester.pumpAndSettle();
 
       expect(updatedID, 'dir-1');
@@ -90,7 +88,7 @@ void main() {
       await tester.pumpApp(
         ds.Node(
           SingleChildScrollView(
-            child: AutoimportItem(
+            child: AutoImportItem(
               current: api.AutoimportDirectory(id: 'dir-1', path: '/tmp/inbox', debounce: ds.Int64(3600)),
               onChange: (v) => removed = v == null,
               delete: (id, {List<httpx.Option> options = const []}) async {
@@ -103,8 +101,13 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.delete_outline));
+      // delete is one of the edit form's actions, so the row has to be expanded first.
+      await tester.tap(find.byType(ds.TableRow).first);
       await tester.pumpAndSettle();
+
+      // the delete button spins until the confirmation is answered, so pump rather than settle.
+      await tester.tap(find.byIcon(Icons.delete_outline));
+      await tester.pump();
 
       expect(find.textContaining('stop monitoring /tmp/inbox'), findsOneWidget);
       await tester.tap(find.text('Yes'));

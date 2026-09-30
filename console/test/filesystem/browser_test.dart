@@ -177,7 +177,7 @@ void main() {
 
     await tester.tap(find.byType(PopupMenuButton<String>));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Monitored Directories'));
+    await tester.tap(find.text('Automatic Archival'));
     await tester.pumpAndSettle();
 
     expect(find.byType(filesystem.AutoimportSearch), findsOneWidget);

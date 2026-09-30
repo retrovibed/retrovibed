@@ -17,6 +17,8 @@ class TableRow extends StatefulWidget {
   final bool maintainState;
   final List<BoxShadow> tint;
   final bool autoexpand;
+  // defaults to the theme's border, const Border() removes it.
+  final Border? border;
 
   const TableRow(
     this.children, {
@@ -27,6 +29,7 @@ class TableRow extends StatefulWidget {
     this.maintainState = true,
     this.tint = const [],
     this.autoexpand = false,
+    this.border,
   });
 
   factory TableRow.single(
@@ -38,6 +41,7 @@ class TableRow extends StatefulWidget {
     bool maintainState = true,
     List<BoxShadow> tint = const [],
     bool autoexpand = false,
+    Border? border,
   }) {
     return TableRow(
       [Expanded(child: child)],
@@ -48,6 +52,7 @@ class TableRow extends StatefulWidget {
       maintainState: maintainState,
       tint: tint,
       autoexpand: autoexpand,
+      border: border,
     );
   }
 
@@ -83,7 +88,11 @@ class _TableRowState extends State<TableRow> {
         borderRadius: defaults.borderRadius,
         child: Container(
           padding: widget.padding ?? defaults.padding / 2,
-          decoration: BoxDecoration(boxShadow: widget.tint),
+          decoration: BoxDecoration(
+            boxShadow: widget.tint,
+            border: widget.border ?? defaults.border,
+            borderRadius: defaults.borderRadius,
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             spacing: defaults.spacing,
@@ -148,6 +157,7 @@ class Table<T> extends StatelessWidget {
           return SingleChildScrollView(
             reverse: defaults.isCompact,
             child: Column(
+              spacing: defaults.spacing / 4,
               mainAxisSize: MainAxisSize.max,
               children: [...leading, ...list, ...trailing],
             ),
@@ -159,9 +169,16 @@ class Table<T> extends StatelessWidget {
 
   static Widget Function(List<T> i) inline<T>(Widget Function(T i) render) {
     return (List<T> items) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: items.map(render).toList(),
+      return Builder(
+        builder: (context) {
+          final defaults = Defaults.of(context);
+          final list = defaults.isCompact ? items.reversed.map(render).toList() : items.map(render).toList();
+          return Column(
+            spacing: defaults.spacing / 4,
+            mainAxisSize: MainAxisSize.min,
+            children: list,
+          );
+        },
       );
     };
   }
@@ -176,6 +193,7 @@ class Table<T> extends StatelessWidget {
   final bool loading;
   final Widget cause;
   final EdgeInsets padding;
+  final EdgeInsets margin;
   final BoxDecoration decoration;
   final MainAxisSize? mainAxisSize;
   final bool collapsable;
@@ -192,6 +210,7 @@ class Table<T> extends StatelessWidget {
     this.cause = errors.Error.zero,
     this.help = HelpScope.None,
     this.padding = EdgeInsets.zero,
+    this.margin = EdgeInsets.zero,
     this.mainAxisSize,
     this.collapsable = false,
     this.decoration = const BoxDecoration(),
@@ -215,6 +234,7 @@ class Table<T> extends StatelessWidget {
           final bounded = constraints.hasTightHeight || (!collapsable && constraints.hasBoundedHeight);
           return c.Container(
             padding: padding,
+            margin: margin,
             decoration: decoration.copyWith(color: decoration.color ?? theme.colorScheme.surfaceContainerLow),
             Column(
               mainAxisSize: mainAxisSize ?? (bounded ? MainAxisSize.max : MainAxisSize.min),
