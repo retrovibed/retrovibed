@@ -6,7 +6,8 @@ type cmdImports struct {
 }
 
 type Commands struct {
-	Import  cmdImports  `cmd:"" help:"import media using various strategies"`
-	Export  exportJSONL `cmd:"" help:"export library records and file data as JSONL to stdout"`
-	Publish cmdPublish  `cmd:"" help:"publish a library content"`
+	Import     cmdImports    `cmd:"" help:"import media using various strategies"`
+	Export     exportJSONL   `cmd:"" help:"export library records and file data as JSONL to stdout"`
+	Publish    cmdPublish    `cmd:"" help:"publish a library content"`
+	Autoimport cmdAutoimport `cmd:"" help:"manage directories monitored for automatic import into the library"`
 }

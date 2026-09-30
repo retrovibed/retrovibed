@@ -76,6 +76,7 @@ type Command struct {
 	AutoBackup               bool             `flag:"" name:"auto-backup" help:"enable automatic encrypted backups of the metadata database" env:"${env_auto_backup}" negatable:"" default:"true"`
 	BackupFrequency          time.Duration    `flag:"" name:"backup-freq" help:"how often the metadata database is backed up" env:"${env_backup_frequency}" default:"168h"`
 	AutoReclaim              bool             `flag:"" name:"auto-reclaim" help:"EXPERIMENTAL: enable automatic reclaiming of disk space of archived media" negatable:"" env:"${env_auto_reclaim}"`
+	AutoImport               bool             `flag:"" name:"auto-import" help:"enable automatic import of files from the monitored directories into the library" default:"true" negatable:""`
 	AutoRecommendations      bool             `flag:"" name:"auto-recommendations" help:"enable automatic daily recommendations" default:"true" negatable:""`
 	AutoSocks5               bool             `flag:"" name:"auto-socks5" help:"enable the socks5 proxy service" default:"true" negatable:""`
 	AutoAcousticsIndex       bool             `flag:"" name:"auto-acoustics-index" help:"acoustic indexing for currently playing song" default:"true" negatable:""`
@@ -145,6 +146,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		mediaidentification = asyncx.NewWakeup(gctx.Context)
 		ddiscpublish        = asyncx.NewWakeup(gctx.Context)
 		locatemedia         = asyncx.NewWakeup(gctx.Context)
+		autoimport          = asyncx.NewWakeup(gctx.Context)
 		vpncfgpath          = userx.DefaultConfigDir(userx.DefaultRelRoot(), "vpn.cfg")
 		storagecfgpath      = userx.DefaultConfigDir(userx.DefaultRelRoot(), "storage.cfg")
 		mediarecsdir        = userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "media.recs.d")
@@ -302,6 +304,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	}
 
 	errorsx.Log(AutoReclaim(gctx.Context, db, mediastore, asyncx.NewWakeup(gctx.Context), t.AutoReclaim))
+	errorsx.Log(AutoImport(gctx.Context, db, tlsx.MustClone(tlscfg.Config(), tlsx.OptionInsecureSkipVerify), autoimport, t.AutoImport))
 
 	if t.AutoSocks5 {
 		if _socks5, err = t.Socks5.Socket(); err != nil {
@@ -524,6 +527,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	).Bind(httpmux.PathPrefix("/m").Subrouter())
 
 	media.NewHTTPFilesystem(db).Bind(httpmux.PathPrefix("/fs").Subrouter())
+	media.NewHTTPAutoimport(db, autoimport).Bind(httpmux.PathPrefix("/autoimport").Subrouter())
 	media.NewHTTPDiscovered(
 		db,
 		torrenting._tclient,

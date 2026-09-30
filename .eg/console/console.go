@@ -174,6 +174,7 @@ func GenerateProtocol(ctx context.Context, _ eg.Op) error {
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/media/media.filesystem.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/media/media.recent.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/media/ddisc.locate.proto"),
+		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/media/media.autoimport.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/media/content.addressable.storage.proto"),
 		runtime.New("PATH=\"${PATH}:${HOME}/.pub-cache/bin\" protoc --dart_out=grpc:console/lib -I.proto .proto/library/library.watch.proto"),
 		// remote control command stream

@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package media;
+
+message AutoimportDirectory {
+  string id = 1 [ json_name = "id" ];
+  string created_at = 2 [ json_name = "created_at" ];
+  string updated_at = 3 [ json_name = "updated_at" ];
+  string path = 4 [ json_name = "path" ];
+  string description = 5 [ json_name = "description" ];
+  // seconds a file must go unmodified before it is imported.
+  uint64 debounce = 6 [ json_name = "debounce" ];
+  // 0 = copy (keep the original), 1 = move (remove the original after import).
+  uint32 mode = 7 [ json_name = "mode" ];
+  string library_directory_id = 8 [ json_name = "library_directory_id" ];
+  string last_scanned_at = 9 [ json_name = "last_scanned_at" ];
+  uint64 pending = 10 [ json_name = "pending" ];
+  uint64 imported = 11 [ json_name = "imported" ];
+}
+
+message AutoimportDirectorySearchRequest {
+  repeated string id = 1 [ json_name = "id" ];
+  string query = 2 [ json_name = "query" ];
+  reserved 3 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message AutoimportDirectorySearchResponse {
+  AutoimportDirectorySearchRequest next = 1 [ json_name = "next" ];
+  repeated AutoimportDirectory items = 2 [ json_name = "items" ];
+}
+
+message AutoimportDirectoryCreateRequest {
+  AutoimportDirectory directory = 1 [ json_name = "directory" ];
+}
+message AutoimportDirectoryCreateResponse {
+  AutoimportDirectory directory = 1 [ json_name = "directory" ];
+}
+
+message AutoimportDirectoryLookupResponse {
+  AutoimportDirectory directory = 1 [ json_name = "directory" ];
+}
+
+message AutoimportDirectoryUpdateRequest {
+  AutoimportDirectory directory = 1 [ json_name = "directory" ];
+}
+message AutoimportDirectoryUpdateResponse {
+  AutoimportDirectory directory = 1 [ json_name = "directory" ];
+}
+
+message AutoimportDirectoryDeleteResponse {
+  AutoimportDirectory directory = 1 [ json_name = "directory" ];
+}

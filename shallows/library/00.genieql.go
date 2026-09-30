@@ -5,6 +5,7 @@ package library
 
 import (
 	"context"
+	"time"
 
 	genieql "github.com/james-lawrence/genieql/ginterp"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -273,4 +274,96 @@ func RecommendationDeleteTombstoned(
 	pattern func(ctx context.Context, q sqlx.Queryer) NewRecommendationScannerStaticRow,
 ) {
 	gql = gql.Query(`DELETE FROM library_recommendations WHERE "tombstoned_at" < NOW() RETURNING ` + RecommendationScannerStaticColumns)
+}
+
+func AutoimportDirectory(gql genieql.Structure) {
+	gql.From(
+		gql.Table("library_autoimport_directories"),
+	)
+}
+
+func AutoimportDirectoryScanner(gql genieql.Scanner, pattern func(i AutoimportDirectory)) {
+	gql.ColumnNamePrefix("library_autoimport_directories.")
+}
+
+func AutoimportDirectoryInsertWithDefaults(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a AutoimportDirectory) NewAutoimportDirectoryScannerStaticRow,
+) {
+	gql.Into("library_autoimport_directories").Default("id", "created_at", "updated_at", "last_scanned_at")
+}
+
+func AutoimportDirectoryFindByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewAutoimportDirectoryScannerStaticRow,
+) {
+	gql = gql.Query(`SELECT ` + AutoimportDirectoryScannerStaticColumns + ` FROM library_autoimport_directories WHERE "id" = {id}`)
+}
+
+func AutoimportDirectoryUpdateByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, a AutoimportDirectory) NewAutoimportDirectoryScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE library_autoimport_directories SET updated_at = NOW(), description = {a.Description}, debounce = {a.Debounce}, mode = {a.Mode}, library_directory_id = {a.LibraryDirectoryID} WHERE "id" = {id} RETURNING ` + AutoimportDirectoryScannerStaticColumns)
+}
+
+func AutoimportDirectoryDeleteByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewAutoimportDirectoryScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM library_autoimport_directories WHERE "id" = {id} RETURNING ` + AutoimportDirectoryScannerStaticColumns)
+}
+
+func AutoimportDirectoryScanned(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewAutoimportDirectoryScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE library_autoimport_directories SET last_scanned_at = NOW() WHERE "id" = {id} RETURNING ` + AutoimportDirectoryScannerStaticColumns)
+}
+
+func AutoimportFile(gql genieql.Structure) {
+	gql.From(
+		gql.Table("library_autoimport_files"),
+	)
+}
+
+func AutoimportFileScanner(gql genieql.Scanner, pattern func(i AutoimportFile)) {
+	gql.ColumnNamePrefix("library_autoimport_files.")
+}
+
+// trailing debounce: import_at only ever moves forward. a newer modification time pushes it out,
+// and a rescan never undoes a retry backoff that scheduled the file later than mtime + debounce.
+func AutoimportFileUpsert(
+	gql genieql.Insert,
+	pattern func(ctx context.Context, q sqlx.Queryer, a AutoimportFile) NewAutoimportFileScannerStaticRow,
+) {
+	gql.Into("library_autoimport_files").Default("id", "created_at", "updated_at", "last_imported_at", "library_metadata_id", "attempts", "error").Conflict("ON CONFLICT (directory_id, name) DO UPDATE SET updated_at = DEFAULT, import_at = EXCLUDED.import_at, attempts = 0, error = '' WHERE EXCLUDED.import_at > library_autoimport_files.import_at")
+}
+
+func AutoimportFileCompleted(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, mid string) NewAutoimportFileScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE library_autoimport_files SET updated_at = NOW(), last_imported_at = NOW(), library_metadata_id = {mid}, attempts = 0, error = '' WHERE "id" = {id} RETURNING ` + AutoimportFileScannerStaticColumns)
+}
+
+func AutoimportFileFailed(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string, cause string, importAt time.Time) NewAutoimportFileScannerStaticRow,
+) {
+	gql = gql.Query(`UPDATE library_autoimport_files SET updated_at = NOW(), attempts = attempts + 1, error = {cause}, import_at = {importAt} WHERE "id" = {id} RETURNING ` + AutoimportFileScannerStaticColumns)
+}
+
+func AutoimportFileDeleteByID(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, id string) NewAutoimportFileScannerStaticRow,
+) {
+	gql = gql.Query(`DELETE FROM library_autoimport_files WHERE "id" = {id} RETURNING ` + AutoimportFileScannerStaticColumns)
+}
+
+func AutoimportFileDeleteByDirectory(
+	gql genieql.Function,
+	pattern func(ctx context.Context, q sqlx.Queryer, did string) NewAutoimportFileScannerStatic,
+) {
+	gql = gql.Query(`DELETE FROM library_autoimport_files WHERE "directory_id" = {did} RETURNING ` + AutoimportFileScannerStaticColumns)
 }
