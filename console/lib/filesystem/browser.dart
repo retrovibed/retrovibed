@@ -14,6 +14,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'directory.create.dart';
 import 'details.dart';
+import 'autoimport.search.dart';
 
 // browses the library as a tree. this is a sibling of the library view rather than a
 // variation on it: the two share the Media row and nothing else, because the library grid
@@ -49,6 +50,9 @@ class FilesystemBrowser extends StatefulWidget {
 class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
   // the entry whose details are open; only the info button sets it.
   String _focused = "";
+  // a view covering the browser completely (e.g. monitored directories), the browser stays
+  // mounted beneath it so closing returns to the same directory.
+  Widget _overlay = ds.Empty;
   api.FilesystemSearchResponse _res = api.filesystem.response(
     next: api.filesystem.request(limit: 32),
   );
@@ -152,7 +156,7 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
       });
     };
 
-    return ds.Table(
+    final table = ds.Table(
       loading: loading,
       cause: cause,
       empty: ds.FileDropWell(
@@ -200,6 +204,13 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
                     PopupMenuItem<String>(
                       onTap: mkdir,
                       child: ListTile(leading: Icon(mimex.icofolder), title: const Text("New Folder")),
+                    ),
+                    PopupMenuItem<String>(
+                      onTap: () => overlay(AutoimportSearch(onClose: () => overlay(ds.Empty))),
+                      child: const ListTile(
+                        leading: Icon(Icons.drive_folder_upload_outlined),
+                        title: Text("Monitored Directories"),
+                      ),
                     ),
                   ],
                 ),
@@ -270,6 +281,21 @@ class _FilesystemBrowser extends State<FilesystemBrowser> with ds.LoadingState {
         },
       ),
     );
+
+    return ds.Overlay(
+      table,
+      overlay: ds.Empty.maybe(
+        _overlay,
+        // an alignment expands the container to cover the browser completely.
+        ds.Container(_overlay, alignment: Alignment.topCenter),
+      ),
+    );
+  }
+
+  void overlay(Widget w) {
+    setState(() {
+      _overlay = w;
+    });
   }
 
   void mkdir() {

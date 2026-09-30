@@ -166,4 +166,31 @@ void main() {
 
     expect(find.text('search in photos'), findsOneWidget);
   });
+
+  testWidgets('monitored directories cover the browser until closed', (WidgetTester tester) async {
+    final searches = _Searches();
+    await tester.pumpApp(_harness(searches));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('photos'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Monitored Directories'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(filesystem.AutoimportSearch), findsOneWidget);
+    expect(find.text('search monitored directories'), findsOneWidget);
+
+    // the close button sits in the tray, outside the local authorization cache, so it remains
+    // usable even though the local daemon is unreachable in tests.
+    await tester.tap(find.byIcon(Icons.close));
+    await tester.pumpAndSettle();
+
+    // closing returns to the directory that was open, without refetching it.
+    expect(find.byType(filesystem.AutoimportSearch), findsNothing);
+    expect(find.text('take.five.mp3'), findsOneWidget);
+    expect(searches.directories, [uuidx.min(), _photos]);
+  });
 }
