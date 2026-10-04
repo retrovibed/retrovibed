@@ -21,6 +21,7 @@ class RecentList extends StatefulWidget {
     this.margin,
     this.host,
     this.authz,
+    this.empty = const Text('Media you watch will appear here', style: TextStyle(color: Colors.grey)),
   });
 
   final String mimetype;
@@ -31,6 +32,7 @@ class RecentList extends StatefulWidget {
   final EdgeInsets? margin;
   final String? host;
   final httpx.Option? authz;
+  final Widget empty;
 
   static Future<void> defaultOnTap(BuildContext context, media.RecentRecordRequest item) async {
     final pos = Duration(milliseconds: item.position.toInt());
@@ -111,32 +113,35 @@ class _RecentListState extends State<RecentList> with ds.LoadingState {
       ds.Loading(
         loading: loading,
         cause: cause,
-        Column(
-          verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-          children: _result.items.map((item) {
-            final deletion = () {
-              return httpx.withRetry(
-                () => widget
-                    .tombstone(
-                      item.id,
-                      host: widget.host,
-                      options: [widget.authz ?? authn.request(authn.AuthzCache.meta(context))],
-                    )
-                    .then((_) => _load(context)),
+        ds.Overlay(
+          Column(
+            verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
+            children: _result.items.map((item) {
+              final deletion = () {
+                return httpx.withRetry(
+                  () => widget
+                      .tombstone(
+                        item.id,
+                        host: widget.host,
+                        options: [widget.authz ?? authn.request(authn.AuthzCache.meta(context))],
+                      )
+                      .then((_) => _load(context)),
+                );
+              };
+              return lib.KnownMediaRowDisplay.future(
+                lib.known.autodetect(
+                  item.media,
+                  host: widget.host,
+                  options: [widget.authz ?? authn.request(authn.AuthzCache.meta(context))],
+                ),
+                onTap: () async => widget.onTap(context, item),
+                trailing: [
+                  ds.LoadingIconButton.remove(onPressed: deletion),
+                ],
               );
-            };
-            return lib.KnownMediaRowDisplay.future(
-              lib.known.autodetect(
-                item.media,
-                host: widget.host,
-                options: [widget.authz ?? authn.request(authn.AuthzCache.meta(context))],
-              ),
-              onTap: () async => widget.onTap(context, item),
-              trailing: [
-                ds.LoadingIconButton.remove(onPressed: deletion),
-              ],
-            );
-          }).toList(),
+            }).toList(),
+          ),
+          overlay: _result.items.isEmpty ? widget.empty : ds.Empty,
         ),
       ),
     );

@@ -13,8 +13,8 @@ import 'package:retrovibed/media/play.queue.dart' as playqueue;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/uuidx.dart' as uuidx;
-import 'package:retrovibed/discovery.dart' as disc;
 import 'api.dart' as remote;
+import 'empty.dart';
 import 'player.control.playback.dart';
 import 'player.control.seek.dart';
 import 'player.control.fullscreen.dart';
@@ -174,7 +174,9 @@ class _State extends State<Connect> with LoadingState {
       widget.apisearch(_latest.sync.library.hostname, [httpx.Request.bearer(() => Future.value(_latest.sync.token))]);
   media.FnMediaFind get _apirandom => (req, {List<httpx.Option> options = const []}) async {
     if (!_autoplay.isCompleted) await _autoplay.future;
-    return widget.apirandom(_latest.sync.library.hostname, [httpx.Request.bearer(() => Future.value(_latest.sync.token))])(
+    return widget.apirandom(_latest.sync.library.hostname, [
+      httpx.Request.bearer(() => Future.value(_latest.sync.token)),
+    ])(
       req,
       options: options,
     );
@@ -208,10 +210,6 @@ class _State extends State<Connect> with LoadingState {
       default:
         return null;
     }
-  }
-
-  Future<void> _onRecentTap(BuildContext context, media.RecentRecordRequest item) async {
-    return (_onPlay(context, item.media, media.MediaSearchResponse(next: item.query)) ?? () async {})();
   }
 
   bool _casfilling(int o) {
@@ -483,48 +481,22 @@ class _State extends State<Connect> with LoadingState {
       search: _search,
     );
 
-    final queue = ValueListenableBuilder<media.MediaSearchState>(
-      valueListenable: _search,
-      builder: (context, state, _) {
-        final category = mimex.category(state.next.mimetypes);
-        return PlaylistQueue(
-          _latest.sync,
-          _socket,
-          key: const ValueKey("queue"),
-          sessionId: _sessionID,
-          onChange: (mut) {
-            final upd = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
-            setState(() {
-              _latest = upd;
-            });
-          },
-          empty: ds.Loading(
-            loading: _latest.sync.token.isEmpty,
-            maintainState: false,
-            maintainAnimation: false,
-            maintainSize: false,
-            Column(
-              verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ds.Heading(Text("Continue"), padding: defaults.padding / 2),
-                Expanded(
-                  child: disc.RecentList(
-                    margin: defaults.margin.copyWith(left: 0, right: 0),
-                    padding: defaults.padding / 2,
-                    category,
-                    latest: widget.apirecentlatest,
-                    host: _latest.sync.library.hostname,
-                    authz: httpx.Request.bearer(() => Future.value(_latest.sync.token)),
-                    onTap: _onRecentTap,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
+    final queue = Empty(
+      _latest.sync,
+      search: _search,
+      socket: _socket,
+      sessionID: _sessionID,
+      onPlay: _onPlay,
+      apirecentlatest: widget.apirecentlatest,
+      apisearch: _apisearch,
+      onChange: (mut) {
+        final upd = _latest.deepCopy()..sync = mut(_latest.sync.deepCopy());
+        setState(() {
+          _latest = upd;
+        });
       },
     );
+
     return ds.Shortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.audioVolumeUp): (
