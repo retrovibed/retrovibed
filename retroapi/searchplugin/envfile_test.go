@@ -33,6 +33,24 @@ func TestReadEnvFile(t *testing.T) {
 		require.Equal(t, []string{"FOO=bar"}, pairs)
 	})
 
+	t.Run("strips trailing inline comment from value", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "plugin.env")
+		require.NoError(t, os.WriteFile(path, []byte("UNIT3D_VERBOSE=1 # set to 1 to log the raw http request/response for every api call\n"), 0600))
+
+		pairs, err := readEnvFile(path)
+		require.NoError(t, err)
+		require.Equal(t, []string{"UNIT3D_VERBOSE=1"}, pairs)
+	})
+
+	t.Run("skips blank values followed by an inline comment", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "plugin.env")
+		require.NoError(t, os.WriteFile(path, []byte("UNIT3D_APIKEY= # api key for requests; required unless baked in via -X main.apiKey\nUNIT3D_DOMAIN= # base url for the unit3d api; defaults to https://yu-scene.net\nUNIT3D_VERBOSE=1 # set to 1 to log the raw http request/response for every api call\n"), 0600))
+
+		pairs, err := readEnvFile(path)
+		require.NoError(t, err)
+		require.Equal(t, []string{"UNIT3D_VERBOSE=1"}, pairs)
+	})
+
 	t.Run("skips malformed lines", func(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "plugin.env")
 		require.NoError(t, os.WriteFile(path, []byte("FOO=bar\nnotapair\n"), 0600))

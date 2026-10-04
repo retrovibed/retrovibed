@@ -1,39 +1,37 @@
 package searchplugin
 
 import (
-	"bufio"
 	"errors"
 	"os"
-	"strings"
+
+	"github.com/retrovibed/retrovibed/retroapi/envfile"
+	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
 )
 
-// readEnvFile parses a .env-style file (KEY=VALUE per line; blank lines
-// and lines beginning with # are skipped) into a "KEY=VALUE" pair slice.
+// readEnvFile parses a .env-style file into a "KEY=VALUE" pair slice using
+// the same convention envfile.Apply writes it with: comment lines and
+// trailing "# ..." hints are dropped and a surrounding quote pair is
+// stripped, so only the value itself reaches the plugin.
 // A missing file is not an error - it yields no pairs. A KEY= with a blank
 // value is treated as unset and skipped: the settings form saves every
 // declared variable, and an empty env var would otherwise override the
 // plugin's own default (including values baked in via -ldflags -X).
 func readEnvFile(path string) (pairs []string, err error) {
-	f, err := os.Open(path)
+	content, err := os.ReadFile(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
 
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line == "" || strings.HasPrefix(line, "#") {
+	for _, v := range envfile.Parse(string(content)) {
+		if stringsx.Blank(v.Value) {
 			continue
 		}
 
-		if _, v, ok := strings.Cut(line, "="); ok && strings.TrimSpace(v) != "" {
-			pairs = append(pairs, line)
-		}
+		pairs = append(pairs, v.Key+"="+v.Value)
 	}
 
-	return pairs, scanner.Err()
+	return pairs, nil
 }
