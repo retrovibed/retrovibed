@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/httpx.dart' as httpx;
 import './media.pb.dart';
 import './preview.unsupported.dart';
 
@@ -17,7 +17,7 @@ class PreviewImage extends StatelessWidget {
     final image = ds.Image.precache(
       context,
       current.image,
-      headers: httpx.localheaders(current.image),
+      headers: authn.AuthedEndpoint.headers(context, current.image),
       fit: BoxFit.contain,
     );
 

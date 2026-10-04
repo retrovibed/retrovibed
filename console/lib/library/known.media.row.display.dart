@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 
 class KnownMediaRowDisplay extends StatelessWidget {
@@ -58,7 +58,7 @@ class KnownMediaRowDisplay extends StatelessWidget {
           ds.Image.precache(
             context,
             current.image,
-            headers: httpx.localheaders(current.image),
+            headers: authn.AuthedEndpoint.headers(context, current.image),
             width: 32,
             height: 48,
             fit: BoxFit.cover,

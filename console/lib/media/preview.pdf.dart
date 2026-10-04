@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pdfrx/pdfrx.dart';
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 import './media.pb.dart';
 import './preview.unsupported.dart';
@@ -20,7 +20,7 @@ class PreviewPdf extends StatelessWidget {
 
     return PdfViewer.uri(
       Uri.parse(uri),
-      headers: httpx.localheaders(uri) ?? const {},
+      headers: authn.AuthedEndpoint.headers(context, uri) ?? const {},
       params: PdfViewerParams(
         errorBannerBuilder: (context, error, stack, documentRef) => PreviewUnsupported(
           current: current,

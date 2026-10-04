@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/authz.dart' as authz;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/meta.dart' as _meta;
 import 'cache.dart' as authn;
 import 'endpoint.dart';
@@ -25,6 +26,17 @@ class AuthedEndpoint extends StatefulWidget {
   static ValueNotifier<_meta.Daemon> daemon(BuildContext context) => Endpoint.of(context)!.widget.daemon;
 
   static authz.Cached<_meta.Token> token(BuildContext context) => _EndpointAuthzCache.meta(context);
+
+  // auth headers for fetching uri directly (e.g. images): the scoped token when
+  // uri belongs to the enclosing AuthedEndpoint's daemon, otherwise the
+  // app-host defaults.
+  static Map<String, String>? headers(BuildContext context, String uri) {
+    final daemon = Endpoint.of(context)?.widget.daemon.value;
+    final bearer = token(context).current.bearer;
+    if (daemon == null || daemon.hostname.isEmpty || bearer.isEmpty) return httpx.localheaders(uri);
+    if (!uri.startsWith("https://${daemon.hostname}")) return httpx.localheaders(uri);
+    return {"Authorization": bearer.toLowerCase().startsWith("bearer ") ? bearer : "bearer $bearer"};
+  }
 
   @override
   State<AuthedEndpoint> createState() => _AuthedEndpoint();

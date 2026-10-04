@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media/media.pb.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
@@ -169,7 +168,7 @@ class KnownMediaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final poster = ds.Image.precache(context, current.image, headers: httpx.localheaders(current.image)) ?? ds.Empty;
+    final poster = ds.Image.precache(context, current.image, headers: authn.AuthedEndpoint.headers(context, current.image)) ?? ds.Empty;
 
     return ConstrainedBox(
       constraints: constraints ?? const BoxConstraints(),
