@@ -10,6 +10,7 @@ import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/meta.dart' as meta;
+import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/remote/api.dart' as remote;
 import 'package:retrovibed/remote/connect.dart';
 import 'package:retrovibed/remote/player.control.playback.dart';
@@ -539,6 +540,97 @@ void main() {
     final playback = tester.widget<PlayerControlPlayback>(find.byType(PlayerControlPlayback));
     expect(playback.current.value.position, fixnum.Int64(15000));
     expect(playback.current.value.duration, fixnum.Int64(180000));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('seeds search mimetypes from the first sync\'s current media', (tester) async {
+    final socket = _FakeRemoteControlSocket();
+    final daemon = ValueNotifier(meta.Daemon());
+    final search = ValueNotifier(
+      media.MediaSearchState(next: media.MediaSearchRequest(mimetypes: mimex.of(mimex.icoaudio))),
+    );
+
+    await tester.pumpApp(
+      authn.Endpoint(
+        Connect(
+          search: search,
+          daemonDiscover: _noopDaemonDiscover,
+          daemonSearch: _noopDaemonSearch,
+          connect: ({required String host, List<httpx.Option> options = const []}) async => socket,
+          apisearch: media.media.searchendpoint,
+          apirandom: media.media.randomendpoint,
+          autoqueueTarget: 5,
+        ),
+        daemon: daemon,
+      ),
+    );
+    await tester.pumpN(5);
+
+    daemon.value = meta.Daemon(hostname: "example.remote:1234");
+    await tester.pumpN(5);
+
+    socket.emit(
+      remote.Stream(
+        sid: uuidx.v7(),
+        vid: fixnum.Int64(1),
+        sync: remote.Sync(
+          current: remote.Stream(
+            queue: remote.Queue(media: media.Media(id: 'v1', mimetype: 'video/mp4')),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpN(2);
+
+    expect(mimex.checksum(search.value.next.mimetypes), mimex.checksumfor(mimex.icomovie));
+
+    socket.emit(
+      remote.Stream(
+        sid: uuidx.v7(),
+        vid: fixnum.Int64(2),
+        sync: remote.Sync(
+          current: remote.Stream(
+            queue: remote.Queue(media: media.Media(id: 'a1', mimetype: 'audio/mp3')),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpN(2);
+
+    expect(mimex.checksum(search.value.next.mimetypes), mimex.checksumfor(mimex.icomovie));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('leaves search mimetypes alone when the first sync has no current media', (tester) async {
+    final socket = _FakeRemoteControlSocket();
+    final daemon = ValueNotifier(meta.Daemon());
+    final search = ValueNotifier(
+      media.MediaSearchState(next: media.MediaSearchRequest(mimetypes: mimex.of(mimex.icoaudio))),
+    );
+
+    await tester.pumpApp(
+      authn.Endpoint(
+        Connect(
+          search: search,
+          daemonDiscover: _noopDaemonDiscover,
+          daemonSearch: _noopDaemonSearch,
+          connect: ({required String host, List<httpx.Option> options = const []}) async => socket,
+          apisearch: media.media.searchendpoint,
+          apirandom: media.media.randomendpoint,
+          autoqueueTarget: 5,
+        ),
+        daemon: daemon,
+      ),
+    );
+    await tester.pumpN(5);
+
+    daemon.value = meta.Daemon(hostname: "example.remote:1234");
+    await tester.pumpN(5);
+
+    socket.emit(remote.Stream(sid: uuidx.v7(), vid: fixnum.Int64(1), sync: remote.Sync()));
+    await tester.pumpN(2);
+
+    expect(mimex.checksum(search.value.next.mimetypes), mimex.checksumfor(mimex.icoaudio));
     expect(tester.takeException(), isNull);
   });
 

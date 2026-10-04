@@ -381,11 +381,23 @@ class _State extends State<Connect> with LoadingState {
                     // the same millisecond.
                     if (msg.vid <= _latest.vid) return;
                     print("sync accepted ${msg.sid} ${msg.sync.queue.length}");
+                    // _latest still holds the nil-sid sentinel until the first
+                    // sync of this connection is accepted.
+                    final first = _latest.sid == uuidx.min();
                     setState(() {
                       _unconfirmed.removeWhere((m) => msg.sync.queue.any((s) => s.asMedia.id == m.id));
                       _latest = msg;
                     });
                     _playback.value = msg.sync.playback;
+                    // seed the search category from whatever the remote is
+                    // currently playing, once per connection, so later syncs
+                    // never override a manual selection.
+                    final ico = mimex.icon(msg.sync.current.asMedia.mimetype);
+                    if (first && (ico == mimex.icoaudio || ico == mimex.icomovie)) {
+                      final next = _search.value.next.clone();
+                      lib.SearchMimetypeDropdown.select(next, mimex.checksumfor(ico));
+                      _search.value = media.MediaSearchState(next: next, count: _search.value.count);
+                    }
                     _fillQueue(_autoqueue);
                     break;
                   case remote.Stream_Command.playback:
