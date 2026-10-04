@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package retrovibed.deeppool.media.metadata;
+
+// copy of deeppool/.proto/dpool.media.metadata.proto; keep the two in sync.
+
+message MediaMetadata {
+  string uid = 1 [ json_name = "uid" ];
+  string sync_id = 2 [ json_name = "sync_id" ];
+  string md5 = 3 [ json_name = "md5" ];
+  string source = 4 [ json_name = "source" ];
+  string id = 5 [ json_name = "id" ];
+  string created_at = 6 [ json_name = "created_at" ];
+  string updated_at = 7 [ json_name = "updated_at" ];
+  string tombstoned_at = 8 [ json_name = "tombstoned_at" ];
+  string released = 9 [ json_name = "released" ];
+  string title = 10 [ json_name = "title" ];
+  double popularity = 11 [ json_name = "popularity" ];
+  bool adult = 12 [ json_name = "adult" ];
+  string backdrop_path = 13 [ json_name = "backdrop_path" ];
+  string poster_path = 14 [ json_name = "poster_path" ];
+  string original_language = 15 [ json_name = "original_language" ];
+  string original_title = 16 [ json_name = "original_title" ];
+  string overview = 17 [ json_name = "overview" ];
+  string mimetype = 18 [ json_name = "mimetype" ];
+  uint32 collation = 19 [ json_name = "collation" ];
+  string subtitle = 20 [ json_name = "subtitle" ];
+  string parent_uid = 21 [ json_name = "parent_uid" ];
+}
+
+message MediaMetadataSearchRequest {
+  string query = 1 [ json_name = "query" ];
+  repeated string source = 2 [ json_name = "source" ];
+  string mimetype = 3 [ json_name = "mimetype" ];
+  reserved 4 to 899;
+  uint64 offset = 900 [ json_name = "offset" ];
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message MediaMetadataSearchResponse {
+  MediaMetadataSearchRequest next = 1 [ json_name = "next" ];
+  repeated MediaMetadata items = 2 [ json_name = "items" ];
+}
+
+message MediaMetadataSyncRequest {
+  string sync = 1 [ json_name = "sync" ];
+  reserved 2 to 900;
+  uint64 limit = 901 [ json_name = "limit" ];
+  reserved 902 to 999;
+}
+
+message MediaMetadataSyncResponse {
+  MediaMetadataSyncRequest next = 1 [ json_name = "next" ];
+  repeated MediaMetadata items = 2 [ json_name = "items" ];
+}
+
+message MediaMetadataUploadRequest {
+  repeated MediaMetadata items = 1 [ json_name = "items" ];
+}
+
+message MediaMetadataUploadResponse {
+  uint64 received = 1 [ json_name = "received" ];
+  uint64 upserted = 2 [ json_name = "upserted" ];
+}
+
+message MediaMetadataEnvRequest {
+  repeated string include_source = 1 [ json_name = "include_source" ];
+  repeated string exclude_source = 2 [ json_name = "exclude_source" ];
+}
+
+message MediaMetadataEnvResponse {
+  string start = 1 [ json_name = "start" ];
+}

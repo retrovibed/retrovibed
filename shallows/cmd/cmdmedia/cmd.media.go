@@ -18,6 +18,7 @@ type Known struct {
 	MusicBrainz     mbimport       `cmd:"" help:"import known media from music brainz and writes to stdout in known media jsonl format for importing"`
 	MusicBrainzBulk mbjsonlimport  `cmd:"" help:"import known media from a music brainz jsonl dump and writes to stdout in known media jsonl format for importing"`
 	Deeppool        deeppoolimport `cmd:"" help:"import known media from deeppool published content and writes to stdout in known media jsonl format for importing"`
+	Golden          knowngolden    `cmd:"" help:"manage the deeppool golden copy of generated known media metadata"`
 	Detect          knowndetect    `cmd:"" help:"detect known media via automated systems"`
 	Query           knownquery     `cmd:"" help:"run a query against known media"`
 	Genquery        knowngenquery  `cmd:"" help:"generate query jsonl from args and write to stdout"`

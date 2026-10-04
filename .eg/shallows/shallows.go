@@ -106,6 +106,7 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 		// module=, so this one keeps the old bucket-local-proto_path/source_relative form).
 		gruntime.New("protoc --proto_path=../.proto --proto_path=../.proto/media --go_opt=Mcontent.addressable.storage.proto=github.com/retrovibed/retroapi/deeppool --go_opt=paths=source_relative --go_out=../retroapi/deeppool content.addressable.storage.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia/media.id.proto=github.com/retrovibed/retrovibed/retroapi/deeppool --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/retroapi --go_out=../retroapi media/media.id.proto"),
+		gruntime.New("protoc --proto_path=../.proto --go_opt=Mmedia/deeppool.media.metadata.proto=github.com/retrovibed/retrovibed/retroapi/deeppool --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/retroapi --go_out=../retroapi media/deeppool.media.metadata.proto"),
 		// community
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity/community.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. community/community.proto"),
 		gruntime.New("protoc --proto_path=../.proto --go_opt=Mcommunity/community.metrics.proto=github.com/retrovibed/retrovibed/shallows/communityapi --go_opt=paths=import --go_opt=module=github.com/retrovibed/retrovibed/shallows --go_out=. community/community.metrics.proto"),
