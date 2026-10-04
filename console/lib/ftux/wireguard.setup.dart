@@ -7,8 +7,8 @@ import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/wireguard.dart' as wireguard;
 
-/// Lets the user upload wireguard configurations during first time setup.
-/// Uploads are persisted immediately, so continuing simply calls [onDone].
+/// Lets the user upload a single wireguard configuration during first time
+/// setup. Calls [onDone] once it's uploaded, or when the user continues without one.
 class WireguardSetup extends StatefulWidget {
   final VoidCallback onDone;
   const WireguardSetup({super.key, required this.onDone});
@@ -18,25 +18,23 @@ class WireguardSetup extends StatefulWidget {
 }
 
 class _WireguardSetupState extends State<WireguardSetup> with ds.LoadingState {
-  final List<wireguard.Wireguard> _uploaded = [];
-
   @override
   void initState() {
     super.initState();
     loading = false;
   }
 
+  // only the first file is uploaded; additional configs can be added under settings.
   Future<Widget?> _upload(ds.FilesEvent v, {StreamSink<httpx.UploadProgress>? progress}) {
     final auth = [authn.request(authn.AuthzCache.meta(context))];
-    return Future.wait(
-      v.files.map((c) {
-        return wireguard.wireguard
-            .uploadable(c.path, c.name, c.mimeType!)
-            .then((f) => wireguard.wireguard.upload((req) => req..files.add(f)))
-            .then((r) => wireguard.wireguard.touch(r.wireguard.id, r.wireguard.nettype, options: auth).then((_) => r))
-            .then((r) => setState(() => _uploaded.add(r.wireguard)));
-      }),
-    ).then((_) => ds.NullWidget).catchError((c) {
+    final c = v.files.first;
+    return wireguard.wireguard
+        .uploadable(c.path, c.name, c.mimeType!)
+        .then((f) => wireguard.wireguard.upload((req) => req..files.add(f)))
+        .then((r) => wireguard.wireguard.touch(r.wireguard.id, r.wireguard.nettype, options: auth))
+        .then((_) => widget.onDone())
+        .then((_) => ds.NullWidget)
+        .catchError((c) {
       setState(() => cause = ds.Error.unknown(c, onTap: reseterr));
       return ds.NullWidget;
     });
@@ -78,7 +76,6 @@ class _WireguardSetupState extends State<WireguardSetup> with ds.LoadingState {
               ),
             ),
           ),
-          for (final wg in _uploaded) Text(wg.description, style: theme.textTheme.bodySmall),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             spacing: defaults.spacing,
