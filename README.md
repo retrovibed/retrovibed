@@ -138,9 +138,31 @@ retrovibed torrent import directory --peer="localhost:9998" {directory} | retrov
 # retrovibed torrent export "query" | retrovibed community publish --dry-run foo
 ```
 
+#### installing search plugins
+
+retrovibed's plugins are significantly safer than other torrenting systems. they are fully sandboxed and can only access the public network from your device.
+
+there are some default content plugins available for testing purposes, you are responsible for following the laws of your region with their use.
+
+```bash
+retrovibe ddisc search plugin install git@git.sr.ht:~jatone/retroscaped --package ./piratebay --name piratebay
+retrovibe ddisc search plugin install git@git.sr.ht:~jatone/retroscaped --package ./leetx --name leetx
+retrovibe ddisc search plugin install git@git.sr.ht:~jatone/retroscaped --package ./unit3d --name {name} \
+ -b main.categoryMovies=1 \
+ -b main.categoryTV=2 \
+ -b main.categoryGames=7 \
+ -b main.categoryMusic=8 \
+ -b main.categorySoftware=9 \
+ -b main.categoryMusicVideo=10 \
+ -b main.categorySport=11 \
+ -b main.categoryBooks=12 \
+ -b main.categoryAudiobook=13 \
+ -b "main.apiKey=..."
+```
+
 #### generating a search plugin with an llm
 
-search plugins are `wasip1`/`wasm` binaries that `retroapi/searchplugin.Registry` loads and runs sandboxed against the real network. They are significantly safer than other search systems in that the plugins are not given any access to the local network or the filesystem.
+search plugins are `wasip1`/`wasm` binaries that `retroapi/searchplugin.Registry` loads and runs sandboxed against local system and lan network access. They are significantly safer than other search systems in that the plugins are not given any access to the local network or the filesystem.
 
 the API contract is small enough that an LLM can write a working plugin from a single reference file plus the name of the site to search:
 
