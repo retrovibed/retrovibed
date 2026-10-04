@@ -14,12 +14,14 @@ class PlayerControlPlayback extends StatefulWidget {
   final remote.RemoteControlSocket socket;
   final String sessionId;
   final ValueListenable<remote.Playback> current;
+  final EdgeInsets? padding;
 
   const PlayerControlPlayback({
     Key? key,
     required this.socket,
     required this.sessionId,
     required this.current,
+    this.padding,
   }) : super(key: key);
 
   @override
@@ -34,7 +36,6 @@ class _State extends State<PlayerControlPlayback> with ds.LoadingState {
 
   @override
   Widget build(BuildContext context) {
-    final defaults = ds.Defaults.of(context);
     return ValueListenableBuilder<remote.Playback>(
       valueListenable: widget.current,
       builder: (context, playback, _) {
@@ -45,9 +46,10 @@ class _State extends State<PlayerControlPlayback> with ds.LoadingState {
           hasDuration ? durationMs.toDouble() : 0.0,
         );
 
-        return ds.Container(
-          padding: defaults.padding,
-          Row(
+        return Padding(
+          padding: widget.padding ?? EdgeInsets.zero,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Expanded(
                 child: Slider(

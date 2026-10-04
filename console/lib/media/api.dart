@@ -52,9 +52,10 @@ typedef FnUploadRequest =
 abstract class media {
   static MediaSearchRequest request({
     int limit = 0,
+    int offset = 0,
     String query = "",
     List<String> mimetypes = const [],
-  }) => MediaSearchRequest(limit: ds.Int64(limit), mimetypes: mimetypes);
+  }) => MediaSearchRequest(query: query, limit: ds.Int64(limit), offset: ds.Int64(offset), mimetypes: mimetypes);
   static MediaSearchResponse response({MediaSearchRequest? next}) =>
       MediaSearchResponse(next: next ?? request(limit: 100), items: []);
 

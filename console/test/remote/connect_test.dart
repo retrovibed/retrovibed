@@ -14,6 +14,7 @@ import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/remote/api.dart' as remote;
 import 'package:retrovibed/remote/connect.dart';
 import 'package:retrovibed/remote/player.control.playback.dart';
+import 'package:retrovibed/remote/player.control.playpause.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
 
@@ -529,6 +530,21 @@ void main() {
     final item = _remoteTrack('m1', 'Track A');
     final (socket, _, sessionId) = await _mountAndPlayUnderQuery(tester, query: 'my query', item: item);
 
+    // the gauge (PlayerControlPlayback inside PlaylistCurrent) only mounts
+    // once a sync reports a current item - the fake's queue-echo never sets
+    // one, so emit it explicitly, keeping the acked queue intact.
+    socket.emit(
+      remote.Stream(
+        sid: uuidx.v7(),
+        vid: fixnum.Int64(++socket._vid),
+        sync: remote.Sync(
+          queue: List.of(socket._acked),
+          current: remote.Stream(sessionId: sessionId, queue: remote.Queue(media: item)),
+        ),
+      ),
+    );
+    await tester.pumpN(2);
+
     socket.emit(
       remote.Stream(
         sessionId: sessionId,
@@ -745,7 +761,7 @@ void main() {
         await rowA.onTap!();
         await tester.pumpN(10);
 
-        // _sessionID is private state - PlayerControlPlayback (rendered
+        // _sessionID is private state - PlayerControlPlayPause (rendered
         // unconditionally once _onPlay resets _focused to null) is the one
         // place it's exposed to the widget tree. PlaylistCurrent would be a
         // more natural pick but only mounts once Sync.current has an id,
@@ -753,7 +769,7 @@ void main() {
         // send isn't guaranteed either - _fillQueue only sends when the
         // daemon's last-known queue depth is below autoqueueTarget, which the
         // first tap already fills - so socket.sent can't be relied on here.
-        final sessionIdA = tester.widget<PlayerControlPlayback>(find.byType(PlayerControlPlayback)).sessionId;
+        final sessionIdA = tester.widget<PlayerControlPlayPause>(find.byType(PlayerControlPlayPause)).sessionId;
 
         socket.emit(
           remote.Stream(
@@ -785,7 +801,7 @@ void main() {
         await rowB.onTap!();
         await tester.pumpN(10);
 
-        final sessionIdB = tester.widget<PlayerControlPlayback>(find.byType(PlayerControlPlayback)).sessionId;
+        final sessionIdB = tester.widget<PlayerControlPlayPause>(find.byType(PlayerControlPlayPause)).sessionId;
         expect(sessionIdA, isNot(sessionIdB));
 
         socket.emit(

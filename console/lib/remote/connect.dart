@@ -16,7 +16,6 @@ import 'package:retrovibed/library.dart' as lib;
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'api.dart' as remote;
 import 'empty.dart';
-import 'player.control.playback.dart';
 import 'player.control.seek.dart';
 import 'player.control.fullscreen.dart';
 import 'player.control.playpause.dart';
@@ -594,7 +593,6 @@ class _State extends State<Connect> with LoadingState {
                           verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
                           spacing: defaults.spacing / 2,
                           children: [
-                            PlayerControlPlayback(socket: _socket, sessionId: _sessionID, current: _playback),
                             ds.Container(
                               constraints: const BoxConstraints(minWidth: double.infinity),
                               Wrap(
@@ -654,7 +652,12 @@ class _State extends State<Connect> with LoadingState {
                               ),
                             ),
                             if (_latest.sync.current.asMedia.hasId())
-                              PlaylistCurrent(_latest.sync.current, sessionId: _sessionID),
+                              PlaylistCurrent(
+                                _latest.sync.current,
+                                socket: _socket,
+                                playback: _playback,
+                                sessionId: _sessionID,
+                              ),
                             Expanded(child: queue),
                           ],
                         ),

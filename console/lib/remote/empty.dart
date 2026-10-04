@@ -1,27 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:stream_transform/stream_transform.dart';
-import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/design.kit/stateful.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
-import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/media.dart' as media;
-import 'package:retrovibed/media/play.queue.dart' as playqueue;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/library.dart' as lib;
-import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/discovery.dart' as disc;
 import 'api.dart' as remote;
-import 'player.control.playback.dart';
-import 'player.control.seek.dart';
-import 'player.control.fullscreen.dart';
-import 'player.control.playpause.dart';
-import 'player.control.sync.dart';
-import 'player.control.volume.dart';
-import 'playlist.current.dart';
 import 'playlist.queue.dart';
 
 class Empty extends StatelessWidget {

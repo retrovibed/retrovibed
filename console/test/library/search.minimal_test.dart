@@ -131,5 +131,55 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     });
+
+    testWidgets('initial request uses the search state', (WidgetTester tester) async {
+      final List<media.MediaSearchRequest> requests = [];
+      final search = ValueNotifier(
+        media.MediaSearchState(
+          next: media.media.request(limit: 10, query: 'initial', mimetypes: ['video/mp4']),
+        ),
+      );
+      await tester.pumpApp(
+        SearchMinimal(
+          apisearch: (req, {String? host, List<httpx.Option> options = const []}) async {
+            requests.add(req.clone());
+            return media.media.response(next: req);
+          },
+          search: search,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(requests, hasLength(1));
+      expect(requests.first.query, 'initial');
+      expect(requests.first.limit.toInt(), 10);
+      expect(requests.first.mimetypes, ['video/mp4']);
+    });
+
+    testWidgets('search state changes refetch with offset reset', (WidgetTester tester) async {
+      final List<media.MediaSearchRequest> requests = [];
+      final search = _search();
+      await tester.pumpApp(
+        SearchMinimal(
+          apisearch: (req, {String? host, List<httpx.Option> options = const []}) async {
+            requests.add(req.clone());
+            return media.media.response(next: req);
+          },
+          search: search,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      search.value = media.MediaSearchState(
+        next: media.media.request(limit: 16, offset: 64, query: 'changed', mimetypes: ['audio/mp3']),
+      );
+      await tester.pumpAndSettle();
+
+      expect(requests, hasLength(2));
+      expect(requests.last.query, 'changed');
+      expect(requests.last.limit.toInt(), 16);
+      expect(requests.last.mimetypes, ['audio/mp3']);
+      expect(requests.last.offset.toInt(), 0);
+    });
   });
 }

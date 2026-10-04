@@ -7,7 +7,6 @@ import 'known.media.icon.dart';
 
 class SearchMinimal extends StatefulWidget {
   final ValueNotifier<media.MediaSearchState> search;
-  final int capacity;
   final media.FnMediaSearch apisearch;
   final Widget empty;
   final Widget help;
@@ -19,7 +18,6 @@ class SearchMinimal extends StatefulWidget {
     this.empty = const Text("no results"),
     this.help = ds.Empty,
     this.onPlay = media.PlayAction,
-    this.capacity = 32,
     required this.search,
   });
 
@@ -66,7 +64,7 @@ class _SearchMinimal extends State<SearchMinimal> with ds.LoadingState {
   @override
   void initState() {
     super.initState();
-    _res.next.limit = ds.Int64(widget.capacity);
+    _res.next = widget.search.value.next;
     ds.postframe(() => refresh(_res.next));
     widget.search.addListener(_searchChanged);
   }

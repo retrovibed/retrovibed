@@ -11,6 +11,8 @@ class RowDisplay extends StatelessWidget {
   final Widget help;
   final Widget expanded;
   final bool highlighted;
+  final Border? border;
+  final EdgeInsets? padding;
   const RowDisplay({
     super.key,
     required this.media,
@@ -21,6 +23,8 @@ class RowDisplay extends StatelessWidget {
     this.help = ds.HelpScope.None,
     this.expanded = ds.Empty,
     this.highlighted = false,
+    this.border,
+    this.padding,
   });
 
   @override
@@ -28,11 +32,12 @@ class RowDisplay extends StatelessWidget {
     final defaults = ds.Defaults.of(context);
     return ds.Help(
       ds.TableRow(
-        padding: defaults.padding,
+        padding: padding ?? defaults.padding,
         onTap: onTap,
         tint: highlighted ? defaults.highlightTint : [],
         expanded: expanded,
         autoexpand: true,
+        border: border,
         [
           ...leading,
           Expanded(child: Text(media.description, overflow: TextOverflow.ellipsis)),

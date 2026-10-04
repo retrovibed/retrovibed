@@ -300,61 +300,64 @@ class _QueryerState extends State<Queryer> {
         policy: OrderedTraversalPolicy(),
         child: FocusTraversalOrder(
           order: const NumericFocusOrder(0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: defaults.spacing / 2,
-            children: [
-              ds.CompactingMenu([
-                if (_mode != ParserResult.close)
-                  ds.CompactingMenu.pinned(
-                    GestureDetector(
-                      onLongPress: _resetMode,
-                      child: QueryerMode(mode: _mode, focus: _modeFocusNode),
-                    ),
-                  ),
-                ...widget.leading,
-                ds.CompactingMenu.expanded(
-                  ds.Help(
-                    Focus(
-                      focusNode: _searchFieldMarker,
-                      canRequestFocus: false,
-                      skipTraversal: true,
-                      child: TextField(
-                        controller: _ctrl,
-                        enabled: !widget.disabled,
-                        autofocus: widget.autofocus,
-                        focusNode: widget.focusNode,
-                        decoration: widget.decoration,
-                        onSubmitted: (v) {
-                          if (_partialParse()) return;
-                          widget.onQuery(v);
-                          widget.focusNode?.requestFocus();
-                          ds.textediting.refocus(_ctrl);
-                        },
+          child: Padding(
+            padding: defaults.padding.copyWith(top: 0, bottom: 0) / 2,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: defaults.spacing / 2,
+              children: [
+                ds.CompactingMenu([
+                  if (_mode != ParserResult.close)
+                    ds.CompactingMenu.pinned(
+                      GestureDetector(
+                        onLongPress: _resetMode,
+                        child: QueryerMode(mode: _mode, focus: _modeFocusNode),
                       ),
                     ),
-                    widget.help,
+                  ...widget.leading,
+                  ds.CompactingMenu.expanded(
+                    ds.Help(
+                      Focus(
+                        focusNode: _searchFieldMarker,
+                        canRequestFocus: false,
+                        skipTraversal: true,
+                        child: TextField(
+                          controller: _ctrl,
+                          enabled: !widget.disabled,
+                          autofocus: widget.autofocus,
+                          focusNode: widget.focusNode,
+                          decoration: widget.decoration,
+                          onSubmitted: (v) {
+                            if (_partialParse()) return;
+                            widget.onQuery(v);
+                            widget.focusNode?.requestFocus();
+                            ds.textediting.refocus(_ctrl);
+                          },
+                        ),
+                      ),
+                      widget.help,
+                    ),
+                  ),
+                  ...widget.trailing.map(
+                    (w) => FocusTraversalOrder(
+                      order: const NumericFocusOrder(1),
+                      child: w,
+                    ),
+                  ),
+                ]),
+                TextFieldTapRegion(
+                  child: _updating ?? _parser.current,
+                ),
+                TextFieldTapRegion(
+                  child: Wrap(
+                    spacing: defaults.spacing,
+                    runSpacing: defaults.spacing / 2,
+                    children: chips,
                   ),
                 ),
-                ...widget.trailing.map(
-                  (w) => FocusTraversalOrder(
-                    order: const NumericFocusOrder(1),
-                    child: w,
-                  ),
-                ),
-              ]),
-              TextFieldTapRegion(
-                child: _updating ?? _parser.current,
-              ),
-              TextFieldTapRegion(
-                child: Wrap(
-                  spacing: defaults.spacing,
-                  runSpacing: defaults.spacing / 2,
-                  children: chips,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
