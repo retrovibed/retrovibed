@@ -49,7 +49,7 @@ class Empty extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    print("DERP DERP ${search.value}");
+    print("DERP DERP count=${search.value.count} next=${search.value.next.toProto3Json()}");
     return ValueListenableBuilder<media.MediaSearchState>(
       valueListenable: search,
       builder: (context, state, _) {

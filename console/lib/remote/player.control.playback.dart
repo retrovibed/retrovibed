@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as remote;
@@ -12,7 +13,7 @@ import 'api.dart' as remote;
 class PlayerControlPlayback extends StatefulWidget {
   final remote.RemoteControlSocket socket;
   final String sessionId;
-  final remote.Sync current;
+  final ValueListenable<remote.Playback> current;
 
   const PlayerControlPlayback({
     Key? key,
@@ -34,37 +35,42 @@ class _State extends State<PlayerControlPlayback> with ds.LoadingState {
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final durationMs = widget.current.playback.duration.toInt();
-    final hasDuration = durationMs > 0;
-    final position = (_dragging ?? widget.current.playback.position.toDouble()).clamp(
-      0.0,
-      hasDuration ? durationMs.toDouble() : 0.0,
-    );
+    return ValueListenableBuilder<remote.Playback>(
+      valueListenable: widget.current,
+      builder: (context, playback, _) {
+        final durationMs = playback.duration.toInt();
+        final hasDuration = durationMs > 0;
+        final position = (_dragging ?? playback.position.toDouble()).clamp(
+          0.0,
+          hasDuration ? durationMs.toDouble() : 0.0,
+        );
 
-    return ds.Container(
-      padding: defaults.padding,
-      Row(
-        children: [
-          Expanded(
-            child: Slider(
-              value: position,
-              min: 0,
-              max: hasDuration ? durationMs.toDouble() : 1.0,
-              onChanged: !hasDuration ? null : (v) => setState(() => _dragging = v),
-              onChangeEnd: !hasDuration
-                  ? null
-                  : (v) {
-                      final delta = (v - widget.current.playback.position.toDouble()).round();
-                      widget.socket.send(remote.messages.seek(delta, sessionId: widget.sessionId));
-                      Future.delayed(const Duration(milliseconds: 1000), () {
-                        setState(() => _dragging = null);
-                      });
-                    },
-            ),
+        return ds.Container(
+          padding: defaults.padding,
+          Row(
+            children: [
+              Expanded(
+                child: Slider(
+                  value: position,
+                  min: 0,
+                  max: hasDuration ? durationMs.toDouble() : 1.0,
+                  onChanged: !hasDuration ? null : (v) => setState(() => _dragging = v),
+                  onChangeEnd: !hasDuration
+                      ? null
+                      : (v) {
+                          final delta = (v - widget.current.value.position.toDouble()).round();
+                          widget.socket.send(remote.messages.seek(delta, sessionId: widget.sessionId));
+                          Future.delayed(const Duration(milliseconds: 1000), () {
+                            setState(() => _dragging = null);
+                          });
+                        },
+                ),
+              ),
+              ds.Duration.elapsed(Duration(milliseconds: (durationMs - position).round())),
+            ],
           ),
-          ds.Duration.elapsed(Duration(milliseconds: (durationMs - position).round())),
-        ],
-      ),
+        );
+      },
     );
   }
 }

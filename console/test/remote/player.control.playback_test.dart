@@ -30,8 +30,8 @@ void main() {
         PlayerControlPlayback(
           socket: _FakeRemoteControlSocket(),
           sessionId: 's1',
-          current: remote.Sync(
-            playback: remote.Playback(
+          current: ValueNotifier(
+            remote.Playback(
               position: fixnum.Int64(0),
               duration: fixnum.Int64(0),
             ),
@@ -49,8 +49,8 @@ void main() {
         PlayerControlPlayback(
           socket: _FakeRemoteControlSocket(),
           sessionId: 's1',
-          current: remote.Sync(
-            playback: remote.Playback(
+          current: ValueNotifier(
+            remote.Playback(
               position: fixnum.Int64(15000),
               duration: fixnum.Int64(180000),
             ),
@@ -68,8 +68,8 @@ void main() {
         PlayerControlPlayback(
           socket: _FakeRemoteControlSocket(),
           sessionId: 's1',
-          current: remote.Sync(
-            playback: remote.Playback(
+          current: ValueNotifier(
+            remote.Playback(
               position: fixnum.Int64(15000),
               duration: fixnum.Int64(180000),
             ),
@@ -87,8 +87,8 @@ void main() {
         PlayerControlPlayback(
           socket: socket,
           sessionId: 's1',
-          current: remote.Sync(
-            playback: remote.Playback(
+          current: ValueNotifier(
+            remote.Playback(
               position: fixnum.Int64(15000),
               duration: fixnum.Int64(180000),
             ),
@@ -116,8 +116,8 @@ void main() {
         PlayerControlPlayback(
           socket: socket,
           sessionId: 's1',
-          current: remote.Sync(
-            playback: remote.Playback(
+          current: ValueNotifier(
+            remote.Playback(
               position: fixnum.Int64(15000),
               duration: fixnum.Int64(180000),
             ),

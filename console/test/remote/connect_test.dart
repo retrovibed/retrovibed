@@ -537,8 +537,8 @@ void main() {
     await tester.pumpN(2);
 
     final playback = tester.widget<PlayerControlPlayback>(find.byType(PlayerControlPlayback));
-    expect(playback.current.playback.position, fixnum.Int64(15000));
-    expect(playback.current.playback.duration, fixnum.Int64(180000));
+    expect(playback.current.value.position, fixnum.Int64(15000));
+    expect(playback.current.value.duration, fixnum.Int64(180000));
     expect(tester.takeException(), isNull);
   });
 

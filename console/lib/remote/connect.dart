@@ -119,6 +119,9 @@ class _State extends State<Connect> with LoadingState {
   Stream<remote.Stream> _messages = Stream.empty();
   // nil-sid sentinel; unset oneof -> _latest.sync reads as a zero Sync.
   remote.Stream _latest = remote.Stream(sid: uuidx.min());
+  // live position/duration for _latest.sync.current, kept outside _latest so
+  // standalone playback frames only rebuild the gauge, not the whole view.
+  final ValueNotifier<remote.Playback> _playback = ValueNotifier(remote.Playback());
   // which widget occupies the focused slot below the transport controls,
   // defaulting to the pending-queue view. Kept in sync with the live
   // search/queue widgets at the top of build()
@@ -306,6 +309,7 @@ class _State extends State<Connect> with LoadingState {
     setState(() {
       _socket = remote.RemoteControlSocket.noop;
       _latest = remote.Stream(sid: uuidx.min());
+      _playback.value = remote.Playback();
       _unconfirmed.clear();
       _focused = PlaylistQueue(
         _latest.sync,
@@ -337,7 +341,7 @@ class _State extends State<Connect> with LoadingState {
     if (!mounted) return;
     if (_endpoint.value.hostname.isEmpty) return;
     if (meta.daemons.isLocalDevice(_endpoint.value)) {
-      setState(() {
+      return setState(() {
         loading = false;
         _socket = remote.RemoteControlSocket.disabled;
         cause = SizedBox.expand(
@@ -354,7 +358,6 @@ class _State extends State<Connect> with LoadingState {
           ),
         );
       });
-      return;
     }
     setState(() => loading = true);
 
@@ -382,16 +385,15 @@ class _State extends State<Connect> with LoadingState {
                       _unconfirmed.removeWhere((m) => msg.sync.queue.any((s) => s.asMedia.id == m.id));
                       _latest = msg;
                     });
+                    _playback.value = msg.sync.playback;
                     _fillQueue(_autoqueue);
                     break;
                   case remote.Stream_Command.playback:
                     // a standalone playback frame reports live
-                    // position/duration for _latest.sync.current - pair it
-                    // onto _latest.sync.playback in place rather than
-                    // waiting on the next full sync echo.
-                    setState(() {
-                      _latest = _latest.deepCopy()..sync = (_latest.sync.deepCopy()..playback = msg.playback);
-                    });
+                    // position/duration for _latest.sync.current - publish
+                    // it to the gauge directly rather than waiting on the
+                    // next full sync echo, without rebuilding the view.
+                    _playback.value = msg.playback;
                     break;
                   default:
                     break;
@@ -468,6 +470,7 @@ class _State extends State<Connect> with LoadingState {
     _endpoint.removeListener(_onEndpointChanged);
     _socket.close();
     _autoqueue.cancel();
+    _playback.dispose();
   }
 
   @override
@@ -579,7 +582,7 @@ class _State extends State<Connect> with LoadingState {
                           verticalDirection: defaults.isCompact ? VerticalDirection.up : VerticalDirection.down,
                           spacing: defaults.spacing / 2,
                           children: [
-                            PlayerControlPlayback(socket: _socket, sessionId: _sessionID, current: _latest.sync),
+                            PlayerControlPlayback(socket: _socket, sessionId: _sessionID, current: _playback),
                             ds.Container(
                               constraints: const BoxConstraints(minWidth: double.infinity),
                               Wrap(
