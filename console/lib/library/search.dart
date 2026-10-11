@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media.dart' as media;
+import 'package:retrovibed/downloads.dart' as downloads;
 import 'package:retrovibed/meta.dart' as meta;
 import 'package:retrovibed/lucene.dart' as lucene;
 import 'grid.display.dart';
@@ -11,19 +12,20 @@ import 'empty.results.dart';
 class Search extends StatefulWidget {
   final media.FnMediaSearch apisearch;
   final media.FnUploadRequest apiupload;
+  final media.FnDownloadSearch apidownloading;
   final TextEditingController? controller;
   final FocusNode? focus;
   final String highlighted;
   final ValueNotifier<media.MediaSearchState> search;
   final ValueNotifier<media.SearchMode> mode;
   final void Function(media.SearchMode) onModeChanged;
-  final Widget downloading;
-  final void Function(Widget) onDownloadingChanged;
+  final ValueNotifier<Future<List<media.Download>>> downloading;
 
   const Search({
     super.key,
     this.apisearch = media.media.search,
     this.apiupload = media.media.upload,
+    this.apidownloading = media.discovered.downloading,
     this.controller,
     this.focus,
     required this.highlighted,
@@ -31,7 +33,6 @@ class Search extends StatefulWidget {
     required this.mode,
     required this.onModeChanged,
     required this.downloading,
-    required this.onDownloadingChanged,
   });
 
   @override
@@ -99,7 +100,7 @@ class _SearchState extends State<Search> with ds.LoadingState {
                   mode: widget.mode,
                   onModeChanged: widget.onModeChanged,
                   apiupload: widget.apiupload,
-                  onDownloadingChanged: widget.onDownloadingChanged,
+                  downloading: widget.downloading,
                 ),
               ),
             ],
@@ -115,7 +116,7 @@ class _SearchState extends State<Search> with ds.LoadingState {
             empty: EmptyResults(onDiscover: () => widget.onModeChanged(media.SearchMode.discovery)),
             leading: [
               _tuning,
-              widget.downloading,
+              downloads.DownloadQueue(widget.downloading, apidownloading: widget.apidownloading),
             ],
           ),
         ),

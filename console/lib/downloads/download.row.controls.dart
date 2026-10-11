@@ -32,7 +32,8 @@ class _ControlState extends State<DownloadRowControls> {
           .catchError((cause) {
             setState(() {
               disabled = false;
-              ds.ErrorBoundary.of(context)?.onError(ds.Error.unknown(cause));
+              final boundary = ds.ErrorBoundary.of(context);
+              boundary?.onError(ds.Error.unknown(cause, onTap: boundary.reset));
             });
           });
     };
@@ -53,7 +54,8 @@ class _ControlState extends State<DownloadRowControls> {
           .catchError((cause) {
             setState(() {
               disabled = false;
-              ds.ErrorBoundary.of(context)?.onError(ds.Error.unknown(cause));
+              final boundary = ds.ErrorBoundary.of(context);
+              boundary?.onError(ds.Error.unknown(cause, onTap: boundary.reset));
             });
           });
     };

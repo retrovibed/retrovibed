@@ -11,6 +11,7 @@ import 'search.dart';
 class Home extends StatefulWidget {
   final media.FnMediaSearch apisearch;
   final media.FnUploadRequest apiupload;
+  final media.FnDownloadSearch apidownloading;
   final TextEditingController? controller;
   final FocusNode? focus;
   final String highlighted;
@@ -20,6 +21,7 @@ class Home extends StatefulWidget {
     super.key,
     this.apisearch = media.media.search,
     this.apiupload = media.media.upload,
+    this.apidownloading = media.discovered.downloading,
     this.controller,
     this.focus,
     required this.highlighted,
@@ -31,7 +33,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with ds.LoadingState {
-  Widget _downloading = ds.Empty;
+  final ValueNotifier<Future<List<media.Download>>> _downloading = ValueNotifier(Future.value(const []));
   final ValueNotifier<media.SearchMode> _mode = ValueNotifier(media.SearchMode.library);
 
   void _switchToMode(media.SearchMode m) {
@@ -42,6 +44,7 @@ class _HomeState extends State<Home> with ds.LoadingState {
   @override
   void dispose() {
     _mode.dispose();
+    _downloading.dispose();
     super.dispose();
   }
 
@@ -53,6 +56,7 @@ class _HomeState extends State<Home> with ds.LoadingState {
         media.SearchMode.library => Search(
           apisearch: widget.apisearch,
           apiupload: widget.apiupload,
+          apidownloading: widget.apidownloading,
           controller: widget.controller,
           focus: widget.focus,
           highlighted: widget.highlighted,
@@ -60,17 +64,16 @@ class _HomeState extends State<Home> with ds.LoadingState {
           mode: _mode,
           onModeChanged: _switchToMode,
           downloading: _downloading,
-          onDownloadingChanged: (w) => setState(() => _downloading = w),
         ),
         media.SearchMode.discovery => disc.Search(
           apiupload: widget.apiupload,
+          apidownloading: widget.apidownloading,
           controller: widget.controller,
           focus: widget.focus,
           search: widget.search,
           mode: _mode,
           onModeChanged: _switchToMode,
           downloading: _downloading,
-          onDownloadingChanged: (w) => setState(() => _downloading = w),
         ),
         media.SearchMode.filesystem => filesystem.FilesystemBrowser(
           search: widget.search,

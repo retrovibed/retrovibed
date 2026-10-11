@@ -45,6 +45,7 @@ void main() {
               next: req,
             );
           },
+          apidownloading: (req, {options = const []}) async => media.DownloadSearchResponse(),
           search: search,
           highlighted: '',
         ),
@@ -75,6 +76,7 @@ void main() {
           apisearch: (req, {host, options = const []}) async {
             return media.MediaSearchResponse(items: [], next: req);
           },
+          apidownloading: (req, {options = const []}) async => media.DownloadSearchResponse(),
           search: search,
           highlighted: '',
         ),
@@ -120,6 +122,7 @@ void main() {
           apisearch: (req, {host, options = const []}) async {
             return media.MediaSearchResponse(items: [], next: req);
           },
+          apidownloading: (req, {options = const []}) async => media.DownloadSearchResponse(),
           search: search,
           highlighted: '',
         ),
@@ -159,6 +162,7 @@ void main() {
           apisearch: (req, {host, options = const []}) async {
             return media.MediaSearchResponse(items: [], next: req);
           },
+          apidownloading: (req, {options = const []}) async => media.DownloadSearchResponse(),
           search: search,
           highlighted: '',
         ),

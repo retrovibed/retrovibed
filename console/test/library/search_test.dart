@@ -86,8 +86,8 @@ Widget _buildSearch({
     search: search,
     mode: mode ?? ValueNotifier(media.SearchMode.library),
     onModeChanged: onModeChanged ?? (_) {},
-    downloading: const SizedBox.shrink(),
-    onDownloadingChanged: (_) {},
+    apidownloading: (req, {options = const []}) async => media.DownloadSearchResponse(),
+    downloading: ValueNotifier(Future.value(const [])),
   );
 }
 

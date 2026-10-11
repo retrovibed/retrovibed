@@ -13,7 +13,7 @@ class SearchUploadDropdown extends StatelessWidget {
   final ValueNotifier<media.SearchMode> mode;
   final void Function(media.SearchMode) onModeChanged;
   final media.FnUploadRequest apiupload;
-  final void Function(Widget) onDownloadingChanged;
+  final ValueNotifier<Future<List<media.Download>>> downloading;
 
   const SearchUploadDropdown({
     super.key,
@@ -21,7 +21,7 @@ class SearchUploadDropdown extends StatelessWidget {
     required this.mode,
     required this.onModeChanged,
     required this.apiupload,
-    required this.onDownloadingChanged,
+    required this.downloading,
   });
 
   @override
@@ -52,21 +52,11 @@ class SearchUploadDropdown extends StatelessWidget {
             apiupload: apiupload,
           ),
           downloads.MenuItemDownloadTorrent(context, (d) {
-            onDownloadingChanged(
-              downloads.DownloadQueue(
-                d,
-                onQueueComplete: () => onDownloadingChanged(ds.Empty),
-              ),
-            );
+            downloading.value = d;
             print("downloading torrents ${d}");
           }),
           downloads.MenuItemDownloadMagnet(context, (d) {
-            onDownloadingChanged(
-              downloads.DownloadQueue(
-                d,
-                onQueueComplete: () => onDownloadingChanged(ds.Empty),
-              ),
-            );
+            downloading.value = d;
             print("downloading magnets ${d}");
           }),
         ],

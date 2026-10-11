@@ -164,6 +164,7 @@ class _DownloadingState extends State<RefreshingDownload> with ds.LoadingState {
         trailing: (ctx) => DownloadRowControls(
           current: current,
           onChange: (d) {
+            widget.updates.add(d);
             ds.RefreshBoundary.of(ctx)?.reset();
           },
         ),

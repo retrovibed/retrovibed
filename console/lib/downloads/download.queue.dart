@@ -1,22 +1,23 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/media/api.dart' as api;
 import 'download.watch.dart';
 
 class DownloadQueue extends StatefulWidget {
-  final Future<List<api.Download>> queue;
+  final ValueNotifier<Future<List<api.Download>>> queue;
   final Duration interval;
-  final api.FnDownloadWatch watch;
+  final api.FnDownloadSearch apidownloading;
+  final api.FnDownloadWatch apiwatch;
   final Duration minCompletedDisplay;
-  final void Function()? onQueueComplete;
   const DownloadQueue(
     this.queue, {
     super.key,
     this.interval = const Duration(milliseconds: 5000),
-    this.watch = api.discovered.watch,
+    this.apidownloading = api.discovered.downloading,
+    this.apiwatch = api.discovered.watch,
     this.minCompletedDisplay = const Duration(seconds: 15),
-    this.onQueueComplete,
   });
 
   @override
@@ -25,51 +26,67 @@ class DownloadQueue extends StatefulWidget {
 
 class _DownloadQueue extends State<DownloadQueue> with ds.LoadingState {
   List<api.Download> _pending = [];
-  int _index = 0;
   final StreamController<api.Download> _updates = StreamController<api.Download>.broadcast();
+  StreamSubscription<api.Download> _subscription = const Stream<api.Download>.empty().listen(null);
 
   @override
   void dispose() {
+    widget.queue.removeListener(_load);
+    _subscription.cancel();
     _updates.close();
     super.dispose();
   }
 
-  void _show(int index) {
-    setState(() => _index = index);
-    if (index >= _pending.length) {
-      widget.onQueueComplete?.call();
-    }
-  }
-
-  void _advance(int index) {
-    if (!mounted || index != _index) return;
-    _show(index + 1);
-  }
-
-  void _onItemCompleted(int index, api.Download startedAs) {
+  void _onItemCompleted(api.Download startedAs) {
     final delay = api.download.completed(startedAs) ? widget.minCompletedDisplay : Duration.zero;
-    Future.delayed(delay, () => _advance(index));
+    Future.delayed(delay, () {
+      setState(() {
+        _pending = ds.fnOnChange(_pending, null, (d) => d.media.id == startedAs.media.id);
+      });
+      // queue drained, check for any remaining active downloads.
+      if (_pending.isEmpty) _load();
+    });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    widget.queue
+  void _load() {
+    setState(() {
+      loading = true;
+    });
+    widget.queue.value
+        .then(
+          (_) => widget.apidownloading(
+            api.discoveredsearch.request(limit: 128),
+            options: [authn.request(authn.AuthzCache.meta(context))],
+          ),
+        )
+        .then((v) => v.items)
         .then((list) {
-          if (!mounted) return;
           setState(() {
             _pending = list;
             loading = false;
           });
-          _show(0);
         })
         .catchError((cause) {
-          if (!mounted) return;
           setState(() {
             this.cause = ds.Error.unknown(cause, onTap: reseterr);
             loading = false;
           });
         });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.queue.addListener(_load);
+    _subscription = _updates.stream.listen((v) {
+      // completion is handled by onCompleted, replacing the item here would change the completed display hold.
+      if (api.download.completed(v)) return;
+      if (api.download.paused(v)) return _load();
+      setState(() {
+        _pending = ds.fnOnChange(_pending, v, (d) => d.media.id == v.media.id);
+      });
+    });
+    ds.postframe(() => _load());
   }
 
   @override
@@ -79,30 +96,20 @@ class _DownloadQueue extends State<DownloadQueue> with ds.LoadingState {
       loading: loading,
       cause: cause,
       ds.ErrorBoundary(
-        _index >= _pending.length
+        _pending.isEmpty
             ? const SizedBox.shrink()
             : Builder(
                 builder: (context) {
-                  final item = _pending[_index];
+                  final item = _pending.first;
                   return ds.Container(
                     padding: defaults.padding,
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      spacing: defaults.spacing,
-                      children: [
-                        Text(
-                          "${_index + 1} of ${_pending.length}",
-                          style: const TextStyle(fontFamily: 'monospace'),
-                        ),
-                        RefreshingDownload(
-                          key: ValueKey(item.media.id),
-                          current: item,
-                          interval: widget.interval,
-                          watch: widget.watch,
-                          updates: _updates,
-                          onCompleted: (_) => _onItemCompleted(_index, item),
-                        ),
-                      ],
+                    RefreshingDownload(
+                      key: ValueKey("${item.media.id}.${item.media.updatedAt}"),
+                      current: item,
+                      interval: widget.interval,
+                      watch: widget.apiwatch,
+                      updates: _updates,
+                      onCompleted: (_) => _onItemCompleted(item),
                     ),
                   );
                 },
