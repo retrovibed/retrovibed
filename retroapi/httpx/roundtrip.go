@@ -3,13 +3,13 @@ package httpx
 import (
 	"bytes"
 	"context"
-	"errors"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/langx"
 	"golang.org/x/time/rate"
 )
@@ -231,7 +231,7 @@ func (t RetryTransport) RoundTrip(req *http.Request) (resp *http.Response, err e
 	tee := io.NopCloser(io.TeeReader(req.Body, buf))
 	req.Body = tee
 
-	if resp, err = t.Delegate.RoundTrip(req); errors.Is(err, context.DeadlineExceeded) {
+	if resp, err = t.Delegate.RoundTrip(req); errorsx.Is(err, context.DeadlineExceeded, io.ErrUnexpectedEOF) {
 		req.Body = io.NopCloser(buf)
 		return t.Delegate.RoundTrip(req)
 	} else if err != nil {
