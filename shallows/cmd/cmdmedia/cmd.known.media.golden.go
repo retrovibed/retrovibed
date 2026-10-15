@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
+	"golang.org/x/time/rate"
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
@@ -59,7 +60,8 @@ func (t goldenenv) run(ctx context.Context, w io.Writer, httpc *http.Client) err
 }
 
 type goldenupload struct {
-	Batch int `flag:"" name:"batch" help:"number of records to upload per request" default:"1024"`
+	Batch     int           `flag:"" name:"batch" help:"number of records to upload per request" default:"1024"`
+	RateLimit time.Duration `flag:"" name:"rate-limit" help:"minimum duration between upload requests, 0 disables rate limiting" default:"0s"`
 }
 
 func (t goldenupload) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, stdin cmdopts.Stdin) error {
@@ -75,7 +77,13 @@ func (t goldenupload) run(ctx context.Context, r io.Reader, httpc *http.Client) 
 	client := deeppool.NewMediaMetadata(httpc)
 	d := jsonl.Iter[library.Known](jsonl.NewDecoder(r))
 
+	limiter := rate.NewLimiter(rate.Every(t.RateLimit), 1)
+
 	for chunk := range iterx.Chunk(d.Each(ctx), t.Batch) {
+		if err := limiter.Wait(ctx); err != nil {
+			return errorsx.Wrap(err, "unable to wait for rate limit")
+		}
+
 		items := make([]*deeppool.MediaMetadata, 0, len(chunk))
 		for _, k := range chunk {
 			items = append(items, &deeppool.MediaMetadata{
