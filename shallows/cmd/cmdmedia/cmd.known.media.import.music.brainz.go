@@ -17,6 +17,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -85,7 +86,7 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 					uidmd5 := uuid.FromBytesOrNil(md5x.JSON(rel).Sum(nil))
 
 					lang := langx.FirstNonZero(
-						errorsx.ZeroSilent(language.Parse(rel.TextRepresentation.Language)),
+						errorsx.ZeroDebug[language.Tag](debugx.Fn)(language.Parse(rel.TextRepresentation.Language)),
 						language.Und,
 					)
 

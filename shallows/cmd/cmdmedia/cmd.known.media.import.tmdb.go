@@ -19,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -102,7 +103,7 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 					Popularity:       float64(mr.Popularity),
 					PosterPath:       t.imgpath(mr.PosterPath),
 					Title:            mr.Title,
-					Released:         errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.ReleaseDate)),
+					Released:         errorsx.ZeroDebug[time.Time](debugx.Fn)(time.Parse(time.DateOnly, mr.ReleaseDate)),
 					Mimetype:         mimex.Video,
 					ParentUID:        uuid.Nil.String(),
 				}
@@ -237,7 +238,7 @@ func (t *tmdbimport) seriesKnown(mr tmdb.TVShowResult) library.Known {
 		PosterPath:       t.imgpath(mr.PosterPath),
 		Title:            mr.Name,
 		Adult:            mr.Adult,
-		Released:         errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.FirstAirDate)),
+		Released:         errorsx.ZeroDebug[time.Time](debugx.Fn)(time.Parse(time.DateOnly, mr.FirstAirDate)),
 		Mimetype:         mimex.Video,
 		ParentUID:        uuid.Nil.String(),
 	}
@@ -324,7 +325,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 					PosterPath:       stringsx.FirstNonBlank(imgpath, job.parent.PosterPath),
 					BackdropPath:     stringsx.FirstNonBlank(imgpath, job.parent.BackdropPath),
 					Collation:        library.KnownCollationEpisode(uint16(ep.SeasonNumber), uint16(ep.EpisodeNumber)),
-					Released:         errorsx.ZeroSilent(time.Parse(time.DateOnly, ep.AirDate)),
+					Released:         errorsx.ZeroDebug[time.Time](debugx.Fn)(time.Parse(time.DateOnly, ep.AirDate)),
 					Mimetype:         mimex.Video,
 				}
 
@@ -429,7 +430,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 				}
 
 				year = slicesx.LastOrDefault(year, slicesx.MapTransform(func(mr tmdb.TVShowResult) time.Time {
-					return timex.Max(errorsx.ZeroSilent(time.Parse(time.DateOnly, mr.FirstAirDate)), year)
+					return timex.Max(errorsx.ZeroDebug[time.Time](debugx.Fn)(time.Parse(time.DateOnly, mr.FirstAirDate)), year)
 				}, resp.Results...)...)
 
 				if len(resp.Results) == 0 || page >= resp.TotalPages {

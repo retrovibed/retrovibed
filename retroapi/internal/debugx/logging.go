@@ -22,3 +22,8 @@ func Printf(format string, v ...interface{}) {
 func Print(v ...interface{}) {
 	log.Output(2, fmt.Sprint(v...))
 }
+
+// Fn executes d.
+func Fn(d func()) {
+	d()
+}

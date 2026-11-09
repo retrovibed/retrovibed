@@ -1,9 +1,11 @@
 package egenv
 
 import (
+	"log"
 	"os"
 	"os/user"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/egdaemon/eg"
@@ -22,6 +24,33 @@ func TTL() time.Duration {
 // Read the run ID from the environment
 func RunID() string {
 	return env.String("00000000-0000-0000-0000-000000000000", eg.EnvComputeRunID)
+}
+
+// Read the account ID from the environment
+func AccountID() string {
+	return env.String("00000000-0000-0000-0000-000000000000", eg.EnvComputeAccountID)
+}
+
+var initiated = sync.OnceValue(func() time.Time {
+	ts, err := time.Parse(time.RFC3339Nano, env.String("", eg.EnvComputeInitiatedTimestamp))
+	if err != nil {
+		log.Println("unable to parse", eg.EnvComputeInitiatedTimestamp, "falling back to the current time", err)
+		return time.Now()
+	}
+
+	return ts
+})
+
+// Initiated provides the instant the billed run duration started at. returns time.Now()
+// as an approximation: when the runtime did not provide it, the time of the first call is used.
+// the environment is only parsed once.
+func Initiated() time.Time {
+	return initiated()
+}
+
+// Read the entry path of the workload from the environment, empty when the runtime did not provide it.
+func Workload() string {
+	return env.String("", eg.EnvComputeWorkload)
 }
 
 // returns the current user.
@@ -104,7 +133,7 @@ func String(fallback string, keys ...string) string {
 	return envx.String(fallback, keys...)
 }
 
-// Base64 read value as a standard base64 encoded string
+// Base64 read value as a base64 encoded string, the standard alphabet is attempted first and then the url alphabet.
 func Base64(fallback []byte, keys ...string) []byte {
 	return envx.Base64(fallback, keys...)
 }

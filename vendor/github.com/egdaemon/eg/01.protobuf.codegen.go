@@ -6,6 +6,10 @@ package eg
 //go:generate protoc --proto_path=.proto --go_opt=Meg.actl.enqueued.proto=github.com/eg/runners --go_opt=paths=source_relative --go_out=runners eg.actl.enqueued.proto
 //go:generate protoc --proto_path=.proto --go_opt=Meg.compute.proto=github.com/eg/compute --go_opt=paths=source_relative --go_out=compute eg.compute.proto
 //go:generate protoc --proto_path=.proto --go_opt=Meg.compute.vcs.proto=github.com/eg/compute --go_opt=paths=source_relative --go_out=compute eg.compute.vcs.proto
+//go:generate protoc --proto_path=.proto --go_opt=Meg.compute.history.proto=github.com/eg/compute --go_opt=paths=source_relative --go_out=compute eg.compute.history.proto
+//go:generate protoc --proto_path=.proto --go_opt=Mmeta.gcp.wif.proto=github.com/egdaemon/eg/gcpwif --go_opt=paths=source_relative --go_out=gcpwif meta.gcp.wif.proto
+//go:generate protoc --proto_path=.proto --go_opt=Meg.repository.schedule.proto=github.com/egdaemon/eg/schedules --go_opt=paths=source_relative --go_out=schedules eg.repository.schedule.proto
+//go:generate protoc --proto_path=.proto --go_opt=Meg.repository.proto=github.com/egdaemon/eg/repositories --go_opt=paths=source_relative --go_out=repositories eg.repository.proto
 
 //go:generate protoc --proto_path=.proto --go_opt=Meg.interp.events.proto=github.com/eg/interp/events --go_opt=paths=source_relative --go_out=interp/events eg.interp.events.proto
 //go:generate protoc --proto_path=.proto --go-grpc_opt=Meg.interp.events.proto=github.com/eg/interp/events --go-grpc_opt=paths=source_relative --go-grpc_out=interp/events eg.interp.events.proto
@@ -17,3 +21,5 @@ package eg
 //go:generate protoc --proto_path=.proto --go-grpc_opt=Meg.interp.exec.proto=github.com/eg/interp/execproxy --go-grpc_opt=paths=source_relative --go-grpc_out=interp/execproxy eg.interp.exec.proto
 
 //go:generate protoc --proto_path=.proto --go_opt=Meg.compute.authz.proto=github.com/egciorg/eg/compute --go_opt=paths=source_relative --go_out=compute eg.compute.authz.proto
+
+//go:generate protoc --proto_path=.proto --go_opt=Meg.duckproxy.proto=github.com/egdaemon/eg/duckproxy --go_opt=paths=source_relative --go_out=duckproxy eg.duckproxy.proto

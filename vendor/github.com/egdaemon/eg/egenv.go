@@ -72,6 +72,8 @@ const (
 	EnvComputeAccountID          = "EG_COMPUTE_ACCOUNT_ID"                      // account id of the compute workload
 	EnvComputeVCS                = "EG_COMPUTE_VCS_URI"                         // vcs uri for the compute workload
 	EnvComputeTTL                = "EG_COMPUTE_TTL"                             // deadline for compute workload
+	EnvComputeWorkload           = "EG_COMPUTE_WORKLOAD"                        // entry path of the workload being run.
+	EnvComputeInitiatedTimestamp = "EG_COMPUTE_INITIATED_TIMESTAMP"             // RFC3339Nano UTC instant the billed run duration starts at.
 	EnvComputeArch               = "EG_COMPUTE_HOST_ARCH"                       // host machine cpu architecture
 	EnvComputeOS                 = "EG_COMPUTE_HOST_OS"                         // host machine operating system
 	EnvComputeWorkloadDirectory  = "EG_COMPUTE_WORKLOAD_DIRECTORY"              // root directory for workloads
@@ -91,7 +93,7 @@ const (
 	EnvComputeGPU                = "EG_COMPUTE_GPU"                             // enable gpu support for the compute workload, propagated to nested module containers.
 	EnvComputeModuleSocket       = "EG_COMPUTE_MODULE_SOCKET"                   // socket providing functionality that is scoped to an individual module. primarily command execution.
 	EnvComputeDefaultGroup       = "EG_COMPUTE_DEFAULT_GROUP"                   // override the group assigned to the user. mainly used by baremetal.
-	EnvComputeAPIEnabled         = "EG_COMPUTE_API_ENABLED"                     // gates the runner's push HTTP surface (POST /b/upload, POST /c/enqueue); default-disabled stopgap ahead of real request authentication.
+	EnvComputeAPIEnabled         = "EG_COMPUTE_API_ENABLED"                     // gates the runner's push HTTP surface (POST /c/upload, POST /c/enqueue) and whether the runner advertises itself as uploadable; enabled by default, see the daemon's --uploadable flag.
 	EnvComputeProfileMode        = "EG_COMPUTE_PROFILE_MODE"                    // profile mode (cpu,heap,mem,allocs,block) for module runs.
 )
 
@@ -135,10 +137,16 @@ func IsDefaultBranchBuild(environ ...string) bool {
 }
 
 const (
+	EnvGoogleApplicationCredentials   = "GOOGLE_APPLICATION_CREDENTIALS"         // path to the application default credentials used by google clients and gcloud.
+	EnvCloudSDKCredentialFileOverride = "CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE" // makes gcloud commands use the credentials in the file, set when the workload was provided credentials.
+	EnvGCPWorkloadIdentityEnabled     = "EG_GCP_WORKLOAD_IDENTITY_ENABLED"       // set by whatever generates the workload (uploads, schedules) when it needs gcp credentials issued to it by its runner.
+)
+
+const (
 	EnvUnsafeCacheID         = "EG_UNSAFE_CACHE_ID"
 	EnvUnsafeGitCloneEnabled = "EG_UNSAFE_GIT_CLONE_ENABLED"
 	EnvUnsafeRemapDirectory  = "EG_UNSAFE_REMAP_DIRECTORY"                    // list of directories to remap, seperated by ':'.
-	EnvUnsafeGcloudADCB64    = "EG_UNSAFE_GOOGLE_APPLICATION_CREDENTIALS_B64" // temporary hack while we deploy remap directory
+	EnvUnsafeGcloudADCB64    = "EG_UNSAFE_GOOGLE_APPLICATION_CREDENTIALS_B64" // application default credentials, base64 encoded with the url alphabet (base64.URLEncoding). temporary hack while we deploy remap directory
 )
 
 const (
