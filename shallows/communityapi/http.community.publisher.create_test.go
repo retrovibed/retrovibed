@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
@@ -19,7 +20,6 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"

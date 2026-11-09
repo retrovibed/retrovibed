@@ -10,8 +10,8 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )

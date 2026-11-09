@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // LocateCreate submits a locate request on the given library endpoint.

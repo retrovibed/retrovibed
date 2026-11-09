@@ -11,8 +11,8 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // NewUploader uploads files into the library served at endpoint.

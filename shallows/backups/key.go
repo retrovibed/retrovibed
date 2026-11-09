@@ -10,9 +10,9 @@ import (
 	"slices"
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 const saltSize = 16

@@ -6,9 +6,9 @@ import (
 	"golang.org/x/crypto/ssh"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 func AutoRegistration(ctx context.Context, signer ssh.Signer, options ...httpx.ClientOption) {

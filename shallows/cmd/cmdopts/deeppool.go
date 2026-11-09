@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 // DeeppoolClient provides an http.Client for deeppool API calls.

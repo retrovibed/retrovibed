@@ -6,8 +6,8 @@ import (
 	"iter"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"golang.org/x/time/rate"
 )

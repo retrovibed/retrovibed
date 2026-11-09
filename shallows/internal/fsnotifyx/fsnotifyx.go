@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 )
 

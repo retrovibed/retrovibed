@@ -12,7 +12,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 // Clone clones uri (a git URL) into a new temp directory and returns its

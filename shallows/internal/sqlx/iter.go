@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"iter"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 type Scanner[T any] interface {

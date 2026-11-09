@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/audiox"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

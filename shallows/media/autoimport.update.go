@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // AutoimportUpdate replaces the editable fields of a monitored directory, identified by id, on the given library endpoint.

@@ -6,7 +6,7 @@ import (
 	"math"
 	"regexp"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 // ErrNoCandidate indicates every Discovered row for a known-media-id was

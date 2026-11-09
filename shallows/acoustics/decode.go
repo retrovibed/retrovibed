@@ -8,7 +8,7 @@ import (
 
 	media "github.com/mutablelogic/go-media"
 	"github.com/mutablelogic/go-media/pkg/ffmpeg"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 // ProbeDuration opens the file with FFmpeg and returns its duration in seconds.

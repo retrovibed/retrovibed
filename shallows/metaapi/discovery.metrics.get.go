@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // DiscoveryMetrics reports the state of the infohash identification pipeline on the given library endpoint.

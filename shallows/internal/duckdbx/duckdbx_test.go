@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/duckdb/duckdb-go/v2"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/stretchr/testify/require"
 )
 

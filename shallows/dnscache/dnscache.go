@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
+	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/netx"
 	"golang.org/x/time/rate"

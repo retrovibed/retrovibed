@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // only utilized in testing, must not be used anywhere else

@@ -3,7 +3,7 @@ package netipx
 import (
 	"net/netip"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 func AddrPortFromStrings(in ...string) (res []netip.AddrPort) {

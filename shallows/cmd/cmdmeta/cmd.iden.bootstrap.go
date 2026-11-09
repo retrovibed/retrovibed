@@ -8,8 +8,8 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 	"github.com/retrovibed/retrovibed/shallows/meta/identityssh"
 )

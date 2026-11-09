@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 type NullDuration struct {

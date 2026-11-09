@@ -9,8 +9,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
-	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
 )
 
 func ErrIsNotExist(err error) error {

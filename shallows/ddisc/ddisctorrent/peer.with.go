@@ -7,7 +7,7 @@ import (
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 func PeerWith(ctx context.Context, s *dht.Server, partition uuid.UUID, n krpc.NodeInfo) (_zero PeerInfo, err error) {

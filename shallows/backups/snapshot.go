@@ -7,7 +7,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 // Snapshot writes a consistent copy of the open database to dst. duckdb does the copy; the

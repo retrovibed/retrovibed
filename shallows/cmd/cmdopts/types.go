@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/alecthomas/kong"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // ParseIP addresses

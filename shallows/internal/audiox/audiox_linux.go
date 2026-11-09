@@ -10,8 +10,8 @@ import (
 
 	"github.com/jfreymuth/pulse"
 	"github.com/jfreymuth/pulse/proto"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // Supported reports whether this build can talk to PulseAudio.

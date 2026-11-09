@@ -4,9 +4,9 @@ import (
 	"log"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // cmdLocateCreate submits a locate request to a running daemon over its

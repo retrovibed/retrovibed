@@ -8,9 +8,9 @@ import (
 	"net/http"
 
 	"github.com/retrovibed/retrovibed/retroapi/env"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 
 	"github.com/retrovibed/retrovibed/retroapi/mimex"

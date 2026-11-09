@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/retrovibed/retrovibed/retroapi/internal/debugx"
+	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/envx"
 	"golang.org/x/text/language"
 )

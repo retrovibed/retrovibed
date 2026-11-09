@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
@@ -18,7 +19,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/audiox"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
 )

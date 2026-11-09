@@ -12,11 +12,11 @@ import (
 	"github.com/justinas/alice"
 	"google.golang.org/protobuf/encoding/protojson"
 
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/websocketx"
 	"github.com/retrovibed/retrovibed/shallows/metaapi"
 )

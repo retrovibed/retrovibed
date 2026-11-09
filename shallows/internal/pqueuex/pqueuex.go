@@ -9,8 +9,8 @@ import (
 	"github.com/linxGnu/pqueue"
 	"github.com/linxGnu/pqueue/entry"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 )

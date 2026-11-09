@@ -3,7 +3,7 @@ package acoustics
 import (
 	"context"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 const (

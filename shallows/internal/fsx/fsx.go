@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/debugx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 func ErrIsNotExist(err error) error {

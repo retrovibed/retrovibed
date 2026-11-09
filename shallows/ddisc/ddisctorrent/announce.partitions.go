@@ -11,9 +11,9 @@ import (
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 )
 
 // announce the provided partitions, and identify any useful peers for syncing.

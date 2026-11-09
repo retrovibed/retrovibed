@@ -16,10 +16,10 @@ import (
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
 )

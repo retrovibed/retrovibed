@@ -10,8 +10,8 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/mutablelogic/go-media/pkg/ffmpeg"
-	"github.com/retrovibed/retrovibed/shallows/internal/debugx"
-	"github.com/retrovibed/retrovibed/shallows/internal/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/debugx"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
