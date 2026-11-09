@@ -24,6 +24,7 @@ func main() {
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,
+		eggithub.DraftClean(0),
 		shell.Op(
 			shell.Env().New("eg login --seed=\"${RETROVIBED_EG_LOGIN_SEED}\""),
 			// TODO: Revisit once darwin is working again.
@@ -32,8 +33,8 @@ func main() {
 		),
 		uploads.Run(egpool.Slice(
 			"eg compute upload --no-follow --ttl=1h --arch=amd64 --cores=8 --memory=12g release/linux",
-			// "eg compute upload --no-follow --ttl=3h --arch=arm64 --cores=3 --memory=3g release/linux",
-			// "eg compute upload --no-follow --arch=amd64 --cores=8 --memory=6g release/archlinux",
+			"eg compute upload --no-follow --ttl=3h --arch=arm64 --cores=3 --memory=3g release/linux",
+			"eg compute upload --no-follow --arch=amd64 --cores=8 --memory=6g release/archlinux",
 			// "eg compute upload --no-follow --arch=amd64 --cores=8 --memory=6g release/retrokiosk",
 			// "eg compute upload --no-follow --arch=amd64 --cores=8 --memory=6g release/debian",
 			// shell.Env().New("eg compute upload release/android"), // TODO: android requires gcp credentials.
