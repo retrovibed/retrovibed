@@ -47,7 +47,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 	// runtime to look into.
 	// https://github.com/pkgforge-dev/Anylinux-AppImages
 	appimage := tarballs.AppImage(b)
-	builddir := egenv.CacheDirectory(tarballs.AppImageBuild(b))
+	builddir := egenv.DirectoryWorkload(tarballs.AppImageBuild(b))
 	return shell.Op(
 		shell.Newf("mkdir -p %s", builddir),
 		shell.Newf(
@@ -55,7 +55,6 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 			egenv.WorkingDirectory(".dist", "AppImageBuilder.yml"),
 			builddir,
 		).Directory(egenv.WorkspaceDirectory()).
-			Attempts(3).
 			Timeout(egenv.TTL()).
 			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed(b))).
 			Environ("VERSION", tarballs.Version()).
