@@ -27,7 +27,7 @@ func main() {
 			eg.Sequential(
 				archlinux.Generate(egenv.CacheDirectory("PKGBUILD")),
 				eg.Parallel(
-					archlinux.Publish(egenv.CacheDirectory("PKGBUILD")),
+					// archlinux.Publish(egenv.CacheDirectory("PKGBUILD")),
 					eggithub.Draft(egenv.CacheDirectory("PKGBUILD")),
 				),
 			),
