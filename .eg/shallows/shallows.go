@@ -11,6 +11,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egcoverage"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
@@ -22,20 +23,20 @@ func testBuildTags() []string {
 var buildTags = []string{"duckdb_use_lib", "retrovibed", "neural"}
 
 func rootdir() string {
-	return egenv.WorkingDirectory("shallows")
+	return egenv.DirectoryWorking("shallows")
 }
 
 func shellruntime() shell.Command {
 	return eggolang.Runtime().Directory(rootdir()).Environ(
-		"CACHE_DIRECTORY", egenv.CacheDirectory(),
+		"CACHE_DIRECTORY", egenv.DirectoryCache(),
 	).Environ(
-		"XDG_CACHE_HOME", egenv.CacheDirectory("xdg"), // temporary until eg catches up.
+		"XDG_CACHE_HOME", egenv.DirectoryCache("xdg"), // temporary until eg catches up.
 	).Environ(
-		"GOLANGCI_LINT_CACHE", egenv.CacheDirectory("golang-lint"),
+		"GOLANGCI_LINT_CACHE", egenv.DirectoryCache("golang-lint"),
 	).Environ(
-		"CGO_LDFLAGS", "-L"+egenv.CacheDirectory("neurals"),
+		"CGO_LDFLAGS", "-L"+egenv.DirectoryCache("neurals"),
 	).Environ(
-		"LD_LIBRARY_PATH", egenv.CacheDirectory("neurals"),
+		"LD_LIBRARY_PATH", egenv.DirectoryCache("neurals"),
 	)
 }
 
@@ -135,44 +136,36 @@ func Install(b *tarballs.Build) eg.OpFn {
 	gruntime := shellruntime()
 
 	return shell.Op(
-		gruntime.Newf("mkdir -p ~/.duckdb %s && ln -sfn %s ~/.duckdb", egenv.CacheDirectory("duckdb"), egenv.CacheDirectory("duckdb")),
+		gruntime.Newf("mkdir -p ~/.duckdb %s && ln -sfn %s ~/.duckdb", egenv.DirectoryCache("duckdb"), egenv.DirectoryCache("duckdb")),
 		gruntime.Newf(
 			"go build -buildvcs=true -tags %s -o %s ./cmd/...",
 			strings.Join(buildTags, ","),
 			dstdir,
 		),
-		gruntime.Newf("cp libpredicttext.so %s/", dstdir).Directory(egenv.CacheDirectory("neurals")),
+		gruntime.Newf("cp libpredicttext.so %s/", dstdir).Directory(egenv.DirectoryCache("neurals")),
 	)
 }
 
 func Compile() eg.OpFn {
-	return eggolang.AutoCompile(
-		eggolang.CompileOption.BuildOptions(
-			eggolang.Build(
-				eggolang.BuildOption.Tags(buildTags...),
-				eggolang.BuildOption.WorkingDirectory(rootdir()),
-				eggolang.BuildOption.Environ(
-					"CGO_LDFLAGS=-L"+egenv.CacheDirectory("neurals"),
-					"LD_LIBRARY_PATH="+egenv.CacheDirectory("neurals"),
-				),
-				eggolang.BuildOption.Timeout(egenv.TTL()),
-			),
-		),
-	)
+	return eggolang.New().
+		Tags(buildTags...).
+		WorkingDirectory(rootdir()).
+		Environ(
+			"CGO_LDFLAGS=-L"+egenv.DirectoryCache("neurals"),
+			"LD_LIBRARY_PATH="+egenv.DirectoryCache("neurals"),
+		).
+		Timeout(egenv.TTL()).
+		AutoCompile()
 }
 
 func Test() eg.OpFn {
 	return eg.Sequential(
-		eggolang.AutoTest(
-			eggolang.TestOption.BuildOptions(
-				eggolang.Build(
-					eggolang.BuildOption.Tags(testBuildTags()...),
-					eggolang.BuildOption.WorkingDirectory(rootdir()),
-					eggolang.BuildOption.Timeout(10*time.Minute),
-				),
-			),
-		),
-		eggolang.RecordCoverage,
+		eggolang.New().
+			Tags(testBuildTags()...).
+			WorkingDirectory(rootdir()).
+			Timeout(10*time.Minute).
+			AutoTest(),
+		egcoverage.Report(eggolang.Coverage()...),
 	)
 }
 

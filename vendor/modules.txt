@@ -462,6 +462,8 @@ github.com/egdaemon/eg/astcodec
 github.com/egdaemon/eg/authn
 github.com/egdaemon/eg/backoff
 github.com/egdaemon/eg/compute
+github.com/egdaemon/eg/duckproxy
+github.com/egdaemon/eg/internal/asynccompute
 github.com/egdaemon/eg/internal/bytesx
 github.com/egdaemon/eg/internal/contextx
 github.com/egdaemon/eg/internal/coverage
@@ -494,6 +496,7 @@ github.com/egdaemon/eg/internal/timex
 github.com/egdaemon/eg/internal/tracex
 github.com/egdaemon/eg/internal/userx
 github.com/egdaemon/eg/interp/c8s
+github.com/egdaemon/eg/interp/dbproxy
 github.com/egdaemon/eg/interp/events
 github.com/egdaemon/eg/interp/execproxy
 github.com/egdaemon/eg/interp/runtime/wasi/ffierrors
@@ -503,6 +506,7 @@ github.com/egdaemon/eg/runtime/wasi/eg
 github.com/egdaemon/eg/runtime/wasi/egenv
 github.com/egdaemon/eg/runtime/wasi/eggit
 github.com/egdaemon/eg/runtime/wasi/egunsafe
+github.com/egdaemon/eg/runtime/wasi/egunsafe/fficoverage
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiegcontainer
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiexec
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigit
@@ -512,6 +516,8 @@ github.com/egdaemon/eg/runtime/wasi/shell
 github.com/egdaemon/eg/runtime/x/wasi/egarch
 github.com/egdaemon/eg/runtime/x/wasi/egbug
 github.com/egdaemon/eg/runtime/x/wasi/egccache
+github.com/egdaemon/eg/runtime/x/wasi/egcoverage
+github.com/egdaemon/eg/runtime/x/wasi/egdb
 github.com/egdaemon/eg/runtime/x/wasi/egdebuild
 github.com/egdaemon/eg/runtime/x/wasi/egdmg
 github.com/egdaemon/eg/runtime/x/wasi/egflatpak
@@ -520,6 +526,7 @@ github.com/egdaemon/eg/runtime/x/wasi/eggithub
 github.com/egdaemon/eg/runtime/x/wasi/eggolang
 github.com/egdaemon/eg/runtime/x/wasi/eggpg
 github.com/egdaemon/eg/runtime/x/wasi/egmd5x
+github.com/egdaemon/eg/runtime/x/wasi/egpool
 github.com/egdaemon/eg/runtime/x/wasi/egsecrets
 github.com/egdaemon/eg/runtime/x/wasi/egsha256x
 github.com/egdaemon/eg/runtime/x/wasi/egtarball

@@ -37,7 +37,6 @@ require (
 	github.com/michiwend/gomusicbrainz v0.0.0-20181012083520-6c07e13dd396
 	github.com/mutablelogic/go-media v1.8.3
 	github.com/pkg/errors v0.9.1
-	github.com/pkg/profile v1.7.0
 	github.com/pressly/goose/v3 v3.29.0
 	github.com/retrovibed/retrovibed/retroapi v0.0.0-20260804202116-1a4f850b87e4
 	github.com/shirou/gopsutil/v4 v4.26.6
@@ -150,6 +149,7 @@ require (
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.33 // indirect
+	github.com/pkg/profile v1.7.0 // indirect
 	github.com/porfirion/trie v1.0.0 // indirect
 	github.com/posener/complete v1.2.3 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect

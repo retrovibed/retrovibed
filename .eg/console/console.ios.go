@@ -55,7 +55,7 @@ func EnsureDuckDBSource(duckdbsrc, duckdbinet, duckdbvss string) eg.OpFn {
 func baseIOSRuntime() shell.Command {
 	return flutterRuntimev2(shell.Runtime()).
 		Debug().
-		Environ("IOSENV", egenv.WorkloadDirectory("ios.compile.env")).
+		Environ("IOSENV", egenv.DirectoryWorkload("ios.compile.env")).
 		Environ("LANG", "en_US.UTF-8")
 }
 
@@ -63,7 +63,7 @@ func baseIOSRuntime() shell.Command {
 // xcrun and writes it to a file for iosRuntime to read back. Must run before any
 // step that calls iosRuntime.
 func GenIOSCompilerEnv(ctx context.Context, op eg.Op) error {
-	env := baseIOSRuntime().Directory(egenv.WorkloadDirectory())
+	env := baseIOSRuntime().Directory(egenv.DirectoryWorkload())
 	return shell.Op(
 		env.New("echo \"CC=$(xcrun --sdk iphoneos --find clang)\" | tee ${IOSENV}"),
 		env.New("echo \"CXX=$(xcrun --sdk iphoneos --find clang++)\" | tee -a ${IOSENV}"),
@@ -74,7 +74,7 @@ func GenIOSCompilerEnv(ctx context.Context, op eg.Op) error {
 }
 
 func iosCompilerEnv() []string {
-	return egenv.MustEnviron(egenv.Build().FromPath(egenv.WorkloadDirectory("ios.compile.env")))
+	return egenv.MustEnviron(egenv.Build().FromPath(egenv.DirectoryWorkload("ios.compile.env")))
 }
 
 func iosRuntime() shell.Command {
@@ -86,7 +86,7 @@ func iosRuntime() shell.Command {
 // from dev.native.libs.
 func CompileIOSBinding(ctx context.Context, _ eg.Op) error {
 	runtime := iosRuntime()
-	libsdir := egenv.CacheDirectory("dev.native.libs")
+	libsdir := egenv.DirectoryCache("dev.native.libs")
 
 	cflags := "-arch arm64"
 	ldflags := "-arch arm64 -lc++ -framework CoreFoundation -framework Security " +
@@ -114,7 +114,7 @@ func CompileIOSBinding(ctx context.Context, _ eg.Op) error {
 func BuildIOS(ctx context.Context, _ eg.Op) error {
 	runtime := iosRuntime()
 	commit := eggit.EnvCommit()
-	libsdir := egenv.CacheDirectory("dev.native.libs")
+	libsdir := egenv.DirectoryCache("dev.native.libs")
 
 	return shell.Run(
 		ctx,
@@ -126,10 +126,10 @@ func BuildIOS(ctx context.Context, _ eg.Op) error {
 			filepath.Join(libsdir, "libretrovibed.a"),
 			filepath.Join(libsdir, "libduckdb.a"),
 			filepath.Join(libsdir, "libpredicttext.a"),
-		).Directory(egenv.WorkingDirectory("console", "ios")),
-		runtime.New("xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework").Directory(egenv.WorkingDirectory("console", "ios")),
+		).Directory(egenv.DirectoryWorking("console", "ios")),
+		runtime.New("xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework").Directory(egenv.DirectoryWorking("console", "ios")),
 		runtime.New("flutter pub get"),
-		runtime.New("pod install").Directory(egenv.WorkingDirectory("console", "ios")),
+		runtime.New("pod install").Directory(egenv.DirectoryWorking("console", "ios")),
 		runtime.Newf("flutter build ipa --build-name=%s --build-number=%s --no-codesign --release", tarballs.Version(), commit.StringReplace("%git.commit.unix%")).
 			Timeout(15*time.Minute),
 	)
