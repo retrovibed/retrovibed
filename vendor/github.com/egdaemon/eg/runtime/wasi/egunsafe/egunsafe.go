@@ -4,7 +4,11 @@ package egunsafe
 
 import (
 	"context"
+	"encoding/base32"
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/netip"
@@ -14,7 +18,9 @@ import (
 
 	"github.com/egdaemon/eg"
 	"github.com/egdaemon/eg/internal/envx"
+	"github.com/egdaemon/eg/internal/errorsx"
 	"github.com/egdaemon/wasinet/wasinet"
+	"github.com/gofrs/uuid/v5"
 	"google.golang.org/grpc"
 )
 
@@ -30,6 +36,12 @@ func DialControlSocket(ctx context.Context) (conn *grpc.ClientConn, err error) {
 		proto, address, _ := strings.Cut(s, "://")
 		return wasinet.DialContext(dctx, proto, address)
 	}))
+}
+
+// DialAnalyticsSocket dials the analytics (duckproxy) socket, for issuing
+// SQL against the host's analytics.db. Signature matches duckproxy.DialFunc.
+func DialAnalyticsSocket(ctx context.Context, network, addr string) (net.Conn, error) {
+	return wasinet.DialContext(ctx, network, addr)
 }
 
 // dial the control socket for modules.
@@ -50,8 +62,58 @@ func DialModuleControlSocket(ctx context.Context) (conn *grpc.ClientConn, err er
 	}))
 }
 
+// RuntimeDirectory returns the absolute path to the runtime directory, joined with paths when provided.
+// the runner controls the location through the environment, the default mount is only used when it is unset.
 func RuntimeDirectory(paths ...string) string {
-	return eg.DefaultMountRoot(eg.RuntimeDirectory, filepath.Join(paths...))
+	return filepath.Join(envx.String(eg.DefaultMountRoot(eg.RuntimeDirectory), eg.EnvComputeRuntimeDirectory), filepath.Join(paths...))
+}
+
+// ModuleRuntimeDirectory is the name of the directory of a workload run, named after the last 4 bytes of the run id,
+// the random part of a v7 uuid. the name is kept short as the sockets within the run's directory are close to the
+// length limit of a unix socket path.
+func ModuleRuntimeDirectory(id uuid.UUID) string {
+	return PatternIsolateFrom(id, 4, "m.%x.d")
+}
+
+// create an string from the given pattern that contains a
+// short (n) length random sequence from a uuidv7.
+// used to create isolated directories like proc/module runtime.
+func PatternIsolate(n int, pattern string) string {
+	return PatternIsolateFrom(errorsx.Must(uuid.NewV7()), n, pattern)
+}
+
+// create an string from the given pattern that contains the
+// last n bytes of the provided id. %x encodes as hex, %s as unpadded url safe base64,
+// a precision of 16, 32, 64 selects hex, lowercase base32, base64 respectively for either verb.
+func PatternIsolateFrom(id uuid.UUID, n int, pattern string) string {
+	return fmt.Sprintf(pattern, fmtisolate(id[uuid.Size-n:]))
+}
+
+// lowercase so its safe on case insensitive filesystems.
+var base32isolate = base32.NewEncoding("0123456789abcdefghijklmnopqrstuv").WithPadding(base32.NoPadding)
+
+// formats bytes for use in paths. the precision selects the base: 16 hex, 32 lowercase base32,
+// 64 unpadded url safe base64. %x defaults to hex, every other verb defaults to base64 as its shorter than hex.
+type fmtisolate []byte
+
+func (t fmtisolate) Format(f fmt.State, verb rune) {
+	base := 64
+	if verb == 'x' {
+		base = 16
+	}
+
+	if p, ok := f.Precision(); ok && (p == 16 || p == 32 || p == 64) {
+		base = p
+	}
+
+	switch base {
+	case 16:
+		io.WriteString(f, hex.EncodeToString(t))
+	case 32:
+		io.WriteString(f, base32isolate.EncodeToString(t))
+	default:
+		io.WriteString(f, base64.RawURLEncoding.EncodeToString(t))
+	}
 }
 
 func UnroutablePrefix() netip.Prefix {

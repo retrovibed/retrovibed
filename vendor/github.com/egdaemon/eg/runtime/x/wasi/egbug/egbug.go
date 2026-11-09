@@ -8,6 +8,7 @@ import (
 	"embed"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
 	"os"
@@ -19,6 +20,7 @@ import (
 	_eg "github.com/egdaemon/eg"
 	"github.com/egdaemon/eg/internal/envx"
 	"github.com/egdaemon/eg/internal/errorsx"
+	"github.com/egdaemon/eg/internal/gitx"
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/env"
@@ -70,13 +72,13 @@ func FileTree(ctx context.Context, op eg.Op) error {
 		ctx,
 		privileged.Newf("echo 'runtime directory: %s' && ls -lhan %s", _eg.DefaultMountRoot(_eg.RuntimeDirectory), _eg.DefaultMountRoot(_eg.RuntimeDirectory)),
 		privileged.Newf("echo 'mount directory: %s' && ls -lhan %s", _eg.DefaultMountRoot(), _eg.DefaultMountRoot()),
-		privileged.Newf("echo 'workload directory: %s' && ls -lhan %s", _eg.DefaultWorkloadDirectory(), _eg.DefaultWorkloadDirectory()),
-		privileged.Newf("echo 'cache directory: %s' && ls -lhan %s", egenv.CacheDirectory(), egenv.CacheDirectory()),
-		privileged.Newf("echo 'ephemeral directory: %s' && ls -lhan %s", egenv.EphemeralDirectory(), egenv.EphemeralDirectory()),
-		privileged.Newf("echo 'working directory: %s' && ls -lhan %s", egenv.WorkingDirectory(), egenv.WorkingDirectory()),
-		// privileged.Newf("tree -a -L 1 %s", egenv.CacheDirectory()),
-		// privileged.Newf("tree -a -L 1 %s", egenv.EphemeralDirectory()),
-		// privileged.Newf("tree -a -L 1 %s", egenv.WorkingDirectory()),
+		privileged.Newf("echo 'workload directory: %s' && ls -lhan %s", _eg.DefaultRootDirectory(), _eg.DefaultRootDirectory()),
+		privileged.Newf("echo 'cache directory: %s' && ls -lhan %s", egenv.DirectoryCache(), egenv.DirectoryCache()),
+		privileged.Newf("echo 'ephemeral directory: %s' && ls -lhan %s", egenv.DirectoryTemp(), egenv.DirectoryTemp()),
+		privileged.Newf("echo 'working directory: %s' && ls -lhan %s", egenv.DirectoryWorking(), egenv.DirectoryWorking()),
+		// privileged.Newf("tree -a -L 1 %s", egenv.DirectoryCache()),
+		// privileged.Newf("tree -a -L 1 %s", egenv.DirectoryTemp()),
+		// privileged.Newf("tree -a -L 1 %s", egenv.DirectoryWorking()),
 		// privileged.Newf("tree -a -L 1 %s", _eg.DefaultMountRoot()),
 	)
 }
@@ -148,7 +150,7 @@ func APTPackage(packages ...string) eg.OpFn {
 
 const (
 	EnvUnsafeDigest = "EG_UNSAFE_ENVVARS_DIGEST"
-	defaultDigest   = "28550586c73d13fa9967587b98a92e02"
+	defaultDigest   = "7bdff99dea1d0e9185962aed4cc0e677"
 )
 
 //go:embed default.env
@@ -191,24 +193,39 @@ func normalizeEnv(environ *envx.Builder) *envx.Builder {
 	normalizedirprefix := func(key string) {
 		environ.Setenv(
 			key,
-			strings.Replace(os.Getenv(key), dirprefix, _eg.DefaultWorkloadDirectory(), 1),
+			strings.Replace(os.Getenv(key), dirprefix, _eg.DefaultRootDirectory(), 1),
 		)
-
 	}
+
 	// zero out some dynamic environment variables for consistent results
 	environ.Setenv(_eg.EnvComputeAccountID, uuid.Nil.String())
 	environ.Setenv(_eg.EnvComputeRunID, uuid.Nil.String())
 	environ.Setenv(_eg.EnvGitHeadCommitTimestamp, "0000-00-00T00:00:00-00:00")
 	environ.Setenv(_eg.EnvGitHeadCommit, "0000000000000000000000000000000000000000")
 	environ.Setenv(_eg.EnvGitBaseCommit, "0000000000000000000000000000000000000000")
+	environ.Setenv(_eg.EnvGitHeadCommitAuthor, "Egdaemon")
+	environ.Setenv(_eg.EnvGitHeadCommitEmail, "noreply@egdaemon.com")
+	environ.Setenv(_eg.EnvComputeInitiatedTimestamp, "0000-00-00T00:00:00-00:00")
 	environ.Setenv(_eg.EnvUnsafeCacheID, uuid.Nil.String())
 	environ.Setenv(_eg.EnvComputeLoggingVerbosity, "0")
 	environ.Setenv(_eg.EnvComputeModuleSocket, _eg.DefaultRuntimeDirectory("module.socket"))
+	environ.Setenv(_eg.EnvComputeOS, "linux")
+	environ.Setenv(_eg.EnvComputeArch, "amd64")
+	environ.Setenv(_eg.EnvComputeGPU, "false")
+	environ.Setenv(_eg.EnvComputeGuestMigrationsEnabled, "true")
+	environ.Setenv(_eg.EnvComputeTTL, "0s")
+	environ.Setenv(_eg.EnvComputeWorkload, "")
+	environ.Unsetenv(_eg.EnvComputeWorkloadName) // not part of default.env, removed so the digest is unchanged.
+	environ.Setenv(_eg.EnvComputeProfileMode, "")
+	environ.Setenv(_eg.EnvComputeWorkspaceDirectory, _eg.DefaultWorkspaceDirectory())
+	environ.Setenv(_eg.EnvGitBaseURI, _eg.DefaultWorkingDirectory())
+	environ.Setenv(_eg.EnvGitHeadURI, _eg.DefaultWorkingDirectory())
+	environ.Setenv(_eg.EnvGitHeadRef, "HEAD")
+	environ.Setenv(_eg.EnvGitBaseVCS, "git@github.com:egdaemon/eg.git")
 
 	// normalize standard directories.
 	normalizedirprefix(_eg.EnvComputeWorkloadDirectory)
 	normalizedirprefix(_eg.EnvComputeWorkingDirectory)
-	normalizedirprefix(_eg.EnvComputeWorkspaceDirectory)
 	normalizedirprefix(_eg.EnvComputeCacheDirectory)
 	normalizedirprefix(_eg.EnvComputeRuntimeDirectory)
 
@@ -220,18 +237,40 @@ func normalizeEnv(environ *envx.Builder) *envx.Builder {
 	environ.Unsetenv("GRPC_GO_LOG_SEVERITY_LEVEL")
 	environ.Unsetenv("GRPC_GO_LOG_VERBOSITY_LEVEL")
 
+	// never include credentials, the environment is printed on mismatch.
+	environ.Unsetenv(_eg.EnvGithubToken)
+	environ.Unsetenv(gitx.EnvAuthEGAccessToken)
+	environ.Unsetenv(gitx.EnvAuthHTTPUsername)
+	environ.Unsetenv(gitx.EnvAuthHTTPPassword)
+
+	// ignore variables that depend on how the process was launched (shell, sudo, baremetal).
+	environ.Unsetenv("USER")
+	environ.Unsetenv("LOGNAME")
+	environ.Unsetenv("SHELL")
+	environ.Unsetenv("SHLVL")
+	environ.Unsetenv("SSH_AUTH_SOCK")
+	environ.Unsetenv("GNUPGHOME")
+	environ.Unsetenv("_")
+	environ.Unsetenv("SUDO_COMMAND")
+	environ.Unsetenv("SUDO_GID")
+	environ.Unsetenv("SUDO_HOME")
+	environ.Unsetenv("SUDO_UID")
+	environ.Unsetenv("SUDO_USER")
+	environ.Unsetenv(_eg.EnvComputeDefaultGroup)
+	environ.Unsetenv(_eg.EnvComputeTLSInsecure)
+	environ.Unsetenv(_eg.EnvExperimentalBaremetal)
+
 	// always ignore compute bin. its development tooling.
 	environ.Unsetenv(_eg.EnvComputeBin)
 	// always ingore unsafe digest, its for testing.
 	environ.Unsetenv(EnvUnsafeDigest)
-	// probably shouldn't ignore this...
-	environ.Unsetenv("DEBIAN_FRONTEND")
 
 	return environ
 }
 
-// Ensures the environment is stable between releases. only usable for standard compute.
-// baremetal is too variable. use EnsureEnvSubset for baremetal.
+// Ensures the environment is stable between releases. variance from the shell that launched
+// the process and from baremetal is removed by normalizeEnv.
+// use EnsureEnv when you need an exact digest over specific keys.
 func EnsureEnvAuto(ctx context.Context, op eg.Op) error {
 
 	// expected hash with normalized values.
@@ -309,6 +348,43 @@ func Sleep(d time.Duration) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
 		time.Sleep(d)
 		return nil
+	}
+}
+
+// utility function for prototyping. blocks until the user answers a y/n prompt on stdin.
+// answering y continues, answering n (or EOF) fails the operation.
+func Wait(prompt string) eg.OpFn {
+	return func(ctx context.Context, op eg.Op) error {
+		answer := make(chan string, 1)
+		go func() {
+			for {
+				log.Printf("%s [y/n]: ", prompt)
+				var s string
+				if _, err := fmt.Fscanln(os.Stdin, &s); err != nil && s == "" {
+					if err == io.EOF {
+						answer <- "n"
+						return
+					}
+					continue
+				}
+
+				switch strings.ToLower(strings.TrimSpace(s)) {
+				case "y", "yes", "n", "no":
+					answer <- strings.ToLower(strings.TrimSpace(s))
+					return
+				}
+			}
+		}()
+
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case a := <-answer:
+			if a[0] != 'y' {
+				return fmt.Errorf("user rejected: %s", prompt)
+			}
+			return nil
+		}
 	}
 }
 

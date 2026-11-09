@@ -63,6 +63,12 @@ func Ignore(err error, ignore ...error) error {
 	return err
 }
 
+// Is reports whether any error in err's tree matches target. thin wrapper over errors.Is
+// so callers don't need to import both packages.
+func Is(err, target error) bool {
+	return errors.Is(err, target)
+}
+
 func NewLimitExceeded(n uint, err error) error {
 	return LimitExceeded{
 		N:     n,
@@ -297,4 +303,29 @@ func (t errWriter) Write([]byte) (int, error) {
 // useful for designing some apis.
 func Writer(err error) io.Writer {
 	return errWriter{err}
+}
+
+// ZeroSilent ignores the error without logging it.
+func ZeroSilent[T any](v T, err error) T {
+	return v
+}
+
+// ZeroDebug logs the error only when debugging is enabled, otherwise ignores it.
+// d is expected to be debugx.Fn, the type must be given explicitly:
+//
+//	errorsx.ZeroDebug[time.Time](debugx.Fn)(time.Parse(time.DateOnly, s))
+func ZeroDebug[T any](d func(func())) func(T, error) T {
+	return func(v T, err error) T {
+		if err == nil {
+			return v
+		}
+
+		d(func() {
+			if cause := log.Output(4, fmt.Sprintln(err)); cause != nil {
+				panic(cause)
+			}
+		})
+
+		return v
+	}
 }

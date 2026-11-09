@@ -1,16 +1,19 @@
 package egenv
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/egdaemon/eg"
 	"github.com/egdaemon/eg/internal/envx"
 	"github.com/egdaemon/eg/internal/errorsx"
+	"github.com/egdaemon/eg/internal/patternx"
 	"github.com/egdaemon/eg/internal/userx"
 	"github.com/egdaemon/eg/runtime/wasi/env"
 )
@@ -19,6 +22,24 @@ import (
 // defaults to an hour. currently not fully implemented.
 func TTL() time.Duration {
 	return env.Duration(time.Hour, eg.EnvComputeTTL)
+}
+
+// CloneEnabled reports whether the repository is cloned from, and so pushed to, a remote. false for `eg compute local`,
+// which works on the local checkout where there is nothing to push to.
+func CloneEnabled() bool {
+	return env.Boolean(true, eg.EnvUnsafeGitCloneEnabled)
+}
+
+// Draft reports whether the workload may upload its artifacts to a draft release, set by `eg compute --draft`.
+// workloads build into the workspace by default and only push when this is true.
+func Draft() bool {
+	return env.Boolean(false, eg.EnvWorkloadDraft)
+}
+
+// Release reports whether the workload may publish the release, set by `eg compute --release`.
+// publishing builds on a draft, so it is only true when Draft is.
+func Release() bool {
+	return Draft() && env.Boolean(false, eg.EnvWorkloadRelease)
 }
 
 // Read the run ID from the environment
@@ -53,66 +74,198 @@ func Workload() string {
 	return env.String("", eg.EnvComputeWorkload)
 }
 
-// returns the current user.
+// Read the name of the workload (the module it runs, i.e. the folder name within the module directory)
+// from the environment, empty for the default workload (see eg.DefaultWorkload).
+func WorkloadName() string {
+	return env.String("", eg.EnvComputeWorkloadName)
+}
+
+// Pattern substitutes values from the environment into the provided pattern.
+//
+// {eg.run.id}        -> the run id of the compute workload, see RunID.
+// {eg.account.id}    -> the account id of the compute workload, see AccountID.
+// {eg.workload}      -> the workload directory, see DirectoryWorkload.
+// {eg.workload.name} -> the name of the module the workload runs, see WorkloadName.
+// {eg.host.arch}     -> the cpu architecture of the host machine.
+// {eg.host.os}       -> the operating system of the host machine.
+// {eg.working}       -> the working directory, see DirectoryWorking.
+// {eg.cache}         -> the cache directory, see DirectoryCache.
+// {eg.tmp}           -> the temporary directory of the module, see DirectoryTemp.
+//
+// the %eg.token% style of tokens is deprecated, use the braces. %eg.run.id% is {eg.run.id}, %eg.workload% is
+// {eg.workload.name} and %eg.workspace% is {eg.workload}.
+//
+// the tokens are substituted first and the result is then formatted with fmt.Sprintf,
+// e.g.) Pattern("{eg.workload}/%s", "foo") -> "/workload/.eg.workspace/foo".
+func Pattern(format string, args ...any) string {
+	patternx.Warn(format)
+
+	// substituted values are escaped so they are not interpreted as verbs.
+	escape := func(v string) string {
+		return strings.ReplaceAll(v, "%", "%%")
+	}
+
+	s := strings.ReplaceAll(format, "%eg.run.id%", escape(RunID()))
+	s = strings.ReplaceAll(s, "{eg.run.id}", escape(RunID()))
+	s = strings.ReplaceAll(s, "%eg.account.id%", escape(AccountID()))
+	s = strings.ReplaceAll(s, "{eg.account.id}", escape(AccountID()))
+	s = strings.ReplaceAll(s, "%eg.workload%", escape(WorkloadName()))
+	s = strings.ReplaceAll(s, "{eg.workload.name}", escape(WorkloadName()))
+	s = strings.ReplaceAll(s, "%eg.host.arch%", escape(env.String("", eg.EnvComputeArch)))
+	s = strings.ReplaceAll(s, "{eg.host.arch}", escape(env.String("", eg.EnvComputeArch)))
+	s = strings.ReplaceAll(s, "%eg.host.os%", escape(env.String("", eg.EnvComputeOS)))
+	s = strings.ReplaceAll(s, "{eg.host.os}", escape(env.String("", eg.EnvComputeOS)))
+	s = strings.ReplaceAll(s, "%eg.workspace%", escape(DirectoryWorkload()))
+	s = strings.ReplaceAll(s, "{eg.workload}", escape(DirectoryWorkload()))
+	s = strings.ReplaceAll(s, "%eg.working%", escape(DirectoryWorking()))
+	s = strings.ReplaceAll(s, "{eg.working}", escape(DirectoryWorking()))
+	s = strings.ReplaceAll(s, "%eg.cache%", escape(DirectoryCache()))
+	s = strings.ReplaceAll(s, "{eg.cache}", escape(DirectoryCache()))
+	s = strings.ReplaceAll(s, "%eg.tmp%", escape(DirectoryTemp()))
+	s = strings.ReplaceAll(s, "{eg.tmp}", escape(DirectoryTemp()))
+
+	return fmt.Sprintf(s, args...)
+}
+
+// User returns the current user.
 func User() *user.User {
 	return userx.CurrentUserOrDefault(userx.Root())
 }
 
-// returns the absolute path to the workload directory of the module. this directory is the
-// root directory of the workload.
-//
-// e.g.) WorkloadDirectory("foo", "bar") -> "/{eg.workload}/foo/bar"
-func WorkloadDirectory(paths ...string) string {
-	return filepath.Join(env.String(eg.DefaultWorkloadDirectory(), eg.EnvComputeWorkloadDirectory), filepath.Join(paths...))
+// dir joins paths onto the first environment key that is set, falling back to fallback when none are.
+func dir(fallback string, paths []string, keys ...string) string {
+	return filepath.Join(env.String(fallback, keys...), filepath.Join(paths...))
 }
 
-// returns the absolute path to the cache directory, when arguments are provided they are joined
-// joined with the cache directory.
+// DirectoryCache returns the absolute path to the cache directory, EG_COMPUTE_CACHE_DIRECTORY or the systemd
+// CACHE_DIRECTORY, falling back to os.TempDir() when neither is set.
 //
-// files stored in the cache directory are maintained between runs on a best effort basis.
-// files prefixed with .eg are reserved for system use.
+// lifecycle: survives across workloads on a best effort basis. entries prefixed with .eg are reserved for system use.
 //
-// e.g.) CacheDirectory("foo", "bar") -> "/{eg.cache}/foo/bar"
+// paths are joined onto the directory.
+// e.g.) DirectoryCache("foo", "bar") -> "/workload/.eg.cache/foo/bar"
+func DirectoryCache(paths ...string) string {
+	return dir(os.TempDir(), paths, eg.EnvComputeCacheDirectory, userx.EnvCacheDirectory)
+}
+
+// CacheDirectory returns the absolute path to the cache directory, joined with paths when provided.
+//
+// Deprecated: use DirectoryCache.
 func CacheDirectory(paths ...string) string {
-	return filepath.Join(env.String(os.TempDir(), eg.EnvComputeCacheDirectory, "CACHE_DIRECTORY"), filepath.Join(paths...))
+	return DirectoryCache(paths...)
 }
 
-// returns the absolute path to the runtime directory, when arguments are provided they are joined
-// joined with the runime directory.
+// RuntimeDirectory returns the absolute path to the runtime directory, EG_COMPUTE_RUNTIME_DIRECTORY, falling back
+// to os.TempDir() when it is not set. the directory holds the files eg itself uses, e.g.) sockets.
 //
-// files stored in the runtime directory are maintained for the duration of a workload. every module
-// will be able to read the data stored in the runtime folder.
+// lifecycle: lives for the duration of a workload and is readable by every module.
 //
-// e.g.) RuntimeDirectory("foo", "bar") -> "/{eg.runtime}/foo/bar"
+// paths are joined onto the directory.
+// e.g.) RuntimeDirectory("foo", "bar") -> "/eg.mnt/.eg.runtime/foo/bar"
+//
+// Deprecated: the directory is owned by eg and is not for use by workloads, use egunsafe.RuntimeDirectory if it is
+// required.
 func RuntimeDirectory(paths ...string) string {
-	return filepath.Join(env.String(os.TempDir(), eg.EnvComputeRuntimeDirectory), filepath.Join(paths...))
+	return dir(os.TempDir(), paths, eg.EnvComputeRuntimeDirectory)
 }
 
-// returns the absolute path to the workspace directory, when arguments are provided they are joined
-// joined with the workspace directory.
+// WorkspaceDirectory returns the absolute path to the workspace directory, EG_COMPUTE_WORKSPACE_DIRECTORY, falling
+// back to eg.DefaultWorkspaceDirectory() when it is not set.
 //
-// experimental directory - intended to be a directory for maintaining data for the lifetime of the workload.
+// lifecycle: shared by every module and lives for the duration of a single workload.
 //
-// e.g.) WorkspaceDirectory("foo", "bar") -> "/{eg.workspace}/foo/bar"
+// paths are joined onto the directory.
+// e.g.) WorkspaceDirectory("foo", "bar") -> "/workload/.eg.workspace/foo/bar"
+//
+// Deprecated: use DirectoryWorkload.
 func WorkspaceDirectory(paths ...string) string {
-	return filepath.Join(env.String(eg.DefaultWorkspaceDirectory(), eg.EnvComputeWorkspaceDirectory), filepath.Join(paths...))
+	return DirectoryWorkload(paths...)
 }
 
-// returns the absolute path to the working directory of the module. this directory is the
-// initial working directory of the workload and is used for cloning git repositories etc.
+// DirectoryWorkload returns the absolute path to the workload directory, EG_COMPUTE_WORKSPACE_DIRECTORY, falling
+// back to eg.DefaultWorkspaceDirectory() when it is not set.
+//
+// lifecycle: shared by every module and lives for the duration of a single workload.
+//
+// paths are joined onto the directory.
+// e.g.) DirectoryWorkload("foo", "bar") -> "/workload/.eg.workspace/foo/bar"
+func DirectoryWorkload(paths ...string) string {
+	return dir(eg.DefaultWorkspaceDirectory(), paths, eg.EnvComputeWorkspaceDirectory)
+}
+
+// DirectoryWorking returns the absolute path to the working directory, EG_COMPUTE_WORKING_DIRECTORY, falling back
+// to eg.DefaultWorkingDirectory() when it is not set. this is the initial working directory of the workload
+// and is where the repository is cloned.
+//
+// lifecycle: lives for the duration of a single workload.
+//
+// paths are joined onto the directory.
+// e.g.) DirectoryWorking("foo", "bar") -> "/workload/eg/foo/bar"
+func DirectoryWorking(paths ...string) string {
+	return dir(eg.DefaultWorkingDirectory(), paths, eg.EnvComputeWorkingDirectory)
+}
+
+// WorkingDirectory returns the absolute path to the working directory, joined with paths when provided.
+//
+// Deprecated: use DirectoryWorking.
 func WorkingDirectory(paths ...string) string {
-	return filepath.Join(env.String(eg.DefaultWorkingDirectory(), eg.EnvComputeWorkingDirectory), filepath.Join(paths...))
+	return DirectoryWorking(paths...)
 }
 
-// returns the absolute path to the ephemeral directory, when arguments are provided they are joined
-// joined with the ephemeral directory.
+// PathRelative reports paths within dir relative to it. relative paths and paths outside dir are returned as is.
+func PathRelative(dir string, path string) string {
+	if !filepath.IsAbs(path) {
+		return path
+	}
+
+	rel, err := filepath.Rel(dir, path)
+	if err != nil || !filepath.IsLocal(rel) {
+		return path
+	}
+
+	return rel
+}
+
+// PathRelativeWorkspace reports paths within the workspace directory relative to it, so they hold wherever the workspace is
+// located, e.g.) a git worktree. relative paths and paths outside the workspace are returned as is.
+func PathRelativeWorkspace(path string) string {
+	return PathRelative(DirectoryWorkload(), path)
+}
+
+// PathRelativeWorking reports paths within the working directory relative to it, so they hold wherever the working directory
+// is located. relative paths and paths outside the working directory are returned as is.
+func PathRelativeWorking(path string) string {
+	return PathRelative(DirectoryWorking(), path)
+}
+
+// PathRelativeCache reports paths within the cache directory relative to it. relative paths and paths outside the
+// cache directory are returned as is.
+func PathRelativeCache(path string) string {
+	return PathRelative(DirectoryCache(), path)
+}
+
+// PathRelativeEphemeral reports paths within the ephemeral directory relative to it. relative paths and paths outside the
+// ephemeral directory are returned as is.
+func PathRelativeEphemeral(path string) string {
+	return PathRelative(DirectoryTemp(), path)
+}
+
+// DirectoryTemp returns the absolute path to the temporary directory, which is os.TempDir(). every module
+// is given its own temporary directory, so it is unique to the module.
 //
-// files stored in the ephemeral directory are maintained for the duration of a single module's execution.
-// and is unique to that module.
+// lifecycle: lives for the duration of a single module's execution.
 //
-// e.g.) EphemeralDirectory("foo", "bar") -> "/{eg.ephemeral}/foo/bar"
+// paths are joined onto the directory.
+// e.g.) DirectoryTemp("foo", "bar") -> "/tmp/foo/bar"
+func DirectoryTemp(paths ...string) string {
+	return dir(os.TempDir(), paths)
+}
+
+// EphemeralDirectory returns the absolute path to the ephemeral directory, joined with paths when provided.
+//
+// Deprecated: use DirectoryTemp.
 func EphemeralDirectory(paths ...string) string {
-	return filepath.Join(os.TempDir(), filepath.Join(paths...))
+	return DirectoryTemp(paths...)
 }
 
 // Extract a time.Duration formatted environment variable from the given keys

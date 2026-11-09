@@ -6,22 +6,19 @@ import (
 	"reflect"
 	"runtime"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/egdaemon/eg"
-	"github.com/egdaemon/eg/internal/envx"
 	"github.com/egdaemon/eg/internal/errorsx"
 	"github.com/egdaemon/eg/interp/events"
 	"github.com/egdaemon/eg/runtime/wasi/egunsafe"
-	"github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiegcontainer"
 	"github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigraph"
 )
 
 // Generally unsafe predefined runner for modules. useful
 // for providing a base line environment but has no long term
 // stability promises.
-func DefaultModule() ContainerRunner {
+func DefaultModule() C8S {
 	path := egunsafe.RuntimeDirectory("eg.default.module")
 	errorsx.Never(eg.PrepareRootContainer(path))
 	return Container("eg").BuildFromFile(path)
@@ -37,6 +34,22 @@ type Op interface {
 }
 
 type OpFn func(context.Context, Op) error
+
+// Op implements Runnable so every OpFn is a Runnable.
+func (t OpFn) Op(ctx context.Context, o Op) error {
+	return t(ctx, o)
+}
+
+// Runnable is the interface form of an OpFn. it allows richer types to be embedded
+// in other interfaces. pass the method value (r.Op) where an OpFn is expected.
+type Runnable interface {
+	Op(context.Context, Op) error
+}
+
+// Fn adapts a bare function into an OpFn, and therefore a Runnable.
+func Fn(fn func(context.Context, Op) error) OpFn {
+	return OpFn(fn)
+}
 
 type runtimeref struct {
 	ptr uintptr
@@ -118,6 +131,7 @@ func Perform(octx context.Context, operations ...OpFn) error {
 	return nil
 }
 
+// Run operations in sequence
 func Sequential(operations ...OpFn) OpFn {
 	return func(octx context.Context, o Op) error {
 		parent := prefixedop("seq", o)
@@ -183,148 +197,26 @@ func WhenFn(b func(ctx context.Context) bool, o OpFn) OpFn {
 	}
 }
 
-// interface to workload runners, used to represent containers, vms, or other such runtimes.
-type Runner interface {
+// C is the compilation half of the virtualization layer, it prepares the runtime (build or pull a container, etc).
+type C interface {
 	CompileWith(ctx context.Context) (err error)
+}
+
+// V is the virtualization layer, used to represent containers, vms, or other such runtimes.
+type V interface {
 	RunWith(ctx context.Context, mpath string) (err error)
 }
 
-// Run the tasks with the specified container.
-func Container(name string) ContainerRunner {
-	return ContainerRunner{
-		name:  name,
-		built: &sync.Once{},
-	}
+// v is both halves of the virtualization layer.
+type v interface {
+	V
+	C
 }
 
-type coption []string
+// Deprecated: use V and C.
+type Runner = v
 
-func (t coption) workdir(dir string) coption {
-	return []string{"-w", dir}
-}
-
-func (t coption) envvar(k, v string) coption {
-	if v == "" {
-		return []string{"-e", k}
-	}
-
-	return []string{"-e", fmt.Sprintf("%s=%s", k, v)}
-}
-
-func (t coption) literal(options ...string) coption {
-	return options
-}
-
-type ContainerRunner struct {
-	name       string
-	definition string
-	pull       string
-	cmd        []string
-	options    []coption
-	built      *sync.Once
-}
-
-func (t ContainerRunner) Clone() ContainerRunner {
-	dup := t
-	dup.cmd = make([]string, 0, len(t.cmd))
-	dup.options = make([]coption, 0, len(t.options))
-	copy(dup.cmd, t.cmd)
-	copy(dup.options, t.options)
-	return t
-}
-
-func (t ContainerRunner) OptionLiteral(args ...string) ContainerRunner {
-	t.options = append(t.options, coption(nil).literal(args...))
-	return t
-}
-
-// specifies the location of the container file on disk.
-func (t ContainerRunner) BuildFromFile(s string) ContainerRunner {
-	t.definition = s
-	return t
-}
-
-// pull the container from a remote repository.
-func (t ContainerRunner) PullFrom(s string) ContainerRunner {
-	t.pull = s
-	return t
-}
-
-// the command to execute.
-func (t ContainerRunner) Command(s string) ContainerRunner {
-	t.cmd = strings.Split(s, " ")
-	return t
-}
-
-// CompileWith builds the container and
-func (t ContainerRunner) CompileWith(ctx context.Context) (err error) {
-	var opts []string
-	for _, o := range t.options {
-		opts = append(opts, o...)
-	}
-
-	t.built.Do(func() {
-		if t.pull != "" {
-			if err = errorsx.Wrapf(ffiegcontainer.Pull(ctx, t.pull, opts), "unable to pull the container: %s", t.name); err != nil {
-				return
-			}
-		}
-
-		if t.definition != "" {
-			if err = errorsx.Wrapf(ffiegcontainer.Build(ctx, t.name, t.definition, opts), "unable to build the container: %s", t.name); err != nil {
-				return
-			}
-		}
-	})
-
-	return err
-}
-
-func (t ContainerRunner) RunWith(ctx context.Context, mpath string) (err error) {
-	var opts []string
-	for _, o := range t.options {
-		opts = append(opts, o...)
-	}
-
-	return errorsx.Wrapf(ffiegcontainer.Run(ctx, t.name, mpath, t.cmd, opts), "unable to run the container: %s", t.name)
-}
-
-// internal use.
-func (t ContainerRunner) ToModuleRunner() ContainerModuleRunner {
-	return ContainerModuleRunner{ContainerRunner: t}
-}
-
-func (t ContainerRunner) OptionWorkingDirectory(dir string) ContainerRunner {
-	t.options = append(t.options, (coption{}).workdir(dir))
-	return t
-}
-
-func (t ContainerRunner) OptionEnvVar(k string) ContainerRunner {
-	t.options = append(t.options, (coption{}).envvar(k, ""))
-	return t
-}
-
-func (t ContainerRunner) OptionEnv(k, v string) ContainerRunner {
-	t.options = append(t.options, (coption{}).envvar(k, v))
-	return t
-}
-
-type ContainerModuleRunner struct {
-	ContainerRunner
-}
-
-func (t ContainerModuleRunner) RunWith(ctx context.Context, mpath string) (err error) {
-	var opts []string
-	for _, o := range t.options {
-		opts = append(opts, o...)
-	}
-
-	opts = append(opts, "-e", fmt.Sprintf("%s=%d", eg.EnvComputeModuleNestedLevel, envx.Int(-1, eg.EnvComputeModuleNestedLevel)+1))
-
-	return errorsx.Wrapf(ffiegcontainer.Module(ctx, t.name, mpath, opts), "unable to run the module: %s", t.name)
-}
-
-func Build(r Runner) OpFn {
+func Build(r C) OpFn {
 	return func(ctx context.Context, o Op) error {
 		return r.CompileWith(ctx)
 	}
@@ -332,7 +224,7 @@ func Build(r Runner) OpFn {
 
 // Module executes a set of operations within the provided environment.
 // Important: this method acts as an Instrumentation point by the runtime.
-func Module(ctx context.Context, r Runner, references ...OpFn) OpFn {
+func Module(ctx context.Context, r v, references ...OpFn) OpFn {
 	return func(ctx context.Context, o Op) error {
 		return r.CompileWith(ctx)
 	}
@@ -340,7 +232,7 @@ func Module(ctx context.Context, r Runner, references ...OpFn) OpFn {
 
 // Exec executes command with the given runner
 // Important: this method acts as an Instrumentation point by the runtime.
-func Exec(ctx context.Context, r Runner) OpFn {
+func Exec(ctx context.Context, r v) OpFn {
 	return func(ctx context.Context, o Op) error {
 		return r.CompileWith(ctx)
 	}
@@ -348,7 +240,7 @@ func Exec(ctx context.Context, r Runner) OpFn {
 
 // Deprecated: this is intended for internal use only. do not use.
 // used to replace invocations at runtime.
-func UnsafeRunner(ctx context.Context, r Runner, modulepath string) OpFn {
+func UnsafeRunner(ctx context.Context, r V, modulepath string) OpFn {
 	return func(ctx context.Context, o Op) error {
 		return r.RunWith(ctx, modulepath)
 	}
@@ -356,7 +248,7 @@ func UnsafeRunner(ctx context.Context, r Runner, modulepath string) OpFn {
 
 // Deprecated: this is intended for internal use only. do not use.
 // used to replace the exec invocations at runtime.
-func UnsafeExec(ctx context.Context, r Runner, modulepath string) OpFn {
+func UnsafeExec(ctx context.Context, r V, modulepath string) OpFn {
 	return func(ctx context.Context, o Op) error {
 		return r.RunWith(ctx, modulepath)
 	}

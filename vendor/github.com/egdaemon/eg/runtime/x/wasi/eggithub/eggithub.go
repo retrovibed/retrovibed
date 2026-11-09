@@ -21,7 +21,7 @@ import (
 // assuming you're generating commits on merge this will always move forward.
 func PatternVersion() string {
 	c := eggit.EnvCommit()
-	return c.StringReplace("r%git.commit.year%.%git.commit.month%.%git.commit.day%%git.commit.unix%")
+	return c.StringReplace("r{git.commit.year}.{git.commit.month}.{git.commit.day}{git.commit.unix}")
 }
 
 // replaces the substitution values within the pattern, resulting in the final resulting archive file's name.
@@ -131,7 +131,7 @@ func verifyAssets(version, assets string, patterns ...string) error {
 func Promote(patterns ...string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		var (
-			path    = egenv.EphemeralDirectory("eg.github.release.assets")
+			path    = egenv.DirectoryTemp("eg.github.release.assets")
 			version = PatternVersion()
 		)
 

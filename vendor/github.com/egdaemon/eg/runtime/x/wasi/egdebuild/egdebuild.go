@@ -115,6 +115,13 @@ func (option) Distro(s string) option {
 	}
 }
 
+// architecture of the debian package, all for packages whose files are the same on every architecture.
+func (option) Architecture(arch string) option {
+	return func(c *Config) {
+		c.Architecture = arch
+	}
+}
+
 func (option) DependsBuild(deps ...string) option {
 	return func(c *Config) {
 		c.Dependency.Build = deps
@@ -203,12 +210,19 @@ func New(pkg string, distro string, src string, opts ...option) (c Config) {
 		},
 		timeout:    5 * time.Minute,
 		runtimeadj: func(c shell.Command) shell.Command { return c },
-	}, opts...)
+	},
+		// temporary until gpg fixes upstream bugs.
+		// this allows the runner to access the .gnupg directory we mount via compute local
+		Option.Runtime(func(c shell.Command) shell.Command {
+			return c.MaybePrivileged(true)
+		}),
+		langx.Compose(opts...),
+	)
 }
 
 // Basic container for building debian packages. the archive must provide the container file
 // to use. if you provide nil archive a default container will be provided but likely wont have dependencies needed.
-func Prepare(c eg.ContainerRunner, archive fs.FS) eg.OpFn {
+func Prepare(c eg.C8S, archive fs.FS) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		const relpath = "Containerfile"
 		if archive == nil {
@@ -221,16 +235,16 @@ func Prepare(c eg.ContainerRunner, archive fs.FS) eg.OpFn {
 			}
 		}
 
-		if err := egfs.CloneFS(ctx, egenv.EphemeralDirectory(), relpath, archive); err != nil {
+		if err := egfs.CloneFS(ctx, egenv.DirectoryTemp(), relpath, archive); err != nil {
 			return err
 		}
 
-		return eg.Build(c.BuildFromFile(filepath.Join(egenv.EphemeralDirectory(), relpath)))(ctx, o)
+		return eg.Build(c.BuildFromFile(filepath.Join(egenv.DirectoryTemp(), relpath)))(ctx, o)
 	}
 }
 
 // container for this package.
-func Runner() eg.ContainerRunner {
+func Runner() eg.C8S {
 	return eg.Container(ContainerName)
 }
 
@@ -261,7 +275,7 @@ func Runtime(cfg Config, opts ...option) shell.Command {
 func Build(cfg Config, opts ...option) eg.OpFn {
 	cfg = From(cfg, opts...)
 	return func(ctx context.Context, _ eg.Op) error {
-		root := egenv.EphemeralDirectory(fmt.Sprintf("deb.%s", cfg.Name))
+		root := egenv.DirectoryTemp(fmt.Sprintf("deb.%s", cfg.Name))
 		if err := fsx.MkDirs(0755, root); err != nil {
 			return err
 		}
@@ -303,21 +317,21 @@ func Build(cfg Config, opts ...option) eg.OpFn {
 // uploads the generated deb packages using a dput configuration.
 func UploadDPut(gcfg Config, dput fs.FS, opts ...option) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
-		if err := egfs.CloneFS(ctx, egenv.EphemeralDirectory(), "dput.config", dput); err != nil {
+		if err := egfs.CloneFS(ctx, egenv.DirectoryTemp(), "dput.config", dput); err != nil {
 			return err
 		}
 		root := fmt.Sprintf("deb.%s", gcfg.Name)
-		bdir := egenv.EphemeralDirectory(root)
+		bdir := egenv.DirectoryTemp(root)
 		cfg := From(gcfg, opts...)
 		runtime := Runtime(cfg)
 		return shell.Run(
 			ctx,
 			// need to run permission adjustments as privileged since the files were created as the root user.
-			runtime.Newf("chown -R egd:egd %s", egenv.EphemeralDirectory("dput.config")).Privileged(),
+			runtime.Newf("chown -R egd:egd %s", egenv.DirectoryTemp("dput.config")).Privileged(),
 			runtime.Newf(
 				"ls %s/*_source.changes | xargs -I {} dput -f -c %s %s {}",
 				bdir,
-				egenv.EphemeralDirectory("dput.config"),
+				egenv.DirectoryTemp("dput.config"),
 				cfg.Name,
 			),
 		)
