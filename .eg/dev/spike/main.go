@@ -29,7 +29,7 @@ func main() {
 			eg.Sequential(
 				tarballs.Tarchive,
 				shell.Op(
-					shell.Newf("ls -lha %s", egenv.WorkspaceDirectory()),
+					shell.Newf("ls -lha %s", egenv.DirectoryWorkload()),
 					shell.Newf("file %s", tarballs.RetrovibedSource()),
 					shell.Newf("tar -tvf %s", tarballs.RetrovibedSource()),
 				),

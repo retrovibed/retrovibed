@@ -33,10 +33,10 @@ func writeBase64File(path, b64, label string) error {
 // KeychainPEM creates a temporary keychain and imports a PEM private key and DER certificate.
 func KeychainPEM(base64key, base64cert string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
-		keypath := egenv.WorkspaceDirectory("apple.key.pem")
-		certpath := egenv.WorkspaceDirectory("apple.cert.der")
-		keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
-		intermediatepath := egenv.WorkspaceDirectory("apple.intermediate.cer")
+		keypath := egenv.DirectoryWorkload("apple.key.pem")
+		certpath := egenv.DirectoryWorkload("apple.cert.der")
+		keychainPath := egenv.DirectoryWorkload("apple.signing.keychain")
+		intermediatepath := egenv.DirectoryWorkload("apple.intermediate.cer")
 
 		if err := writeBase64File(keypath, base64key, "key"); err != nil {
 			return err
@@ -74,9 +74,9 @@ func KeychainPEM(base64key, base64cert string) eg.OpFn {
 // label distinguishes temp files when multiple certificates are imported.
 func KeychainAppendPEM(label, base64key, base64cert string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
-		keypath := egenv.WorkspaceDirectory(fmt.Sprintf("apple.%s.key.pem", label))
-		certpath := egenv.WorkspaceDirectory(fmt.Sprintf("apple.%s.cert.der", label))
-		keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
+		keypath := egenv.DirectoryWorkload(fmt.Sprintf("apple.%s.key.pem", label))
+		certpath := egenv.DirectoryWorkload(fmt.Sprintf("apple.%s.cert.der", label))
+		keychainPath := egenv.DirectoryWorkload("apple.signing.keychain")
 
 		if err := writeBase64File(keypath, base64key, "installer key"); err != nil {
 			return err

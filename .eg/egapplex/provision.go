@@ -13,7 +13,7 @@ import (
 // bundle.
 func Provision(profile []byte, dstpaths ...string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
-		profilepath := egenv.WorkspaceDirectory("apple.mobileprovision")
+		profilepath := egenv.DirectoryWorkload("apple.mobileprovision")
 
 		if err := writeFile(profilepath, profile, "provisioning profile"); err != nil {
 			return err

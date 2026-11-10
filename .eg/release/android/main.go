@@ -121,14 +121,14 @@ func CredentialsHack(ctx context.Context, o eg.Op) error {
 	// 	return err
 	// }
 
-	// if err = os.WriteFile(egenv.WorkloadDirectory("gcloud", "application_default_credentials.json"), decoded, 0600); err != nil {
+	// if err = os.WriteFile(egenv.DirectoryWorkload("gcloud", "application_default_credentials.json"), decoded, 0600); err != nil {
 	// 	return err
 	// }
 
 	return shell.Run(
 		ctx,
 		// shell.Newf("echo %s | tr -- '-_' '+/' | base64 -d -i | install -D -m 600 /dev/stdin ~/.config/gcloud/application_default_credentials.json", encoded),
-		// shell.Newf("echo %s | tr -- '-_' '+/' | base64 -d -i | install -D -m 600 /dev/stdin %s", encoded, egenv.WorkloadDirectory("gcloud", "application_default_credentials.json")),
-		shell.Newf("which gcloud && gcloud config set auth/credential_file_override %s", egenv.WorkloadDirectory("gcloud", "application_default_credentials.json")),
+		// shell.Newf("echo %s | tr -- '-_' '+/' | base64 -d -i | install -D -m 600 /dev/stdin %s", encoded, egenv.DirectoryWorkload("gcloud", "application_default_credentials.json")),
+		shell.Newf("which gcloud && gcloud config set auth/credential_file_override %s", egenv.DirectoryWorkload("gcloud", "application_default_credentials.json")),
 	)
 }

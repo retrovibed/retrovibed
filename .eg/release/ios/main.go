@@ -57,11 +57,11 @@ func main() {
 				apikey,
 				egenv.Base64URL(nil, "RETROVIBED_APPLE_AUTH_KEY"),
 			),
-			egapplex.UnlockKeychain(egenv.WorkspaceDirectory("apple.signing.keychain")),
+			egapplex.UnlockKeychain(egenv.DirectoryWorkload("apple.signing.keychain")),
 			shell.Op(
 				flutter.Newf(
 					"xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/ipa -exportOptionsPlist ios/ExportOptions.plist OTHER_CODE_SIGN_FLAGS=\"--keychain %s\"",
-					egenv.WorkspaceDirectory("apple.signing.keychain"),
+					egenv.DirectoryWorkload("apple.signing.keychain"),
 				).Timeout(10*time.Minute),
 			),
 			egapplex.Upload(apikey, issuerid, egenv.WorkingDirectory("console", "build/ios/ipa/*.ipa"), "ios"),

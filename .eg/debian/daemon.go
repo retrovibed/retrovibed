@@ -22,7 +22,7 @@ import (
 var debskel embed.FS
 
 func cachedir() string {
-	return egenv.WorkspaceDirectory(".git", "retrovibed")
+	return egenv.DirectoryWorkload(".git", "retrovibed")
 }
 
 func gpgoptions() []eggpg.Option {

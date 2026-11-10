@@ -58,9 +58,9 @@ func UnlockKeychain(keychainPath string) eg.OpFn {
 // KeychainP12 creates a temporary keychain and imports the provided .p12 certificate.
 func KeychainP12(key []byte, password string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
-		keypath := egenv.WorkspaceDirectory("apple.p12")
-		keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
-		intermediatepath := egenv.WorkspaceDirectory("apple.intermediate.cer")
+		keypath := egenv.DirectoryWorkload("apple.p12")
+		keychainPath := egenv.DirectoryWorkload("apple.signing.keychain")
+		intermediatepath := egenv.DirectoryWorkload("apple.intermediate.cer")
 
 		if err := writeFile(keypath, key, "certificate"); err != nil {
 			return err
@@ -88,10 +88,10 @@ func KeychainP12(key []byte, password string) eg.OpFn {
 // KeychainPEM creates a temporary keychain and imports a PEM private key and DER certificate.
 func KeychainPEM(key, cert []byte) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
-		keypath := egenv.WorkspaceDirectory("apple.key.pem")
-		certpath := egenv.WorkspaceDirectory("apple.cert.der")
-		keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
-		intermediatepath := egenv.WorkspaceDirectory("apple.intermediate.cer")
+		keypath := egenv.DirectoryWorkload("apple.key.pem")
+		certpath := egenv.DirectoryWorkload("apple.cert.der")
+		keychainPath := egenv.DirectoryWorkload("apple.signing.keychain")
+		intermediatepath := egenv.DirectoryWorkload("apple.intermediate.cer")
 
 		if err := writeFile(keypath, key, "key"); err != nil {
 			return err
@@ -128,7 +128,7 @@ func KeychainPEM(key, cert []byte) eg.OpFn {
 // for bundling a chain (e.g. leaf + intermediate) for a single identity.
 func KeychainAppendPEM(certs ...[]byte) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
-		keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
+		keychainPath := egenv.DirectoryWorkload("apple.signing.keychain")
 
 		env := shell.Runtime().
 			Environ("APPLE_KEYCHAIN_PASSWORD", egenv.RunID()).
@@ -139,7 +139,7 @@ func KeychainAppendPEM(certs ...[]byte) eg.OpFn {
 		}
 
 		for _, cert := range certs {
-			certfile, err := os.CreateTemp(egenv.WorkspaceDirectory(), "apple.*.cert.der")
+			certfile, err := os.CreateTemp(egenv.DirectoryWorkload(), "apple.*.cert.der")
 			if err != nil {
 				return fmt.Errorf("failed to create temp cert file: %w", err)
 			}

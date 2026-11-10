@@ -38,7 +38,7 @@ func main() {
 	dmgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")
 	pkgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.pkg")
 	entitlements := egenv.WorkingDirectory("console", "macos", "Runner", "Release.entitlements")
-	keychainPath := egenv.WorkspaceDirectory("apple.signing.keychain")
+	keychainPath := egenv.DirectoryWorkload("apple.signing.keychain")
 
 	apikey := egenv.String("", "RETROVIBED_APPLE_API_KEY")
 	issuerid := egenv.String("", "RETROVIBED_APPLE_ISSUER_ID")

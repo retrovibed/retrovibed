@@ -35,8 +35,8 @@ func Release(b *tarballs.Build) eg.OpFn {
 			egtarball.Archive(tarballs.RetrovibedSource()),
 			egtarball.Archive(tarballs.Retrovibed(b)),
 			egenv.CacheDirectory(tarballs.Flatpak(b)),
-			egenv.WorkspaceDirectory(tarballs.AppImage(b)),
-			egenv.WorkspaceDirectory(tarballs.AppImageZsync(b)),
+			egenv.DirectoryWorkload(tarballs.AppImage(b)),
+			egenv.DirectoryWorkload(tarballs.AppImageZsync(b)),
 		),
 	)
 }
@@ -54,7 +54,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 			"appimage-builder --recipe %s --skip-tests --build-dir %s",
 			egenv.WorkingDirectory(".dist", "AppImageBuilder.yml"),
 			builddir,
-		).Directory(egenv.WorkspaceDirectory()).
+		).Directory(egenv.DirectoryWorkload()).
 			Timeout(egenv.TTL()).
 			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed(b))).
 			Environ("VERSION", tarballs.Version()).
@@ -62,7 +62,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 			Environ("APPIMAGE_ARCH", egarch.POSIXFrom(b.Arch)).
 			Environ("APPIMAGE_FILE_NAME", appimage).
 			Environ("GPG_ID", maintainer.GPGID),
-		shell.Newf("cp %s* %s", egenv.WorkspaceDirectory(appimage), egenv.CacheDirectory()),
+		shell.Newf("cp %s* %s", egenv.DirectoryWorkload(appimage), egenv.CacheDirectory()),
 	)
 }
 
