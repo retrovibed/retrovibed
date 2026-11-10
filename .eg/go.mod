@@ -3,7 +3,7 @@ module eg/compute
 go 1.27.2
 
 require (
-	github.com/egdaemon/eg v0.0.0-20261109184352-622e7a0a1aaf
+	github.com/egdaemon/eg v0.0.0-20261110160704-3e0b7b788656
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d
 	golang.org/x/net v0.61.0
 	google.golang.org/api v0.307.0
@@ -46,6 +46,7 @@ require (
 	github.com/go-git/go-git/v6 v6.0.0-beta.1 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/gofrs/uuid/v5 v5.5.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/google/pprof v0.0.0-20261105003125-4bf881d7fb0b // indirect

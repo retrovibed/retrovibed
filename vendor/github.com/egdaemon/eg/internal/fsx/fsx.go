@@ -261,6 +261,27 @@ func CloneTree(ctx context.Context, dstdir string, rootdir string, archive fs.FS
 	})
 }
 
+// JoinIfPresent joins rel onto root, blank when root is blank. a blank root means the directory is
+// disabled and must stay blank, joining would turn it into a relative path.
+func JoinIfPresent(root string, rel ...string) string {
+	if root == "" {
+		return ""
+	}
+
+	return filepath.Join(append([]string{root}, rel...)...)
+}
+
+// Relative reports path relative to dir. ok is false when path is not within dir, which includes
+// paths that leave dir, e.g.) dir/../x, and siblings sharing a prefix with it, e.g.) dir-other/x.
+func Relative(dir, path string) (rel string, ok bool) {
+	rel, err := filepath.Rel(dir, path)
+	if err != nil || !filepath.IsLocal(rel) {
+		return "", false
+	}
+
+	return rel, true
+}
+
 func MkDirs(perm fs.FileMode, paths ...string) (err error) {
 	for _, p := range paths {
 		if err = os.MkdirAll(p, perm); err != nil {

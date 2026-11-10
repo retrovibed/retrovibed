@@ -455,7 +455,7 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20261109184352-622e7a0a1aaf
+# github.com/egdaemon/eg v0.0.0-20261110160704-3e0b7b788656
 ## explicit; go 1.27.2
 github.com/egdaemon/eg
 github.com/egdaemon/eg/astcodec
@@ -711,6 +711,9 @@ github.com/goccy/go-json/internal/encoder/vm_color_indent
 github.com/goccy/go-json/internal/encoder/vm_indent
 github.com/goccy/go-json/internal/errors
 github.com/goccy/go-json/internal/runtime
+# github.com/gofrs/flock v0.13.0
+## explicit; go 1.24.0
+github.com/gofrs/flock
 # github.com/gofrs/uuid/v5 v5.5.1
 ## explicit; go 1.25
 github.com/gofrs/uuid/v5

@@ -91,8 +91,8 @@ github.com/duckdb/duckdb-go/v2 v2.10505.0 h1:SWwvLn2Qx/RQSnQNupwgIF8VbnJ5A6OQU9l
 github.com/duckdb/duckdb-go/v2 v2.10505.0/go.mod h1:m0PW4J4FG9hlFlVdXi6Ds9owpyIDaBdE2jyce00fGcE=
 github.com/dustin/go-humanize v1.1.0 h1:dbKTrvD0klcbBV/h4AWJdMuZogJACoMlvWIWZ5b2xWg=
 github.com/dustin/go-humanize v1.1.0/go.mod h1:hc1CvRkJMsgxqjmjMQF3QNRAZBwY8AXBAzKYoSX9sFI=
-github.com/egdaemon/eg v0.0.0-20261109184352-622e7a0a1aaf h1:zJrCBqrRFkxi0EZlHi4TysJ6+52s/xmGqlMPYOLpd0U=
-github.com/egdaemon/eg v0.0.0-20261109184352-622e7a0a1aaf/go.mod h1:bRqF0LScI9zqmiR5nZG4YeRfDuvJQdHJ728xGuMdy8Y=
+github.com/egdaemon/eg v0.0.0-20261110160704-3e0b7b788656 h1:y3qHpLXqpZcXs7CpotE170MvcHIa7yb1vaDj7+FffSU=
+github.com/egdaemon/eg v0.0.0-20261110160704-3e0b7b788656/go.mod h1:4bKq0vYk2565R35LL/vthVtQ2V+W97k60uL0kqtPz0E=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d h1:vpuyri6vixAcYsEBsCI9wk32/fGI/ZpJp0z4zkZ3oS0=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d/go.mod h1:2/G25/idU+fUZa8vElMrvgKi2RRkNM/0z0hHRsIfvkQ=
 github.com/egdaemon/wasinet/wazeronet v0.0.0-20260928194155-07f223337a8d h1:7Q86hXF6BAjqT28Xc9HTBi3Yyi6JzFTFP4QzfSuSnos=
@@ -135,6 +135,8 @@ github.com/gobwas/httphead v0.1.0/go.mod h1:O/RXo79gxV8G+RqlR/otEwx4Q36zl9rqC5u1
 github.com/gobwas/pool v0.2.1/go.mod h1:q8bcK0KcYlCgd9e7WYLm9LpyS+YeLd8JVDW6WezmKEw=
 github.com/gobwas/ws v1.2.1/go.mod h1:hRKAFb8wOxFROYNsT1bqfWnhX+b5MFeJM9r2ZSwg/KY=
 github.com/goccy/go-json v0.10.5 h1:Fq85nIqj+gXn/S5ahsiTlK3TmC85qgirsdTP/+DeaC4=
+github.com/gofrs/flock v0.13.0 h1:95JolYOvGMqeH31+FC7D2+uULf6mG61mEZ/A8dRYMzw=
+github.com/gofrs/flock v0.13.0/go.mod h1:jxeyy9R1auM5S6JYDBhDt+E2TCo7DkratH4Pgi8P+Z0=
 github.com/gofrs/uuid v4.0.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=
 github.com/gofrs/uuid/v5 v5.5.1 h1:z1Ce19/JwNidXpy3tOQc3241lnJLKdKyq/xlNvlD4Ng=
 github.com/gofrs/uuid/v5 v5.5.1/go.mod h1:bbAA98EoIlxyRHIVg6ektCSsZ5n8mSbwgEhvhMYlZgg=
