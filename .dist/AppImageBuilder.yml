@@ -107,9 +107,25 @@ AppDir:
       - libglycin-2-0
       - glycin-loaders
 
-  # media_kit libmpv.so symlink bug -- see note above.
+  # media_kit libmpv.so symlink bug and appimage-builder arm64 linker bug -- see notes above.
   after_bundle: |
-    ln -sf libmpv.so.2 "${APPDIR}/usr/lib/x86_64-linux-gnu/libmpv.so"
+    for d in "${APPDIR}"/usr/lib/*-linux-gnu; do
+      [ -e "$d/libmpv.so.2" ] && ln -sf libmpv.so.2 "$d/libmpv.so"
+    done
+
+    # THIRD PARTY BUG workaround: appimage-builder's runtime setup locates the dynamic
+    # linker with a hardcoded "*/x86_64-linux-gnu/ld-linux*.so*" glob and crashes with
+    # "'NoneType' object has no attribute 'parent'" on any other architecture. On
+    # aarch64 provide a relative symlink at the path it searches. The linker is moved
+    # into runtime/compat (with this symlink, preserving the relative layout) before
+    # the search runs, and the lib64 link it creates then resolves through this
+    # directory to the real linker. Must stay relative so it survives the move and
+    # the AppImage being mounted elsewhere.
+    for linker in "${APPDIR}"/usr/lib/aarch64-linux-gnu/ld-linux-*.so.*; do
+      [ -e "$linker" ] || continue
+      mkdir -p "${APPDIR}/usr/lib/x86_64-linux-gnu"
+      ln -sf "../aarch64-linux-gnu/$(basename "$linker")" "${APPDIR}/usr/lib/x86_64-linux-gnu/$(basename "$linker")"
+    done
 
   files:
     exclude:
