@@ -10,7 +10,6 @@ import (
 	"eg/compute/neurals"
 	"eg/compute/release"
 	"log"
-	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -28,13 +27,9 @@ import (
 // with its own dev.native.libs default and would clobber it if set here
 // first.
 func androidruntime() shell.Command {
-	ctx, done := context.WithTimeout(context.Background(), time.Minute)
-	defer done()
-
 	return shell.Env().
 		EnvironFrom(eggradlex.Env()...).
 		Environ("ANDROID_HOME", "/opt/android-sdk").
-		EnvironFrom(egsecrets.Env(ctx, "gcpsm://retrovibed-prod/android-keystore-prod-env")...).
 		Environ("RETROVIBED_ANDROID_KEY_STORE_PATH", egenv.CacheDirectory("android", "keystore"))
 }
 

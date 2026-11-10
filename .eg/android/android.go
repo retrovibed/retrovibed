@@ -2,7 +2,6 @@ package android
 
 import (
 	"context"
-	"eg/compute/envx"
 	"errors"
 	"fmt"
 	"io"
@@ -121,7 +120,7 @@ func Deploy(id, bundlePath, trackName string) eg.OpFn {
 
 func release(id, bundlePath, trackName, status string) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) (err error) {
-		gcpcreds := option.WithCredentialsJSON(envx.Base64([]byte("{}"), _eg.EnvUnsafeGcloudADCB64))
+		gcpcreds := option.WithCredentialsJSON(egenv.Base64URL([]byte("{}"), _eg.EnvUnsafeGcloudADCB64))
 		scopes := option.WithScopes(androidpublisher.AndroidpublisherScope)
 
 		bt := &http.Transport{
