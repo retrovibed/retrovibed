@@ -131,7 +131,6 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 
 	builddir := fmt.Sprintf("build/%s", platform)
 	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
-	// absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
 
 	return egccache.Runtime().
 		Debug().

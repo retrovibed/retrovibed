@@ -32,19 +32,19 @@ func main() {
 			// shell.Env().New("gh workflow run release.macosx.yml --ref main").Attempts(3),
 		),
 		uploads.Run(egpool.Slice(
-			// "eg compute upload --arch=amd64 --cores=8 --memory=6g release/archlinux",
-			// "eg compute upload --ttl=1h --arch=amd64 --cores=8 --memory=12g release/linux",
-			// "eg compute upload --ttl=3h --arch=arm64 --cores=3 --memory=3g release/linux",
+			"eg compute upload --no-follow --arch=amd64 --cores=8 --memory=6g release/archlinux",
+			"eg compute upload --no-follow --ttl=1h --arch=amd64 --cores=8 --memory=12g release/linux",
+			"eg compute upload --no-follow --ttl=3h --arch=arm64 --cores=3 --memory=3g release/linux",
 			// "eg compute upload --no-follow --arch=amd64 --cores=8 --memory=6g release/retrokiosk",
 			// "eg compute upload --no-follow --arch=amd64 --cores=8 --memory=6g release/debian",
-			"eg compute upload --ttl=1h --arch=amd64 --cores=8 --memory=12g --gcp-auto release/android", // TODO: android requires gcp credentials.
+			// "eg compute upload --ttl=1h --arch=amd64 --cores=8 --memory=12g --gcp-auto release/android", // TODO: android requires gcp credentials.
 		)),
 		eg.Sequential(
 			egx.RetryUntilSuccess(
 				30*time.Second,
 				eggithub.Promote(
 					"PKGBUILD",
-					"retrovibed.darwin.arm64.dmg",
+					// "retrovibed.darwin.arm64.dmg",
 					"retrovibed.linux.amd64.AppImage",
 					"retrovibed.linux.amd64.AppImage.zsync",
 					"retrovibed.linux.amd64.tar.xz",
