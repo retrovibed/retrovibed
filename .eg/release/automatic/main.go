@@ -9,6 +9,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
+	"github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/egpool"
@@ -18,6 +19,7 @@ func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
+	gh := shell.Env().Environ("GH_TOKEN", ffigit.Bearer())
 	uploads := egpool.New(1, func(cmd string) eg.OpFn {
 		return shell.Op(shell.Env().New(cmd).Attempts(3))
 	})
@@ -28,8 +30,8 @@ func main() {
 		shell.Op(
 			shell.Env().New("eg login --seed=\"${RETROVIBED_EG_LOGIN_SEED}\""),
 			// TODO: Revisit once darwin is working again.
-			// shell.Env().New("gh workflow run release.ios.yml --ref main").Attempts(3),
-			// shell.Env().New("gh workflow run release.macosx.yml --ref main").Attempts(3),
+			gh.New("gh workflow run release.ios.yml --ref main").Attempts(3),
+			gh.New("gh workflow run release.macosx.yml --ref main").Attempts(3),
 		),
 		uploads.Run(egpool.Slice(
 			"eg compute upload --no-follow --arch=amd64 --cores=8 --memory=6g release/archlinux",
@@ -43,7 +45,7 @@ func main() {
 			egx.RetryUntilSuccess(
 				30*time.Second,
 				eggithub.Promote(
-					// "retrovibed.darwin.arm64.dmg",
+					"retrovibed.darwin.arm64.dmg",
 					"PKGBUILD",
 					"retrovibed.linux.amd64.AppImage",
 					"retrovibed.linux.amd64.AppImage.zsync",
