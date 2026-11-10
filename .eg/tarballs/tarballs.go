@@ -51,17 +51,17 @@ func AppImageBuild(b *Build) string {
 
 // Version returns the date-based build version string from git commit metadata.
 func Version() string {
-	return eggit.EnvCommit().StringReplace("%git.commit.year%.%git.commit.month%.%git.commit.day%")
+	return eggit.EnvCommit().StringReplace("{git.commit.year}.{git.commit.month}.{git.commit.day}")
 }
 
 func VersionUnix() string {
-	return eggit.EnvCommit().StringReplace("%git.commit.year%.%git.commit.month%.%git.commit.unix%")
+	return eggit.EnvCommit().StringReplace("{git.commit.year}.{git.commit.month}.{git.commit.unix}")
 }
 
 func Tarchive(ctx context.Context, op eg.Op) error {
 	return eg.Sequential(
 		shell.Op(
-			shell.Newf("git archive --format=tar.gz -o %s %s", egtarball.Archive(RetrovibedSource()), eggit.EnvCommit().StringReplace("%git.hash%")),
+			shell.Newf("git archive --format=tar.gz -o %s %s", egtarball.Archive(RetrovibedSource()), eggit.EnvCommit().StringReplace("{git.hash}")),
 		),
 	)(ctx, op)
 }

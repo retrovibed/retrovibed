@@ -85,7 +85,7 @@ func BuildDarwin(ctx context.Context, _ eg.Op) error {
 	commit := eggit.EnvCommit()
 	runtime := darwinRuntime(shell.Runtime()).
 		Environ("BUILD_NAME", tarballs.Version()).
-		Environ("BUILD_NUMBER", commit.StringReplace("%git.commit.unix%")).
+		Environ("BUILD_NUMBER", commit.StringReplace("{git.commit.unix}")).
 		// nothing in this pipeline builds x86_64 native libs; exclude it so flutter
 		// doesn't attempt a universal binary and hand the code_assets hook's single
 		// arm64 dylib to lipo twice. FLUTTER_XCODE_* env vars are forwarded to

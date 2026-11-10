@@ -130,7 +130,7 @@ func BuildIOS(ctx context.Context, _ eg.Op) error {
 		runtime.New("xcodebuild -create-xcframework -framework RetrovivedBind.framework -output RetrovivedBind.xcframework").Directory(egenv.DirectoryWorking("console", "ios")),
 		runtime.New("flutter pub get"),
 		runtime.New("pod install").Directory(egenv.DirectoryWorking("console", "ios")),
-		runtime.Newf("flutter build ipa --build-name=%s --build-number=%s --no-codesign --release", tarballs.Version(), commit.StringReplace("%git.commit.unix%")).
+		runtime.Newf("flutter build ipa --build-name=%s --build-number=%s --no-codesign --release", tarballs.Version(), commit.StringReplace("{git.commit.unix}")).
 			Timeout(15*time.Minute),
 	)
 }
