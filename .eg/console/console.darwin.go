@@ -76,7 +76,7 @@ func BuildDevDarwin(ctx context.Context, _ eg.Op) error {
 	runtime := darwinRuntime(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("flutter build macos --debug"),
+		runtime.New("flutter build macos"),
 		runtime.New("codesign --force --sign - build/macos/Build/Products/Debug/retrovibed.app"),
 	)
 }
@@ -94,6 +94,7 @@ func BuildDarwin(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		runtime.New("rm -rf build/macos/{x64,arm64}/debug").Lenient(true),
-		runtime.New("flutter build macos -v --build-name='${BUILD_NAME}' --build-number='${BUILD_NUMBER}' --release lib/main.dart"),
+		runtime.New("DERP ${BUILD_NUMER}"),
+		runtime.New("flutter build macos --build-name='${BUILD_NAME}' --build-number='${BUILD_NUMBER}' --release lib/main.dart"),
 	)
 }
