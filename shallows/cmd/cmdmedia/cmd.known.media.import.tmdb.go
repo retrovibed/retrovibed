@@ -18,6 +18,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -40,6 +41,7 @@ type tmdbimport struct {
 	Source      string    `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"tmdb"`
 	Attempts    uint      `flag:"" name:"attempts" help:"set maximum number of attempts per request" default:"5"`
 	Concurrency uint16    `flag:"" name:"concurrency" help:"maximum number of shows to fetch episode details for concurrently" default:"8"`
+	Limit       uint64    `flag:"" name:"limit" help:"maximum number of records to emit, 0 for unlimited" default:"131072"`
 	cause       error
 }
 
@@ -472,21 +474,43 @@ func (t tmdbimport) Run(gctx *cmdopts.Global) (err error) {
 
 	encoder := jsonl.NewEncoder(os.Stdout)
 
-	for v := range t.movies(gctx.Context, c) {
-		if err := encoder.Encode(v); err != nil {
-			return errorsx.Wrap(err, "unable to encode media")
+	seq := iterx.FromFn(func(ctx context.Context, yield func(library.Known) bool) error {
+		for v := range t.records(ctx, c) {
+			if !yield(v) {
+				return nil
+			}
 		}
-	}
 
-	if t.cause != nil {
 		return t.cause
-	}
-
-	for v := range t.series(gctx.Context, c) {
+	})
+	seq = iterx.Take(seq, langx.FirstNonZero(t.Limit, math.MaxUint64))
+	for v := range seq.Each(gctx.Context) {
 		if err := encoder.Encode(v); err != nil {
 			return errorsx.Wrap(err, "unable to encode media")
 		}
 	}
 
-	return t.cause
+	return seq.Err()
+}
+
+// records yields movies followed by series, stopping before series if
+// retrieving movies failed.
+func (t *tmdbimport) records(ctx context.Context, c *tmdb.Client) iter.Seq[library.Known] {
+	return func(yield func(library.Known) bool) {
+		for v := range t.movies(ctx, c) {
+			if !yield(v) {
+				return
+			}
+		}
+
+		if t.cause != nil {
+			return
+		}
+
+		for v := range t.series(ctx, c) {
+			if !yield(v) {
+				return
+			}
+		}
+	}
 }

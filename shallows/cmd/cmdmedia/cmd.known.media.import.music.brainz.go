@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"iter"
 	"log"
+	"math"
 	"os"
 	"strings"
 	"time"
@@ -16,6 +17,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
@@ -34,6 +36,7 @@ type mbimport struct {
 	Source   string    `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"musicbrainz"`
 	Attempts uint      `flag:"" name:"attempts" help:"set maximum number of attempts per request" default:"5"`
 	Contact  string    `flag:"" name:"contact" help:"required email for user agent" required:"true"`
+	Limit    uint64    `flag:"" name:"limit" help:"maximum number of records to emit, 0 for unlimited" default:"131072"`
 	cause    error
 }
 
@@ -128,13 +131,23 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 }
 
 func (t mbimport) run(ctx context.Context, c *gomusicbrainz.WS2Client, encoder *jsonl.Encoder, l *rate.Limiter, bs backoffx.Strategy) (err error) {
-	for v := range t.releases(ctx, c, l, bs) {
+	seq := iterx.FromFn(func(ctx context.Context, yield func(library.Known) bool) error {
+		for v := range t.releases(ctx, c, l, bs) {
+			if !yield(v) {
+				return nil
+			}
+		}
+
+		return t.cause
+	})
+	seq = iterx.Take(seq, langx.FirstNonZero(t.Limit, math.MaxUint64))
+	for v := range seq.Each(ctx) {
 		if err := encoder.Encode(v); err != nil {
 			return errorsx.Wrap(err, "unable to encode music metadata")
 		}
 	}
 
-	return t.cause
+	return seq.Err()
 }
 
 func (t mbimport) Run(gctx *cmdopts.Global) (err error) {

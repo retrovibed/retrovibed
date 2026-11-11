@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"time"
@@ -13,10 +14,12 @@ import (
 
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
@@ -27,6 +30,7 @@ import (
 type deeppoolimport struct {
 	StartAt time.Time `flag:"" name:"start" help:"date to start retrieving data from" format:"2006-01-02" default:"1970-01-01"`
 	Source  string    `flag:"" name:"source" help:"short id for the data source" hidden:"true" default:"deeppool"`
+	Limit   uint64    `flag:"" name:"limit" help:"maximum number of records to emit, 0 for unlimited" default:"131072"`
 }
 
 func (t deeppoolimport) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) error {
@@ -45,25 +49,36 @@ func (t deeppoolimport) run(ctx context.Context, enc *json.Encoder, httpc *http.
 	// This is safe for now because retrovibed was created well after the Unix epoch.
 	cursor := uuid.Must(uuid.NewV7AtTime(timex.Max(t.StartAt, time.Unix(0, 0)))).String()
 
-	for {
-		resp, err := client.Sync(ctx, cursor)
-		if err != nil {
-			return errorsx.Wrap(err, "failed to sync published content from deeppool")
-		}
-
-		for _, pc := range resp.Items {
-			if err := enc.Encode(t.knownFromPublished(pc)); err != nil {
-				return errorsx.Wrap(err, "unable to encode media")
+	seq := iterx.FromFn(func(ctx context.Context, yield func(library.Known) bool) error {
+		for {
+			resp, err := client.Sync(ctx, cursor)
+			if err != nil {
+				return errorsx.Wrap(err, "failed to sync published content from deeppool")
 			}
-		}
 
-		if len(resp.Items) == 0 {
-			return nil
-		}
+			for _, pc := range resp.Items {
+				if !yield(t.knownFromPublished(pc)) {
+					return nil
+				}
+			}
 
-		cursor = slicesx.LastOrZero(resp.Items...).Id
-		log.Println("syncing published content", cursor)
+			if len(resp.Items) == 0 {
+				return nil
+			}
+
+			cursor = slicesx.LastOrZero(resp.Items...).Id
+			log.Println("syncing published content", cursor)
+		}
+	})
+	seq = iterx.Take(seq, langx.FirstNonZero(t.Limit, math.MaxUint64))
+
+	for v := range seq.Each(ctx) {
+		if err := enc.Encode(v); err != nil {
+			return errorsx.Wrap(err, "unable to encode media")
+		}
 	}
+
+	return seq.Err()
 }
 
 func (t deeppoolimport) knownFromPublished(pc *communityapi.PublishedContent) library.Known {
