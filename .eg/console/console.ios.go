@@ -55,7 +55,7 @@ func EnsureDuckDBSource(duckdbsrc, duckdbinet, duckdbvss string) eg.OpFn {
 func baseIOSRuntime() shell.Command {
 	return flutterRuntimev2(shell.Runtime()).
 		Debug().
-		Environ("IOSENV", egenv.DirectoryWorkload("ios.compile.env")).
+		Environ("IOSENV", egenv.DirectoryCache("ios.compile.env")).
 		Environ("LANG", "en_US.UTF-8")
 }
 
@@ -63,8 +63,11 @@ func baseIOSRuntime() shell.Command {
 // xcrun and writes it to a file for iosRuntime to read back. Must run before any
 // step that calls iosRuntime.
 func GenIOSCompilerEnv(ctx context.Context, op eg.Op) error {
-	env := baseIOSRuntime().Directory(egenv.DirectoryWorkload())
+	// the env file lives in the cache directory (the workload directory doesn't exist on
+	// baremetal runs); it is rewritten on every run, so it never goes stale.
+	env := baseIOSRuntime()
 	return shell.Op(
+		env.New("mkdir -p $(dirname ${IOSENV})"),
 		env.New("echo \"CC=$(xcrun --sdk iphoneos --find clang)\" | tee ${IOSENV}"),
 		env.New("echo \"CXX=$(xcrun --sdk iphoneos --find clang++)\" | tee -a ${IOSENV}"),
 		env.New("echo \"SDKROOT=$(xcrun --sdk iphoneos --show-sdk-path)\" | tee -a ${IOSENV}"),
@@ -74,7 +77,7 @@ func GenIOSCompilerEnv(ctx context.Context, op eg.Op) error {
 }
 
 func iosCompilerEnv() []string {
-	return egenv.MustEnviron(egenv.Build().FromPath(egenv.DirectoryWorkload("ios.compile.env")))
+	return egenv.MustEnviron(egenv.Build().FromPath(egenv.DirectoryCache("ios.compile.env")))
 }
 
 func iosRuntime() shell.Command {

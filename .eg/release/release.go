@@ -60,6 +60,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 			Environ("VERSION", tarballs.Version()).
 			Environ("APT_ARCH", b.Arch).
 			Environ("APPIMAGE_ARCH", egarch.POSIXFrom(b.Arch)).
+			Environ("APPIMAGE_COMP", "zstd").
 			Environ("APPIMAGE_FILE_NAME", appimage).
 			Environ("GPG_ID", maintainer.GPGID),
 		shell.Newf("cp %s* %s", egenv.DirectoryWorkload(appimage), egenv.CacheDirectory()),
