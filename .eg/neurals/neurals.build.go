@@ -21,7 +21,9 @@ import (
 func runtime() shell.Command {
 	return shell.Runtime().
 		Directory(egenv.WorkingDirectory("neurals")).
-		Environ("CARGO_TARGET_DIR", egenv.CacheDirectory("neurals", "target"))
+		Environ("CARGO_TARGET_DIR", egenv.CacheDirectory("neurals", "target")).
+		// rustc and its linker write their temporary files to TMPDIR, the default /tmp is a small tmpfs.
+		Environ("TMPDIR", egenv.DirectoryWorkload())
 }
 
 // Compile runs cargo build --release.

@@ -27,17 +27,29 @@ func rootdir() string {
 }
 
 func shellruntime() shell.Command {
-	return eggolang.Runtime().Directory(rootdir()).Environ(
-		"CACHE_DIRECTORY", egenv.DirectoryCache(),
-	).Environ(
-		"XDG_CACHE_HOME", egenv.DirectoryCache("xdg"), // temporary until eg catches up.
-	).Environ(
-		"GOLANGCI_LINT_CACHE", egenv.DirectoryCache("golang-lint"),
-	).Environ(
-		"CGO_LDFLAGS", "-L"+egenv.DirectoryCache("neurals"),
-	).Environ(
-		"LD_LIBRARY_PATH", egenv.DirectoryCache("neurals"),
-	)
+	return eggolang.Runtime().
+		Directory(rootdir()).
+		Environ(
+			"CACHE_DIRECTORY", egenv.DirectoryCache(),
+		).
+		Environ(
+			"XDG_CACHE_HOME", egenv.DirectoryCache("xdg"), // temporary until eg catches up.
+		).
+		Environ(
+			"GOLANGCI_LINT_CACHE", egenv.DirectoryCache("golang-lint"),
+		).
+		Environ(
+			"CGO_LDFLAGS", "-L"+egenv.DirectoryCache("neurals"),
+		).
+		Environ(
+			"LD_LIBRARY_PATH", egenv.DirectoryCache("neurals"),
+		).
+		Environ(
+			"GOTMPDIR", egenv.DirectoryWorkload(),
+		).
+		Environ(
+			"TMPDIR", egenv.DirectoryWorkload(),
+		)
 }
 
 func NeuralsBuild() eg.OpFn {
@@ -154,7 +166,13 @@ func Compile() eg.OpFn {
 			"CGO_LDFLAGS=-L"+egenv.DirectoryCache("neurals"),
 			"LD_LIBRARY_PATH="+egenv.DirectoryCache("neurals"),
 		).
+		Environ(egenv.MustEnviron(
+			egenv.Build().
+				Var("GOTMPDIR", egenv.DirectoryWorkload()).
+				Var("TMPDIR", egenv.DirectoryWorkload()),
+		)...).
 		Timeout(egenv.TTL()).
+		Parallelism(1).
 		AutoCompile()
 }
 

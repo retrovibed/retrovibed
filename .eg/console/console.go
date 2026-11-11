@@ -146,7 +146,6 @@ func GenerateFlutter(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("du -sh"),
 		runtime.New("mkdir -p ${GOTMPDIR} ${TMPDIR}"),
 		runtime.New("flutter create --org space.retrovibe --platforms=linux,macos,ios,android .").Timeout(egenv.TTL()),
 		runtime.New("flutter config --enable-native-assets"),

@@ -15,8 +15,24 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egarch"
+	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
+
+// diskdebug prints the state needed to diagnose "no space left on device" failures: the sizes of the mounts (tmpfs vs
+// overlay), inodes, the temporary directories in effect, and the memory limit tmpfs is counted against.
+func diskdebug(ctx context.Context, op eg.Op) error {
+	debug := shell.Runtime().Lenient(true)
+	return shell.Run(
+		ctx,
+		debug.New("du -xsh /tmp/* 2>/dev/null"),
+		debug.New("df -h"),
+		debug.New("df -ih /tmp"),
+		debug.New("env | grep -i tmp"),
+		debug.New("ls -lah ${GOTMPDIR} ${TMPDIR} /tmp"),
+		debug.New("cat /sys/fs/cgroup/memory.max; free -m"),
+	)
+}
 
 func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
@@ -32,16 +48,14 @@ func main() {
 			deb,
 			eg.Sequential(
 				shallows.NeuralsBuild(),
-				eg.Parallel(
-					eg.Sequential(
-						console.GenerateFlutter,
-						console.CompileBinding,
-						console.BuildLinux,
-					),
-					shallows.Compile(),
+				eg.Sequential(
+					egbug.DebugFailure(console.GenerateFlutter, diskdebug),
+					egbug.DebugFailure(console.CompileBinding, diskdebug),
+					egbug.DebugFailure(console.BuildLinux, diskdebug),
 				),
+				egbug.DebugFailure(shallows.Compile(), diskdebug),
 				eg.Parallel(
-					build(),
+					egbug.DebugFailure(build(), diskdebug),
 					tarballs.Tarchive,
 				),
 			),
