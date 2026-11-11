@@ -94,7 +94,7 @@ func BuildDarwin(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		runtime.New("rm -rf build/macos/{x64,arm64}/debug").Lenient(true),
-		runtime.New("DERP ${BUILD_NUMER}"),
+		runtime.New("echo DERP ${BUILD_NUMER}").Debug(),
 		runtime.New("flutter build macos --build-name='${BUILD_NAME}' --build-number='${BUILD_NUMBER}' --release lib/main.dart"),
 	)
 }
