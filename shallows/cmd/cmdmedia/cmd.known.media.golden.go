@@ -57,6 +57,12 @@ func (t goldenenv) run(ctx context.Context, w io.Writer, httpc *http.Client) err
 	return envx.Build().Var(
 		"RETROVIBED_ARCHIVE_START_DATE",
 		resp.Start,
+	).Var(
+		"RETROVIBED_ARCHIVE_LATEST_UID",
+		resp.Uid,
+	).Var(
+		"RETROVIBED_ARCHIVE_SYNC_ID",
+		resp.SyncId,
 	).CopyTo(w)
 }
 

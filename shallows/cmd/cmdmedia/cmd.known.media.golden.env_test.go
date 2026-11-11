@@ -28,14 +28,14 @@ func TestKnownGoldenEnv(t *testing.T) {
 			require.Equal(t, "/mm/env", r.URL.Path)
 			include = r.URL.Query()["include_source"]
 			exclude = r.URL.Query()["exclude_source"]
-			require.NoError(t, json.NewEncoder(w).Encode(&deeppool.MediaMetadataEnvResponse{Start: "2023-03-01"}))
+			require.NoError(t, json.NewEncoder(w).Encode(&deeppool.MediaMetadataEnvResponse{Start: "2023-03-01", Uid: "uid-1", SyncId: "sync-1"}))
 		}))
 		defer srv.Close()
 
 		cmd := goldenenv{IncludeSource: []string{"tmdb"}, ExcludeSource: []string{"musicbrainz"}}
 		require.NoError(t, cmd.run(ctx, &buf, &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
 
-		require.Equal(t, "RETROVIBED_ARCHIVE_START_DATE=2023-03-01\n", buf.String())
+		require.Equal(t, "RETROVIBED_ARCHIVE_START_DATE=2023-03-01\nRETROVIBED_ARCHIVE_LATEST_UID=uid-1\nRETROVIBED_ARCHIVE_SYNC_ID=sync-1\n", buf.String())
 		require.Equal(t, []string{"tmdb"}, include)
 		require.Equal(t, []string{"musicbrainz"}, exclude)
 	})

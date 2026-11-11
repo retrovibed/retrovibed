@@ -71,4 +71,6 @@ message MediaMetadataEnvRequest {
 
 message MediaMetadataEnvResponse {
   string start = 1 [ json_name = "start" ];
+  string uid = 2 [ json_name = "uid" ];
+  string sync_id = 3 [ json_name = "sync_id" ];
 }

@@ -608,6 +608,8 @@ func (x *MediaMetadataEnvRequest) GetExcludeSource() []string {
 type MediaMetadataEnvResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Start         string                 `protobuf:"bytes,1,opt,name=start,proto3" json:"start,omitempty"`
+	Uid           string                 `protobuf:"bytes,2,opt,name=uid,proto3" json:"uid,omitempty"`
+	SyncId        string                 `protobuf:"bytes,3,opt,name=sync_id,proto3" json:"sync_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -645,6 +647,20 @@ func (*MediaMetadataEnvResponse) Descriptor() ([]byte, []int) {
 func (x *MediaMetadataEnvResponse) GetStart() string {
 	if x != nil {
 		return x.Start
+	}
+	return ""
+}
+
+func (x *MediaMetadataEnvResponse) GetUid() string {
+	if x != nil {
+		return x.Uid
+	}
+	return ""
+}
+
+func (x *MediaMetadataEnvResponse) GetSyncId() string {
+	if x != nil {
+		return x.SyncId
 	}
 	return ""
 }
@@ -707,9 +723,11 @@ const file_media_deeppool_media_metadata_proto_rawDesc = "" +
 	"\bupserted\x18\x02 \x01(\x04R\bupserted\"i\n" +
 	"\x17MediaMetadataEnvRequest\x12&\n" +
 	"\x0einclude_source\x18\x01 \x03(\tR\x0einclude_source\x12&\n" +
-	"\x0eexclude_source\x18\x02 \x03(\tR\x0eexclude_source\"0\n" +
+	"\x0eexclude_source\x18\x02 \x03(\tR\x0eexclude_source\"\\\n" +
 	"\x18MediaMetadataEnvResponse\x12\x14\n" +
-	"\x05start\x18\x01 \x01(\tR\x05startb\x06proto3"
+	"\x05start\x18\x01 \x01(\tR\x05start\x12\x10\n" +
+	"\x03uid\x18\x02 \x01(\tR\x03uid\x12\x18\n" +
+	"\async_id\x18\x03 \x01(\tR\async_idb\x06proto3"
 
 var (
 	file_media_deeppool_media_metadata_proto_rawDescOnce sync.Once
