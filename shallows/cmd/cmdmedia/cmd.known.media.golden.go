@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -62,6 +63,37 @@ func (t goldenenv) run(ctx context.Context, w io.Writer, httpc *http.Client) err
 type goldenupload struct {
 	Batch     int           `flag:"" name:"batch" help:"number of records to upload per request" default:"1024"`
 	RateLimit time.Duration `flag:"" name:"rate-limit" help:"minimum duration between upload requests, 0 disables rate limiting" default:"0s"`
+	Retries   int           `flag:"" name:"retries" help:"number of times to retry a batch after a transient failure (EOF, 429, 5xx)" default:"5"`
+	Backoff   time.Duration `flag:"" name:"backoff" help:"initial delay between retries, doubles on each attempt (max 1m)" default:"1s"`
+}
+
+// upload sends the batch, retrying transient failures with exponential backoff.
+func (t goldenupload) upload(ctx context.Context, client deeppool.MediaMetadataClient, items []*deeppool.MediaMetadata) (resp *deeppool.MediaMetadataUploadResponse, err error) {
+	// transient reports whether the upload error is worth retrying.
+	transient := func(err error) bool {
+		if errors.Is(err, io.ErrUnexpectedEOF) || errors.Is(err, io.EOF) {
+			return true
+		}
+
+		return false
+	}
+
+	delay := t.Backoff
+	for attempt := 0; ; attempt++ {
+		if resp, err = client.Upload(ctx, items...); err == nil || attempt >= t.Retries || !transient(err) {
+			return resp, err
+		}
+
+		log.Println("upload failed, retrying", attempt+1, "of", t.Retries, "in", delay, err)
+
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		case <-time.After(delay):
+		}
+
+		delay = min(delay*2, time.Minute)
+	}
 }
 
 func (t goldenupload) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, stdin cmdopts.Stdin) error {
@@ -78,6 +110,7 @@ func (t goldenupload) run(ctx context.Context, r io.Reader, httpc *http.Client) 
 	d := jsonl.Iter[library.Known](jsonl.NewDecoder(r))
 
 	limiter := rate.NewLimiter(rate.Every(t.RateLimit), 1)
+	last := uuid.Nil.String() // last successfully uploaded uid, the resume point for the export --offset.
 
 	for chunk := range iterx.Chunk(d.Each(ctx), t.Batch) {
 		if err := limiter.Wait(ctx); err != nil {
@@ -108,12 +141,13 @@ func (t goldenupload) run(ctx context.Context, r io.Reader, httpc *http.Client) 
 			})
 		}
 
-		resp, err := client.Upload(ctx, items...)
+		resp, err := t.upload(ctx, client, items)
 		if err != nil {
-			return errorsx.Wrap(err, "unable to upload media metadata")
+			return errorsx.Wrapf(err, "unable to upload media metadata: resume with --offset %s", last)
 		}
 
-		log.Println("uploaded", resp.Received, "received", resp.Upserted, "upserted")
+		last = items[len(items)-1].Uid
+		log.Println("uploaded", resp.Received, "received", resp.Upserted, "upserted", "last uid", last)
 	}
 
 	return d.Err()

@@ -62,6 +62,52 @@ func TestKnownGoldenUpload(t *testing.T) {
 		require.Equal(t, "2020-01-01T00:00:00Z", batches[0][0].Released)
 	})
 
+	t.Run("retries transient server errors", func(t *testing.T) {
+		var (
+			input    bytes.Buffer
+			requests int
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		require.NoError(t, json.NewEncoder(&input).Encode(library.Known{UID: uuid.Must(uuid.NewV4()).String(), Md5: uuid.Must(uuid.NewV4()).String()}))
+
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			requests++
+			if requests < 3 {
+				w.WriteHeader(http.StatusBadGateway)
+				return
+			}
+			require.NoError(t, json.NewEncoder(w).Encode(&deeppool.MediaMetadataUploadResponse{Received: 1, Upserted: 1}))
+		}))
+		defer srv.Close()
+
+		cmd := goldenupload{Batch: 2, Retries: 3, Backoff: time.Millisecond}
+		require.NoError(t, cmd.run(ctx, &input, &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
+		require.Equal(t, 3, requests)
+	})
+
+	t.Run("does not retry client errors", func(t *testing.T) {
+		var (
+			input    bytes.Buffer
+			requests int
+		)
+		ctx, done := testx.Context(t)
+		defer done()
+
+		require.NoError(t, json.NewEncoder(&input).Encode(library.Known{UID: uuid.Must(uuid.NewV4()).String(), Md5: uuid.Must(uuid.NewV4()).String()}))
+
+		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			requests++
+			w.WriteHeader(http.StatusUnauthorized)
+		}))
+		defer srv.Close()
+
+		cmd := goldenupload{Batch: 2, Retries: 3, Backoff: time.Millisecond}
+		require.Error(t, cmd.run(ctx, &input, &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
+		require.Equal(t, 1, requests)
+	})
+
 	t.Run("propagates server errors", func(t *testing.T) {
 		var input bytes.Buffer
 		ctx, done := testx.Context(t)
