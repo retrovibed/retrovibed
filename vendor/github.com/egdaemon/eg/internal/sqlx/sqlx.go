@@ -25,6 +25,21 @@ func IgnoreClosed(err error) error {
 	return err
 }
 
+// duckdb reports constraint violations as "Constraint Error: ...". matched by message because importing the duckdb
+// driver to inspect its error type does not compile to wasi.
+const errConstraintMsg = "Constraint Error:"
+
+// IgnoreConstraint returns nil when err is a duckdb constraint violation (e.g. a duplicate primary key), and err
+// otherwise. duckdb's ON CONFLICT cannot see rows inserted by concurrent uncommitted transactions, so racing writers
+// of the same row fail with a constraint violation even though the row was stored.
+func IgnoreConstraint(err error) error {
+	if err != nil && strings.Contains(err.Error(), errConstraintMsg) {
+		return nil
+	}
+
+	return err
+}
+
 // Queryer is the interface genieql-generated code is emitted against, so
 // callers can pass either a *sql.DB or a *sql.Tx.
 type Queryer interface {

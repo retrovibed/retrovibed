@@ -2,7 +2,6 @@ package egx
 
 import (
 	"context"
-	"time"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 )
@@ -18,24 +17,5 @@ func Fallback(ops ...eg.OpFn) eg.OpFn {
 			}
 		}
 		return err
-	}
-}
-
-// RetryUntilSuccess retries the operation until it succeeds or the context
-// is cancelled, waiting delay between attempts.
-func RetryUntilSuccess(delay time.Duration, op eg.OpFn) eg.OpFn {
-	return func(ctx context.Context, o eg.Op) error {
-		for {
-			err := op(ctx, o)
-			if err == nil {
-				return nil
-			}
-
-			select {
-			case <-ctx.Done():
-				return ctx.Err()
-			case <-time.After(delay):
-			}
-		}
 	}
 }

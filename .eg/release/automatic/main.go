@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"eg/compute/egx"
 	"log"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
 	"github.com/egdaemon/eg/runtime/x/wasi/egpool"
+	"github.com/egdaemon/eg/runtime/x/wasi/egx"
 )
 
 func main() {
@@ -42,8 +42,7 @@ func main() {
 			// "eg compute upload --ttl=1h --arch=amd64 --cores=8 --memory=12g --gcp-auto release/android", // TODO: android requires gcp credentials.
 		)),
 		eg.Sequential(
-			egx.RetryUntilSuccess(
-				30*time.Second,
+			egx.Retry(0).Delay(30*time.Second).Run(
 				eggithub.Promote(
 					"retrovibed.darwin.arm64.dmg",
 					"PKGBUILD",

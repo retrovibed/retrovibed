@@ -53,6 +53,9 @@ cloud.google.com/go/iam/apiv1/iampb
 cloud.google.com/go/secretmanager/apiv1
 cloud.google.com/go/secretmanager/apiv1/secretmanagerpb
 cloud.google.com/go/secretmanager/internal
+# github.com/KimMachineGun/automemlimit v1.0.1
+## explicit; go 1.21.0
+github.com/KimMachineGun/automemlimit/memlimit
 # github.com/Masterminds/squirrel v1.5.4
 ## explicit; go 1.14
 github.com/Masterminds/squirrel
@@ -455,7 +458,7 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20261110160704-3e0b7b788656
+# github.com/egdaemon/eg v0.0.0-20261111210610-93f6b58c3980
 ## explicit; go 1.27.2
 github.com/egdaemon/eg
 github.com/egdaemon/eg/astcodec
@@ -483,6 +486,7 @@ github.com/egdaemon/eg/internal/iterx
 github.com/egdaemon/eg/internal/jwtx
 github.com/egdaemon/eg/internal/langx
 github.com/egdaemon/eg/internal/md5x
+github.com/egdaemon/eg/internal/memlimitx
 github.com/egdaemon/eg/internal/modfilex
 github.com/egdaemon/eg/internal/numericx
 github.com/egdaemon/eg/internal/patternx
@@ -530,6 +534,7 @@ github.com/egdaemon/eg/runtime/x/wasi/egpool
 github.com/egdaemon/eg/runtime/x/wasi/egsecrets
 github.com/egdaemon/eg/runtime/x/wasi/egsha256x
 github.com/egdaemon/eg/runtime/x/wasi/egtarball
+github.com/egdaemon/eg/runtime/x/wasi/egx
 github.com/egdaemon/eg/runtime/x/wasi/execx
 github.com/egdaemon/eg/secrets
 # github.com/egdaemon/gdx v0.0.0-20261031085230-c2c1dd829dc4
@@ -736,7 +741,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20261105003125-4bf881d7fb0b
+# github.com/google/pprof v0.0.0-20261111200114-fac431ef4d26
 ## explicit; go 1.26.0
 github.com/google/pprof/profile
 # github.com/google/s2a-go v0.1.11
@@ -823,7 +828,7 @@ github.com/jackc/pgservicefile
 # github.com/jackc/pgtype v1.14.4
 ## explicit; go 1.13
 github.com/jackc/pgtype
-# github.com/jackc/pgx/v5 v5.12.0
+# github.com/jackc/pgx/v5 v5.13.0
 ## explicit; go 1.25.0
 github.com/jackc/pgx/v5
 github.com/jackc/pgx/v5/internal/iobufpool
@@ -1025,6 +1030,9 @@ github.com/mutablelogic/go-media/pkg/ffmpeg
 github.com/mutablelogic/go-media/pkg/ffmpeg/schema
 github.com/mutablelogic/go-media/pkg/file
 github.com/mutablelogic/go-media/sys/ffmpeg80
+# github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58
+## explicit; go 1.16
+github.com/pbnjay/memory
 # github.com/pierrec/lz4/v4 v4.1.33
 ## explicit; go 1.22
 github.com/pierrec/lz4/v4
