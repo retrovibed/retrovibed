@@ -18,7 +18,7 @@ func CompileBinding(ctx context.Context, o eg.Op) error {
 
 	return shell.Run(
 		ctx,
-		runtime.New("mkdir -p ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}"),
+		runtime.New("mkdir -p ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY} ${GOTMPDIR} ${TMPDIR}"),
 		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.so .").
 			Timeout(egenv.TTL()).
 			Environ("CGO_LDFLAGS", "-L"+egenv.CacheDirectory("neurals")),

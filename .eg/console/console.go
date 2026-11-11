@@ -21,6 +21,8 @@ func flutterRuntimev2(v shell.Command) shell.Command {
 		Directory(egenv.WorkingDirectory("console")).
 		Environ("CI", egenv.String("", "CI")).
 		EnvironFrom(eggolang.Env()...).
+		Environ("GOTMPDIR", egenv.DirectoryWorkload(".eg", "golang")).
+		Environ("TMPDIR", egenv.DirectoryWorkload(".eg", "tmp")).
 		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart")).
 		Environ("RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY", egenv.CacheDirectory("dev.native.libs")).
 		Environ("NIX_RETROVIBED_SHARED_NATIVE_LIBS", egenv.CacheDirectory("dev.native.libs", "example.so"))
