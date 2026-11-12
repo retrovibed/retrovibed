@@ -42,9 +42,6 @@ func init() {
 		egdebuild.Option.DependsBuild("rsync", "tree"),
 		egdebuild.Option.Depends("avahi-daemon", "cage", "kbd", "libfuse2", "pipewire-audio", "retrozsync", "ssh"),
 		egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...),
-		egdebuild.Option.Runtime(func(r shell.Command) shell.Command {
-			return r.Privileged()
-		}),
 	)
 }
 
@@ -58,7 +55,7 @@ func Prepare(ctx context.Context, o eg.Op) error {
 	)(ctx, o)
 }
 
-func Runner() eg.ContainerRunner {
+func Runner() eg.C8S {
 	return egdebuild.Runner()
 }
 
@@ -124,4 +121,8 @@ func Verify(ctx context.Context, op eg.Op) error {
 			runtime.New("systemd-analyze verify /usr/lib/systemd/system/retrokiosk@.service").Privileged(),
 		),
 	)(ctx, op)
+}
+
+func Copy(dst string) eg.OpFn {
+	return egdebuild.Copy(gcfg, dst)
 }
