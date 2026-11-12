@@ -2,6 +2,7 @@ package asyncx
 
 import (
 	"context"
+	"errors"
 	"log"
 	"sync"
 	"time"
@@ -24,7 +25,6 @@ func Periodic(ctx context.Context, async *Wakeup, b backoffx.Strategy, msg strin
 
 type Wakeup struct {
 	*sync.Cond
-	done    chan struct{}
 	C       <-chan error
 	cleanup func()
 }
@@ -35,41 +35,54 @@ func (t *Wakeup) Close() error {
 }
 
 func NewWakeup(ctx context.Context) *Wakeup {
-	ictx, done := context.WithCancel(ctx)
 	q := make(chan error, 1)
+	closing := make(chan error, 1)
 	wakeup := sync.NewCond(&sync.Mutex{})
-	donesig := make(chan struct{})
+	closed := func() error {
+		select {
+		case err := <-closing:
+			return err
+		default:
+			return nil
+		}
+	}
 	a := &Wakeup{
 		Cond: wakeup,
-		done: donesig,
 		C:    q,
 		cleanup: sync.OnceFunc(func() {
 			log.Println("async wakeup shutdown initiated")
-			done()
 			select {
-			case q <- ErrWakeupClosed:
+			case closing <- ErrWakeupClosed:
 				log.Println("async wakeup sent closed error")
+				wakeup.L.Lock()
 				wakeup.Broadcast()
+				wakeup.L.Unlock()
 			case <-ctx.Done():
 				log.Println("async wakeup parent context was cancelled")
 			}
 
-			close(donesig)
+			close(closing)
 		}),
 	}
 
 	go func() {
 		for {
 			a.L.Lock()
-			a.Wait()
+			// closing is filled before the broadcast, so checking it under the lock
+			// means the broadcast cannot be lost.
+			if len(closing) == 0 {
+				a.Wait()
+			}
 			a.L.Unlock()
 
+			err := closed()
 			select {
-			case <-ictx.Done():
+			case <-ctx.Done():
 				return
-			case <-donesig:
-				return
-			case q <- nil:
+			case q <- err:
+				if errors.Is(err, ErrWakeupClosed) {
+					return
+				}
 			}
 		}
 	}()

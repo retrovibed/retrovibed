@@ -36,7 +36,8 @@ func TestWatchFiles(t *testing.T) {
 		}()
 
 		select {
-		case <-wakeup.C:
+		case err := <-wakeup.C:
+			require.NoError(t, err)
 		case <-t.Context().Done():
 			require.Fail(t, "wakeup was not triggered")
 		}
@@ -65,7 +66,8 @@ func TestWatchFiles(t *testing.T) {
 		}()
 
 		select {
-		case <-wakeup.C:
+		case err := <-wakeup.C:
+			require.NoError(t, err)
 		case <-t.Context().Done():
 			require.Fail(t, "wakeup was not triggered")
 		}
@@ -98,7 +100,8 @@ func TestWatchDirectories(t *testing.T) {
 		}()
 
 		select {
-		case <-wakeup.C:
+		case err := <-wakeup.C:
+			require.NoError(t, err)
 		case <-t.Context().Done():
 			require.Fail(t, "wakeup was not triggered")
 		}
@@ -128,7 +131,8 @@ func TestWatchDirectories(t *testing.T) {
 		}()
 
 		select {
-		case <-wakeup.C:
+		case err := <-wakeup.C:
+			require.NoError(t, err)
 		case <-t.Context().Done():
 			require.Fail(t, "wakeup was not triggered")
 		}

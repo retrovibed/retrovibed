@@ -24,7 +24,8 @@ func TestWakeup(t *testing.T) {
 			case <-cc:
 				runtime.Gosched() // forces scheduling
 				wakeup.Broadcast()
-			case <-wakeup.C:
+			case err := <-wakeup.C:
+				require.NoError(t, err)
 				c += 1
 				cc <- struct{}{}
 			case <-t.Context().Done():
