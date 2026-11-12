@@ -41,7 +41,7 @@ func (c *cmakeVars) quoted(key, value string) *cmakeVars {
 
 // download the version of duckdb we're using
 func Download(ctx context.Context, op eg.Op) error {
-	sruntime := shell.Runtime().Directory(egenv.CacheDirectory())
+	sruntime := shell.Runtime().Directory(egenv.DirectoryCache())
 	return shell.Run(
 		ctx,
 		// 3 attempts to deal with racey behavior around cloning the repo multiple times in parallel.
@@ -55,14 +55,14 @@ func Download(ctx context.Context, op eg.Op) error {
 // compile and put the results into the specified directory.
 func Compile(runtime shell.Command) eg.OpFn {
 	return func(ctx context.Context, op eg.Op) error {
-		return compile(runtime, egenv.WorkingDirectory(".dist", "duckdb_config.cmake"))(ctx, op)
+		return compile(runtime, egenv.DirectoryWorking(".dist", "duckdb_config.cmake"))(ctx, op)
 	}
 }
 
 func compile(runtime shell.Command, cmakeconfigs ...string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		sruntime := runtime.
-			Directory(egenv.CacheDirectory("duckdb"))
+			Directory(egenv.DirectoryCache("duckdb"))
 		cfg := cmake().
 			set("EXTENSION_STATIC_BUILD", "1"). // this needs to happen *before* our configurations are loaded. jfc.
 			quoted("DUCKDB_EXTENSION_CONFIGS", strings.Join(cmakeconfigs, ";")).
@@ -113,7 +113,7 @@ func bundlelibtool(sruntime shell.Command) eg.OpFn {
 // compile and put the results into the specified directory.
 func CompileDevRuntime() shell.Command {
 	builddir := "build/dev"
-	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	absbuilddir := egenv.DirectoryTemp("duckdb", builddir)
 	return shell.Runtime().
 		Debug().
 		Directory(absbuilddir).
@@ -130,7 +130,7 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 		set("BUILD_UNITTESTS", "OFF")
 
 	builddir := fmt.Sprintf("build/%s", platform)
-	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	absbuilddir := egenv.DirectoryTemp("duckdb", builddir)
 
 	return egccache.Runtime().
 		Debug().
@@ -142,14 +142,14 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 
 func CompileDev(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
-		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_config.cmake")),
+		compile(sruntime, egenv.DirectoryWorking(".dist", "duckdb_config.cmake")),
 		bundle(sruntime),
 	)
 }
 
 func CompileAndroid(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
-		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_android_config.cmake")),
+		compile(sruntime, egenv.DirectoryWorking(".dist", "duckdb_android_config.cmake")),
 		bundle(sruntime),
 	)
 }
@@ -185,7 +185,7 @@ func CompileDarwinRuntime(platform, arch string) shell.Command {
 		set("BUILD_SHELL", "OFF")
 
 	builddir := fmt.Sprintf("build/%s-%s", platform, arch)
-	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	absbuilddir := egenv.DirectoryTemp("duckdb", builddir)
 
 	return egccache.Runtime().
 		Debug().
@@ -197,7 +197,7 @@ func CompileDarwinRuntime(platform, arch string) shell.Command {
 
 func CompileDarwin(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
-		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_darwin_config.cmake")),
+		compile(sruntime, egenv.DirectoryWorking(".dist", "duckdb_darwin_config.cmake")),
 		bundlelibtool(sruntime),
 	)
 }
@@ -212,7 +212,7 @@ func CompileIOSRuntime(platform, arch string) shell.Command {
 		set("BUILD_SHELL", "OFF")
 
 	builddir := fmt.Sprintf("build/%s-%s", platform, arch)
-	absbuilddir := egenv.EphemeralDirectory("duckdb", builddir)
+	absbuilddir := egenv.DirectoryTemp("duckdb", builddir)
 	// absbuilddir := egenv.CacheDirectory("duckdb.bin", builddir)
 
 	return egccache.Runtime().
@@ -225,7 +225,7 @@ func CompileIOSRuntime(platform, arch string) shell.Command {
 
 func CompileIOS(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
-		compile(sruntime, egenv.WorkingDirectory(".dist", "duckdb_ios_config.cmake")),
+		compile(sruntime, egenv.DirectoryWorking(".dist", "duckdb_ios_config.cmake")),
 		bundlelibtool(sruntime),
 	)
 }

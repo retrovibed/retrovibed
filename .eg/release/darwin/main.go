@@ -34,10 +34,10 @@ func main() {
 	defer done()
 
 	tarballapp := filepath.Join(egtarball.Path(tarballs.Retrovibed(tarinfo())), "retrovibed.app")
-	appstoreapp := egenv.CacheDirectory("retrovibed.appstore.app")
-	dmgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")
-	pkgpath := egenv.CacheDirectory("retrovibed.darwin.arm64.pkg")
-	entitlements := egenv.WorkingDirectory("console", "macos", "Runner", "Release.entitlements")
+	appstoreapp := egenv.DirectoryCache("retrovibed.appstore.app")
+	dmgpath := egenv.DirectoryCache("retrovibed.darwin.arm64.dmg")
+	pkgpath := egenv.DirectoryCache("retrovibed.darwin.arm64.pkg")
+	entitlements := egenv.DirectoryWorking("console", "macos", "Runner", "Release.entitlements")
 	keychainPath := egenv.DirectoryWorkload("apple.signing.keychain")
 
 	apikey := egenv.String("", "RETROVIBED_APPLE_API_KEY")
@@ -48,12 +48,12 @@ func main() {
 		eg.Sequential(
 			eg.Parallel(
 				duckdb.MaybeBuild(
-					egenv.CacheDirectory("dev.native.libs", "libduckdb.a"),
+					egenv.DirectoryCache("dev.native.libs", "libduckdb.a"),
 					duckdb.CompileDarwinRuntime("osx_arm64", "arm64"),
 					duckdb.CompileDarwin,
 					duckdb.CloneBuild,
 				),
-				neurals.CompileDarwin(egenv.CacheDirectory("dev.native.libs")),
+				neurals.CompileDarwin(egenv.DirectoryCache("dev.native.libs")),
 			),
 			console.GenerateFlutter,
 			console.CompileDarwinBinding,
@@ -63,7 +63,7 @@ func main() {
 				shell.Newf("mkdir -p %s", tarballapp),
 				shell.Newf(
 					"cp -R %s/ %s/",
-					egenv.WorkingDirectory("console", "build", "macos", "Build", "Products", "Release", "retrovibed.app"),
+					egenv.DirectoryWorking("console", "build", "macos", "Build", "Products", "Release", "retrovibed.app"),
 					tarballapp,
 				),
 			),

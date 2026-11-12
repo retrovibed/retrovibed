@@ -25,7 +25,7 @@ import (
 // APK/AAB) alongside the other packaging artifacts already dropped there.
 func Dist(files ...string) eg.OpFn {
 	return shell.Op(
-		shell.Newf("rsync --mkpath -av %s %s/", strings.Join(files, " "), egenv.CacheDirectory(".dist")),
+		shell.Newf("rsync --mkpath -av %s %s/", strings.Join(files, " "), egenv.DirectoryCache(".dist")),
 	)
 }
 
@@ -34,7 +34,7 @@ func Release(b *tarballs.Build) eg.OpFn {
 		eggithub.Draft(
 			egtarball.Archive(tarballs.RetrovibedSource()),
 			egtarball.Archive(tarballs.Retrovibed(b)),
-			egenv.CacheDirectory(tarballs.Flatpak(b)),
+			egenv.DirectoryCache(tarballs.Flatpak(b)),
 			egenv.DirectoryWorkload(tarballs.AppImage(b)),
 			egenv.DirectoryWorkload(tarballs.AppImageZsync(b)),
 		),
@@ -52,7 +52,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 		shell.Newf("mkdir -p %s", builddir),
 		shell.Newf(
 			"appimage-builder --recipe %s --skip-tests --build-dir %s",
-			egenv.WorkingDirectory(".dist", "AppImageBuilder.yml"),
+			egenv.DirectoryWorking(".dist", "AppImageBuilder.yml"),
 			builddir,
 		).Directory(egenv.DirectoryWorkload()).
 			Timeout(egenv.TTL()).
@@ -63,7 +63,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 			Environ("APPIMAGE_COMP", "zstd").
 			Environ("APPIMAGE_FILE_NAME", appimage).
 			Environ("GPG_ID", maintainer.GPGID),
-		shell.Newf("cp %s* %s", egenv.DirectoryWorkload(appimage), egenv.CacheDirectory()),
+		shell.Newf("cp %s* %s", egenv.DirectoryWorkload(appimage), egenv.DirectoryCache()),
 	)
 }
 
@@ -77,7 +77,7 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 func SmokeTest(b *tarballs.Build) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		const dir = ".dist/distrobuilds"
-		appimage := egenv.CacheDirectory(tarballs.AppImage(b))
+		appimage := egenv.DirectoryCache(tarballs.AppImage(b))
 		if b.Arch != "amd64" {
 			log.Println("skipping smoke tests on non-amd64 systems")
 			return nil
@@ -126,12 +126,12 @@ func Tarball(b *tarballs.Build) eg.OpFn {
 
 func DarwinDmg(b1 *tarballs.Build) eg.OpFn {
 	path := tarballs.Retrovibed(b1)
-	dmg := egdmg.New(path, egdmg.OptionBuildDir(egenv.CacheDirectory()))
+	dmg := egdmg.New(path, egdmg.OptionBuildDir(egenv.DirectoryCache()))
 	return eg.Sequential(
 		egdmg.Build(dmg, egtarball.Path(tarballs.Retrovibed(b1))),
 		shell.Op(
-			shell.Newf("echo mv %s %s", egdmg.Path(path), egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")),
-			shell.Newf("mv %s %s", egdmg.Path(path), egenv.CacheDirectory("retrovibed.darwin.arm64.dmg")),
+			shell.Newf("echo mv %s %s", egdmg.Path(path), egenv.DirectoryCache("retrovibed.darwin.arm64.dmg")),
+			shell.Newf("mv %s %s", egdmg.Path(path), egenv.DirectoryCache("retrovibed.darwin.arm64.dmg")),
 		),
 	)
 }

@@ -30,7 +30,7 @@ func init() {
 	gcfg = egdebuild.New(
 		"glycin-ng",
 		"",
-		egenv.CacheDirectory("glycinng"),
+		egenv.DirectoryCache("glycinng"),
 		egdebuild.Option.Maintainer(maintainer.Name, maintainer.Email),
 		egdebuild.Option.SigningKeyID(maintainer.GPGFingerprint),
 		egdebuild.Option.ChangeLogDate(c.Committer.When),

@@ -111,7 +111,7 @@ func Upload(ctx context.Context, o eg.Op) error {
 
 func Copy(cachedir string) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
-		debroot := egenv.EphemeralDirectory("deb.retrovibed")
+		debroot := egenv.DirectoryTemp("deb.retrovibed")
 		return shell.Op(
 			shell.Newf("tree -L 2 %s", debroot),
 			shell.Newf("tree -L 1 %s", cachedir),

@@ -40,7 +40,7 @@ func gradleCacheEnv(runtime shell.Command) shell.Command {
 // installable release (minified/R8) builds for reproducing release-only bugs.
 // It must never be used to sign anything distributed to users.
 func devKeystorePath() string {
-	return egenv.CacheDirectory("android", "dev-keystore.jks")
+	return egenv.DirectoryCache("android", "dev-keystore.jks")
 }
 
 func ensureDevKeystore(ctx context.Context, o eg.Op) error {

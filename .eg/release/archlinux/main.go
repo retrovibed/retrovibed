@@ -25,10 +25,10 @@ func main() {
 			ctx,
 			archlinux.AURRunner(),
 			eg.Sequential(
-				archlinux.Generate(egenv.CacheDirectory("PKGBUILD")),
+				archlinux.Generate(egenv.DirectoryCache("PKGBUILD")),
 				eg.Parallel(
 					// archlinux.Publish(egenv.CacheDirectory("PKGBUILD")),
-					eggithub.Draft(egenv.CacheDirectory("PKGBUILD")),
+					eggithub.Draft(egenv.DirectoryCache("PKGBUILD")),
 				),
 			),
 		),

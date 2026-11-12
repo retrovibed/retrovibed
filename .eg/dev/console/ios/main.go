@@ -70,14 +70,14 @@ func main() {
 
 	runtime := shell.Runtime().
 		EnvironFrom(eggolang.Env()...).
-		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart"))
+		Environ("PUB_CACHE", egenv.DirectoryCache(".eg", "dart"))
 
-	flutter := runtime.Directory(egenv.WorkingDirectory("console"))
-	duckdbsrc := egenv.CacheDirectory("duckdb", "v1.5.3", "src")
-	duckdbinet := egenv.CacheDirectory("duckdb", "v1.5.3", "inet")
-	duckdbvss := egenv.CacheDirectory("duckdb", "v1.5.3", "vss")
-	duckdbArm64 := egenv.CacheDirectory("duckdb", "v1.5.3", "ios-sim-arm64")
-	duckdbX86 := egenv.CacheDirectory("duckdb", "v1.5.3", "ios-sim-x86_64")
+	flutter := runtime.Directory(egenv.DirectoryWorking("console"))
+	duckdbsrc := egenv.DirectoryCache("duckdb", "v1.5.3", "src")
+	duckdbinet := egenv.DirectoryCache("duckdb", "v1.5.3", "inet")
+	duckdbvss := egenv.DirectoryCache("duckdb", "v1.5.3", "vss")
+	duckdbArm64 := egenv.DirectoryCache("duckdb", "v1.5.3", "ios-sim-arm64")
+	duckdbX86 := egenv.DirectoryCache("duckdb", "v1.5.3", "ios-sim-x86_64")
 
 	err := eg.Perform(
 		ctx,

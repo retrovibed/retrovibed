@@ -30,7 +30,7 @@ func androidruntime() shell.Command {
 	return shell.Env().
 		EnvironFrom(eggradlex.Env()...).
 		Environ("ANDROID_HOME", "/opt/android-sdk").
-		Environ("RETROVIBED_ANDROID_KEY_STORE_PATH", egenv.CacheDirectory("android", "keystore"))
+		Environ("RETROVIBED_ANDROID_KEY_STORE_PATH", egenv.DirectoryCache("android", "keystore"))
 }
 
 func main() {
@@ -51,9 +51,9 @@ func main() {
 				shell.New("gcloud auth list").Lenient(true),
 			),
 			eg.WhenFn(
-				egfs.FileNotExistsFn(egenv.CacheDirectory("android", "keystore")),
+				egfs.FileNotExistsFn(egenv.DirectoryCache("android", "keystore")),
 				egsecrets.CopyIntoFileOp(
-					egenv.CacheDirectory("android", "keystore"),
+					egenv.DirectoryCache("android", "keystore"),
 					egenv.String("", "RETROVIBED_RELEASE_ANDROID_KEYSTORE"),
 				),
 			),
@@ -94,14 +94,14 @@ func main() {
 			console.BuildAndroidAPK(androidruntime()),
 			console.BuildAndroidBundle(androidruntime()),
 			release.Dist(
-				egenv.WorkingDirectory("console/build/app/outputs/apk/release/retrovibed.apk"),
-				egenv.WorkingDirectory("console/build/app/outputs/bundle/release/retrovibed.aab"),
+				egenv.DirectoryWorking("console/build/app/outputs/apk/release/retrovibed.apk"),
+				egenv.DirectoryWorking("console/build/app/outputs/bundle/release/retrovibed.aab"),
 			),
 			eggithub.Draft(
-				egenv.WorkingDirectory("console/build/app/outputs/apk/release/retrovibed.apk"),
-				egenv.WorkingDirectory("console/build/app/outputs/bundle/release/retrovibed.aab"),
+				egenv.DirectoryWorking("console/build/app/outputs/apk/release/retrovibed.apk"),
+				egenv.DirectoryWorking("console/build/app/outputs/bundle/release/retrovibed.aab"),
 			),
-			android.Draft(android.ID, egenv.WorkingDirectory("console/build/app/outputs/bundle/release/retrovibed.aab"), "internal"),
+			android.Draft(android.ID, egenv.DirectoryWorking("console/build/app/outputs/bundle/release/retrovibed.aab"), "internal"),
 		),
 	)
 

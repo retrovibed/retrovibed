@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
+	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 )
 
@@ -33,7 +34,7 @@ func Notarize(apikey, issuerid, artifactPath string) eg.OpFn {
 
 		return shell.Run(
 			ctx,
-			shell.Newf("xcrun notarytool submit %s --key %s --key-id %s --issuer %s --wait", artifactPath, keypath, apikey, issuerid),
+			shell.Newf("xcrun notarytool submit %s --key %s --key-id %s --issuer %s --wait", artifactPath, keypath, apikey, issuerid).Timeout(egenv.TTL()),
 			shell.Newf("xcrun stapler staple %s", artifactPath),
 		)
 	}

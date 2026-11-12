@@ -13,7 +13,7 @@ import (
 // package build has no network access requirement — launchpad builders block
 // network access during the build step.
 func Download(ctx context.Context, op eg.Op) error {
-	sruntime := shell.Runtime().Directory(egenv.CacheDirectory())
+	sruntime := shell.Runtime().Directory(egenv.DirectoryCache())
 	return shell.Run(
 		ctx,
 		// 3 attempts to deal with racey behavior around cloning the repo multiple times in parallel.
@@ -21,6 +21,6 @@ func Download(ctx context.Context, op eg.Op) error {
 		sruntime.New("md5sum retrozsync/go.mod"),
 		sruntime.New("echo \"cb929c8563349d0778576b4224fdb40b  retrozsync/go.mod\" > retrozsync.md5"),
 		sruntime.New("md5sum -c retrozsync.md5"),
-		shell.Runtime().Directory(egenv.CacheDirectory("retrozsync")).New("go mod vendor"),
+		shell.Runtime().Directory(egenv.DirectoryCache("retrozsync")).New("go mod vendor"),
 	)
 }

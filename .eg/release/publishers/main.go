@@ -28,11 +28,11 @@ var plugins = []plugin{
 }
 
 func runtime() shell.Command {
-	return shell.Runtime().Directory(egenv.WorkingDirectory())
+	return shell.Runtime().Directory(egenv.DirectoryWorking())
 }
 
 func wasmdir() string {
-	return egenv.EphemeralDirectory("retrovibed", "publishers", "wasm")
+	return egenv.DirectoryTemp("retrovibed", "publishers", "wasm")
 }
 
 func main() {

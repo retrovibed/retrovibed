@@ -45,7 +45,7 @@ func Prepare(ctx context.Context, o eg.Op) error {
 // available (e.g. for the GitHub release upload) even when the AUR git
 // remote is unreachable.
 func Generate(path string) eg.OpFn {
-	templatedir := egenv.WorkingDirectory(".eg", "archlinux")
+	templatedir := egenv.DirectoryWorking(".eg", "archlinux")
 
 	runtime := shell.Runtime().Environ("PKGVER", pkgver())
 
@@ -65,7 +65,7 @@ func Publish(path string) eg.OpFn {
 			return fmt.Errorf("EG_SSH_KEY_SEED environment variable is required to publish to the AUR")
 		}
 
-		aurdir := egenv.EphemeralDirectory("aur-retrovibed")
+		aurdir := egenv.DirectoryTemp("aur-retrovibed")
 		commitmsg := fmt.Sprintf("update retrovibed to %s", eggit.EnvCommit().Hash)
 
 		runtime := shell.Runtime().

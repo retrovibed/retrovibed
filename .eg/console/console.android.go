@@ -38,7 +38,7 @@ func BuildAndroidAPK(runtime shell.Command) eg.OpFn {
 			runtime.New(
 				fmt.Sprintf("flutter build apk --target-platform android-arm64,android-x64 --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("{git.commit.unix}")),
 			).Timeout(20*time.Minute),
-			runtime.New("mv app-release.apk retrovibed.apk").Timeout(20*time.Minute).Directory(egenv.WorkingDirectory("console/build/app/outputs/apk/release")),
+			runtime.New("mv app-release.apk retrovibed.apk").Timeout(20*time.Minute).Directory(egenv.DirectoryWorking("console/build/app/outputs/apk/release")),
 		)
 	}
 }
@@ -53,7 +53,7 @@ func BuildAndroidBundle(runtime shell.Command) eg.OpFn {
 			runtime.New(
 				fmt.Sprintf("flutter build appbundle --target-platform android-arm64,android-x64 --build-name=%s --build-number=%s --release lib/main.dart", tarballs.Version(), commit.StringReplace("{git.commit.unix}")),
 			).Timeout(20*time.Minute),
-			runtime.New("mv app-release.aab retrovibed.aab").Timeout(20*time.Minute).Directory(egenv.WorkingDirectory("console/build/app/outputs/bundle/release")),
+			runtime.New("mv app-release.aab retrovibed.aab").Timeout(20*time.Minute).Directory(egenv.DirectoryWorking("console/build/app/outputs/bundle/release")),
 		)
 	}
 }

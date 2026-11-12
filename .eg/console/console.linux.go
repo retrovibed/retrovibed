@@ -21,7 +21,7 @@ func CompileBinding(ctx context.Context, o eg.Op) error {
 		runtime.New("mkdir -p ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY} ${GOTMPDIR}"),
 		runtime.New("go -C retrovibedbind build -buildmode=c-shared -buildvcs=true --tags duckdb_use_lib,retrovibed,neural -o ${RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY}/libretrovibed.so .").
 			Timeout(egenv.TTL()).
-			Environ("CGO_LDFLAGS", "-L"+egenv.CacheDirectory("neurals")),
+			Environ("CGO_LDFLAGS", "-L"+egenv.DirectoryCache("neurals")),
 	)
 }
 
@@ -83,7 +83,7 @@ func FlatpakManifest(b *tarballs.Build) eg.OpFn {
 		// needs to be in an op so that the sha256 and download url are defered until this command actually runs.
 		return eg.Sequential(
 			egflatpak.ManifestOp(
-				egenv.CacheDirectory(tarballs.Flatpak(b)),
+				egenv.DirectoryCache(tarballs.Flatpak(b)),
 				flatpak(
 					moduleTarball(eggithub.DownloadURL(tarballs.Retrovibed(b)), egtarball.SHA256(tarballs.Retrovibed(b))),
 				),

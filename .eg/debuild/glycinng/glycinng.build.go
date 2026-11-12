@@ -20,7 +20,7 @@ const (
 // so this must run as a module step inside Runner()'s container, not via a
 // bare top-level eg.Perform (the default eg container has no Rust toolchain).
 func Download(ctx context.Context, op eg.Op) error {
-	sruntime := shell.Runtime().Directory(egenv.CacheDirectory())
+	sruntime := shell.Runtime().Directory(egenv.DirectoryCache())
 	return shell.Run(
 		ctx,
 		// 3 attempts to deal with racey behavior around cloning the repo multiple times in parallel.

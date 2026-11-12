@@ -20,8 +20,8 @@ import (
 // makes cargo-ndk undiscoverable ("no such command: `ndk`").
 func runtime() shell.Command {
 	return shell.Runtime().
-		Directory(egenv.WorkingDirectory("neurals")).
-		Environ("CARGO_TARGET_DIR", egenv.CacheDirectory("neurals", "target"))
+		Directory(egenv.DirectoryWorking("neurals")).
+		Environ("CARGO_TARGET_DIR", egenv.DirectoryCache("neurals", "target"))
 	// .
 	// // rustc and its linker write their temporary files to TMPDIR, the default /tmp is a small tmpfs.
 	// Environ("TMPDIR", egenv.DirectoryWorkload())
@@ -104,9 +104,9 @@ func CompileIOS(dir string) eg.OpFn {
 // MaybeBuild skips compilation if sopath already exists.
 func MaybeBuild(sopath string, compile func(dir string) eg.OpFn, clone func(dir string) eg.OpFn) eg.OpFn {
 	return eg.WhenFn(func(ctx context.Context) bool {
-		return !egfs.FileExists(egenv.CacheDirectory(sopath))
+		return !egfs.FileExists(egenv.DirectoryCache(sopath))
 	}, eg.Sequential(
-		compile(egenv.CacheDirectory(filepath.Dir(sopath))),
-		clone(egenv.CacheDirectory(filepath.Dir(sopath))),
+		compile(egenv.DirectoryCache(filepath.Dir(sopath))),
+		clone(egenv.DirectoryCache(filepath.Dir(sopath))),
 	))
 }

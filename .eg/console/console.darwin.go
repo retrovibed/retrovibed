@@ -19,7 +19,7 @@ import (
 // the ELF. the duckdb and predicttext static libs stay in dev.native.libs, which is what
 // the -L flags below point at.
 func DarwinLibDir() string {
-	return egenv.CacheDirectory("dev.native.libs", "darwin")
+	return egenv.DirectoryCache("dev.native.libs", "darwin")
 }
 
 // darwinRuntime applies flutterRuntimev2's defaults and then re-asserts the native-libs
@@ -34,7 +34,7 @@ func darwinRuntime(runtime shell.Command) shell.Command {
 
 func CompileDarwinBinding(ctx context.Context, o eg.Op) error {
 	runtime := darwinRuntime(shell.Runtime())
-	libsdir := egenv.CacheDirectory("dev.native.libs")
+	libsdir := egenv.DirectoryCache("dev.native.libs")
 
 	neuralsflags := "-L" + libsdir + " -lpredicttext"
 	duckdbldflags := "-Wl,-force_load," + libsdir + "/libduckdb.a " + "-lc++"

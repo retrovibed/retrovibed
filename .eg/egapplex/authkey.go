@@ -18,7 +18,7 @@ func AuthKey(keyid string, key []byte) eg.OpFn {
 			return fmt.Errorf("appleAuthKey: missing key id")
 		}
 
-		filename := egenv.EphemeralDirectory("apple.auth.key.p8")
+		filename := egenv.DirectoryTemp("apple.auth.key.p8")
 
 		if err := writeFile(filename, key, "auth key"); err != nil {
 			return err

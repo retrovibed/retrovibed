@@ -35,7 +35,7 @@ func init() {
 	gcfg = egdebuild.New(
 		"duckdb",
 		"",
-		egenv.CacheDirectory("duckdb"),
+		egenv.DirectoryCache("duckdb"),
 		egdebuild.Option.Maintainer(maintainer.Name, maintainer.Email),
 		egdebuild.Option.SigningKeyID(maintainer.GPGFingerprint),
 		egdebuild.Option.ChangeLogDate(c.Committer.When),

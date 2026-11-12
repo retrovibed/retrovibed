@@ -23,19 +23,19 @@ func main() {
 	apikey := egenv.String("", "RETROVIBED_APPLE_API_KEY")
 	issuerid := egenv.String("", "RETROVIBED_APPLE_ISSUER_ID")
 
-	flutter := shell.Runtime().Directory(egenv.WorkingDirectory("console"))
+	flutter := shell.Runtime().Directory(egenv.DirectoryWorking("console"))
 	err := eg.Perform(
 		ctx,
 		eg.Sequential(
 			console.GenIOSCompilerEnv,
 			eg.Parallel(
 				duckdb.MaybeBuild(
-					egenv.CacheDirectory("dev.native.libs", "libduckdb.a"),
+					egenv.DirectoryCache("dev.native.libs", "libduckdb.a"),
 					duckdb.CompileIOSRuntime("ios_arm64", "arm64"),
 					duckdb.CompileIOS,
 					duckdb.CloneStaticBuild,
 				),
-				neurals.CompileIOS(egenv.CacheDirectory("dev.native.libs")),
+				neurals.CompileIOS(egenv.DirectoryCache("dev.native.libs")),
 			),
 			console.GenerateFlutter,
 			egbug.DebugFailure(
@@ -64,7 +64,7 @@ func main() {
 					egenv.DirectoryWorkload("apple.signing.keychain"),
 				).Timeout(10*time.Minute),
 			),
-			egapplex.Upload(apikey, issuerid, egenv.WorkingDirectory("console", "build/ios/ipa/*.ipa"), "ios"),
+			egapplex.Upload(apikey, issuerid, egenv.DirectoryWorking("console", "build/ios/ipa/*.ipa"), "ios"),
 		),
 	)
 

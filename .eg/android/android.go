@@ -49,7 +49,7 @@ const (
 // entries), so their intermediate .a/.so build artifacts belong in
 // JNIStagingDir instead, never here.
 func JNILibDir(arch string, paths ...string) string {
-	return egenv.CacheDirectory("android.lib", arch, filepath.Join(paths...))
+	return egenv.DirectoryCache("android.lib", arch, filepath.Join(paths...))
 }
 
 // JNILibRoot returns the parent of every JNILibDir(arch), i.e. the cache
@@ -60,7 +60,7 @@ func JNILibDir(arch string, paths ...string) string {
 // handed one architecture's
 // directory up front.
 func JNILibRoot() string {
-	return egenv.CacheDirectory("android.lib")
+	return egenv.DirectoryCache("android.lib")
 }
 
 // JNIStagingDir returns the persistent cache directory for intermediate
@@ -70,7 +70,7 @@ func JNILibRoot() string {
 // JNILibDir — gradle's jniLibs packaging has no way to distinguish "linker
 // input" from "ship this," it bundles every .so it finds.
 func JNIStagingDir(arch string, paths ...string) string {
-	return egenv.CacheDirectory("android.lib.dev", arch, filepath.Join(paths...))
+	return egenv.DirectoryCache("android.lib.dev", arch, filepath.Join(paths...))
 }
 
 // SigningKey generates an Android upload signing key using keytool. The resulting

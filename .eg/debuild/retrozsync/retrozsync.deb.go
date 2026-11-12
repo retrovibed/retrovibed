@@ -38,7 +38,7 @@ func init() {
 	gcfg = egdebuild.New(
 		"retrozsync",
 		"",
-		egenv.CacheDirectory("retrozsync"),
+		egenv.DirectoryCache("retrozsync"),
 		egdebuild.Option.Maintainer(maintainer.Name, maintainer.Email),
 		egdebuild.Option.SigningKeyID(maintainer.GPGFingerprint),
 		egdebuild.Option.ChangeLogDate(c.Committer.When),
@@ -61,8 +61,8 @@ func Runner() eg.ContainerRunner {
 }
 
 func Build(ctx context.Context, o eg.Op) error {
-	debroot := egenv.EphemeralDirectory("deb.retrozsync")
-	cachedir := egenv.CacheDirectory(".dist")
+	debroot := egenv.DirectoryTemp("deb.retrozsync")
+	cachedir := egenv.DirectoryCache(".dist")
 	runtime := shell.Runtime().Timeout(egenv.TTL())
 
 	return eg.Sequential(

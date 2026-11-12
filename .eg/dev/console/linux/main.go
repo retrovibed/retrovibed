@@ -31,7 +31,7 @@ func main() {
 			eg.Sequential(
 				eg.Parallel(
 					duckdb.MaybeBuild(
-						egenv.CacheDirectory("dev.native.libs", "libduckdb.a"),
+						egenv.DirectoryCache("dev.native.libs", "libduckdb.a"),
 						duckdb.CompileDevRuntime(),
 						duckdb.CompileDev,
 						duckdb.CloneBuild,
@@ -41,8 +41,8 @@ func main() {
 				console.Generate,
 				console.GenerateDevBinding(
 					shell.Runtime(),
-					egenv.WorkingDirectory("console", "build", "nativelib"),
-					egenv.CacheDirectory("dev.native.libs"),
+					egenv.DirectoryWorking("console", "build", "nativelib"),
+					egenv.DirectoryCache("dev.native.libs"),
 				),
 				console.BuildLinux,
 				console.RunDev(`flutter run -d linux`),

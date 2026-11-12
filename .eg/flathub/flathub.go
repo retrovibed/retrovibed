@@ -75,14 +75,14 @@ func Metainfo(b *tarballs.Build) eg.OpFn {
 func Release(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
 		shell.Op(
-			shell.Newf("gh repo clone flathub/space.retrovibe.Console %s", egenv.EphemeralDirectory("flathub")),
-			shell.Newf("gh release download --repo retrovibed/retrovibed --pattern 'space.retrovibe.Console.yml' --dir %s --clobber", egenv.EphemeralDirectory("flathub")),
+			shell.Newf("gh repo clone flathub/space.retrovibe.Console %s", egenv.DirectoryTemp("flathub")),
+			shell.Newf("gh release download --repo retrovibed/retrovibed --pattern 'space.retrovibe.Console.yml' --dir %s --clobber", egenv.DirectoryTemp("flathub")),
 		),
-		cloneAssets(egenv.EphemeralDirectory("flathub")),
+		cloneAssets(egenv.DirectoryTemp("flathub")),
 		shell.Op(
-			shell.Newf("git -C %s add -A", egenv.EphemeralDirectory("flathub")),
-			shell.Newf("git -C %s -c user.name='Retrovibed Engineering' -c user.email='engineering@retrovibe.space' commit -m 'Update to latest retrovibed release'", egenv.EphemeralDirectory("flathub")),
-			shell.Newf("git -C %s push origin HEAD", egenv.EphemeralDirectory("flathub")),
+			shell.Newf("git -C %s add -A", egenv.DirectoryTemp("flathub")),
+			shell.Newf("git -C %s -c user.name='Retrovibed Engineering' -c user.email='engineering@retrovibe.space' commit -m 'Update to latest retrovibed release'", egenv.DirectoryTemp("flathub")),
+			shell.Newf("git -C %s push origin HEAD", egenv.DirectoryTemp("flathub")),
 		),
 	)(ctx, o)
 }
@@ -95,18 +95,18 @@ func Submit(ctx context.Context, o eg.Op) error {
 			shell.New("mkdir -m 0700 -p /home/egd/.ssh"),
 			shell.New("eg ssh key --path /home/egd/.ssh/id_ed25519"),
 			shell.New("git config --global url.\"git@github.com:\".insteadOf \"https://github.com/\""),
-			shell.Newf("gh repo fork flathub/flathub --org retrovibed --fork-name flathub --remote-name origin --clone -- %s", egenv.EphemeralDirectory("flathub")),
-			shell.Newf("git -C %s remote -v", egenv.EphemeralDirectory("flathub")),
-			shell.Newf("git -C %s checkout -b space.retrovibe.Console origin/new-pr", egenv.EphemeralDirectory("flathub")),
-			shell.Newf("gh release download --repo retrovibed/retrovibed --pattern 'space.retrovibe.Console.yml' --dir %s --clobber", egenv.EphemeralDirectory("flathub")),
+			shell.Newf("gh repo fork flathub/flathub --org retrovibed --fork-name flathub --remote-name origin --clone -- %s", egenv.DirectoryTemp("flathub")),
+			shell.Newf("git -C %s remote -v", egenv.DirectoryTemp("flathub")),
+			shell.Newf("git -C %s checkout -b space.retrovibe.Console origin/new-pr", egenv.DirectoryTemp("flathub")),
+			shell.Newf("gh release download --repo retrovibed/retrovibed --pattern 'space.retrovibe.Console.yml' --dir %s --clobber", egenv.DirectoryTemp("flathub")),
 		),
-		cloneAssets(egenv.EphemeralDirectory("flathub")),
+		cloneAssets(egenv.DirectoryTemp("flathub")),
 		shell.Op(
-			shell.Newf("chown -R egd:egd %s", egenv.EphemeralDirectory("flathub")).Privileged(),
-			shell.Newf("git -C %s add -A .", egenv.EphemeralDirectory("flathub")),
-			shell.Newf("git -C %s -c user.name='Retrovibed Engineering' -c user.email='engineering@retrovibe.space' commit -m 'Add space.retrovibe.Console'", egenv.EphemeralDirectory("flathub")),
-			shell.Newf("git -C %s remote -v", egenv.EphemeralDirectory("flathub")),
-			shell.Newf("git -C %s push origin HEAD", egenv.EphemeralDirectory("flathub")),
+			shell.Newf("chown -R egd:egd %s", egenv.DirectoryTemp("flathub")).Privileged(),
+			shell.Newf("git -C %s add -A .", egenv.DirectoryTemp("flathub")),
+			shell.Newf("git -C %s -c user.name='Retrovibed Engineering' -c user.email='engineering@retrovibe.space' commit -m 'Add space.retrovibe.Console'", egenv.DirectoryTemp("flathub")),
+			shell.Newf("git -C %s remote -v", egenv.DirectoryTemp("flathub")),
+			shell.Newf("git -C %s push origin HEAD", egenv.DirectoryTemp("flathub")),
 		),
 	)(ctx, o)
 }

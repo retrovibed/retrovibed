@@ -32,7 +32,7 @@ func init() {
 	gcfg = egdebuild.New(
 		"retrokiosk",
 		"",
-		egenv.WorkingDirectory(".eg", "debuild", "retrokiosk", "rootfs"),
+		egenv.DirectoryWorking(".eg", "debuild", "retrokiosk", "rootfs"),
 		egdebuild.Option.Maintainer(maintainer.Name, maintainer.Email),
 		egdebuild.Option.SigningKeyID(maintainer.GPGFingerprint),
 		egdebuild.Option.ChangeLogDate(c.Committer.When),
@@ -63,8 +63,8 @@ func Runner() eg.ContainerRunner {
 }
 
 func Build(ctx context.Context, o eg.Op) error {
-	debroot := egenv.EphemeralDirectory("deb.retrokiosk")
-	cachedir := egenv.CacheDirectory(".dist")
+	debroot := egenv.DirectoryTemp("deb.retrokiosk")
+	cachedir := egenv.DirectoryCache(".dist")
 	runtime := shell.Runtime().
 		Timeout(egenv.TTL())
 
@@ -110,7 +110,7 @@ func Upload(ctx context.Context, o eg.Op) error {
 // and preset-enabled, unit file well-formed. It does not start the service —
 // that requires a real VT/DRM, which test containers don't have.
 func Verify(ctx context.Context, op eg.Op) error {
-	debroot := egenv.EphemeralDirectory("deb.retrokiosk")
+	debroot := egenv.DirectoryTemp("deb.retrokiosk")
 	runtime := shell.Runtime().Timeout(egenv.TTL())
 
 	return eg.Sequential(

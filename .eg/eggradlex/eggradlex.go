@@ -11,7 +11,7 @@ import (
 // CacheDirectory is the persistent GRADLE_USER_HOME shared across builds, so
 // downloaded dependencies survive a clean clone of the working directory.
 func CacheDirectory() string {
-	return egenv.CacheDirectory(".eg", "gradle")
+	return egenv.DirectoryCache(".eg", "gradle")
 }
 
 // Env returns the environment variables that point gradle at CacheDirectory.
