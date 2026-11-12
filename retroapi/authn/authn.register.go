@@ -286,20 +286,29 @@ func PrintIdentity(w io.Writer, s ssh.Signer, session *Session) error {
 	var (
 		err3 error
 	)
-	_, err1 := fmt.Fprintln(w, "fingerprint", ssh.FingerprintSHA256(s.PublicKey()))
-	_, err2 := fmt.Fprintln(w, "identity   ", md5x.String(ssh.FingerprintSHA256(s.PublicKey())))
+	// the labels are padded to a fixed width so the values line up.
+	line := func(label string, value string) error {
+		_, err := fmt.Fprintf(w, "%-11s %s\n", label, value)
+		return err
+	}
+
+	err1 := line("fingerprint", ssh.FingerprintSHA256(s.PublicKey()))
+	err2 := line("identity", md5x.String(ssh.FingerprintSHA256(s.PublicKey())))
 	if session != nil {
 		if session.Account != nil {
-			_, err3 = fmt.Fprintln(w, "account    ", session.Account.Id)
+			err3 = line("account", session.Account.Id)
 		}
 		if session.Profile != nil {
-			_, err6 := fmt.Fprintln(w, "display    ", session.Profile.Display)
-			_, err7 := fmt.Fprintln(w, "email      ", session.Profile.Email)
-			_, err8 := fmt.Fprintln(w, "status     ", ProfileState(session.Profile))
-			err3 = errorsx.Compact(err3, err6, err7, err8)
+			err3 = errorsx.Compact(
+				err3,
+				line("profile", session.Profile.Id),
+				line("display", session.Profile.Display),
+				line("email", session.Profile.Email),
+				line("status", ProfileState(session.Profile)),
+			)
 		}
 	}
-	_, err4 := fmt.Fprintln(w, "public     ", strings.TrimSpace(string(ssh.MarshalAuthorizedKey(s.PublicKey()))))
-	_, err5 := fmt.Fprintln(w, "base64     ", base64.URLEncoding.EncodeToString(s.PublicKey().Marshal()))
+	err4 := line("public", strings.TrimSpace(string(ssh.MarshalAuthorizedKey(s.PublicKey()))))
+	err5 := line("base64", base64.URLEncoding.EncodeToString(s.PublicKey().Marshal()))
 	return errorsx.Compact(err1, err2, err3, err4, err5)
 }

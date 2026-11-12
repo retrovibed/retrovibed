@@ -90,6 +90,7 @@ func TestCloudDisplay(t *testing.T) {
 		out := buf.String()
 		require.Contains(t, out, "fingerprint")
 		require.Contains(t, out, "account     6d1f5c9e-2f2c-4d2f-9a4b-6a3a3f0a7c11")
+		require.Contains(t, out, "profile     profile-id")
 		require.Contains(t, out, "display     Jane Doe")
 		require.Contains(t, out, "email       jane@example.com")
 		require.Contains(t, out, "status      enabled")

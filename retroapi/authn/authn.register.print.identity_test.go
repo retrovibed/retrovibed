@@ -3,6 +3,7 @@ package authn_test
 import (
 	"bytes"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -23,12 +24,33 @@ func TestPrintIdentity(t *testing.T) {
 		var out bytes.Buffer
 		session := &authn.Session{
 			Account: &authn.Account{Id: "account-1"},
-			Profile: &authn.Profile{Display: "Jane Doe", Email: "jane@example.com"},
+			Profile: &authn.Profile{Id: "profile-1", Display: "Jane Doe", Email: "jane@example.com"},
 		}
 		require.NoError(t, authn.PrintIdentity(&out, signer, session))
-		require.Contains(t, out.String(), "account-1")
-		require.Contains(t, out.String(), "Jane Doe")
-		require.Contains(t, out.String(), "jane@example.com")
+		require.Contains(t, out.String(), "account     account-1")
+		require.Contains(t, out.String(), "profile     profile-1")
+		require.Contains(t, out.String(), "display     Jane Doe")
+		require.Contains(t, out.String(), "email       jane@example.com")
+	})
+
+	t.Run("every value starts in the same column", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		signer, err := authn.Seeded(ctx, "print-identity", false, filepath.Join(t.TempDir(), "id"))
+		require.NoError(t, err)
+
+		var out bytes.Buffer
+		session := &authn.Session{
+			Account: &authn.Account{Id: "account-1"},
+			Profile: &authn.Profile{Id: "profile-1", Display: "Jane Doe", Email: "jane@example.com"},
+		}
+		require.NoError(t, authn.PrintIdentity(&out, signer, session))
+
+		for _, line := range strings.Split(strings.TrimSpace(out.String()), "\n") {
+			require.Equal(t, " ", line[11:12], line)
+			require.NotEqual(t, " ", line[:1], line)
+		}
 	})
 
 	t.Run("omits display and email without a session", func(t *testing.T) {
