@@ -36,7 +36,8 @@ message Token {
   bool archive_sync = 1009 [ json_name = "archive_sync" ];
   bool community_sync = 1010 [ json_name = "community_sync" ];
   bool device_backup = 1011 [ json_name = "device_backup" ];
-  reserved 1012 to 1999;
+  bool media_metadata_upload = 1012 [ json_name = "media_metadata_upload" ];
+  reserved 1013 to 1999;
   // START OF RETROVIBE LOCAL FIELDS
   bool remote_control = 2000 [ json_name = "remote_control" ];
   bool local_only = 2001 [ json_name = "local_only" ];

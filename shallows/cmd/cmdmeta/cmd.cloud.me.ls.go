@@ -49,14 +49,19 @@ func (t CloudMeLs) render(w io.Writer, current string, profiles []*authn.Profile
 	})
 
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(tw, "\tID\tACCOUNT\tNAME\tEMAIL\tSTATUS")
+	if _, err := fmt.Fprintln(tw, "\tID\tACCOUNT\tNAME\tEMAIL\tSTATUS"); err != nil {
+		return err
+	}
+
 	for _, p := range profiles {
 		mark := ""
 		if p.GetId() == current {
 			mark = "*"
 		}
 
-		fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\n", mark, p.GetId(), p.GetAccountId(), p.GetDisplay(), p.GetEmail(), authn.ProfileState(p))
+		if _, err := fmt.Fprintf(tw, "%s\t%s\t%s\t%s\t%s\t%s\n", mark, p.GetId(), p.GetAccountId(), p.GetDisplay(), p.GetEmail(), authn.ProfileState(p)); err != nil {
+			return err
+		}
 	}
 
 	return tw.Flush()

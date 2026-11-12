@@ -24,6 +24,7 @@ func PrintPermissions(w io.Writer, t *Token) error {
 	flag("library_modify", t.LibraryModify)
 	flag("archive_sync", t.ArchiveSync)
 	flag("device_backup", t.DeviceBackup)
+	flag("media_metadata_upload", t.MediaMetadataUpload)
 	flag("remote_control", t.RemoteControl)
 	flag("local_only", t.LocalOnly)
 	flag(fmt.Sprintf("archive_upload=%d", t.ArchiveUpload), t.ArchiveUpload > 0)

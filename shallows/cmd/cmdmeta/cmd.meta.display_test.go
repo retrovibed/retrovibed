@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
@@ -29,7 +30,7 @@ func TestCloudDisplay(t *testing.T) {
 			require.NoError(t, json.NewEncoder(w).Encode(map[string]string{"code": "stub-code", "state": r.URL.Query().Get("state")}))
 		})
 		mux.HandleFunc("/oauth2/ssh/token", func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprint(w, `{"access_token":"stub-access-token","token_type":"bearer","expires_in":3600}`)
+			errorsx.Must(fmt.Fprint(w, `{"access_token":"stub-access-token","token_type":"bearer","expires_in":3600}`))
 		})
 		// the login options token is the selected account id, /authn/ssh only returns the profiles of that account.
 		mux.HandleFunc("/authn/s/", func(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +42,7 @@ func TestCloudDisplay(t *testing.T) {
 			}
 			_ = json.NewDecoder(r.Body).Decode(&options)
 			if options.Token == "" {
-				fmt.Fprint(w, authed)
+				errorsx.Must(fmt.Fprint(w, authed))
 				return
 			}
 
@@ -58,7 +59,7 @@ func TestCloudDisplay(t *testing.T) {
 			}
 			require.NoError(t, json.NewEncoder(w).Encode(map[string]any{"profiles": selected}))
 		})
-		mux.HandleFunc("/m/authz/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprint(w, authz) })
+		mux.HandleFunc("/m/authz/", func(w http.ResponseWriter, r *http.Request) { errorsx.Must(fmt.Fprint(w, authz)) })
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
