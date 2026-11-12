@@ -69,12 +69,19 @@ const Token$json = {
     {'1': 'archive_sync', '3': 1009, '4': 1, '5': 8, '10': 'archive_sync'},
     {'1': 'community_sync', '3': 1010, '4': 1, '5': 8, '10': 'community_sync'},
     {'1': 'device_backup', '3': 1011, '4': 1, '5': 8, '10': 'device_backup'},
+    {
+      '1': 'media_metadata_upload',
+      '3': 1012,
+      '4': 1,
+      '5': 8,
+      '10': 'media_metadata_upload'
+    },
     {'1': 'remote_control', '3': 2000, '4': 1, '5': 8, '10': 'remote_control'},
     {'1': 'local_only', '3': 2001, '4': 1, '5': 8, '10': 'local_only'},
   ],
   '9': [
     {'1': 9, '2': 1000},
-    {'1': 1012, '2': 2000},
+    {'1': 1013, '2': 2000},
   ],
 };
 
@@ -90,9 +97,10 @@ final $typed_data.Uint8List tokenDescriptor = $convert.base64Decode(
     'licmFyeV9yZWFkGO8HIAEoCFIMbGlicmFyeV9yZWFkEicKDmxpYnJhcnlfbW9kaWZ5GPAHIAEo'
     'CFIObGlicmFyeV9tb2RpZnkSIwoMYXJjaGl2ZV9zeW5jGPEHIAEoCFIMYXJjaGl2ZV9zeW5jEi'
     'cKDmNvbW11bml0eV9zeW5jGPIHIAEoCFIOY29tbXVuaXR5X3N5bmMSJQoNZGV2aWNlX2JhY2t1'
-    'cBjzByABKAhSDWRldmljZV9iYWNrdXASJwoOcmVtb3RlX2NvbnRyb2wY0A8gASgIUg5yZW1vdG'
-    'VfY29udHJvbBIfCgpsb2NhbF9vbmx5GNEPIAEoCFIKbG9jYWxfb25seUoFCAkQ6AdKBgj0BxDQ'
-    'Dw==');
+    'cBjzByABKAhSDWRldmljZV9iYWNrdXASNQoVbWVkaWFfbWV0YWRhdGFfdXBsb2FkGPQHIAEoCF'
+    'IVbWVkaWFfbWV0YWRhdGFfdXBsb2FkEicKDnJlbW90ZV9jb250cm9sGNAPIAEoCFIOcmVtb3Rl'
+    'X2NvbnRyb2wSHwoKbG9jYWxfb25seRjRDyABKAhSCmxvY2FsX29ubHlKBQgJEOgHSgYI9QcQ0A'
+    '8=');
 
 @$core.Deprecated('Use authzRequestDescriptor instead')
 const AuthzRequest$json = {

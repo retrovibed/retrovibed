@@ -165,6 +165,7 @@ class Token extends $pb.GeneratedMessage {
     $core.bool? archiveSync,
     $core.bool? communitySync,
     $core.bool? deviceBackup,
+    $core.bool? mediaMetadataUpload,
     $core.bool? remoteControl,
     $core.bool? localOnly,
   }) {
@@ -187,6 +188,8 @@ class Token extends $pb.GeneratedMessage {
     if (archiveSync != null) result.archiveSync = archiveSync;
     if (communitySync != null) result.communitySync = communitySync;
     if (deviceBackup != null) result.deviceBackup = deviceBackup;
+    if (mediaMetadataUpload != null)
+      result.mediaMetadataUpload = mediaMetadataUpload;
     if (remoteControl != null) result.remoteControl = remoteControl;
     if (localOnly != null) result.localOnly = localOnly;
     return result;
@@ -227,6 +230,7 @@ class Token extends $pb.GeneratedMessage {
     ..aOB(1009, _omitFieldNames ? '' : 'archive_sync')
     ..aOB(1010, _omitFieldNames ? '' : 'community_sync')
     ..aOB(1011, _omitFieldNames ? '' : 'device_backup')
+    ..aOB(1012, _omitFieldNames ? '' : 'media_metadata_upload')
     ..aOB(2000, _omitFieldNames ? '' : 'remote_control')
     ..aOB(2001, _omitFieldNames ? '' : 'local_only')
     ..hasRequiredFields = false;
@@ -414,22 +418,31 @@ class Token extends $pb.GeneratedMessage {
   @$pb.TagNumber(1011)
   void clearDeviceBackup() => $_clearField(1011);
 
+  @$pb.TagNumber(1012)
+  $core.bool get mediaMetadataUpload => $_getBF(18);
+  @$pb.TagNumber(1012)
+  set mediaMetadataUpload($core.bool value) => $_setBool(18, value);
+  @$pb.TagNumber(1012)
+  $core.bool hasMediaMetadataUpload() => $_has(18);
+  @$pb.TagNumber(1012)
+  void clearMediaMetadataUpload() => $_clearField(1012);
+
   /// START OF RETROVIBE LOCAL FIELDS
   @$pb.TagNumber(2000)
-  $core.bool get remoteControl => $_getBF(18);
+  $core.bool get remoteControl => $_getBF(19);
   @$pb.TagNumber(2000)
-  set remoteControl($core.bool value) => $_setBool(18, value);
+  set remoteControl($core.bool value) => $_setBool(19, value);
   @$pb.TagNumber(2000)
-  $core.bool hasRemoteControl() => $_has(18);
+  $core.bool hasRemoteControl() => $_has(19);
   @$pb.TagNumber(2000)
   void clearRemoteControl() => $_clearField(2000);
 
   @$pb.TagNumber(2001)
-  $core.bool get localOnly => $_getBF(19);
+  $core.bool get localOnly => $_getBF(20);
   @$pb.TagNumber(2001)
-  set localOnly($core.bool value) => $_setBool(19, value);
+  set localOnly($core.bool value) => $_setBool(20, value);
   @$pb.TagNumber(2001)
-  $core.bool hasLocalOnly() => $_has(19);
+  $core.bool hasLocalOnly() => $_has(20);
   @$pb.TagNumber(2001)
   void clearLocalOnly() => $_clearField(2001);
 }
