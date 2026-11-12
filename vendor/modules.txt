@@ -458,7 +458,7 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20261111235708-6c4a6753ca02
+# github.com/egdaemon/eg v0.0.0-20261112185231-8823a622f3c3
 ## explicit; go 1.27.2
 github.com/egdaemon/eg
 github.com/egdaemon/eg/astcodec
@@ -1329,7 +1329,7 @@ golang.org/x/text/width
 # golang.org/x/time v0.16.0
 ## explicit; go 1.26.0
 golang.org/x/time/rate
-# golang.org/x/tools v0.52.1-0.20261106145633-d407941a339a
+# golang.org/x/tools v0.52.1-0.20261112185146-9f3d0663efd6
 ## explicit; go 1.26.0
 golang.org/x/tools/cmd/goimports
 golang.org/x/tools/cmd/stringer
@@ -1342,6 +1342,8 @@ golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/go/packages
 golang.org/x/tools/go/types/objectpath
 golang.org/x/tools/imports
+golang.org/x/tools/internal/diff
+golang.org/x/tools/internal/diff/lcs
 golang.org/x/tools/internal/event
 golang.org/x/tools/internal/event/core
 golang.org/x/tools/internal/event/keys

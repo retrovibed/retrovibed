@@ -33,6 +33,7 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/linxGnu/pqueue v0.2.3
 	github.com/logrusorgru/aurora v2.0.3+incompatible
+	github.com/mattn/go-isatty v0.0.24
 	github.com/michiwend/gomusicbrainz v0.0.0-20181012083520-6c07e13dd396
 	github.com/mutablelogic/go-media v1.8.3
 	github.com/pkg/errors v0.9.1
@@ -135,7 +136,6 @@ require (
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
-	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.23 // indirect
 	github.com/mdlayher/netlink v1.11.2 // indirect
@@ -178,7 +178,7 @@ require (
 	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/telemetry v0.0.0-20261009151841-97e8ea77aa2a // indirect
-	golang.org/x/tools v0.52.1-0.20261106145633-d407941a339a // indirect
+	golang.org/x/tools v0.52.1-0.20261112185146-9f3d0663efd6 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect

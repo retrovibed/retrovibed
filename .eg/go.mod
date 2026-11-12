@@ -3,7 +3,7 @@ module eg/compute
 go 1.27.2
 
 require (
-	github.com/egdaemon/eg v0.0.0-20261111235708-6c4a6753ca02
+	github.com/egdaemon/eg v0.0.0-20261112185231-8823a622f3c3
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d
 	golang.org/x/net v0.62.0
 	google.golang.org/api v0.307.0
@@ -96,7 +96,7 @@ require (
 	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/text v0.44.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	golang.org/x/tools v0.52.1-0.20261106145633-d407941a339a // indirect
+	golang.org/x/tools v0.52.1-0.20261112185146-9f3d0663efd6 // indirect
 	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261005182115-fad411399dd8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
