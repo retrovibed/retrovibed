@@ -27,6 +27,17 @@ var (
 	gcfg egdebuild.Config
 )
 
+func cachedir() string {
+	return egenv.DirectoryWorkload(".dist", "retrokiosk")
+}
+
+func gpgoptions() []eggpg.Option {
+	// eggpg.Options() takes GNUPGHOME from the environment, which inside the container is the
+	// host-provided /eg.mnt/.gnupg (not writable by us: "unsafe ownership", "Permission denied").
+	// pin the isolated per-container home instead.
+	return eggpg.Options().Home("/home/egd/.gnupg")
+}
+
 func init() {
 	c := eggit.EnvCommit()
 	gcfg = egdebuild.New(
@@ -45,13 +56,10 @@ func init() {
 	)
 }
 
-func gpgoptions() []eggpg.Option {
-	return eggpg.Options().Privileged()
-}
-
 func Prepare(ctx context.Context, o eg.Op) error {
 	return eg.Parallel(
-		egdebuild.Prepare(Runner(), nil),
+		// egdebuild.Prepare(Runner(), nil),
+		egdebuild.Prepare(Runner(), errorsx.Must(fs.Sub(debskel, ".debskel"))),
 	)(ctx, o)
 }
 
@@ -60,12 +68,8 @@ func Runner() eg.C8S {
 }
 
 func Build(ctx context.Context, o eg.Op) error {
-	debroot := egenv.DirectoryTemp("deb.retrokiosk")
-	cachedir := egenv.DirectoryCache(".dist")
-	runtime := shell.Runtime().
-		Timeout(egenv.TTL())
-
 	return eg.Sequential(
+		egbug.Log("DERP DERP 0"),
 		// override eg compute local's setting of the home directory.
 		// ideally we should default to this except when performing local
 		// compute workloads.
@@ -73,6 +77,7 @@ func Build(ctx context.Context, o eg.Op) error {
 			eggpg.Seed(gpgoptions()...),
 			eggpg.Debug(gpgoptions()...),
 		),
+		egbug.Log("DERP DERP 1"),
 		eg.Parallel(
 			egdebuild.Build(
 				gcfg,
@@ -85,10 +90,6 @@ func Build(ctx context.Context, o eg.Op) error {
 				egdebuild.Option.BuildBinary(20*time.Minute),
 				egdebuild.Option.NoLint(),
 			),
-		),
-		shell.Op(
-			runtime.Newf("mkdir -p %s", cachedir),
-			runtime.Newf(`find %s -maxdepth 2 -name 'retrokiosk_*.deb' -exec cp -v {} %s \;`, debroot, cachedir),
 		),
 	)(ctx, o)
 }
