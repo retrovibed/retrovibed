@@ -19,16 +19,7 @@ func Reverse(s string) string {
 	return string(r)
 }
 
-// DefaultIfBlank uses the default value if the provided string is blank.
-func DefaultIfBlank(s, defaultValue string) string {
-	if strings.TrimSpace(s) != "" {
-		return s
-	}
-
-	return defaultValue
-}
-
-func FirstNonBlank(values ...string) string {
+func First(values ...string) string {
 	for _, s := range values {
 		if len(strings.TrimSpace(s)) != 0 {
 			return s
@@ -36,15 +27,6 @@ func FirstNonBlank(values ...string) string {
 	}
 
 	return ""
-}
-
-// First get the first value from the array.
-func First(values ...string) string {
-	if len(values) == 0 {
-		return ""
-	}
-
-	return values[0]
 }
 
 func Blank(s string) bool {

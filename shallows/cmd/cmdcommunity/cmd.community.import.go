@@ -62,7 +62,7 @@ func (t cmdCommunityImport) Run(gctx *cmdopts.Global) (err error) {
 				CommunityID:  pc.CommunityId,
 				KnownMediaID: pc.KnownMediaId,
 				MagnetURI:    pc.MagnetUri,
-				LibraryID:    stringsx.FirstNonBlank(pc.LibraryId, uuidx.Nil().String()), OAuthGoogleID: uuidx.Nil().String(),
+				LibraryID:    stringsx.First(pc.LibraryId, uuidx.Nil().String()), OAuthGoogleID: uuidx.Nil().String(),
 				PublishedAt: timex.Inf(),
 			}
 			err = community.PublishedContentInsertWithDefaults(gctx.Context, db, dbpc).Scan(&dbpc)

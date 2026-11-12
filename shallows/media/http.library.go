@@ -224,7 +224,7 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		copied = &iox.Copied{Result: new(uint64)}
 		mhash  = md5.New()
 		// the filesystem endpoint names a destination when it uploads into a directory.
-		directory = stringsx.FirstNonBlank(r.FormValue("directory_id"), uuidx.Nil().String())
+		directory = stringsx.First(r.FormValue("directory_id"), uuidx.Nil().String())
 	)
 
 	if f, fh, err = r.FormFile("content"); err != nil {

@@ -68,7 +68,7 @@ func MetadataOptionFromMagnet(i *metainfo.Magnet) func(*Metadata) {
 
 func MetadataOptionMimetype(d string) func(*Metadata) {
 	return func(m *Metadata) {
-		m.Mimetype = stringsx.FirstNonBlank(d, mimex.Bittorrent)
+		m.Mimetype = stringsx.First(d, mimex.Bittorrent)
 	}
 }
 
@@ -83,7 +83,7 @@ func MetadataOptionDescription(d string) func(*Metadata) {
 // name), so a caller's fallback never overrides a more authoritative name.
 func MetadataOptionDescriptionDefault(d string) func(*Metadata) {
 	return func(m *Metadata) {
-		m.Description = stringsx.FirstNonBlank(m.Description, d)
+		m.Description = stringsx.First(m.Description, d)
 	}
 }
 

@@ -18,11 +18,11 @@ import (
 type DaemonOption func(*Daemon)
 
 func DaemonOptionMaybeID(v *Daemon) {
-	v.ID = stringsx.FirstNonBlank(v.ID, md5x.String(v.Hostname))
+	v.ID = stringsx.First(v.ID, md5x.String(v.Hostname))
 }
 
 func DaemonOptionEnsureDescription(v *Daemon) {
-	v.Description = stringsx.FirstNonBlank(v.Description, v.Hostname, v.ID)
+	v.Description = stringsx.First(v.Description, v.Hostname, v.ID)
 }
 
 func DaemonOptionTestDefaults(v *Daemon) {
@@ -47,7 +47,7 @@ func DaemonFromHost() Daemon {
 	return Daemon{
 		CreatedAt:   time.Now(),
 		Description: "local device",
-		Hostname:    stringsx.FirstNonBlank(fmt.Sprintf("%s:9998", errorsx.Zero(os.Hostname())), "localhost"),
+		Hostname:    stringsx.First(fmt.Sprintf("%s:9998", errorsx.Zero(os.Hostname())), "localhost"),
 		ID:          uuidx.Max().String(),
 		UpdatedAt:   time.Now(),
 	}

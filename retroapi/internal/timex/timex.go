@@ -2,6 +2,7 @@ package timex
 
 import (
 	"context"
+	"iter"
 	"log"
 	"math"
 	"reflect"
@@ -173,6 +174,23 @@ func RFC3339NanoEncode(t time.Time) time.Time {
 // RFC3339Nano truncate time to RFC3339Nano
 func RFC3339NanoDecode(t time.Time) time.Time {
 	return RFC3339NanoMaxDecode(RFC3339NanoMinDecode(t))
+}
+
+// Parser parses each value using the layout and yields the result decoded by RFC3339NanoDecode, so the
+// json safe infinities round trip to Inf and NegInf. blank and unparseable values are skipped.
+func Parser(layout string, values ...string) iter.Seq[time.Time] {
+	return func(yield func(time.Time) bool) {
+		for _, v := range values {
+			ts, err := time.Parse(layout, v)
+			if err != nil {
+				continue
+			}
+
+			if !yield(RFC3339NanoDecode(ts)) {
+				return
+			}
+		}
+	}
 }
 
 // RFC3339NanoMinDecode convert minimum value for RFC3339 to time.Time.

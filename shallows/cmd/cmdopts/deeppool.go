@@ -17,6 +17,9 @@ type DeeppoolClient interface {
 // with deeppool and creates an authenticated client.
 type DeeppoolClientDefault struct {
 	SSHID *SSHID
+	// Global provides the account (--account-id) that selects the profile when the ssh key is associated
+	// with multiple. a pointer because the flags are parsed after the client is constructed.
+	Global *Global
 }
 
 func (t DeeppoolClientDefault) HTTPClient(ctx context.Context) (*http.Client, error) {
@@ -25,11 +28,13 @@ func (t DeeppoolClientDefault) HTTPClient(ctx context.Context) (*http.Client, er
 		return nil, errorsx.Wrap(err, "unable to generate signer id")
 	}
 
-	if _, err := authn.AutoRegistration(ctx, signer); err != nil {
+	session, err := authn.AutoRegistrationOnce(ctx, signer, t.Global.AccountID, false, ChooseProfile)
+	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to register with archival service")
 	}
 
-	c, err := authn.AutoJWTClient(ctx, signer)
+	// act as the account the registration resolved.
+	c, err := authn.AutoJWTClient(ctx, signer, session.Account.GetId())
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create api client")
 	}

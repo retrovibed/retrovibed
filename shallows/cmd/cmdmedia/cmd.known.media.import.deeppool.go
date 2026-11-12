@@ -32,7 +32,7 @@ type deeppoolimport struct {
 }
 
 func (t deeppoolimport) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) error {
-	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid}.HTTPClient(gctx.Context)
+	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid, Global: gctx}.HTTPClient(gctx.Context)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create deeppool client")
 	}
@@ -83,7 +83,7 @@ func (t deeppoolimport) knownFromPublished(pc *communityapi.PublishedContent) li
 	_md5 := md5x.JSON(pc)
 	uidmd5 := uuidx.FromBytesOrNil(_md5.Sum(nil))
 
-	uid := stringsx.FirstNonBlank(pc.KnownMediaId, ddiscapi.ImportedMediaUUID(t.Source, uuidx.FromStringOrNil(pc.Id)).String())
+	uid := stringsx.First(pc.KnownMediaId, ddiscapi.ImportedMediaUUID(t.Source, uuidx.FromStringOrNil(pc.Id)).String())
 
 	return library.Known{
 		Source:    t.Source,
@@ -93,7 +93,7 @@ func (t deeppoolimport) knownFromPublished(pc *communityapi.PublishedContent) li
 		ID:        pc.Id,
 		Title:     pc.Title,
 		Overview:  pc.Description,
-		Mimetype:  stringsx.FirstNonBlank(pc.Mimetype, mimex.Video),
+		Mimetype:  stringsx.First(pc.Mimetype, mimex.Video),
 		ParentUID: uuidx.Nil().String(),
 	}
 }

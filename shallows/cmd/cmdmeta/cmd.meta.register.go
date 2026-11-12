@@ -13,7 +13,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 )
 
-type CloudRegister struct{}
+type CloudRegister struct {
+	Account string `name:"account" help:"optional id of the account to register with, an administrator of the account must approve the registration"`
+}
 
 func (t CloudRegister) Run(gctx *cmdopts.Global) (err error) {
 	id, err := sshx.Load(env.PrivateKeyPath())
@@ -21,7 +23,7 @@ func (t CloudRegister) Run(gctx *cmdopts.Global) (err error) {
 		return err
 	}
 
-	session, err := authn.AutoRegistration(gctx.Context, id)
+	session, err := authn.AutoRegistrationOnce(gctx.Context, id, t.Account, true, cmdopts.ChooseProfile)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to register")
 	}

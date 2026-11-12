@@ -198,7 +198,7 @@ func (t *HTTPAutoimport) create(w http.ResponseWriter, r *http.Request) {
 
 	d := NewLibraryAutoimportDirectory(msg.Directory)
 	d.Path = filepath.Clean(d.Path)
-	d.LibraryDirectoryID = stringsx.FirstNonBlank(d.LibraryDirectoryID, uuidx.Nil().String())
+	d.LibraryDirectoryID = stringsx.First(d.LibraryDirectoryID, uuidx.Nil().String())
 
 	if !filepath.IsAbs(d.Path) {
 		log.Println("autoimport directory path must be absolute", d.Path)
@@ -254,7 +254,7 @@ func (t *HTTPAutoimport) update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	d := NewLibraryAutoimportDirectory(msg.Directory)
-	d.LibraryDirectoryID = stringsx.FirstNonBlank(d.LibraryDirectoryID, uuidx.Nil().String())
+	d.LibraryDirectoryID = stringsx.First(d.LibraryDirectoryID, uuidx.Nil().String())
 
 	// mode and debounce are enforced by the table's check constraints.
 	if err = library.AutoimportDirectoryUpdateByID(r.Context(), t.q, id, d).Scan(&d); duckdbx.ErrUniqueConstraintViolation(err) != nil {

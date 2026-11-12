@@ -97,7 +97,7 @@ func KnownOptionAutoDescription(t *Known) {
 // set ParentUID still carry Go's zero-value "" here, which the driver can't
 // convert.
 func KnownOptionAutoParentUID(t *Known) {
-	t.ParentUID = stringsx.FirstNonBlank(t.ParentUID, uuidx.Nil().String())
+	t.ParentUID = stringsx.First(t.ParentUID, uuidx.Nil().String())
 }
 
 // KnownCollationSpecialsSeason marks TMDB "Specials" (season_number == 0)

@@ -206,8 +206,8 @@ func (t *HTTPPublished) publish(w http.ResponseWriter, r *http.Request) {
 	}
 
 	req.PublishedContent.CommunityId = cid
-	req.PublishedContent.Title = stringsx.FirstNonBlank(req.PublishedContent.Title, lmd.Description)
-	req.PublishedContent.KnownMediaId = stringsx.FirstNonBlank(req.PublishedContent.KnownMediaId, lmd.KnownMediaID)
+	req.PublishedContent.Title = stringsx.First(req.PublishedContent.Title, lmd.Description)
+	req.PublishedContent.KnownMediaId = stringsx.First(req.PublishedContent.KnownMediaId, lmd.KnownMediaID)
 
 	pc := community.NewPublishedContent(
 		community.PublishedContent{

@@ -50,12 +50,11 @@ func RSSOptionDigest(s string) RSSOption {
 
 // populates the encryption seed based on the url host if it hasnt already been set.
 func RSSOptionDefaultEncryptionSeed(r *RSS) {
-	r.EncryptionSeed = stringsx.FirstNonBlank(
+	r.EncryptionSeed = stringsx.First(
 		r.EncryptionSeed, md5x.FormatUUID(
-			md5x.Digest(stringsx.DefaultIfBlank(
+			md5x.Digest(stringsx.First(
 				errorsx.Zero(url.Parse(r.URL)).Host,
-				uuidx.NewV4().String(),
-			)),
+				uuidx.NewV4().String())),
 		),
 	)
 }

@@ -40,12 +40,12 @@ import (
 )
 
 func Hostname() string {
-	return stringsx.FirstNonBlank(errorsx.Zero(os.Hostname()), "localhost")
+	return stringsx.First(errorsx.Zero(os.Hostname()), "localhost")
 }
 
 func Username() string {
 	u := userx.CurrentUserOrDefault(userx.Zero())
-	return stringsx.FirstNonBlank(u.Name, u.Username, u.Uid)
+	return stringsx.First(u.Name, u.Username, u.Uid)
 }
 
 func Main(args ...string) {
@@ -151,7 +151,7 @@ func Main(args ...string) {
 		),
 		kong.BindTo(shellcli.Context, (*context.Context)(nil)),
 		kong.BindTo(os.Stdin, (*cmdopts.Stdin)(nil)),
-		kong.BindTo(cmdopts.DeeppoolClientDefault{SSHID: &shellcli.SSHID}, (*cmdopts.DeeppoolClient)(nil)),
+		kong.BindTo(cmdopts.DeeppoolClientDefault{SSHID: &shellcli.SSHID, Global: &shellcli.Global}, (*cmdopts.DeeppoolClient)(nil)),
 		kong.TypeMapper(reflect.TypeOf(&net.IP{}), kong.MapperFunc(cmdopts.ParseIP)),
 		kong.TypeMapper(reflect.TypeOf(&net.TCPAddr{}), kong.MapperFunc(cmdopts.ParseTCPAddr)),
 		kong.TypeMapper(reflect.TypeOf([]*net.TCPAddr(nil)), kong.MapperFunc(cmdopts.ParseTCPAddrArray)),

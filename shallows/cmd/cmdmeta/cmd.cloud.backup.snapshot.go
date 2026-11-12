@@ -21,7 +21,7 @@ func (t CloudBackupSnapshot) Run(gctx *cmdopts.Global) (err error) {
 		return err
 	}
 
-	c, err := authn.AutoJWTClient(gctx.Context, id)
+	c, err := authn.AutoJWTClient(gctx.Context, id, gctx.AccountID)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to authenticate")
 	}

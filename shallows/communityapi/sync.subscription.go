@@ -49,7 +49,7 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *Published
 		new(int160.FromByteArray(md.InfoHash)),
 		tracking.MetadataOptionFromMagnet(&md),
 		tracking.MetadataOptionDescription(md.DisplayName),
-		tracking.MetadataOptionKnownMediaID(stringsx.FirstNonBlank(pc.KnownMediaId, uuidx.Max().String())),
+		tracking.MetadataOptionKnownMediaID(stringsx.First(pc.KnownMediaId, uuidx.Max().String())),
 		tracking.MetadataOptionEntropySeed(md.InfoHash.Bytes()),
 		tracking.MetadataOptionMimetype(pc.Mimetype),
 		tracking.MetadataOptionAutoDescription,
@@ -69,7 +69,7 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *Published
 	dbpc := community.NewPublishedContent(community.PublishedContent{
 		// the md5x uuid is a partial hack due to duckdb not supporting partial indexes.
 		// the likelyhood of a real collision  with an actual bit of library data is miniscule.
-		LibraryID:    stringsx.FirstNonBlank(pc.LibraryId, md5x.FormatUUID(md5x.Digest(pc.CommunityId, pc.MagnetUri))),
+		LibraryID:    stringsx.First(pc.LibraryId, md5x.FormatUUID(md5x.Digest(pc.CommunityId, pc.MagnetUri))),
 		KnownMediaID: tmeta.KnownMediaID,
 	}, PublishedContentOptionFromProto(pc))
 

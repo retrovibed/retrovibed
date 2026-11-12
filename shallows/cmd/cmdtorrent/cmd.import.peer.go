@@ -118,7 +118,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 	defer db.Close()
 
 	rootstore := fsx.DirVirtual(userx.DefaultDataDirectory(userx.DefaultRelRoot()))
-	torrentstore := fsx.DirVirtual(stringsx.FirstNonBlank(t.Directory, env.TorrentDir()))
+	torrentstore := fsx.DirVirtual(stringsx.First(t.Directory, env.TorrentDir()))
 	mediastore := fsx.DirVirtual(env.MediaDir())
 
 	if err := fsx.MkDirs(0700, torrentstore.Path(), mediastore.Path()); err != nil {
@@ -130,7 +130,7 @@ func (t importPeer) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 		return err
 	}
 
-	c, err := authn.AutoJWTClient(gctx.Context, id)
+	c, err := authn.AutoJWTClient(gctx.Context, id, gctx.AccountID)
 	if err == nil {
 		return err
 	}

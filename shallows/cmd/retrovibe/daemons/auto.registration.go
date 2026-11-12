@@ -11,9 +11,9 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 )
 
-func AutoRegistration(ctx context.Context, signer ssh.Signer, options ...httpx.ClientOption) {
+func AutoRegistration(ctx context.Context, signer ssh.Signer, account string, options ...httpx.ClientOption) {
 	contextx.Run(ctx, func() {
-		if _, err := authn.AutoRegistration(ctx, signer, options...); err != nil {
+		if _, err := authn.AutoRegistration(ctx, signer, account, options...); err != nil {
 			errorsx.Log(errorsx.Wrap(err, "unable to register with archival service"))
 		}
 	})

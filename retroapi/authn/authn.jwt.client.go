@@ -1,6 +1,7 @@
 package authn
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"fmt"
@@ -21,13 +22,15 @@ import (
 // client's authz layer requires one to already exist to fetch a bearer at
 // all, including for Register's own /authn/ssh request. Use
 // RegistrationJWTClient for that instead.
-func AutoJWTClient(ctx context.Context, signer ssh.Signer, options ...httpx.ClientOption) (c *http.Client, err error) {
+// account selects the profile when the key is associated with multiple, a blank account requires the
+// key to be associated with a single profile.
+func AutoJWTClient(ctx context.Context, signer ssh.Signer, account string, options ...httpx.ClientOption) (c *http.Client, err error) {
 	c, err = Oauth2DeeppoolHTTPClient(ctx, signer, options...)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "failed to create oauth2 http client")
 	}
 
-	return RetryClient(AuthzClient(JWTClientHostname(c, env.Deeppool()))), nil
+	return RetryClient(AuthzClient(JWTClientHostname(c, env.Deeppool(), account))), nil
 }
 
 // RegistrationJWTClient returns the client Register must be called with: the
@@ -44,12 +47,14 @@ func RegistrationJWTClientWithEndpoint(ctx context.Context, signer ssh.Signer, e
 	return Oauth2DeeppoolHTTPClientWithEndpoint(ctx, signer, endpoint, options...)
 }
 
-func JWTClientHostname(oauth2c *http.Client, hostname string, options ...httpx.ClientOption) *http.Client {
+// JWTClientHostname account selects the profile when the key is associated with multiple.
+func JWTClientHostname(oauth2c *http.Client, hostname string, account string, options ...httpx.ClientOption) *http.Client {
 	return oauth2.NewClient(
 		context.WithValue(context.Background(), oauth2.HTTPClient, HTTPClientDefaults(options...)),
 		&jwttokensource{
 			oauth2c:  oauth2c,
 			endpoint: fmt.Sprintf("https://%s", hostname),
+			account:  account,
 		},
 	)
 }
@@ -57,6 +62,7 @@ func JWTClientHostname(oauth2c *http.Client, hostname string, options ...httpx.C
 type jwttokensource struct {
 	oauth2c  *http.Client
 	endpoint string
+	account  string
 }
 
 func (t *jwttokensource) Token() (*oauth2.Token, error) {
@@ -67,7 +73,12 @@ func (t *jwttokensource) Token() (*oauth2.Token, error) {
 	ctx, done := context.WithTimeout(context.Background(), 3*time.Second)
 	defer done()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/authn/ssh", t.endpoint), nil)
+	options, err := LoginOptionsToken(ctx, t.oauth2c, t.endpoint, t.account)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fmt.Sprintf("%s/authn/ssh", t.endpoint), bytes.NewReader(options))
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +98,7 @@ func (t *jwttokensource) Token() (*oauth2.Token, error) {
 		return nil, fmt.Errorf("no profiles associated with this identity. this should have been done automatically during boot")
 	case 1:
 	default:
-		return nil, fmt.Errorf("mumlitple profiles per identity not supported")
+		return nil, ambiguousProfiles(&authed)
 	}
 
 	return &oauth2.Token{AccessToken: authed.Profiles[0].Token}, err
@@ -142,13 +153,14 @@ func FetchAuthz(ctx context.Context, oauth2c *http.Client, endpoint string) (aut
 }
 
 // FetchCloudAuthz retrieves the permissions granted to the signer's profile by the cloud service.
-func FetchCloudAuthz(ctx context.Context, signer ssh.Signer, options ...httpx.ClientOption) (*AuthzResponse, error) {
+// account selects the profile when the key is associated with multiple.
+func FetchCloudAuthz(ctx context.Context, signer ssh.Signer, account string, options ...httpx.ClientOption) (*AuthzResponse, error) {
 	c, err := Oauth2DeeppoolHTTPClient(ctx, signer, options...)
 	if err != nil {
 		return nil, errorsx.Wrap(err, "failed to create oauth2 http client")
 	}
 
-	return FetchAuthz(ctx, JWTClientHostname(c, env.Deeppool(), options...), fmt.Sprintf("https://%s/m/authz/", env.Deeppool()))
+	return FetchAuthz(ctx, JWTClientHostname(c, env.Deeppool(), account, options...), fmt.Sprintf("https://%s/m/authz/", env.Deeppool()))
 }
 
 func (t *metatokensource) Token() (*oauth2.Token, error) {

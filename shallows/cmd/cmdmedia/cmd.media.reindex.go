@@ -106,7 +106,7 @@ func (t reindex) run(ctx context.Context, db *sql.DB, c library.QueryCleaner, me
 			continue
 		}
 
-		if err = library.MetadataUpdateReindexByID(ctx, db, md.ID, desc, library.NormalizedDescription(md.Description), stringsx.FirstNonBlank(kid, md.KnownMediaID)).Scan(&md); err != nil {
+		if err = library.MetadataUpdateReindexByID(ctx, db, md.ID, desc, library.NormalizedDescription(md.Description), stringsx.First(kid, md.KnownMediaID)).Scan(&md); err != nil {
 			return err
 		}
 	}

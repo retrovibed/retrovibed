@@ -32,7 +32,7 @@ func (t knownreindex) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	tvfs := fsx.DirVirtual(stringsx.FirstNonBlank(t.Directory, env.TorrentDir()))
+	tvfs := fsx.DirVirtual(stringsx.First(t.Directory, env.TorrentDir()))
 
 	return t.run(gctx.Context, db, tvfs, blockcache.NewTorrentFromVirtualFS(tvfs))
 }

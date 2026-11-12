@@ -249,6 +249,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 		if c, err := authn.AutoJWTClient(
 			gctx.Context,
 			id,
+			gctx.AccountID,
 			// its important that the dialer option is the first in the list.
 			// that way we ensure the dialer doesnt cause a panic or we leak connections.
 			authn.ClientOptionDialer(socialringDialer),
@@ -257,6 +258,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 			go AutoRegistration(
 				gctx.Context,
 				id,
+				gctx.AccountID,
 				// its important that the dialer option is the first in the list.
 				// that way we ensure the dialer doesnt cause a panic or we leak connections.
 				authn.ClientOptionDialer(socialringDialer),

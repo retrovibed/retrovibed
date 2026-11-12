@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
+	"github.com/retrovibed/retrovibed/retroapi/internal/timex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/stretchr/testify/require"
 )
@@ -40,6 +42,61 @@ func TestPrintIdentity(t *testing.T) {
 		require.NoError(t, authn.PrintIdentity(&out, signer, nil))
 		require.NotContains(t, out.String(), "display")
 		require.NotContains(t, out.String(), "email")
+		require.NotContains(t, out.String(), "status")
+	})
+
+	t.Run("status is enabled when no disabled timestamp has passed", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		signer, err := authn.Seeded(ctx, "print-identity", false, filepath.Join(t.TempDir(), "id"))
+		require.NoError(t, err)
+
+		inf := timex.RFC3339Inf().Format(time.RFC3339Nano)
+		var out bytes.Buffer
+		session := &authn.Session{Profile: &authn.Profile{DisabledAt: inf, DisabledManuallyAt: inf, DisabledPendingApprovalAt: inf}}
+		require.NoError(t, authn.PrintIdentity(&out, signer, session))
+		require.Contains(t, out.String(), "status      enabled")
+	})
+
+	t.Run("status is enabled when the server does not send the timestamps", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		signer, err := authn.Seeded(ctx, "print-identity", false, filepath.Join(t.TempDir(), "id"))
+		require.NoError(t, err)
+
+		var out bytes.Buffer
+		require.NoError(t, authn.PrintIdentity(&out, signer, &authn.Session{Profile: &authn.Profile{}}))
+		require.Contains(t, out.String(), "status      enabled")
+	})
+
+	t.Run("status is disabled when the profile was disabled manually", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		signer, err := authn.Seeded(ctx, "print-identity", false, filepath.Join(t.TempDir(), "id"))
+		require.NoError(t, err)
+
+		inf := timex.RFC3339Inf().Format(time.RFC3339Nano)
+		var out bytes.Buffer
+		session := &authn.Session{Profile: &authn.Profile{DisabledAt: inf, DisabledManuallyAt: time.Now().Add(-time.Hour).Format(time.RFC3339Nano), DisabledPendingApprovalAt: inf}}
+		require.NoError(t, authn.PrintIdentity(&out, signer, session))
+		require.Contains(t, out.String(), "status      disabled")
+	})
+
+	t.Run("status is disabled when the profile is pending approval", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		signer, err := authn.Seeded(ctx, "print-identity", false, filepath.Join(t.TempDir(), "id"))
+		require.NoError(t, err)
+
+		inf := timex.RFC3339Inf().Format(time.RFC3339Nano)
+		var out bytes.Buffer
+		session := &authn.Session{Profile: &authn.Profile{DisabledAt: inf, DisabledManuallyAt: inf, DisabledPendingApprovalAt: timex.RFC3339NegInf().Format(time.RFC3339Nano)}}
+		require.NoError(t, authn.PrintIdentity(&out, signer, session))
+		require.Contains(t, out.String(), "status      disabled")
 	})
 
 	t.Run("does not panic when the session has no account", func(t *testing.T) {

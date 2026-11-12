@@ -25,6 +25,7 @@ import (
 // Global command fields.
 type Global struct {
 	Verbosity int                `help:"increase verbosity of logging" short:"v" type:"counter" default:"0" env:"RETROVIBED_LOGGING_VERBOSITY"`
+	AccountID string             `name:"account-id" help:"id of the account to use when the ssh key is associated with multiple profiles" env:"RETROVIBED_ACCOUNT"`
 	Context   context.Context    `kong:"-"`
 	Shutdown  context.CancelFunc `kong:"-"`
 	Cleanup   *sync.WaitGroup    `kong:"-"`

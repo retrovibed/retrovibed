@@ -155,7 +155,7 @@ func DiscoverFromRSSFeedsOnce(
 			meta, err := importer.Import(
 				fctx,
 				uri.URL,
-				tracking.MetadataOptionMimetype(stringsx.FirstNonBlank(channel.Retrovibed.Mimetype, uri.Mimetype)),
+				tracking.MetadataOptionMimetype(stringsx.First(channel.Retrovibed.Mimetype, uri.Mimetype)),
 				tracking.MetadataOptionDescriptionDefault(item.Title),
 				tracking.MetadataOptionKnownMediaID(uuidx.Max().String()),
 				tracking.MetadataOptionAutoEntropySeed(encryptionseed),
@@ -176,7 +176,7 @@ func DiscoverFromRSSFeedsOnce(
 			}
 		}
 
-		if updated := stringsx.FirstNonBlank(feed.Description, channel.Title); updated != feed.Description {
+		if updated := stringsx.First(feed.Description, channel.Title); updated != feed.Description {
 			feed.Description = updated
 			feed.Digest = md5digest
 

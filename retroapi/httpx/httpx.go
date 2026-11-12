@@ -409,7 +409,7 @@ func MimeType(h http.Header) string {
 		return fallback
 	}
 
-	return stringsx.DefaultIfBlank(t, fallback)
+	return stringsx.FirstNonBlank(t, fallback)
 }
 
 type notFoundHandler struct{}

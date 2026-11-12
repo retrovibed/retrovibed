@@ -46,7 +46,7 @@ func RegenerateFeed(ctx context.Context, q sqlx.Queryer, published FeedPublisher
 		Description:   c.Description,
 		TTL:           langx.FirstNonZero(int(c.DefaultTtl), feedDefaultTTL),
 		LastBuildDate: time.Now().UTC(),
-		Language:      stringsx.FirstNonBlank(c.DefaultLanguage, feedDefaultLanguage),
+		Language:      stringsx.First(c.DefaultLanguage, feedDefaultLanguage),
 		Retrovibed:    &rss.Retrovibed{Entropy: c.Entropy, Mimetype: c.Mimetype},
 	}
 
@@ -87,7 +87,7 @@ func buildFeedItems(ctx context.Context, q sqlx.Queryer, c *Community) ([]rss.It
 
 		items = append(items, rss.Item{
 			Guid:        pc.ID,
-			Title:       stringsx.FirstNonBlank(known.Title, known.OriginalTitle, lmd.Description),
+			Title:       stringsx.First(known.Title, known.OriginalTitle, lmd.Description),
 			Link:        pc.MagnetURI,
 			PublishDate: pc.PublishedAt,
 			Description: known.Overview,

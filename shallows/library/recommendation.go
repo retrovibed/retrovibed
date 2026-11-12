@@ -131,7 +131,7 @@ func RecommendationFromRandomKnown(ctx context.Context, q sqlx.Queryer, mimetype
 		Adult:        known.Adult,
 		Title:        known.Title,
 		Overview:     known.Overview,
-		Image:        stringsx.FirstNonBlank(known.PosterPath, known.BackdropPath),
+		Image:        stringsx.First(known.PosterPath, known.BackdropPath),
 		Popularity:   known.Popularity,
 		Released:     known.Released,
 	}).Scan(&rec); err != nil {

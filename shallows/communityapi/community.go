@@ -23,7 +23,7 @@ func NewCommunity(opts ...func(*Community)) *Community {
 func CommunityFromDeeppool(c *Community) community.Community {
 	return community.Community{
 		ID:                 c.Id,
-		AccountID:          stringsx.DefaultIfBlank(c.AccountId, uuidx.Nil().String()),
+		AccountID:          stringsx.First(c.AccountId, uuidx.Nil().String()),
 		CreatedAt:          errorsx.Zero(grpcx.DecodeTime(c.CreatedAt)),
 		UpdatedAt:          errorsx.Zero(grpcx.DecodeTime(c.UpdatedAt)),
 		Mimetype:           c.Mimetype,

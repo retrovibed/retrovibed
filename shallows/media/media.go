@@ -25,7 +25,7 @@ func MediaOptionFromLibraryMetadata(cc library.Metadata) MediaOption {
 		c.KnownMediaId = cc.KnownMediaID
 		c.CreatedAt = grpcx.EncodeTime(cc.CreatedAt)
 		c.UpdatedAt = grpcx.EncodeTime(cc.UpdatedAt)
-		c.Mimetype = stringsx.FirstNonBlank(cc.Mimetype, mimex.Binary)
+		c.Mimetype = stringsx.First(cc.Mimetype, mimex.Binary)
 		c.EncryptionSeed = cc.EncryptionSeed
 		c.DirectoryId = cc.DirectoryID
 	}
@@ -50,7 +50,7 @@ func MediaOptionFromTorrentMetadata(cc tracking.Metadata) MediaOption {
 		c.KnownMediaId = cc.KnownMediaID
 		c.CreatedAt = grpcx.EncodeTime(cc.CreatedAt)
 		c.UpdatedAt = grpcx.EncodeTime(cc.UpdatedAt)
-		c.Mimetype = stringsx.FirstNonBlank(cc.Mimetype, mimex.Bittorrent)
+		c.Mimetype = stringsx.First(cc.Mimetype, mimex.Bittorrent)
 		c.EncryptionSeed = cc.EncryptionSeed
 	}
 }

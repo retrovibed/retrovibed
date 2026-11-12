@@ -103,7 +103,7 @@ func (t *HTTPFilesystem) search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
-	msg.Next.DirectoryId = stringsx.FirstNonBlank(msg.Next.DirectoryId, uuidx.Nil().String())
+	msg.Next.DirectoryId = stringsx.First(msg.Next.DirectoryId, uuidx.Nil().String())
 
 	// directories float to the top of their own listing, which is the ordering every file
 	// manager uses. the mimetype is bound rather than interpolated.
@@ -183,7 +183,7 @@ func (t *HTTPFilesystem) create(w http.ResponseWriter, r *http.Request) {
 		library.MetadataOptionDescription(req.Name),
 		library.MetadataOptionAutoDescription(library.NormalizedDescription(req.Name)),
 		library.MetadataOptionMimetype(mimex.Directory),
-		library.MetadataOptionDirectoryID(stringsx.FirstNonBlank(req.DirectoryId, uuidx.Nil().String())),
+		library.MetadataOptionDirectoryID(stringsx.First(req.DirectoryId, uuidx.Nil().String())),
 	)
 
 	if err := library.DirectoryUpsert(r.Context(), t.q, md).Scan(&md); err != nil {
@@ -217,7 +217,7 @@ func (t *HTTPFilesystem) move(w http.ResponseWriter, r *http.Request) {
 	// recursive descent here would then run until the process is killed. such a move
 	// matches no row, which is indistinguishable from a missing id and equally a bad
 	// request either way.
-	if err := library.MetadataMoveByID(r.Context(), t.q, id, stringsx.FirstNonBlank(req.DirectoryId, uuidx.Nil().String())).Scan(&md); sqlx.ErrNoRows(err) != nil {
+	if err := library.MetadataMoveByID(r.Context(), t.q, id, stringsx.First(req.DirectoryId, uuidx.Nil().String())).Scan(&md); sqlx.ErrNoRows(err) != nil {
 		log.Println("move rejected", id, "into", req.DirectoryId)
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

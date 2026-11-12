@@ -46,7 +46,7 @@ func (t knownarchive) run(ctx context.Context, in io.Reader) (err error) {
 	if strings.Contains(t.Pattern, "*") {
 		dir, err = os.MkdirTemp(t.Directory, t.Pattern)
 	} else {
-		dir = filepath.Join(stringsx.FirstNonBlank(t.Directory, "."), t.Pattern)
+		dir = filepath.Join(stringsx.First(t.Directory, "."), t.Pattern)
 		err = os.MkdirAll(dir, 0700)
 	}
 	if err != nil {

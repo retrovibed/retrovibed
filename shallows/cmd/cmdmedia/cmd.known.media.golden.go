@@ -39,7 +39,7 @@ type goldenenv struct {
 }
 
 func (t goldenenv) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) error {
-	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid}.HTTPClient(gctx.Context)
+	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid, Global: gctx}.HTTPClient(gctx.Context)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create deeppool client")
 	}
@@ -102,7 +102,7 @@ func (t goldenupload) upload(ctx context.Context, client deeppool.MediaMetadataC
 }
 
 func (t goldenupload) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, stdin cmdopts.Stdin) error {
-	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid}.HTTPClient(gctx.Context)
+	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid, Global: gctx}.HTTPClient(gctx.Context)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create deeppool client")
 	}
@@ -163,7 +163,7 @@ type goldensync struct {
 }
 
 func (t goldensync) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) error {
-	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid}.HTTPClient(gctx.Context)
+	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid, Global: gctx}.HTTPClient(gctx.Context)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create deeppool client")
 	}

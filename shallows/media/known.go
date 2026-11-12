@@ -12,7 +12,7 @@ func KnownOptionFromLibraryKnown(cc library.Known) KnownOption {
 	return func(c *Known) {
 		c.Id = cc.ID
 		c.Uid = cc.UID
-		c.Image = stringsx.FirstNonBlank(cc.PosterPath, cc.BackdropPath)
+		c.Image = stringsx.First(cc.PosterPath, cc.BackdropPath)
 		c.Rating = float32(cc.Popularity)
 		c.Description = cc.Title
 		c.Summary = cc.Overview

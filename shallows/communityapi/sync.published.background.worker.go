@@ -134,7 +134,7 @@ func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (e
 	}
 
 	if decoded.OAuthGoogleID != uuidx.Nil().String() {
-		if uerr := community.YouTubeUpload(ctx, t.q, t.httpc, t.mvfs, decoded.OAuthGoogleID, lmd, stringsx.FirstNonBlank(known.Title, lmd.Description), known.Overview); uerr != nil {
+		if uerr := community.YouTubeUpload(ctx, t.q, t.httpc, t.mvfs, decoded.OAuthGoogleID, lmd, stringsx.First(known.Title, lmd.Description), known.Overview); uerr != nil {
 			log.Println(errorsx.Wrap(uerr, "youtube cross-post failed"))
 		}
 	}
@@ -149,9 +149,9 @@ func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (e
 
 		req := publishplugin.Request{
 			MediaPath:   lmd.ID,
-			Title:       stringsx.FirstNonBlank(t.render(cp.TemplateTitle, decoded, known, lmd), decoded.Title, known.Title, lmd.Description),
-			Description: stringsx.FirstNonBlank(t.render(cp.TemplateDescription, decoded, known, lmd), decoded.Title, known.Title, lmd.Description),
-			Mimetype:    stringsx.FirstNonBlank(decoded.Mimetype, known.Mimetype, lmd.Mimetype),
+			Title:       stringsx.First(t.render(cp.TemplateTitle, decoded, known, lmd), decoded.Title, known.Title, lmd.Description),
+			Description: stringsx.First(t.render(cp.TemplateDescription, decoded, known, lmd), decoded.Title, known.Title, lmd.Description),
+			Mimetype:    stringsx.First(decoded.Mimetype, known.Mimetype, lmd.Mimetype),
 			CommunityID: decoded.CommunityID,
 			Magnet:      decoded.MagnetURI,
 			Adult:       known.Adult,
@@ -206,8 +206,8 @@ func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (e
 			CommunityId:    decoded.CommunityID,
 			KnownMediaId:   decoded.KnownMediaID,
 			MagnetUri:      decoded.MagnetURI,
-			Title:          stringsx.FirstNonBlank(known.Title, lmd.Description),
-			Mimetype:       stringsx.FirstNonBlank(known.Mimetype, lmd.Mimetype),
+			Title:          stringsx.First(known.Title, lmd.Description),
+			Mimetype:       stringsx.First(known.Mimetype, lmd.Mimetype),
 			Description:    known.Overview,
 			ArchivedId:     lmd.ArchiveID,
 			EncryptionSeed: lmd.EncryptionSeed,

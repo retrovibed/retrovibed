@@ -34,7 +34,7 @@ func IdentifyLibraryMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 			known library.KnownScored
 		)
 
-		if known, err = identifier.Identify(ctx, mimex.Category(stringsx.FirstNonBlank(md.Mimetype, mimex.Binary)), md.Description); err != nil {
+		if known, err = identifier.Identify(ctx, mimex.Category(stringsx.First(md.Mimetype, mimex.Binary)), md.Description); err != nil {
 			log.Println("unable to detect known media for library media", md.ID, md.Description, "|", err)
 			continue
 		}
