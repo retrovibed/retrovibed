@@ -11,7 +11,6 @@ void main() {
         KnownMediaDownloadList(
           children: [api.Known(description: 'Test', summary: 'summary')],
         ),
-        isolatecache: true,
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
@@ -29,7 +28,6 @@ void main() {
           leading: const Text('leading'),
           children: [api.Known(description: 'Test', summary: 'summary')],
         ),
-        isolatecache: true,
       );
       await tester.pumpAndSettle();
       expect(find.text('leading'), findsOneWidget);

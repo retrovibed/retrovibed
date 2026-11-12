@@ -66,7 +66,7 @@ void main() {
     });
 
     testWidgets('renders items returned from the api with onChange wired up', (tester) async {
-      await tester.pumpApp(NewReleases(mimex.video, latest: _withItems), isolatecache: true);
+      await tester.pumpApp(NewReleases(mimex.video, latest: _withItems));
       await tester.pumpAndSettle();
       expect(find.text('New Releases'), findsOneWidget);
       expect(find.byType(lib.KnownMediaLocator), findsWidgets);
@@ -74,7 +74,7 @@ void main() {
     });
 
     testWidgets('onChange folds an updated item back into the list', (tester) async {
-      await tester.pumpApp(NewReleases(mimex.video, latest: _withItems), isolatecache: true);
+      await tester.pumpApp(NewReleases(mimex.video, latest: _withItems));
       await tester.pumpAndSettle();
 
       final locators = tester.widgetList<lib.KnownMediaLocator>(find.byType(lib.KnownMediaLocator)).toList();
@@ -92,7 +92,7 @@ void main() {
     });
 
     testWidgets('onChange removes the item from the list when given null', (tester) async {
-      await tester.pumpApp(NewReleases(mimex.video, latest: _withItems), isolatecache: true);
+      await tester.pumpApp(NewReleases(mimex.video, latest: _withItems));
       await tester.pumpAndSettle();
 
       final locators = tester.widgetList<lib.KnownMediaLocator>(find.byType(lib.KnownMediaLocator)).toList();

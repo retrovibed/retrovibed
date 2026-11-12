@@ -49,11 +49,12 @@ class SocialActionPhoto extends StatelessWidget {
   // the camera hands back a bare path, so sniff the mimetype the same way
   // FileDropWell does for picked and dropped files.
   Future<String> _mimetype(XFile photo) {
-    return File(photo.path)
-        .openSync()
+    final v = File(photo.path).openSync();
+    return v
         .read(mimex.defaultMagicNumbersMaxLength)
         .then((v) => v.toList())
-        .then((bits) => mimex.fromFile(photo.name, magicbits: bits));
+        .then((bits) => mimex.fromFile(photo.name, magicbits: bits))
+        .whenComplete(v.closeSync);
   }
 
   Future<void> _publish(

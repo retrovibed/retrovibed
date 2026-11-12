@@ -68,7 +68,7 @@ void main() {
     });
 
     testWidgets('renders items returned from the api', (tester) async {
-      await tester.pumpApp(Recommendations(mimex.video, apilatest: _withItems), isolatecache: true);
+      await tester.pumpApp(Recommendations(mimex.video, apilatest: _withItems));
       await tester.pumpAndSettle();
       expect(find.text('Recommendations'), findsOneWidget);
       expect(find.byType(lib.KnownMediaLocator), findsWidgets);

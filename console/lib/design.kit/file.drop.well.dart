@@ -81,14 +81,18 @@ class FileDropWell extends StatefulWidget {
       }
 
       if (foldersonly) return Future<DropItem?>.value(null);
-
-      return c.openRead(0, mimex.defaultMagicNumbersMaxLength).first.then((v) => v.toList()).then((bits) {
-        return DropItemFile(
-          c.path,
-          name: c.name,
-          mimeType: mimex.fromFile(c.name, magicbits: bits).toString(),
-        );
-      });
+      // consume the (bounded) stream to completion rather than cancelling after the first chunk,
+      // cancelling closes the file asynchronously which races with callers deleting the directory.
+      return c
+          .openRead(0, mimex.defaultMagicNumbersMaxLength)
+          .fold<List<int>>([], (acc, chunk) => acc..addAll(chunk))
+          .then((bits) {
+            return DropItemFile(
+              c.path,
+              name: c.name,
+              mimeType: mimex.fromFile(c.name, magicbits: bits).toString(),
+            );
+          });
     });
 
     return Future.wait(resolved).then((files) => FilesEvent(files: files.nonNulls.toList()));
@@ -117,14 +121,14 @@ class FileDropWell extends StatefulWidget {
 
     return openFiles(acceptedTypeGroups: [filter]).then((files) {
       final eventfiles = files.map((f) {
-        final fh = File(f.path);
-        return fh.openSync().read(mimex.defaultMagicNumbersMaxLength).then((v) => v.toList()).then((bits) {
+        final n = File(f.path).openSync();
+        return n.read(mimex.defaultMagicNumbersMaxLength).then((v) => v.toList()).then((bits) {
           return DropItemFile(
             f.path,
             name: f.name,
             mimeType: mimex.fromFile(f.name, magicbits: bits).toString(),
           );
-        });
+        }).whenComplete(n.closeSync);
       }).toList();
 
       return Future.wait(eventfiles).then((files) => FilesEvent(files: files));
