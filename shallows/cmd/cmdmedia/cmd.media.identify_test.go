@@ -7,7 +7,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -38,8 +38,8 @@ func TestIdentifyRun(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
 		require.NoError(t, db.Close())
 
-		genparser := cmdtestx.Genparser(identify{})
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "--database", metapath, "--cache-database", cachepath))
+		harness := cmdtestx.New(t, &identify{}).Options(cmdtestx.Standard(t))
+		require.NoError(t, harness.Run("--database", metapath, "--cache-database", cachepath))
 
 		db, err = cmdopts.DatabaseCustom(ctx, metapath, cachepath)
 		require.NoError(t, err)
@@ -64,8 +64,8 @@ func TestIdentifyRun(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
 		require.NoError(t, db.Close())
 
-		genparser := cmdtestx.Genparser(identify{})
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "--database", metapath, "--cache-database", cachepath))
+		harness := cmdtestx.New(t, &identify{}).Options(cmdtestx.Standard(t))
+		require.NoError(t, harness.Run("--database", metapath, "--cache-database", cachepath))
 
 		db, err = cmdopts.DatabaseCustom(ctx, metapath, cachepath)
 		require.NoError(t, err)
@@ -97,8 +97,8 @@ func TestIdentifyRun(t *testing.T) {
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
 		require.NoError(t, db.Close())
 
-		genparser := cmdtestx.Genparser(identify{})
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "--database", metapath, "--cache-database", cachepath))
+		harness := cmdtestx.New(t, &identify{}).Options(cmdtestx.Standard(t))
+		require.NoError(t, harness.Run("--database", metapath, "--cache-database", cachepath))
 
 		db, err = cmdopts.DatabaseCustom(ctx, metapath, cachepath)
 		require.NoError(t, err)
@@ -112,7 +112,7 @@ func TestIdentifyRun(t *testing.T) {
 		metapath := filepath.Join(t.TempDir(), "meta.db")
 		cachepath := filepath.Join(t.TempDir(), "cache.db")
 
-		genparser := cmdtestx.Genparser(identify{})
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "--database", metapath, "--cache-database", cachepath))
+		harness := cmdtestx.New(t, &identify{}).Options(cmdtestx.Standard(t))
+		require.NoError(t, harness.Run("--database", metapath, "--cache-database", cachepath))
 	})
 }

@@ -1,19 +1,14 @@
 package cmdmeta_test
 
 import (
-	"context"
 	"path/filepath"
-	"sync"
 	"testing"
 
-	"github.com/alecthomas/kong"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
-	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
@@ -24,29 +19,7 @@ import (
 )
 
 func TestIdenAdd(t *testing.T) {
-	var cli struct {
-		cmdopts.Global
-		cmdopts.TLSConfig
-		cmdopts.SSHID
-		cmdopts.Endpoint
-		Identity cmdmeta.Identity `cmd:""`
-	}
-
-	cli.Context, cli.Shutdown = context.WithCancel(context.Background())
-	cli.Cleanup = &sync.WaitGroup{}
-
-	parser := kong.Must(
-		&cli,
-		kong.Bind(&cli.TLSConfig),
-		kong.Bind(&cli.Global),
-		kong.Bind(&cli.SSHID),
-		kong.Bind(&cli.Endpoint),
-		kong.Vars{
-			"vars_private_key":                  env.PrivateKeyPath(),
-			"vars_user_configuration_directory": t.TempDir(),
-			"env_http_endpoint":                 env.Endpoint,
-		},
-	)
+	harness := cmdtestx.New(t, &cmdmeta.Identity{}).Options(cmdtestx.Standard(t))
 
 	t.Run("creates profile with admin permissions", func(t *testing.T) {
 		ctx, done := testx.Context(t)
@@ -67,7 +40,7 @@ func TestIdenAdd(t *testing.T) {
 		_, pub, err := sshx.UnsafeNewKeyGen().Generate()
 		require.NoError(t, err)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "identity", "add", "--private-key-path", keypath, "--endpoint", srv.URL, string(pub)))
+		require.NoError(t, harness.Run("add", "--private-key-path", keypath, "--endpoint", srv.URL, string(pub)))
 
 		require.Equal(t, 2, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_profiles"))(t))
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_sso_identity_ssh WHERE profile_id != (SELECT profile_id FROM meta_sso_identity_ssh LIMIT 1)"))(t))
@@ -103,7 +76,7 @@ func TestIdenAdd(t *testing.T) {
 		require.NoError(t, err)
 		pub = sshx.Comment(pub, "alice@example.com")
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "identity", "add", "--private-key-path", keypath, "--endpoint", srv.URL, string(pub)))
+		require.NoError(t, harness.Run("add", "--private-key-path", keypath, "--endpoint", srv.URL, string(pub)))
 
 		display, err := sqlx.String(ctx, q, "SELECT display FROM meta_profiles WHERE id = (SELECT profile_id FROM meta_sso_identity_ssh ORDER BY created_at DESC LIMIT 1)")
 		require.NoError(t, err)
@@ -130,7 +103,7 @@ func TestIdenAdd(t *testing.T) {
 		require.NoError(t, err)
 		pub = sshx.Comment(pub, "alice@example.com")
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "identity", "add", "--private-key-path", keypath, "--endpoint", srv.URL, "--username", "alice", string(pub)))
+		require.NoError(t, harness.Run("add", "--private-key-path", keypath, "--endpoint", srv.URL, "--username", "alice", string(pub)))
 
 		display, err := sqlx.String(ctx, q, "SELECT display FROM meta_profiles WHERE id = (SELECT profile_id FROM meta_sso_identity_ssh ORDER BY created_at DESC LIMIT 1)")
 		require.NoError(t, err)
@@ -156,8 +129,8 @@ func TestIdenAdd(t *testing.T) {
 		_, pub, err := sshx.UnsafeNewKeyGen().Generate()
 		require.NoError(t, err)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "identity", "add", "--private-key-path", keypath, "--endpoint", srv.URL, string(pub)))
-		require.NoError(t, cmdtestx.Execute(t, parser, "identity", "add", "--private-key-path", keypath, "--endpoint", srv.URL, string(pub)))
+		require.NoError(t, harness.Run("add", "--private-key-path", keypath, "--endpoint", srv.URL, string(pub)))
+		require.NoError(t, harness.Run("add", "--private-key-path", keypath, "--endpoint", srv.URL, string(pub)))
 
 		require.Equal(t, 2, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_profiles"))(t))
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_sso_identity_ssh WHERE profile_id != (SELECT profile_id FROM meta_sso_identity_ssh LIMIT 1)"))(t))

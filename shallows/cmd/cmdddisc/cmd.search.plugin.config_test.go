@@ -8,7 +8,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/stretchr/testify/require"
 )
@@ -21,10 +21,9 @@ func TestSearchPluginConfig(t *testing.T) {
 		require.NoError(t, os.MkdirAll(filepath.Dir(envpath), 0o700))
 		require.NoError(t, envx.WriteFile(envpath, []string{"FOO=bar"}))
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "config", "noop",
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("search", "plugin", "config", "noop",
 			"-e", "FOO=updated",
-			"-e", "BAZ=qux",
-		))
+			"-e", "BAZ=qux"))
 
 		pairs, err := envx.FromPath(envpath)
 		require.NoError(t, err)
@@ -34,9 +33,8 @@ func TestSearchPluginConfig(t *testing.T) {
 	t.Run("creates the env file when none exists", func(t *testing.T) {
 		t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "config", "noop",
-			"-e", "FOO=bar",
-		))
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("search", "plugin", "config", "noop",
+			"-e", "FOO=bar"))
 
 		envpath := filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.env")
 		pairs, err := envx.FromPath(envpath)
@@ -47,9 +45,8 @@ func TestSearchPluginConfig(t *testing.T) {
 	t.Run("accepts a .wasm suffixed name", func(t *testing.T) {
 		t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "config", "noop.wasm",
-			"-e", "FOO=bar",
-		))
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("search", "plugin", "config", "noop.wasm",
+			"-e", "FOO=bar"))
 
 		envpath := filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.env")
 		pairs, err := envx.FromPath(envpath)

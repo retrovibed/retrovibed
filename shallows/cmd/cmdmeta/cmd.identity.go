@@ -17,16 +17,6 @@ type Identity struct {
 	Register  IdenRegister `cmd:"" help:"register the current identity with the cloud service"`
 }
 
-type IdenDisplay struct{}
-
-func (t IdenDisplay) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
-	signer, err := id.Signer()
-	if err != nil {
-		return err
-	}
-	return authn.PrintIdentity(os.Stdout, signer, nil)
-}
-
 type GenerateID struct {
 	Force bool   `flag:"" name:"force" help:"force creation if a identity already exists, this is to prevent you from accidently destroying your identity"`
 	Seed  string `arg:"" name:"seed" help:"used to seed the key generation, this command is used for when you want to maintain a persistent account identity easily" required:"true"`

@@ -44,9 +44,9 @@ func RegistrationJWTClientWithEndpoint(ctx context.Context, signer ssh.Signer, e
 	return Oauth2DeeppoolHTTPClientWithEndpoint(ctx, signer, endpoint, options...)
 }
 
-func JWTClientHostname(oauth2c *http.Client, hostname string) *http.Client {
+func JWTClientHostname(oauth2c *http.Client, hostname string, options ...httpx.ClientOption) *http.Client {
 	return oauth2.NewClient(
-		context.WithValue(context.Background(), oauth2.HTTPClient, HTTPClientDefaults()),
+		context.WithValue(context.Background(), oauth2.HTTPClient, HTTPClientDefaults(options...)),
 		&jwttokensource{
 			oauth2c:  oauth2c,
 			endpoint: fmt.Sprintf("https://%s", hostname),
@@ -117,26 +117,43 @@ type metatokensource struct {
 	endpoint string
 }
 
-func (t *metatokensource) Token() (*oauth2.Token, error) {
-	var (
-		authed AuthzResponse
-	)
-
-	ctx, done := context.WithTimeout(context.Background(), 3*time.Second)
+// FetchAuthz retrieves the authorization (bearer + granted permissions) from the authz endpoint.
+func FetchAuthz(ctx context.Context, oauth2c *http.Client, endpoint string) (authed *AuthzResponse, err error) {
+	ctx, done := context.WithTimeout(ctx, 3*time.Second)
 	defer done()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, t.endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
-		return nil, err
+		return authed, err
 	}
 
-	resp, err := httpx.AsError(t.oauth2c.Do(req))
+	resp, err := httpx.AsError(oauth2c.Do(req))
 	if err != nil {
-		return nil, err
+		return authed, err
 	}
 	defer resp.Body.Close()
 
-	if err = jsonx.UnmarshalRead(resp.Body, &authed); err != nil {
+	authed = new(AuthzResponse)
+	if err = jsonx.UnmarshalRead(resp.Body, authed); err != nil {
+		return nil, err
+	}
+
+	return authed, nil
+}
+
+// FetchCloudAuthz retrieves the permissions granted to the signer's profile by the cloud service.
+func FetchCloudAuthz(ctx context.Context, signer ssh.Signer, options ...httpx.ClientOption) (*AuthzResponse, error) {
+	c, err := Oauth2DeeppoolHTTPClient(ctx, signer, options...)
+	if err != nil {
+		return nil, errorsx.Wrap(err, "failed to create oauth2 http client")
+	}
+
+	return FetchAuthz(ctx, JWTClientHostname(c, env.Deeppool(), options...), fmt.Sprintf("https://%s/m/authz/", env.Deeppool()))
+}
+
+func (t *metatokensource) Token() (*oauth2.Token, error) {
+	authed, err := FetchAuthz(context.Background(), t.oauth2c, t.endpoint)
+	if err != nil {
 		return nil, err
 	}
 
@@ -144,5 +161,5 @@ func (t *metatokensource) Token() (*oauth2.Token, error) {
 		AccessToken: authed.Bearer,
 		Expiry:      time.UnixMilli(authed.Token.Exp * 1000),
 		ExpiresIn:   authed.Token.Exp,
-	}, err
+	}, nil
 }

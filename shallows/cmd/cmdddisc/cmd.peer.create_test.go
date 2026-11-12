@@ -9,7 +9,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -42,13 +42,12 @@ func TestPeerCreate(t *testing.T) {
 		routes := bindPeerManagement(t, q)
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "peers", "create",
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("peers", "create",
 			"--private-key-path", keypath,
 			"--endpoint", srv.URL,
 			"--name", "derp",
 			"--peer", "34363564353033612d643263352d363338332d30",
-			"--partition", "033292b1-98c2-5e96-38a4-956548a40b55",
-		))
+			"--partition", "033292b1-98c2-5e96-38a4-956548a40b55"))
 
 		id, err := int160.FromHexEncodedString("34363564353033612d643263352d363338332d30")
 		require.NoError(t, err)

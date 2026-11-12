@@ -14,7 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
@@ -55,9 +55,8 @@ func TestMediaQuery(t *testing.T) {
 
 		peers := slicesx.MapTransform(func(n netip.AddrPort) string { return n.String() }, torrenttestx.AddrPorts(tpeer)...)
 
-		kctx, err := cmdtestx.Genparser(cmdddisc.Commands{}, kong.Writers(nil, &buf))(t).Parse(
+		kctx, err := cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t), kong.Writers(nil, &buf)).Parse(
 			append([]string{
-				"command",
 				"media",
 				"query",
 				"--no-bootstrap",
@@ -66,7 +65,7 @@ func TestMediaQuery(t *testing.T) {
 				id,
 			},
 				peers...,
-			),
+			)...,
 		)
 
 		require.NoError(t, err)

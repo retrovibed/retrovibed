@@ -9,7 +9,7 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -146,8 +146,8 @@ func TestKnownImportRunWithGlobal(t *testing.T) {
 		var input bytes.Buffer
 		require.NoError(t, jsonl.NewEncoder(&input).Encode(a, b))
 
-		genparser := cmdtestx.Genparser(knownimport{}, kong.BindTo(&input, (*cmdopts.Stdin)(nil)))
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "--database", path))
+		harness := cmdtestx.New(t, &knownimport{}).Options(cmdtestx.Standard(t), kong.BindTo(&input, (*cmdopts.Stdin)(nil)))
+		require.NoError(t, harness.Run("--database", path))
 
 		db, err := cmdopts.DatabaseCache(ctx, path)
 		require.NoError(t, err)

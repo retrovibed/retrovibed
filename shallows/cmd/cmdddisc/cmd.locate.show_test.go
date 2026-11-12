@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -37,10 +37,9 @@ func TestLocateShow(t *testing.T) {
 		).Bind(routes.PathPrefix("/l").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "locate", "show",
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("locate", "show",
 			"--private-key-path", keypath,
 			"--endpoint", srv.URL,
-			"--id", l.ID,
-		))
+			"--id", l.ID))
 	})
 }

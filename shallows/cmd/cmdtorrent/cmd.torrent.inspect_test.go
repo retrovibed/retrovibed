@@ -14,7 +14,7 @@ import (
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/stretchr/testify/require"
@@ -35,12 +35,13 @@ func TestInspect(t *testing.T) {
 		require.NoError(t, os.WriteFile(path, testx.Must(metainfo.Encode(md))(t), 0600))
 
 		var buf bytes.Buffer
-		genparser := cmdtestx.Genparser(cmdtorrent.Commands{}, kong.Writers(&buf, nil), kong.Vars{
+		harness := cmdtestx.New(t, &cmdtorrent.Commands{}).Options(cmdtestx.Standard(t), kong.Writers(&buf, nil), kong.Vars{
 			"env_torrent_private":    env.TorrentPrivateNetwork,
 			"vars_cores":             strconv.Itoa(runtime.GOMAXPROCS(0)),
 			"vars_timestamp_started": time.Now().UTC().Format(time.RFC3339),
 		})
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "inspect", path))
+
+		require.NoError(t, harness.Run("inspect", path))
 
 		require.Contains(t, buf.String(), md.HashInfoBytes().String())
 		require.Contains(t, buf.String(), md.Comment)
@@ -61,12 +62,13 @@ func TestInspect(t *testing.T) {
 		require.NoError(t, os.WriteFile(path2, testx.Must(metainfo.Encode(md2))(t), 0600))
 
 		var buf bytes.Buffer
-		genparser := cmdtestx.Genparser(cmdtorrent.Commands{}, kong.Writers(&buf, nil), kong.Vars{
+		harness := cmdtestx.New(t, &cmdtorrent.Commands{}).Options(cmdtestx.Standard(t), kong.Writers(&buf, nil), kong.Vars{
 			"env_torrent_private":    env.TorrentPrivateNetwork,
 			"vars_cores":             strconv.Itoa(runtime.GOMAXPROCS(0)),
 			"vars_timestamp_started": time.Now().UTC().Format(time.RFC3339),
 		})
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "inspect", path1, path2))
+
+		require.NoError(t, harness.Run("inspect", path1, path2))
 
 		require.Contains(t, buf.String(), md1.HashInfoBytes().String())
 		require.Contains(t, buf.String(), md2.HashInfoBytes().String())
@@ -76,12 +78,13 @@ func TestInspect(t *testing.T) {
 		missing := filepath.Join(t.TempDir(), "does.not.exist.torrent")
 
 		var buf bytes.Buffer
-		genparser := cmdtestx.Genparser(cmdtorrent.Commands{}, kong.Writers(&buf, nil), kong.Vars{
+		harness := cmdtestx.New(t, &cmdtorrent.Commands{}).Options(cmdtestx.Standard(t), kong.Writers(&buf, nil), kong.Vars{
 			"env_torrent_private":    env.TorrentPrivateNetwork,
 			"vars_cores":             strconv.Itoa(runtime.GOMAXPROCS(0)),
 			"vars_timestamp_started": time.Now().UTC().Format(time.RFC3339),
 		})
-		err := cmdtestx.Execute(t, genparser(t), "command", "inspect", missing)
+
+		err := harness.Run("inspect", missing)
 		require.Error(t, err)
 		require.ErrorContains(t, err, "failed to read file")
 		require.ErrorContains(t, err, missing)
@@ -95,12 +98,13 @@ func TestInspect(t *testing.T) {
 		require.NoError(t, os.WriteFile(path, testx.Must(metainfo.Encode(md))(t), 0600))
 
 		var buf bytes.Buffer
-		genparser := cmdtestx.Genparser(cmdtorrent.Commands{}, kong.Writers(&buf, nil), kong.Vars{
+		harness := cmdtestx.New(t, &cmdtorrent.Commands{}).Options(cmdtestx.Standard(t), kong.Writers(&buf, nil), kong.Vars{
 			"env_torrent_private":    env.TorrentPrivateNetwork,
 			"vars_cores":             strconv.Itoa(runtime.GOMAXPROCS(0)),
 			"vars_timestamp_started": time.Now().UTC().Format(time.RFC3339),
 		})
-		err := cmdtestx.Execute(t, genparser(t), "command", "inspect", path)
+
+		err := harness.Run("inspect", path)
 		require.Error(t, err)
 		require.ErrorContains(t, err, "failed to format torrent")
 		require.ErrorContains(t, err, path)

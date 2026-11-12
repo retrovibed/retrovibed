@@ -11,7 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/stretchr/testify/require"
 )
@@ -35,10 +35,9 @@ func TestSearchPluginInstall(t *testing.T) {
 		t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 		dir := writeFixturePlugin(t)
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "install", dir,
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("search", "plugin", "install", dir,
 			"--name", "noop",
-			"-e", "FOO=bar",
-		))
+			"-e", "FOO=bar"))
 
 		wasm, err := os.ReadFile(filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.wasm"))
 		require.NoError(t, err)
@@ -53,9 +52,8 @@ func TestSearchPluginInstall(t *testing.T) {
 		t.Setenv("XDG_CONFIG_HOME", t.TempDir())
 		dir := writeFixturePlugin(t)
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "install", dir,
-			"--name", "noop.wasm",
-		))
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("search", "plugin", "install", dir,
+			"--name", "noop.wasm"))
 
 		_, err := os.Stat(filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "noop.wasm"))
 		require.NoError(t, err)
@@ -93,10 +91,9 @@ func main() {
 }
 `), 0600))
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "install", dir,
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("search", "plugin", "install", dir,
 			"--name", "baked",
-			"-b", "main.tag=baked-value",
-		))
+			"-b", "main.tag=baked-value"))
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
@@ -121,7 +118,7 @@ func main() {
 		renamed := filepath.Join(filepath.Dir(dir), "myplugin")
 		require.NoError(t, os.Rename(dir, renamed))
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "search", "plugin", "install", renamed))
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("search", "plugin", "install", renamed))
 
 		_, err := os.Stat(filepath.Join(searchplugin.SearchPluginDir(userx.DefaultConfigDir(userx.DefaultRelRoot())), "myplugin.wasm"))
 		require.NoError(t, err)

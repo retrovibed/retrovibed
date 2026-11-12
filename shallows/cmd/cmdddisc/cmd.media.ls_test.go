@@ -9,7 +9,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -38,13 +38,11 @@ func TestMediaLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(
-			t,
-			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run(
+
 			"media", "ls",
 			"--private-key-path", keypath,
-			"--endpoint", srv.URL,
-		))
+			"--endpoint", srv.URL))
 	})
 
 	t.Run("filters by known media id", func(t *testing.T) {
@@ -73,14 +71,12 @@ func TestMediaLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(
-			t,
-			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run(
+
 			"media", "ls",
 			"--private-key-path", keypath,
 			"--endpoint", srv.URL,
-			"--known-media-id", knownMediaID,
-		))
+			"--known-media-id", knownMediaID))
 	})
 
 	t.Run("filters to offloaded media", func(t *testing.T) {
@@ -107,12 +103,11 @@ func TestMediaLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run(
 			"media", "ls",
 			"--private-key-path", keypath,
 			"--endpoint", srv.URL,
-			"--offload",
-		))
+			"--offload"))
 	})
 
 	t.Run("filters to media pending indexing", func(t *testing.T) {
@@ -139,14 +134,12 @@ func TestMediaLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(
-			t,
-			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run(
+
 			"media", "ls",
 			"--private-key-path", keypath,
 			"--endpoint", srv.URL,
-			"--indexing",
-		))
+			"--indexing"))
 	})
 
 	t.Run("filters to a specific id", func(t *testing.T) {
@@ -173,13 +166,11 @@ func TestMediaLs(t *testing.T) {
 		).Bind(routes.PathPrefix("/ddisc/media").Subrouter())
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(
-			t,
-			cmdtestx.Genparser(cmdddisc.Commands{})(t), "command",
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run(
+
 			"media", "ls",
 			"--private-key-path", keypath,
 			"--endpoint", srv.URL,
-			"--id", wanted.ID,
-		))
+			"--id", wanted.ID))
 	})
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -19,7 +19,7 @@ import (
 )
 
 func TestUpdate(t *testing.T) {
-	genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{})
+	harness := cmdtestx.New(t, &cmdmeta.Usermanagement{}).Options(cmdtestx.Standard(t))
 
 	newServer := func(t *testing.T, q sqlx.Queryer) *httptest.Server {
 		t.Helper()
@@ -43,10 +43,9 @@ func TestUpdate(t *testing.T) {
 		var p meta.Profile
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
 
-		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "update", "--private-key-path", keypath, "--endpoint", srv.URL, "--display", "New Name", p.ID))
+		require.NoError(t, harness.Run("update", "--private-key-path", keypath, "--endpoint", srv.URL, "--display", "New Name", p.ID))
 
 		var updated meta.Profile
 		require.NoError(t, meta.ProfileFindByID(ctx, q, p.ID).Scan(&updated))
@@ -68,10 +67,9 @@ func TestUpdate(t *testing.T) {
 		var p meta.Profile
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
 
-		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "update", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
+		require.NoError(t, harness.Run("update", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
 
 		var updated meta.Profile
 		require.NoError(t, meta.ProfileFindByID(ctx, q, p.ID).Scan(&updated))

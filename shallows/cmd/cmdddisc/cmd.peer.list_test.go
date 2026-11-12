@@ -7,7 +7,7 @@ import (
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
 	"github.com/stretchr/testify/require"
@@ -29,11 +29,10 @@ func TestPeerList(t *testing.T) {
 		routes := bindPeerManagement(t, q)
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "peers", "list",
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("peers", "list",
 			"--private-key-path", keypath,
 			"--insecure",
-			"--endpoint", srv.URL,
-		))
+			"--endpoint", srv.URL))
 	})
 
 	t.Run("filters by query", func(t *testing.T) {
@@ -51,11 +50,10 @@ func TestPeerList(t *testing.T) {
 		routes := bindPeerManagement(t, q)
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, cmdtestx.Genparser(cmdddisc.Commands{})(t), "command", "peers", "list",
+		require.NoError(t, cmdtestx.New(t, &cmdddisc.Commands{}).Options(cmdtestx.Standard(t)).Run("peers", "list",
 			"--private-key-path", keypath,
 			"--insecure",
 			"--endpoint", srv.URL,
-			"--query", "searchable",
-		))
+			"--query", "searchable"))
 	})
 }

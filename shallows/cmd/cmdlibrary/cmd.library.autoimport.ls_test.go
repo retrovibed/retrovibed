@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdlibrary"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -47,8 +47,8 @@ func TestAutoimportLs(t *testing.T) {
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
 		var buf bytes.Buffer
-		genparser := cmdtestx.Genparser(cmdlibrary.Commands{}, kong.Writers(&buf, nil), kong.Vars{"vars_cores": strconv.Itoa(runtime.GOMAXPROCS(0)), "vars_media_directory": t.TempDir(), "vars_user_configuration_directory": t.TempDir()})
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "autoimport", "ls", "--private-key-path", keypath, "--endpoint", srv.URL))
+		harness := cmdtestx.New(t, &cmdlibrary.Commands{}).Options(cmdtestx.Standard(t), kong.Writers(&buf, nil), kong.Vars{"vars_cores": strconv.Itoa(runtime.GOMAXPROCS(0)), "vars_media_directory": t.TempDir(), "vars_user_configuration_directory": t.TempDir()})
+		require.NoError(t, harness.Run("autoimport", "ls", "--private-key-path", keypath, "--endpoint", srv.URL))
 
 		require.Contains(t, buf.String(), fmt.Sprintf("id='%s' path='%s' mode=copy debounce=1h0m0s", d.ID, d.Path))
 	})

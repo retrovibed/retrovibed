@@ -10,6 +10,7 @@ import (
 
 type Cloud struct {
 	Register CloudRegister `cmd:"" help:"register the current identity with the cloud service"`
+	Show     CloudDisplay  `cmd:"" help:"display the current identity as known by the cloud service"`
 	Backup   CloudBackup   `cmd:"" help:"encrypted backups of the metadata database"`
 }
 

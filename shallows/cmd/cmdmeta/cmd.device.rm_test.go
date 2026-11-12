@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
@@ -39,8 +39,8 @@ func TestDeviceRm(t *testing.T) {
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
 		var buf bytes.Buffer
-		genparser := cmdtestx.Genparser(cmdmeta.Device{}, kong.Writers(&buf, nil))
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "rm", d.ID, "--private-key-path", keypath, "--endpoint", srv.URL))
+		harness := cmdtestx.New(t, &cmdmeta.Device{}).Options(cmdtestx.Standard(t), kong.Writers(&buf, nil))
+		require.NoError(t, harness.Run("rm", d.ID, "--private-key-path", keypath, "--endpoint", srv.URL))
 
 		require.EqualValues(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM meta_daemons"))
 	})

@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -19,7 +19,7 @@ import (
 )
 
 func TestIdenRegister(t *testing.T) {
-	genparser := cmdtestx.Genparser(cmdmeta.Identity{})
+	harness := cmdtestx.New(t, &cmdmeta.Identity{}).Options(cmdtestx.Standard(t))
 
 	newServer := func(t *testing.T, q sqlx.Queryer) *httptest.Server {
 		t.Helper()
@@ -42,7 +42,7 @@ func TestIdenRegister(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "register", "--private-key-path", keypath, "--endpoint", srv.URL))
+		require.NoError(t, harness.Run("register", "--private-key-path", keypath, "--endpoint", srv.URL))
 
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_profiles"))(t))
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_sso_identity_ssh"))(t))
@@ -65,10 +65,9 @@ func TestIdenRegister(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 		srv := newServer(t, q)
-		parser := genparser(t)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "register", "--private-key-path", keypath, "--endpoint", srv.URL))
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "register", "--private-key-path", keypath, "--endpoint", srv.URL))
+		require.NoError(t, harness.Run("register", "--private-key-path", keypath, "--endpoint", srv.URL))
+		require.NoError(t, harness.Run("register", "--private-key-path", keypath, "--endpoint", srv.URL))
 
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_profiles"))(t))
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_sso_identity_ssh"))(t))

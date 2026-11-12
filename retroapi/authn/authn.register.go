@@ -139,7 +139,14 @@ func PrintIdentity(w io.Writer, s ssh.Signer, session *Session) error {
 	_, err1 := fmt.Fprintln(w, "fingerprint", ssh.FingerprintSHA256(s.PublicKey()))
 	_, err2 := fmt.Fprintln(w, "identity   ", md5x.String(ssh.FingerprintSHA256(s.PublicKey())))
 	if session != nil {
-		_, err3 = fmt.Fprintln(w, "account    ", session.Account.Id)
+		if session.Account != nil {
+			_, err3 = fmt.Fprintln(w, "account    ", session.Account.Id)
+		}
+		if session.Profile != nil {
+			_, err6 := fmt.Fprintln(w, "display    ", session.Profile.Display)
+			_, err7 := fmt.Fprintln(w, "email      ", session.Profile.Email)
+			err3 = errorsx.Compact(err3, err6, err7)
+		}
 	}
 	_, err4 := fmt.Fprintln(w, "public     ", strings.TrimSpace(string(ssh.MarshalAuthorizedKey(s.PublicKey()))))
 	_, err5 := fmt.Fprintln(w, "base64     ", base64.URLEncoding.EncodeToString(s.PublicKey().Marshal()))

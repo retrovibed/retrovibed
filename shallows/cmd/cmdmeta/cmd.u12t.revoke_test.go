@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/meta"
@@ -15,7 +15,7 @@ import (
 )
 
 func TestPendingRevoke(t *testing.T) {
-	genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{})
+	harness := cmdtestx.New(t, &cmdmeta.Usermanagement{}).Options(cmdtestx.Standard(t))
 	t.Run("removes authz for a profile", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
@@ -36,7 +36,7 @@ func TestPendingRevoke(t *testing.T) {
 		routes := mux.NewRouter()
 		srv := cmdtestx.NewTLSServer(t, q, routes)
 
-		require.NoError(t, cmdtestx.Execute(t, genparser(t), "command", "revoke", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
+		require.NoError(t, harness.Run("revoke", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
 
 		require.Equal(t, 0, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM authz_meta WHERE profile_id = '"+p.ID+"'"))(t))
 	})

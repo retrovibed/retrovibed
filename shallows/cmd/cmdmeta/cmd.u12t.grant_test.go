@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdmeta"
-	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
+	cmdtestx "github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx/v2"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -19,7 +19,7 @@ import (
 )
 
 func TestGrant(t *testing.T) {
-	genparser := cmdtestx.Genparser(cmdmeta.Usermanagement{})
+	harness := cmdtestx.New(t, &cmdmeta.Usermanagement{}).Options(cmdtestx.Standard(t))
 
 	newServer := func(t *testing.T, q sqlx.Queryer) *httptest.Server {
 		t.Helper()
@@ -43,10 +43,9 @@ func TestGrant(t *testing.T) {
 		var p meta.Profile
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
 
-		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
+		require.NoError(t, harness.Run("grant", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
 
 		var authz meta.Authz
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))
@@ -72,10 +71,9 @@ func TestGrant(t *testing.T) {
 		var p meta.Profile
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
 
-		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, "--no-library-read", "--library-modify", "--remote-control", "--usermanagement", p.ID))
+		require.NoError(t, harness.Run("grant", "--private-key-path", keypath, "--endpoint", srv.URL, "--no-library-read", "--library-modify", "--remote-control", "--usermanagement", p.ID))
 
 		var authz meta.Authz
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))
@@ -100,10 +98,9 @@ func TestGrant(t *testing.T) {
 		var p meta.Profile
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
 
-		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, "--library-read", "--library-modify", "--remote-control", "--billing-read", "--billing-modify", "--community-modify", "--usermanagement", p.ID))
+		require.NoError(t, harness.Run("grant", "--private-key-path", keypath, "--endpoint", srv.URL, "--library-read", "--library-modify", "--remote-control", "--billing-read", "--billing-modify", "--community-modify", "--usermanagement", p.ID))
 
 		var authz meta.Authz
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))
@@ -128,11 +125,10 @@ func TestGrant(t *testing.T) {
 		var p meta.Profile
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
 
-		parser := genparser(t)
 		srv := newServer(t, q)
 
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
-		require.NoError(t, cmdtestx.Execute(t, parser, "command", "grant", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
+		require.NoError(t, harness.Run("grant", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
+		require.NoError(t, harness.Run("grant", "--private-key-path", keypath, "--endpoint", srv.URL, p.ID))
 
 		var authz meta.Authz
 		require.NoError(t, meta.AuthzFindByProfileID(ctx, q, sqlx.NewNullString(p.ID)).Scan(&authz))
