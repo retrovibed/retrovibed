@@ -12,6 +12,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggpg"
@@ -71,8 +72,10 @@ func Runner() eg.C8S {
 
 func Build(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
-		eggpg.Seed(gpgoptions()...),
-		// eggpg.Debug(gpgoptions()...),
+		egbug.DebugFailure(
+			eggpg.Seed(gpgoptions()...),
+			eggpg.Debug(gpgoptions()...),
+		),
 		egdebuild.Build(gcfg, egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename), egdebuild.Option.NoLint()), // resolute
 		egdebuild.Build(
 			gcfg,
