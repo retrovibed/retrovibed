@@ -18,20 +18,20 @@ import (
 
 func flutterRuntimev2(v shell.Command) shell.Command {
 	return v.
-		Directory(egenv.WorkingDirectory("console")).
+		Directory(egenv.DirectoryWorking("console")).
 		Environ("CI", egenv.String("", "CI")).
 		EnvironFrom(eggolang.Env()...).
 		Environ("GOTMPDIR", egenv.DirectoryWorkload(".eg", "golang")).
-		Environ("TMPDIR", egenv.DirectoryWorkload(".eg", "tmp")).
-		Environ("PUB_CACHE", egenv.CacheDirectory(".eg", "dart")).
-		Environ("RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY", egenv.CacheDirectory("dev.native.libs")).
-		Environ("NIX_RETROVIBED_SHARED_NATIVE_LIBS", egenv.CacheDirectory("dev.native.libs", "example.so"))
+		Environ("PUB_CACHE", egenv.DirectoryCache(".eg", "dart")).
+		Environ("RETROVIBED_SHARED_NATIVE_LIBS_DIRECTORY", egenv.DirectoryCache("dev.native.libs")).
+		Environ("NIX_RETROVIBED_SHARED_NATIVE_LIBS", egenv.DirectoryCache("dev.native.libs", "example.so"))
 }
 
 func Tests(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
+		runtime.New("mkdir -p ${GOTMPDIR}"),
 		runtime.New("flutter test --reporter failures-only").Timeout(10*time.Minute),
 	)
 }
@@ -40,6 +40,7 @@ func Linting(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
+		runtime.New("mkdir -p ${GOTMPDIR}"),
 		runtime.New("flutter analyze"),
 	)
 }
@@ -130,7 +131,7 @@ func AndroidRuntime(target string) shell.Command {
 	return shell.Runtime().
 		Environ("GOOS", "android").
 		Environ("CGO_ENABLED", "1").
-		Environ("GRADLE_USER_HOME", egenv.CacheDirectory("gradle")).
+		Environ("GRADLE_USER_HOME", egenv.DirectoryCache("gradle")).
 		Environ("CC", fmt.Sprintf("/opt/android-sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang --sysroot=/opt/android-sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/sysroot -target %s", target)).
 		Environ("CXX", fmt.Sprintf("/opt/android-sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++ --sysroot=/opt/android-sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/linux-x86_64/sysroot -target %s", target))
 }
@@ -146,7 +147,7 @@ func GenerateFlutter(ctx context.Context, _ eg.Op) error {
 	runtime := flutterRuntimev2(shell.Runtime())
 	return shell.Run(
 		ctx,
-		runtime.New("mkdir -p ${GOTMPDIR} ${TMPDIR}"),
+		runtime.New("mkdir -p ${GOTMPDIR}"),
 		runtime.New("flutter create --org space.retrovibe --platforms=linux,macos,ios,android .").Timeout(egenv.TTL()),
 		runtime.New("flutter config --enable-native-assets"),
 		runtime.New("flutter pub get"),
@@ -199,7 +200,7 @@ func GenerateProtocol(ctx context.Context, _ eg.Op) error {
 func Install(b *tarballs.Build) eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed(b)), "usr", "lib", "retrovibed")
-		bundledir := egenv.WorkingDirectory("console", "build", "linux", egarch.DartFrom(b.Arch), "release", "bundle")
+		bundledir := egenv.DirectoryWorking("console", "build", "linux", egarch.DartFrom(b.Arch), "release", "bundle")
 		runtime := shell.Runtime().
 			Environ("FLUTTER_RELEASE_BUNDLE", bundledir).
 			Environ("OUTPUTDIR", dstdir)
