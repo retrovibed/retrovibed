@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	_ "github.com/duckdb/duckdb-go/v2"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/stretchr/testify/require"
 )
@@ -55,7 +55,7 @@ func newDiscoverHit(kid string) ddisc.Discovered {
 }
 
 func TestDiscoverTriesEveryStrategy(t *testing.T) {
-	kid := uuid.Must(uuid.NewV4()).String()
+	kid := uuidx.NewV4().String()
 	hit1 := newDiscoverHit(kid)
 	hit2 := newDiscoverHit(kid)
 	called2 := false
@@ -81,7 +81,7 @@ func TestDiscoverTriesEveryStrategy(t *testing.T) {
 }
 
 func TestDiscoverFallsThroughOnMiss(t *testing.T) {
-	kid := uuid.Must(uuid.NewV4()).String()
+	kid := uuidx.NewV4().String()
 	hit := newDiscoverHit(kid)
 
 	seq := ddisc.Discover(
@@ -109,7 +109,7 @@ func TestDiscoverPropagatesGenuineErrorAndStopsChain(t *testing.T) {
 	seq := ddisc.Discover(
 		context.Background(),
 		ddisc.DefaultPolicy(),
-		ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String()},
+		ddisc.DiscoverRequest{KnownMediaID: uuidx.NewV4().String()},
 		nil,
 		fakeDiscoverStrategy{err: cause},
 		fakeDiscoverStrategy{called: &called2},
@@ -125,7 +125,7 @@ func TestDiscoverEmptyWhenAllStrategiesMiss(t *testing.T) {
 	seq := ddisc.Discover(
 		context.Background(),
 		ddisc.DefaultPolicy(),
-		ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String()},
+		ddisc.DiscoverRequest{KnownMediaID: uuidx.NewV4().String()},
 		nil,
 		fakeDiscoverStrategy{},
 		fakeDiscoverStrategy{},
@@ -159,7 +159,7 @@ func TestTitleFilterCleansHostileFreeText(t *testing.T) {
 }
 
 func TestDiscoverRanksYieldedCandidates(t *testing.T) {
-	kid := uuid.Must(uuid.NewV4()).String()
+	kid := uuidx.NewV4().String()
 	hit := newDiscoverHit(kid)
 
 	seq := ddisc.Discover(

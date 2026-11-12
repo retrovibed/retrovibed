@@ -5,9 +5,9 @@ import (
 	"log"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/retrovibed/retrovibed/shallows/tracking"
@@ -40,9 +40,9 @@ func IdentifyTorrentMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 			continue
 		}
 
-		if uuid.FromStringOrNil(known.UID).IsNil() {
+		if uuidx.FromStringOrNil(known.UID).IsZero() {
 			log.Println("unable to detect media for torrent", md.ID, md.Description)
-			if err = tracking.MetadataAssignKnownMediaID(ctx, db, md.ID, uuid.Nil.String()).Scan(&md); err != nil {
+			if err = tracking.MetadataAssignKnownMediaID(ctx, db, md.ID, uuidx.Nil().String()).Scan(&md); err != nil {
 				log.Println("unable to mark torrent as unidentifiable", md.ID, err)
 			}
 			continue

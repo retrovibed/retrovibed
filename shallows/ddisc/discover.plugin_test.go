@@ -6,11 +6,11 @@ import (
 	"iter"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -36,7 +36,7 @@ func TestPluginStrategyYieldsUnpersisted(t *testing.T) {
 
 	id := int160.Random()
 	magnet := fmt.Sprintf("magnet:?xt=urn:btih:%s", id.String())
-	kid := uuid.Must(uuid.NewV4()).String()
+	kid := uuidx.NewV4().String()
 
 	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Uri: magnet, Uritype: mimex.Magnet, Health: 5, Bytes: 1234, Mimetype: mimex.Video}}}
 	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: kid, Query: "ubuntu", Mimetypes: []string{mimex.Video}})
@@ -56,7 +56,7 @@ func TestPluginStrategyNoopsWithoutTitle(t *testing.T) {
 	q := sqltestx.Metadatabase(t)
 
 	plugins := fakePluginSeq{results: []*ddiscapi.Import{{Uri: "magnet:?xt=urn:btih:1111111111111111111111111111111111111111", Uritype: mimex.Magnet}}}
-	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: uuid.Must(uuid.NewV4()).String()})
+	seq := ddisc.PluginStrategy(plugins).Discover(t.Context(), ddisc.DiscoverRequest{KnownMediaID: uuidx.NewV4().String()})
 
 	var count int
 	for range seq.Each(t.Context()) {
@@ -69,7 +69,7 @@ func TestPluginStrategyNoopsWithoutTitle(t *testing.T) {
 
 func TestPluginStrategyResolvesNonMagnetURI(t *testing.T) {
 	uri := "https://tracker.example/download/1000.abc"
-	kid := uuid.Must(uuid.NewV4()).String()
+	kid := uuidx.NewV4().String()
 
 	plugins := fakePluginSeq{results: []*ddiscapi.Import{{
 		Uri:      uri,

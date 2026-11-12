@@ -5,13 +5,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -40,7 +40,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 				ctx,
 				q,
 				meta.NewWireguard(
-					testx.Must(uuid.NewV4())(t).String(),
+					uuidx.NewV4().String(),
 					meta.WireguardOptionDescription("test"),
 					meta.WireguardOptionDistribution,
 				),
@@ -59,7 +59,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 			metaapi.HTTPWireguardOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current?nettype=1", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -92,7 +92,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 			metaapi.HTTPWireguardOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current?nettype=1", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -115,7 +115,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		wg = meta.NewWireguard(
-			testx.Must(uuid.NewV4())(t).String(),
+			uuidx.NewV4().String(),
 			meta.WireguardOptionDescription("test"),
 			meta.WireguardOptionDistribution,
 		)
@@ -135,7 +135,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 			metaapi.HTTPWireguardOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -163,7 +163,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 				ctx,
 				q,
 				meta.NewWireguard(
-					testx.Must(uuid.NewV4())(t).String(),
+					uuidx.NewV4().String(),
 					meta.WireguardOptionDescription("test"),
 					meta.WireguardOptionDistribution,
 				),
@@ -180,7 +180,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 			metaapi.HTTPWireguardOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current?nettype=1", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -208,7 +208,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 				ctx,
 				q,
 				meta.NewWireguard(
-					testx.Must(uuid.NewV4())(t).String(),
+					uuidx.NewV4().String(),
 					meta.WireguardOptionDescription("test"),
 					meta.WireguardOptionDistribution,
 				),
@@ -226,7 +226,7 @@ func TestHTTPWireguardCurrent(t *testing.T) {
 			metaapi.HTTPWireguardOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/current?nettype=1", nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)

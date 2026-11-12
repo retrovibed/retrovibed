@@ -6,13 +6,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -42,7 +42,7 @@ func TestHTTPCommunityPublisherDelete(t *testing.T) {
 
 	var v meta.Authz
 	require.NoError(t, testx.Fake(&v, meta.AuthzOptionAdmin))
-	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 	token := httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)
 
 	seed := func(t *testing.T, id string, content []byte) string {
@@ -56,7 +56,7 @@ func TestHTTPCommunityPublisherDelete(t *testing.T) {
 	}
 
 	t.Run("successfully deletes", func(t *testing.T) {
-		id := uuid.Must(uuid.NewV7()).String()
+		id := uuidx.NewV7().String()
 		path := seed(t, id, []byte("removeme"))
 
 		resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, "/"+id, nil, httptestx.RequestOptionAuthorization(token))
@@ -78,24 +78,24 @@ func TestHTTPCommunityPublisherDelete(t *testing.T) {
 	// a selection pointing at a module that is gone only ever surfaces as a
 	// failed lookup on the next publish, so uninstalling detaches it.
 	t.Run("detaches the publisher from every community", func(t *testing.T) {
-		id := uuid.Must(uuid.NewV7()).String()
+		id := uuidx.NewV7().String()
 		seed(t, id, []byte("removeme"))
 
 		attached := make([]community.CommunityPublisher, 0, 2)
 		for range 2 {
 			var cp community.CommunityPublisher
 			require.NoError(t, community.CommunityPublisherInsertWithDefaults(ctx, q, community.CommunityPublisher{
-				ID: uuid.Must(uuid.NewV7()).String(), CommunityID: uuid.Must(uuid.NewV7()).String(), PublisherID: id,
+				ID: uuidx.NewV7().String(), CommunityID: uuidx.NewV7().String(), PublisherID: id,
 			}).Scan(&cp))
 			attached = append(attached, cp)
 		}
 
 		// a selection of a different plugin has nothing to do with this one.
-		other := uuid.Must(uuid.NewV7()).String()
+		other := uuidx.NewV7().String()
 		seed(t, other, []byte("keepme"))
 		var untouched community.CommunityPublisher
 		require.NoError(t, community.CommunityPublisherInsertWithDefaults(ctx, q, community.CommunityPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), CommunityID: attached[0].CommunityID, PublisherID: other,
+			ID: uuidx.NewV7().String(), CommunityID: attached[0].CommunityID, PublisherID: other,
 		}).Scan(&untouched))
 
 		resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, "/"+id, nil, httptestx.RequestOptionAuthorization(token))
@@ -114,7 +114,7 @@ func TestHTTPCommunityPublisherDelete(t *testing.T) {
 	})
 
 	t.Run("missing publisher returns 404", func(t *testing.T) {
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, "/"+uuid.Must(uuid.NewV7()).String(), nil, httptestx.RequestOptionAuthorization(token))
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, "/"+uuidx.NewV7().String(), nil, httptestx.RequestOptionAuthorization(token))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)
@@ -122,10 +122,10 @@ func TestHTTPCommunityPublisherDelete(t *testing.T) {
 	})
 
 	t.Run("requires a privileged token", func(t *testing.T) {
-		claims := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		unprivileged := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
-		id := uuid.Must(uuid.NewV7()).String()
+		id := uuidx.NewV7().String()
 		path := seed(t, id, []byte("keepme"))
 
 		resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, "/"+id, nil, httptestx.RequestOptionAuthorization(unprivileged))

@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -33,7 +33,7 @@ func TestKnownMediaDetector(t *testing.T) {
 			ddisc.DiscoveredOptionTitle(known.Title),
 			ddisc.DiscoveredOptionMimetype(mimex.Video),
 		)
-		require.Equal(t, uuid.Nil.String(), cand.KnownMediaID, "candidate must start unresolved for the detector to have anything to do")
+		require.Equal(t, uuidx.Nil().String(), cand.KnownMediaID, "candidate must start unresolved for the detector to have anything to do")
 
 		seq := ddisc.KnownMediaDetector(q, library.QueryCleanerNoop())(fakeDiscoverSeq{results: []ddisc.Discovered{cand}})
 
@@ -52,7 +52,7 @@ func TestKnownMediaDetector(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		kid := uuid.Must(uuid.NewV4()).String()
+		kid := uuidx.NewV4().String()
 		id := int160.Random()
 		cand := ddisc.NewDiscovered(&id,
 			ddisc.DiscoveredOptionKnownMedia(kid),
@@ -110,7 +110,7 @@ func TestKnownMediaDetector(t *testing.T) {
 		}
 		require.NoError(t, seq.Err(), "a per-candidate clean failure must be logged, not surfaced as the sequence error")
 		require.Len(t, got, 2, "a clean failure must not drop the candidate, the rest of the sequence keeps processing")
-		require.Equal(t, uuid.Nil.String(), got[0].KnownMediaID, "the failing candidate is yielded unresolved")
+		require.Equal(t, uuidx.Nil().String(), got[0].KnownMediaID, "the failing candidate is yielded unresolved")
 		require.Equal(t, known.UID, got[1].KnownMediaID)
 	})
 }

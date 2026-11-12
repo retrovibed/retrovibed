@@ -7,7 +7,6 @@ import (
 	"unicode/utf8"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/storage"
@@ -15,6 +14,7 @@ import (
 	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -72,7 +72,7 @@ func TestDiscoverDHTMetadata(t *testing.T) {
 
 		var disc ddisc.Discovered
 		require.NoError(t, ddisc.DiscoveredFindByID(ctx, q, expectedID).Scan(&disc))
-		require.Equal(t, uuid.Max.String(), disc.KnownMediaID, "expected discovered record to be indexed")
+		require.Equal(t, uuidx.Max().String(), disc.KnownMediaID, "expected discovered record to be indexed")
 
 		sql, args, err := tracking.UnknownSearchBuilder().RemoveColumns().Columns("COUNT(*)").Where(squirrel.Eq{"id": expectedID}).ToSql()
 		require.NoError(t, err)
@@ -188,7 +188,7 @@ func TestDiscoverDHTMetadata(t *testing.T) {
 
 		var disc ddisc.Discovered
 		require.NoError(t, ddisc.DiscoveredFindByID(ctx, q, expectedID).Scan(&disc))
-		require.Equal(t, uuid.Nil.String(), disc.KnownMediaID, "expected blocked discovered record to remain unindexed")
+		require.Equal(t, uuidx.Nil().String(), disc.KnownMediaID, "expected blocked discovered record to remain unindexed")
 	})
 
 	t.Run("sanitizes a corrupted (invalid utf8) torrent name instead of failing the insert", func(t *testing.T) {
@@ -241,7 +241,7 @@ func TestDiscoverDHTMetadata(t *testing.T) {
 		var disc ddisc.Discovered
 		require.NoError(t, ddisc.DiscoveredFindByID(ctx, q, expectedID).Scan(&disc))
 		require.True(t, utf8.ValidString(disc.Title), "expected corrupted title to be sanitized to valid utf8")
-		require.Equal(t, uuid.Nil.String(), disc.SyncUID, "expected corrupted record to be excluded from sync")
+		require.Equal(t, uuidx.Nil().String(), disc.SyncUID, "expected corrupted record to be excluded from sync")
 
 		sql, args, err := tracking.UnknownSearchBuilder().RemoveColumns().Columns("COUNT(*)").Where(squirrel.Eq{"id": expectedID}).ToSql()
 		require.NoError(t, err)

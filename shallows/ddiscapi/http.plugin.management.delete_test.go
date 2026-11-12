@@ -6,13 +6,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -39,7 +39,7 @@ func TestHTTPPluginManagementDelete(t *testing.T) {
 
 	var v meta.Authz
 	require.NoError(t, testx.Fake(&v, meta.AuthzOptionAdmin))
-	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 	token := httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)
 
 	t.Run("successfully delete", func(t *testing.T) {
@@ -73,7 +73,7 @@ func TestHTTPPluginManagementDelete(t *testing.T) {
 		path := filepath.Join(searchplugin.SearchPluginDir(configDir), "bar.wasm")
 		require.NoError(t, os.WriteFile(path, []byte("barcontent"), 0o600))
 
-		claims := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		unprivileged := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, "/"+md5x.String("bar"), nil, httptestx.RequestOptionAuthorization(unprivileged))

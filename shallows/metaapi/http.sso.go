@@ -7,7 +7,6 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -16,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -167,7 +167,7 @@ func (t *HTTPSSO) register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	code := http.StatusConflict
-	if uuid.FromStringOrNil(iden.ProfileID).String() == uuid.Nil.String() {
+	if uuidx.FromStringOrNil(iden.ProfileID).String() == uuidx.Nil().String() {
 		if err = meta.ProfileInsertWithDefaults(r.Context(), t.q, langx.Clone(meta.Profile{}, meta.ProfileOptionDisplay(reg.Display))).Scan(&p); err != nil {
 			httpx.Unauthorized(w, errorsx.Wrap(err, "profile creation failed"))
 			return

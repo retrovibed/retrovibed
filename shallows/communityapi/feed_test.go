@@ -10,9 +10,9 @@ import (
 
 	"github.com/retrovibed/retrovibed/shallows/community"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 
@@ -43,7 +43,7 @@ func TestRegenerateFeed(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -66,7 +66,7 @@ func TestRegenerateFeed(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -94,25 +94,25 @@ func TestFeedGeneration(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
-			knownID     = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			knownID     = uuidx.NewV7().String()
 		)
 		defer done()
 
 		known := library.Known{
 			ID:            knownID,
 			UID:           knownID,
-			Md5:           uuid.Must(uuid.NewV4()).String(),
+			Md5:           uuidx.NewV4().String(),
 			Title:         "Test Movie",
 			OriginalTitle: "Test Movie Original",
 			Overview:      "A test movie for feed generation",
-			ParentUID:     uuid.Nil.String(),
+			ParentUID:     uuidx.Nil().String(),
 		}
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		var lmd1 library.Metadata
 		require.NoError(t, testx.Fake(&lmd1, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
-			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.ID = uuidx.NewV7().String()
 			m.Description = "test-media-1.mp4"
 			m.Bytes = 100 * bytesx.MiB
 			m.Mimetype = "video/mp4"
@@ -122,7 +122,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		var lmd2 library.Metadata
 		require.NoError(t, testx.Fake(&lmd2, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
-			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.ID = uuidx.NewV7().String()
 			m.Description = "unknown-media.mkv"
 			m.Bytes = 500 * bytesx.MiB
 			m.Mimetype = "video/x-matroska"
@@ -181,13 +181,13 @@ func TestFeedGeneration(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 
 		var lmd1 library.Metadata
 		require.NoError(t, testx.Fake(&lmd1, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
-			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.ID = uuidx.NewV7().String()
 			m.Description = "unlisted-media.mp4"
 			m.Bytes = bytesx.KiB
 			m.Mimetype = "video/mp4"
@@ -196,7 +196,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		var lmd2 library.Metadata
 		require.NoError(t, testx.Fake(&lmd2, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
-			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.ID = uuidx.NewV7().String()
 			m.Description = "hosted-media.mp4"
 			m.Bytes = 2 * bytesx.KiB
 			m.Mimetype = "video/mp4"
@@ -241,13 +241,13 @@ func TestFeedGeneration(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 
 		var lmd1 library.Metadata
 		require.NoError(t, testx.Fake(&lmd1, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
-			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.ID = uuidx.NewV7().String()
 			m.Description = "synced-media.mp4"
 			m.Bytes = bytesx.KiB
 			m.Mimetype = "video/mp4"
@@ -256,7 +256,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		var lmd2 library.Metadata
 		require.NoError(t, testx.Fake(&lmd2, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
-			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.ID = uuidx.NewV7().String()
 			m.Description = "pending-media.mp4"
 			m.Bytes = 2 * bytesx.KiB
 			m.Mimetype = "video/mp4"
@@ -303,13 +303,13 @@ func TestFeedGeneration(t *testing.T) {
 		var (
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 
 		var lmd1 library.Metadata
 		require.NoError(t, testx.Fake(&lmd1, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
-			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.ID = uuidx.NewV7().String()
 			m.Description = "synced-media.mp4"
 			m.Bytes = bytesx.KiB
 			m.Mimetype = "video/mp4"
@@ -318,7 +318,7 @@ func TestFeedGeneration(t *testing.T) {
 
 		var lmd2 library.Metadata
 		require.NoError(t, testx.Fake(&lmd2, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
-			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.ID = uuidx.NewV7().String()
 			m.Description = "urlless-media.mp4"
 			m.Bytes = 2 * bytesx.KiB
 			m.Mimetype = "video/mp4"

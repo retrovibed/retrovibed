@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
@@ -15,6 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -54,12 +54,12 @@ func TestHTTPCommunityPublisherClone(t *testing.T) {
 
 	var v meta.Authz
 	require.NoError(t, testx.Fake(&v, meta.AuthzOptionAdmin))
-	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 	token := httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)
 
 	seed := func(t *testing.T, environment string) community.PluginPublisher {
 		var row community.PluginPublisher
-		path := filepath.Join(dir, uuid.Must(uuid.NewV7()).String()+".wasm")
+		path := filepath.Join(dir, uuidx.NewV7().String()+".wasm")
 		require.NoError(t, os.WriteFile(path, wasm, 0o600))
 		if environment != "" {
 			require.NoError(t, os.WriteFile(publishplugin.EnvPath(path), []byte(environment), 0o600))
@@ -168,7 +168,7 @@ func TestHTTPCommunityPublisherClone(t *testing.T) {
 	})
 
 	t.Run("missing publisher returns 404", func(t *testing.T) {
-		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodPost, "/"+uuid.Must(uuid.NewV7()).String()+"/clone", nil, httptestx.RequestOptionAuthorization(token))
+		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodPost, "/"+uuidx.NewV7().String()+"/clone", nil, httptestx.RequestOptionAuthorization(token))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)
@@ -178,7 +178,7 @@ func TestHTTPCommunityPublisherClone(t *testing.T) {
 	t.Run("requires a privileged token", func(t *testing.T) {
 		source := seed(t, "")
 
-		claims := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		unprivileged := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		before := errorsx.Zero(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM plugin_publishers"))

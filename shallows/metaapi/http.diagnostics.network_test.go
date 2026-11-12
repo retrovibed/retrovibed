@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/wireguardx"
@@ -44,7 +44,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 			metaapi.HTTPDiagnosticsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -72,7 +72,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 			metaapi.HTTPDiagnosticsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -98,7 +98,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 			metaapi.HTTPDiagnosticsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -126,7 +126,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 			metaapi.HTTPDiagnosticsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -159,7 +159,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 			metaapi.HTTPDiagnosticsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -192,7 +192,7 @@ func TestHTTPDiagnosticsNetwork(t *testing.T) {
 			metaapi.HTTPDiagnosticsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)

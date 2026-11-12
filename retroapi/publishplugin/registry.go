@@ -72,14 +72,15 @@ type Registry struct {
 	// wasip1 has no trust store of its own.
 	sslCertDir string
 
-	// configDir is the config root (e.g. userx.DefaultConfigDir(...)) this
+	// configdir is the config root (e.g. userx.DefaultConfigDir(...)) this
 	// registry's plugins read per-plugin config from
-	// (PluginConfigDir(configDir, name), under PublishPluginDir(configDir)).
-	configDir string
-	// cacheDir is the cache root (e.g. userx.DefaultCacheDirectory(...))
+	// (PluginConfigDir(configdir, name), under PublishPluginDir(configdir)).
+	configdir string
+	// cachedir is the cache root (e.g. userx.DefaultCacheDirectory(...))
 	// this registry's plugins write per-plugin cache state to
-	// (PluginCacheDir(cacheDir, name), under PublishPluginDir(cacheDir)).
-	cacheDir string
+	// (PluginCacheDir(cachedir, name), under PublishPluginDir(cachedir)).
+	cachedir   string
+	runtimedir string
 
 	mu      sync.RWMutex
 	modules map[string]wazero.CompiledModule
@@ -97,13 +98,20 @@ type Option func(*Registry)
 // per-plugin config from (default: userx.DefaultConfigDir(userx.DefaultRelRoot())).
 // Also where the publish.d plugin directory itself is watched from.
 func OptionConfigDir(dir string) Option {
-	return func(r *Registry) { r.configDir = dir }
+	return func(r *Registry) { r.configdir = dir }
 }
 
 // OptionCacheDir overrides the cache root a Registry's plugins write
 // per-plugin cache state to (default: userx.DefaultCacheDirectory(userx.DefaultRelRoot())).
 func OptionCacheDir(dir string) Option {
-	return func(r *Registry) { r.cacheDir = dir }
+	return func(r *Registry) { r.cachedir = dir }
+}
+
+// OptionRuntimeDir overrides the runtime root a Registry creates its
+// scratch directories under (default: userx.DefaultRuntimeDirectory(userx.DefaultRelRoot())).
+// The directory is created if it does not exist.
+func OptionRuntimeDir(dir string) Option {
+	return func(r *Registry) { r.runtimedir = dir }
 }
 
 // NewRegistry builds a Registry using wasinet's default Virtual socket
@@ -111,9 +119,6 @@ func OptionCacheDir(dir string) Option {
 // dial/lookup goes through the host's *net.Dialer/*net.Resolver instead).
 // See NewRegistryWithSocket to substitute a different wnetruntime.Socket.
 func NewRegistry(ctx context.Context, options ...Option) (*Registry, error) {
-	if err := fsx.MkDirs(0700, userx.DefaultRuntimeDirectory(userx.DefaultRelRoot())); err != nil {
-		return nil, errorsx.Wrap(err, "unable to ensure runtime directory exist")
-	}
 	return NewRegistryWithSocket(ctx, defaultSocket(), options...)
 }
 
@@ -131,7 +136,7 @@ func NewRegistryWithSocket(ctx context.Context, sock wnetruntime.Socket, options
 		return nil, err
 	}
 
-	if err := watch(ctx, r, PublishPluginDir(r.configDir)); err != nil {
+	if err := watch(ctx, r, PublishPluginDir(r.configdir)); err != nil {
 		return nil, err
 	}
 
@@ -146,14 +151,31 @@ func defaultSocket() wnetruntime.Socket {
 // without starting the publish.d directory watch, so tests can Load plugins
 // directly without touching the real, hardcoded plugin directory.
 func newRegistry(ctx context.Context, sock wnetruntime.Socket, options ...Option) (*Registry, error) {
-	cachedir := userx.DefaultCacheDirectory(userx.DefaultRelRoot())
+	r := langx.Clone(Registry{
+		sslCertDir: langx.FirstNonZero(
+			fsx.LocatePhysicalPath(
+				"/etc/ssl/certs",
+				"/etc/pki/tls/certs",
+				"/usr/share/ca-certificates",
+			),
+			"/etc/ssl/certs",
+		),
+		configdir:  userx.DefaultConfigDir(userx.DefaultRelRoot()),
+		cachedir:   userx.DefaultCacheDirectory(userx.DefaultRelRoot()),
+		runtimedir: userx.DefaultRuntimeDirectory(userx.DefaultRelRoot()),
+		modules:    map[string]wazero.CompiledModule{},
+	}, options...)
+
+	if err := fsx.MkDirs(0700, r.runtimedir, r.cachedir, r.configdir); err != nil {
+		return nil, errorsx.Wrap(err, "unable to ensure registry directories exist")
+	}
 
 	// Plugins are large (tens of MB) wasm binaries; without a persistent
 	// compilation cache wazero AOT-compiles every one of them from scratch
 	// on every daemon start, which can add tens of seconds to startup.
 	// Caching compiled code here means only new/changed plugins pay that
 	// cost.
-	compiledir := filepath.Join(cachedir, "wazero.compiled")
+	compiledir := filepath.Join(r.cachedir, "wazero.compiled")
 	if err := os.MkdirAll(compiledir, 0700); err != nil {
 		return nil, errorsx.Wrap(err, "unable to create wazero compilation cache directory")
 	}
@@ -173,26 +195,10 @@ func newRegistry(ctx context.Context, sock wnetruntime.Socket, options ...Option
 		return nil, errorsx.Wrap(err, "unable to instantiate wasinet")
 	}
 
-	r := &Registry{
-		runtime: runtime,
-		sslCertDir: langx.FirstNonZero(
-			fsx.LocatePhysicalPath(
-				"/etc/ssl/certs",
-				"/etc/pki/tls/certs",
-				"/usr/share/ca-certificates",
-			),
-			"/etc/ssl/certs",
-		),
-		configDir: userx.DefaultConfigDir(userx.DefaultRelRoot()),
-		cacheDir:  cachedir,
-		modules:   map[string]wazero.CompiledModule{},
-	}
-	for _, opt := range options {
-		opt(r)
-	}
+	r.runtime = runtime
 	r.pool = asynccompute.New(r.runPublishJob)
 
-	return r, nil
+	return &r, nil
 }
 
 // PublishPluginDir is the well-known publish.d directory nested under root -
@@ -229,12 +235,12 @@ func PluginCacheDir(root string, name string) string {
 
 // PluginConfigDir returns this registry's per-plugin config directory for name.
 func (r *Registry) PluginConfigDir(name string) string {
-	return PluginConfigDir(r.configDir, name)
+	return PluginConfigDir(r.configdir, name)
 }
 
 // PluginCacheDir returns this registry's per-plugin cache directory for name.
 func (r *Registry) PluginCacheDir(name string) string {
-	return PluginCacheDir(r.cacheDir, name)
+	return PluginCacheDir(r.cachedir, name)
 }
 
 // Load compiles path (a .wasm file) and adds it to the registry. Compiling

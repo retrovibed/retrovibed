@@ -6,13 +6,13 @@ import (
 	"log"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/linxGnu/pqueue"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/contextx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -34,14 +34,14 @@ func RecommendationsBackgroundRun(ctx context.Context, q sqlx.Queryer, wq pqueue
 	reclimit := uint64(128)
 
 	reqaudio := RecommendationRefreshRequest{
-		ProfileId: uuid.Nil.String(),
+		ProfileId: uuidx.Nil().String(),
 		Mimetype:  mimex.Audio,
 		Adult:     false,
 		Language:  lang,
 		Limit:     reclimit,
 	}
 	reqvideo := RecommendationRefreshRequest{
-		ProfileId: uuid.Nil.String(),
+		ProfileId: uuidx.Nil().String(),
 		Mimetype:  mimex.Video,
 		Adult:     false,
 		Language:  lang,

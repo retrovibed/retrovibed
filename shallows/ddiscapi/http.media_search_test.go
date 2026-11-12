@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -12,6 +11,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -76,7 +76,7 @@ func TestHTTPMediaSearch(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		knownMediaID := uuid.Must(uuid.NewV7()).String()
+		knownMediaID := uuidx.NewV7().String()
 
 		matchID := int160.Random()
 		match = ddisc.NewDiscovered(&matchID, ddisc.DiscoveredOptionKnownMedia(knownMediaID), ddisc.DiscoveredOptionAutoMagnet)
@@ -129,7 +129,7 @@ func TestHTTPMediaSearch(t *testing.T) {
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, unresolved).Scan(&unresolved))
 
 		resolvedID := int160.Random()
-		resolved = ddisc.NewDiscovered(&resolvedID, ddisc.DiscoveredOptionKnownMedia(uuid.Must(uuid.NewV7()).String()), ddisc.DiscoveredOptionAutoMagnet)
+		resolved = ddisc.NewDiscovered(&resolvedID, ddisc.DiscoveredOptionKnownMedia(uuidx.NewV7().String()), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, resolved).Scan(&resolved))
 
 		routes := mux.NewRouter()

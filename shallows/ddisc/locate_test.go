@@ -3,8 +3,8 @@ package ddisc_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -16,7 +16,7 @@ func TestLocate(t *testing.T) {
 		l := ddisc.NewLocate("ubuntu", mimex.Video)
 		require.Equal(t, "ubuntu", l.Query)
 		require.Equal(t, mimex.Video, l.Mimetype)
-		require.Equal(t, uuid.Nil.String(), l.KnownMediaID)
+		require.Equal(t, uuidx.Nil().String(), l.KnownMediaID)
 		require.NotEmpty(t, l.ID)
 
 		same := ddisc.NewLocate("ubuntu", mimex.Video)
@@ -41,7 +41,7 @@ func TestLocate(t *testing.T) {
 		l := ddisc.NewLocate("ubuntu", mimex.Video)
 		require.NoError(t, ddisc.LocateInsertWithDefaults(t.Context(), q, l).Scan(&l))
 
-		tid := uuid.Must(uuid.NewV4()).String()
+		tid := uuidx.NewV4().String()
 		require.NoError(t, ddisc.LocateLocated(t.Context(), q, l.ID, tid).Scan(&l))
 		require.Equal(t, tid, l.LocatedTorrentID)
 
@@ -72,7 +72,7 @@ func TestLocate(t *testing.T) {
 		l := ddisc.NewLocate("ubuntu", mimex.Video)
 		require.NoError(t, ddisc.LocateInsertWithDefaults(t.Context(), q, l).Scan(&l))
 
-		tid := uuid.Must(uuid.NewV4()).String()
+		tid := uuidx.NewV4().String()
 		require.NoError(t, ddisc.LocateLocated(t.Context(), q, l.ID, tid).Scan(&l))
 		require.NoError(t, ddisc.LocateCompleted(t.Context(), q, l.ID).Scan(&l))
 
@@ -93,6 +93,6 @@ func TestLocate(t *testing.T) {
 		}
 		require.NoError(t, s.Err())
 		require.True(t, found, "re-searching a completed locate should reopen it for reprocessing")
-		require.Equal(t, uuid.Max.String(), again.LocatedTorrentID, "stale located_torrent_id should be cleared, not handed back")
+		require.Equal(t, uuidx.Max().String(), again.LocatedTorrentID, "stale located_torrent_id should be cleared, not handed back")
 	})
 }

@@ -14,7 +14,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
@@ -24,6 +23,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -209,7 +209,7 @@ func (t *HTTPLibrary) patch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if uuid.Max == uuid.FromStringOrNil(md.ArchiveID) {
+	if uuidx.Max() == uuidx.FromStringOrNil(md.ArchiveID) {
 		// signal that archival needs to be done.
 		t.archival.Broadcast()
 	}
@@ -224,7 +224,7 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		copied = &iox.Copied{Result: new(uint64)}
 		mhash  = md5.New()
 		// the filesystem endpoint names a destination when it uploads into a directory.
-		directory = stringsx.FirstNonBlank(r.FormValue("directory_id"), uuid.Nil.String())
+		directory = stringsx.FirstNonBlank(r.FormValue("directory_id"), uuidx.Nil().String())
 	)
 
 	if f, fh, err = r.FormFile("content"); err != nil {
@@ -267,7 +267,7 @@ func (t *HTTPLibrary) upload(w http.ResponseWriter, r *http.Request) {
 		library.MetadataOptionBytes(*copied.Result),
 		library.MetadataOptionDescription(fh.Filename),
 		library.MetadataOptionMimetype(fh.Header.Get("Content-Type")),
-		library.MetadataOptionKnownMediaID(uuid.Max.String()),
+		library.MetadataOptionKnownMediaID(uuidx.Max().String()),
 		library.MetadataOptionAutoDescription(library.NormalizedDescription(fh.Filename)),
 		library.MetadataOptionDirectoryID(directory),
 	)
@@ -349,7 +349,7 @@ func (t *HTTPLibrary) random(w http.ResponseWriter, r *http.Request) {
 		return sqlx.ScanOne(library.MetadataSearch(r.Context(), t.q, q.Where(library.MetadataQueryRandomBefore(id))))
 	}
 
-	tmp, err := perform(uuid.Must(uuid.NewV4()).String())
+	tmp, err := perform(uuidx.NewV4().String())
 	if errorsx.Is(err, sql.ErrNoRows) {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusNotFound))
 		return

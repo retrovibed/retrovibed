@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -55,7 +55,7 @@ func CommunityQueryNeedsSync() squirrel.Sqlizer {
 // CommunityQueryAccountID matches communities owned by accountID; uuid.Nil
 // (i.e. unset) matches every community, applying no filter.
 func CommunityQueryAccountID(accountID string) squirrel.Sqlizer {
-	if stringsx.Blank(accountID) || accountID == uuid.Nil.String() {
+	if stringsx.Blank(accountID) || accountID == uuidx.Nil().String() {
 		return squirrelx.Noop{}
 	}
 

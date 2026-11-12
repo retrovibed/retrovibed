@@ -3,9 +3,9 @@ package daemons_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -53,7 +53,7 @@ func TestTorrentMetadataIdentify(t *testing.T) {
 		require.NoError(t, daemons.IdentifyTorrentMedia(ctx, q, library.QueryCleanerNoop()))
 
 		require.NoError(t, tracking.MetadataFindByID(ctx, q, lmd.ID).Scan(&lmd))
-		require.Equal(t, uuid.Nil.String(), lmd.KnownMediaID)
+		require.Equal(t, uuidx.Nil().String(), lmd.KnownMediaID)
 	})
 
 	t.Run("blank cleaned description marks known media id as nil", func(t *testing.T) {
@@ -71,7 +71,7 @@ func TestTorrentMetadataIdentify(t *testing.T) {
 		require.NoError(t, daemons.IdentifyTorrentMedia(ctx, q, library.NewQueryCleanerFn(func(string) string { return "" })))
 
 		require.NoError(t, tracking.MetadataFindByID(ctx, q, lmd.ID).Scan(&lmd))
-		require.Equal(t, uuid.Nil.String(), lmd.KnownMediaID)
+		require.Equal(t, uuidx.Nil().String(), lmd.KnownMediaID)
 	})
 
 	t.Run("empty metadata table returns no error", func(t *testing.T) {

@@ -7,13 +7,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -88,7 +88,7 @@ func TestHTTPDaemonCreateNew(t *testing.T) {
 		Daemon: testx.Must(metaapi.NewDaemonFromMetaDaemon(v))(t),
 	}))(t)
 
-	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+	claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 	resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/", b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
@@ -132,7 +132,7 @@ func TestHTTPDaemonCreateUpdate(t *testing.T) {
 		Daemon: testx.Must(metaapi.NewDaemonFromMetaDaemon(v))(t),
 	}))(t)
 
-	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+	claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 	resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/", b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
@@ -180,7 +180,7 @@ func TestHTTPDaemonUpdate(t *testing.T) {
 			Daemon: testx.Must(metaapi.NewDaemonFromMetaDaemon(u))(t),
 		}))(t)
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 		resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, fmt.Sprintf("/%s", v.ID), b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -222,7 +222,7 @@ func TestHTTPDaemonTouch(t *testing.T) {
 		metaapi.HTTPDaemonsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 	).Bind(routes.PathPrefix("/").Subrouter())
 
-	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+	claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 	resp, req, err := httptestx.BuildRequestBytes(http.MethodPut, fmt.Sprintf("/%s", v.ID), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
@@ -263,7 +263,7 @@ func TestHTTPDaemonDelete(t *testing.T) {
 		Daemon: testx.Must(metaapi.NewDaemonFromMetaDaemon(v))(t),
 	}))(t)
 
-	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+	claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 	resp, req, err := httptestx.BuildRequestBytes(http.MethodDelete, fmt.Sprintf("/%s", v.ID), b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)
@@ -314,7 +314,7 @@ func TestHTTPDaemonLatest(t *testing.T) {
 		Daemon: testx.Must(metaapi.NewDaemonFromMetaDaemon(v))(t),
 	}))(t)
 
-	claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+	claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 	resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/latest", b, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 	require.NoError(t, err)

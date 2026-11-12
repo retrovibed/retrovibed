@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/james-lawrence/torrent/torrenttestx"
@@ -94,7 +93,7 @@ func TestDownloadSyncMetadata(t *testing.T) {
 
 	require.Equal(t, 0, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata WHERE known_media_id = ?", m.ID))(t))
 	require.Equal(t, 2, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM library_metadata WHERE torrent_id = ?", tmd.ID))(t))
-	require.Equal(t, uuid.Max.String(), testx.Must(sqlx.String(ctx, q, "SELECT known_media_id::text FROM torrents_metadata WHERE id = ?", tmd.ID))(t))
+	require.Equal(t, uuidx.Max().String(), testx.Must(sqlx.String(ctx, q, "SELECT known_media_id::text FROM torrents_metadata WHERE id = ?", tmd.ID))(t))
 
 	routes.ServeHTTP(resp, req)
 

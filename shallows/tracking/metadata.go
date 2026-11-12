@@ -19,7 +19,6 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -28,6 +27,7 @@ import (
 	rootenv "github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
@@ -122,7 +122,7 @@ func MetadataOptionKnownMediaID(d string) func(*Metadata) {
 }
 
 func MetadataOptionDisableKnownMedia(m *Metadata) {
-	m.KnownMediaID = uuid.Nil.String()
+	m.KnownMediaID = uuidx.Nil().String()
 }
 
 func MetadataOptionAutoEntropySeed(d []byte) func(*Metadata) {
@@ -256,8 +256,8 @@ func NewMetadata(md *int160.T, options ...func(*Metadata)) (m Metadata) {
 		ExpiresAt:      timex.Inf(),
 		TombstonedAt:   timex.Inf(),
 		NextAnnounceAt: timex.NegInf(),
-		KnownMediaID:   uuid.Max.String(),
-		EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+		KnownMediaID:   uuidx.Max().String(),
+		EncryptionSeed: uuidx.NewV4().String(),
 		Mimetype:       mimex.Bittorrent,
 	}, options...)
 	return r

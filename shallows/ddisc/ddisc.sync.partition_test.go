@@ -3,7 +3,6 @@ package ddisc_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
@@ -28,8 +27,8 @@ func TestSyncPartition(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		partitions := ddisc.Partitions(16, cryptox.NewChaCha8(t.Name()))
-		p0 := uuid.FromStringOrNil("d7e5e5df-b2ad-416a-97c6-c634465cec75")
-		p1 := uuid.FromStringOrNil("0c67c93f-a940-4d55-aab0-aaacaea2b050")
+		p0 := uuidx.FromStringOrNil("d7e5e5df-b2ad-416a-97c6-c634465cec75")
+		p1 := uuidx.FromStringOrNil("0c67c93f-a940-4d55-aab0-aaacaea2b050")
 
 		n0 := partitions.Max(p0.Bytes())
 		n1 := partitions.Max(p1.Bytes())
@@ -41,7 +40,7 @@ func TestSyncPartition(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx))).String()),
+				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuidx.FromStringOrNil(uuidx.WithSuffix(idx))).String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
@@ -49,8 +48,8 @@ func TestSyncPartition(t *testing.T) {
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
-			require.NotEqual(t, uuid.Nil.String(), d.KnownMediaID)
-			require.NotEqual(t, uuid.Nil.String(), d.Partition)
+			require.NotEqual(t, uuidx.Nil().String(), d.KnownMediaID)
+			require.NotEqual(t, uuidx.Nil().String(), d.Partition)
 		}
 		for idx := range 64 {
 			genrecord(idx)
@@ -70,8 +69,8 @@ func TestSyncPartition(t *testing.T) {
 				ddisc.DiscoveredOptionAutoMagnet,
 			)
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
-			require.Equal(t, uuid.Nil.String(), d.KnownMediaID)
-			require.Equal(t, uuid.Nil.String(), d.Partition)
+			require.Equal(t, uuidx.Nil().String(), d.KnownMediaID)
+			require.Equal(t, uuidx.Nil().String(), d.Partition)
 		}
 
 		require.InDelta(t, 64, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE partition != '00000000-0000-0000-0000-000000000000'"), 3)
@@ -82,7 +81,7 @@ func TestSyncPartition(t *testing.T) {
 				count = 0
 			)
 			for d := range syncer.Each(t.Context()) {
-				require.NotEqual(t, uuid.Nil.String(), d.KnownMediaID)
+				require.NotEqual(t, uuidx.Nil().String(), d.KnownMediaID)
 				require.GreaterOrEqual(t, d.SyncUID, last.SyncUID)
 				last = d
 				count++
@@ -100,9 +99,9 @@ func TestSyncPartition(t *testing.T) {
 
 		prev := last
 		last = assertbatch(prev, 9, ddisc.SyncPartition(q, n0.String(), prev.SyncUID))
-		require.NotEqual(t, uuid.Nil.String(), last.SyncUID)
+		require.NotEqual(t, uuidx.Nil().String(), last.SyncUID)
 		last = assertbatch(prev, 5, ddisc.SyncPartition(q, n1.String(), prev.SyncUID))
-		require.NotEqual(t, uuid.Nil.String(), last.SyncUID)
+		require.NotEqual(t, uuidx.Nil().String(), last.SyncUID)
 
 		for idx := range 128 {
 			genrecord(idx + 64)
@@ -110,8 +109,8 @@ func TestSyncPartition(t *testing.T) {
 
 		prev = last
 		last = assertbatch(prev, 7, ddisc.SyncPartition(q, n0.String(), prev.SyncUID))
-		require.NotEqual(t, uuid.Nil.String(), last.SyncUID)
-		assertbatch(ddisc.Discovered{SyncUID: uuid.Nil.String()}, 16, ddisc.SyncPartition(q, n0.String(), uuid.Nil.String()))
+		require.NotEqual(t, uuidx.Nil().String(), last.SyncUID)
+		assertbatch(ddisc.Discovered{SyncUID: uuidx.Nil().String()}, 16, ddisc.SyncPartition(q, n0.String(), uuidx.Nil().String()))
 	})
 
 	t.Run("never returns private media", func(t *testing.T) {
@@ -123,7 +122,7 @@ func TestSyncPartition(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		partitions := ddisc.Partitions(16, cryptox.NewChaCha8(t.Name()))
-		p0 := uuid.FromStringOrNil("1a5c9e5a-0e1d-4f39-9d34-9a7ee9e3d6d3")
+		p0 := uuidx.FromStringOrNil("1a5c9e5a-0e1d-4f39-9d34-9a7ee9e3d6d3")
 		n0 := partitions.Max(p0.Bytes())
 
 		for idx := range 16 {
@@ -135,7 +134,7 @@ func TestSyncPartition(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx))).String()),
+				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuidx.FromStringOrNil(uuidx.WithSuffix(idx))).String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
@@ -146,7 +145,7 @@ func TestSyncPartition(t *testing.T) {
 		}
 
 		count := 0
-		seq := ddisc.SyncPartition(q, n0.String(), uuid.Nil.String())
+		seq := ddisc.SyncPartition(q, n0.String(), uuidx.Nil().String())
 		for d := range seq.Each(t.Context()) {
 			require.False(t, d.Private, "private media must never be synced to a peer")
 			count++

@@ -1,8 +1,8 @@
 package communityapi
 
 import (
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
@@ -23,7 +23,7 @@ func NewCommunity(opts ...func(*Community)) *Community {
 func CommunityFromDeeppool(c *Community) community.Community {
 	return community.Community{
 		ID:                 c.Id,
-		AccountID:          stringsx.DefaultIfBlank(c.AccountId, uuid.Nil.String()),
+		AccountID:          stringsx.DefaultIfBlank(c.AccountId, uuidx.Nil().String()),
 		CreatedAt:          errorsx.Zero(grpcx.DecodeTime(c.CreatedAt)),
 		UpdatedAt:          errorsx.Zero(grpcx.DecodeTime(c.UpdatedAt)),
 		Mimetype:           c.Mimetype,

@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/michiwend/gomusicbrainz"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
@@ -86,7 +85,7 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 				}
 
 				for _, rel := range resp.Releases {
-					uidmd5 := uuid.FromBytesOrNil(md5x.JSON(rel).Sum(nil))
+					uidmd5 := uuidx.FromBytesOrNil(md5x.JSON(rel).Sum(nil))
 
 					lang := langx.FirstNonZero(
 						errorsx.ZeroDebug[language.Tag](debugx.Fn)(language.Parse(rel.TextRepresentation.Language)),
@@ -96,7 +95,7 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 					credit := slicesx.FirstOrZero(rel.ArtistCredit.NameCredits...)
 
 					// We use the RG ID so that all versions of this album collapse into one record.
-					id := uuid.FromStringOrNil(string(rel.ReleaseGroup.ID))
+					id := uuidx.FromStringOrNil(string(rel.ReleaseGroup.ID))
 
 					// Note: Search results don't include full tracklists (recordings).
 					// To get songs, a separate Lookup call per release is required.
@@ -112,7 +111,7 @@ func (t *mbimport) releases(ctx context.Context, c *gomusicbrainz.WS2Client, l *
 						PosterPath:       fmt.Sprintf("https://coverartarchive.org/release-group/%s/front-500", id),
 						OriginalLanguage: lang.String(),
 						Mimetype:         mimex.Audio,
-						ParentUID:        uuid.Nil.String(),
+						ParentUID:        uuidx.Nil().String(),
 					}
 
 					if !yield(v) {

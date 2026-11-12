@@ -5,9 +5,9 @@ import (
 	"log"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -39,10 +39,10 @@ func IdentifyLibraryMedia(ctx context.Context, db sqlx.Queryer, mc library.Query
 			continue
 		}
 
-		if uuid.FromStringOrNil(known.UID).IsNil() {
+		if uuidx.FromStringOrNil(known.UID).IsZero() {
 			log.Println("no match for library media", md.ID, md.Description)
 			updated := md
-			updated.KnownMediaID = uuid.Nil.String()
+			updated.KnownMediaID = uuidx.Nil().String()
 			if err = library.MetadataUpdate(ctx, db, md.ID, updated).Scan(&md); err != nil {
 				log.Println("unable to mark library media as unidentifiable", md.ID, err)
 			}

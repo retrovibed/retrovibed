@@ -3,13 +3,13 @@ package ddisc_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -26,8 +26,8 @@ func TestSyncDiscovered(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		partitions := ddisc.Partitions(128, cryptox.NewChaCha8(t.Name()))
-		p0 := uuid.Must(uuid.NewV4())
-		p1 := uuid.Must(uuid.NewV4())
+		p0 := uuidx.NewV4()
+		p1 := uuidx.NewV4()
 
 		n := partitions.Max(p0.Bytes())
 
@@ -50,7 +50,7 @@ func TestSyncDiscovered(t *testing.T) {
 				ddisc.DiscoveredOptionAutoMagnet,
 			)
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
-			require.Contains(t, []string{uuid.Nil.String(), uuid.Max.String()}, d.KnownMediaID)
+			require.Contains(t, []string{uuidx.Nil().String(), uuidx.Max().String()}, d.KnownMediaID)
 		}
 
 		require.InDelta(t, 7, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE known_media_id = 'FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF'"), 5)
@@ -61,7 +61,7 @@ func TestSyncDiscovered(t *testing.T) {
 				count = 0
 			)
 			for d := range syncer.Each(t.Context()) {
-				require.Contains(t, []string{uuid.Nil.String(), uuid.Max.String()}, d.KnownMediaID)
+				require.Contains(t, []string{uuidx.Nil().String(), uuidx.Max().String()}, d.KnownMediaID)
 				require.GreaterOrEqual(t, d.SyncUID, last.SyncUID)
 				last = d
 				count++
@@ -76,8 +76,8 @@ func TestSyncDiscovered(t *testing.T) {
 				SyncUID: "00000000-0000-0000-0000-000000000000",
 			}
 		)
-		last = assertbatch(last, ddisc.SyncDiscovered(q, block1, uuid.Nil.String()))
-		require.NotEqual(t, uuid.Nil.String(), last.SyncUID)
+		last = assertbatch(last, ddisc.SyncDiscovered(q, block1, uuidx.Nil().String()))
+		require.NotEqual(t, uuidx.Nil().String(), last.SyncUID)
 
 		// add newly discovered data to the pool.
 		for range 64 {
@@ -128,7 +128,7 @@ func TestSyncDiscovered(t *testing.T) {
 		}
 
 		count := 0
-		seq := ddisc.SyncDiscovered(q, nofilter, uuid.Nil.String())
+		seq := ddisc.SyncDiscovered(q, nofilter, uuidx.Nil().String())
 		for d := range seq.Each(t.Context()) {
 			require.False(t, d.Private, "private media must never be synced to a peer")
 			count++

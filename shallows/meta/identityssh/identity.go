@@ -1,12 +1,12 @@
 package identityssh
 
 import (
-	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 )
 
 type Option func(*Identity)
 
 func OptionTestDefaults(a *Identity) {
-	a.ID = uuid.Must(uuid.NewV4()).String()
-	a.ProfileID = uuid.Nil.String()
+	a.ID = uuidx.NewV4().String()
+	a.ProfileID = uuidx.Nil().String()
 }

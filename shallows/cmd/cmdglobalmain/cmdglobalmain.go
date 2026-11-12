@@ -17,10 +17,10 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/egdaemon/gdx"
 	"github.com/egdaemon/gdx/konggdx"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdcommunity"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdetl"
@@ -108,7 +108,7 @@ func Main(args ...string) {
 			"vars_user_cache_directory":         userx.DefaultCacheDirectory(userx.DefaultRelRoot()),
 			"vars_date_started":                 tsstarted.UTC().Format(time.DateOnly),
 			"vars_timestamp_started":            tsstarted.UTC().Format(time.RFC3339),
-			"vars_random_seed":                  uuid.Must(uuid.NewV4()).String(),
+			"vars_random_seed":                  uuidx.NewV4().String(),
 			"vars_cores":                        strconv.Itoa(runtime.GOMAXPROCS(0)),
 			"vars_downloads_directory":          userx.DefaultDownloadDirectory(),
 			"vars_media_directory":              env.MediaDir(),

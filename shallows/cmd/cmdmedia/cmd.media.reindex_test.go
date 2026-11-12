@@ -6,13 +6,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -44,7 +44,7 @@ func TestReindexRun(t *testing.T) {
 
 		mediastore := fsx.DirVirtual(t.TempDir())
 
-		lmd0ID := uuid.Must(uuid.NewV4()).String()
+		lmd0ID := uuidx.NewV4().String()
 		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(lmd0ID)))
 		lmd0 := library.NewMetadata(lmd0ID,
 			library.MetadataOptionDescription(files[0].Path),
@@ -54,7 +54,7 @@ func TestReindexRun(t *testing.T) {
 		)
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd0).Scan(&lmd0))
 
-		lmd1ID := uuid.Must(uuid.NewV4()).String()
+		lmd1ID := uuidx.NewV4().String()
 		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(lmd1ID)))
 		lmd1 := library.NewMetadata(lmd1ID,
 			library.MetadataOptionDescription(files[1].Path),
@@ -98,7 +98,7 @@ func TestReindexRun(t *testing.T) {
 
 		mediastore := fsx.DirVirtual(t.TempDir())
 
-		lmdID := uuid.Must(uuid.NewV4()).String()
+		lmdID := uuidx.NewV4().String()
 		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(lmdID)))
 		lmd := library.NewMetadata(lmdID,
 			library.MetadataOptionDescription("original description"),
@@ -138,7 +138,7 @@ func TestReindexRun(t *testing.T) {
 
 		mediastore := fsx.DirVirtual(t.TempDir())
 
-		indexedID := uuid.Must(uuid.NewV4()).String()
+		indexedID := uuidx.NewV4().String()
 		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(indexedID)))
 		indexed := library.NewMetadata(indexedID,
 			library.MetadataOptionDescription("already indexed"),
@@ -149,7 +149,7 @@ func TestReindexRun(t *testing.T) {
 		)
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, indexed).Scan(&indexed))
 
-		unindexedID := uuid.Must(uuid.NewV4()).String()
+		unindexedID := uuidx.NewV4().String()
 		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(unindexedID)))
 		unindexed := library.NewMetadata(unindexedID,
 			library.MetadataOptionDescription("not yet indexed"),
@@ -192,14 +192,14 @@ func TestReindexRun(t *testing.T) {
 
 		mediastore := fsx.DirVirtual(t.TempDir())
 
-		lmdID := uuid.Must(uuid.NewV4()).String()
+		lmdID := uuidx.NewV4().String()
 		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(lmdID)))
 		lmd := library.NewMetadata(lmdID,
 			library.MetadataOptionDescription(files[0].Path),
 			library.MetadataOptionBytes(files[0].Length),
 			library.MetadataOptionOffset(files[0].Offset),
 			library.MetadataOptionTorrentID(tmd.ID),
-			library.MetadataOptionKnownMediaID(uuid.Must(uuid.NewV4()).String()),
+			library.MetadataOptionKnownMediaID(uuidx.NewV4().String()),
 		)
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
 
@@ -207,7 +207,7 @@ func TestReindexRun(t *testing.T) {
 
 		var got library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, db, lmd.ID).Scan(&got))
-		require.Equal(t, uuid.Max.String(), got.KnownMediaID)
+		require.Equal(t, uuidx.Max().String(), got.KnownMediaID)
 	})
 
 	t.Run("without reidentify flag the known media id is preserved", func(t *testing.T) {
@@ -233,8 +233,8 @@ func TestReindexRun(t *testing.T) {
 
 		mediastore := fsx.DirVirtual(t.TempDir())
 
-		kid := uuid.Must(uuid.NewV4()).String()
-		lmdID := uuid.Must(uuid.NewV4()).String()
+		kid := uuidx.NewV4().String()
+		lmdID := uuidx.NewV4().String()
 		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(lmdID)))
 		lmd := library.NewMetadata(lmdID,
 			library.MetadataOptionDescription(files[0].Path),
@@ -275,8 +275,8 @@ func TestReindexRun(t *testing.T) {
 
 		mediastore := fsx.DirVirtual(t.TempDir())
 
-		kid := uuid.Must(uuid.NewV4()).String()
-		lmdID := uuid.Must(uuid.NewV4()).String()
+		kid := uuidx.NewV4().String()
+		lmdID := uuidx.NewV4().String()
 		require.NoError(t, os.Symlink(filepath.Join(torrentdir, md.ID.String()), mediastore.Path(lmdID)))
 		lmd := library.NewMetadata(lmdID,
 			library.MetadataOptionDescription(files[0].Path),
@@ -300,8 +300,8 @@ func TestReindexRun(t *testing.T) {
 
 		mediastore := fsx.DirVirtual(t.TempDir())
 
-		lmdID := uuid.Must(uuid.NewV4()).String()
-		orphanTorrentID := uuid.Must(uuid.NewV4()).String()
+		lmdID := uuidx.NewV4().String()
+		orphanTorrentID := uuidx.NewV4().String()
 		lmd := library.NewMetadata(lmdID,
 			library.MetadataOptionDescription("orphaned"),
 			library.MetadataOptionTorrentID(orphanTorrentID),
@@ -330,7 +330,7 @@ func TestReindexRun(t *testing.T) {
 
 		// symlink points at a torrent directory that has no <id>.torrent file written to disk.
 		missingTorrentDir := t.TempDir()
-		lmdID := uuid.Must(uuid.NewV4()).String()
+		lmdID := uuidx.NewV4().String()
 		require.NoError(t, os.Symlink(filepath.Join(missingTorrentDir, md.ID.String()), mediastore.Path(lmdID)))
 		lmd := library.NewMetadata(lmdID,
 			library.MetadataOptionDescription("unreachable"),
@@ -353,7 +353,7 @@ func TestReindexRun(t *testing.T) {
 		// the loop treats a nil torrent id as an unexpected state and logs it. a folder has
 		// no torrent by construction, so every folder would report as a defect.
 		dir := library.NewMetadata(
-			uuid.Must(uuid.NewV7()).String(),
+			uuidx.NewV7().String(),
 			library.MetadataOptionDescription("photos"),
 			library.MetadataOptionMimetype(mimex.Directory),
 		)

@@ -3,9 +3,9 @@ package env
 import (
 	"sync"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/env"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 )
 
@@ -84,7 +84,7 @@ const (
 
 var v = sync.OnceValue(func() []byte {
 	return []byte(envx.String(
-		uuid.Must(uuid.NewV4()).String(),
+		uuidx.NewV4().String(),
 		JWTSharedSecret,
 	))
 })

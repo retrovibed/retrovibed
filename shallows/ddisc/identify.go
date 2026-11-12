@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -16,6 +15,7 @@ import (
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
 )
@@ -96,6 +96,12 @@ func IdentifyOne(ctx context.Context, dhts *dht.Server, tclient *torrent.Client,
 
 	mime, err := Mimetype(r)
 
+	// when the deadline expires mid-read DownloadProgress closes r, which surfaces
+	// as an unhelpful "closed pipe" error; report the actual cause instead.
+	if err != nil && dctx.Err() != nil {
+		err = errorsx.Compact(dctx.Err(), err)
+	}
+
 	// Mimetype only needs the leading bytes; DownloadProgress keeps driving
 	// connections/pieces concurrently with that read, so cancel it now and
 	// wait for its close/stop cleanup to actually finish before returning -
@@ -111,7 +117,7 @@ func IdentifyOne(ctx context.Context, dhts *dht.Server, tclient *torrent.Client,
 	disc = langx.Clone(
 		disc,
 		DiscoveredOptionMimetype(mime.String()),
-		DiscoveredOptionKnownMedia(uuid.Max.String()),
+		DiscoveredOptionKnownMedia(uuidx.Max().String()),
 		DiscoveredOptionAcquisitionState(AcquisitionStateAvailable),
 	)
 

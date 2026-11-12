@@ -16,7 +16,9 @@ import (
 	"github.com/james-lawrence/torrent/internal/bytesx"
 	"github.com/james-lawrence/torrent/internal/errorsx"
 	"github.com/james-lawrence/torrent/internal/langx"
+	"github.com/james-lawrence/torrent/internal/slogx"
 	"github.com/james-lawrence/torrent/internal/timex"
+	"golang.org/x/time/rate"
 )
 
 // connreaderinit takes writer explicitly (constructed in RunHandshookConn
@@ -38,6 +40,7 @@ func connreaderinit(ctx context.Context, cn *connection, writer *writerstate, to
 		keepAliveTimeout: to,
 		chokeduntil:      ts.Add(-1 * time.Minute),
 		uploadavailable:  atomicx.Pointer(ts),
+		lograte:          rate.NewLimiter(rate.Every(time.Minute), 5),
 		seed:             cn.t.seeding(),
 		Idler:            cstate.Idle(ctx, cn.upload),
 		requestbuffer:    new(bytes.Buffer),
@@ -63,6 +66,7 @@ type readerstate struct {
 	uploadavailable  *atomic.Pointer[time.Time]
 	pool             *sync.Pool    // buffer pool for storing chunks
 	requestbuffer    *bytes.Buffer // message buffer
+	lograte          *rate.Limiter
 	*cstate.Idler
 }
 
@@ -172,14 +176,30 @@ func (t _connreaderUpload) upload() (time.Duration, error) {
 		}
 
 		if delay := res.Delay(); delay > 0 {
-			t.cfg.errors().Printf("c(%p) seed(%t) maximum upload rate exceed n(%d) - delay(%v) - %s req(%d)\n", t.connection, t.seed, uploaded, delay, r, t.peerRequestsLen())
+			slogx.With(t.cfg.debug()).
+				Limit(t.lograte).
+				Info(fmt.Sprintf("c(%p) seed(%t) maximum upload rate exceed n(%d) - delay(%v) - %s req(%d)", t.connection, t.seed, uploaded, delay, r, t.peerRequestsLen()))
 			res.Cancel()
 			return delay, nil
 		}
 
 		ok, err := t.writechunk(r)
 		if err != nil {
-			t.cfg.errors().Println("error sending chunk to peer, choking peer", err)
+			slogx.With(t.cfg.errors()).
+				Limit(t.lograte).Error(
+				fmt.Sprintln("error sending chunk to peer, choking peer", r, err),
+			)
+
+			// drop the request that failed, Choke is a noop when the peer is already choked
+			// which would leave it queued and retried in a tight loop.
+			t.cmu().Lock()
+			delete(t.PeerRequests, r)
+			t.cmu().Unlock()
+
+			if t.supported(btprotocol.ExtensionBitFast) {
+				t.writer.Post(r.ToMsg(btprotocol.Reject))
+			}
+
 			// If we failed to send a chunk, choke the peer to ensure they
 			// flush all their requests. We've probably dropped a piece,
 			// but there's no way to communicate this to the peer. If they

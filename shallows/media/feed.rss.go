@@ -1,8 +1,8 @@
 package media
 
 import (
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -18,7 +18,7 @@ func NewTrackingFeedRSSFromFeedRSS(req *rss.FeedCreateRequest) func(*tracking.RS
 		t.Autoarchive = req.Feed.Autoarchive
 		t.Contributing = req.Feed.Contributing
 		t.EncryptionSeed = req.Feed.EncryptionSeed
-		t.Digest = langx.FirstNonZero(req.Feed.Digest, uuid.Nil.String())
+		t.Digest = langx.FirstNonZero(req.Feed.Digest, uuidx.Nil().String())
 		t.NextCheck = timex.FirstNonZero(
 			errorsx.Zero(grpcx.DecodeTime(req.Feed.NextCheck)),
 			t.NextCheck,

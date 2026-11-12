@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -58,7 +58,7 @@ func TestSearchProtocol(t *testing.T) {
 		)
 		defer tclient.Close()
 
-		knownmedia := ddiscapi.ImportedMediaUUID(t.Name(), uuid.Must(uuid.NewV7()))
+		knownmedia := ddiscapi.ImportedMediaUUID(t.Name(), uuidx.NewV7())
 		genrecord := func(ctx context.Context, q sqlx.Queryer, idx int) {
 			id := int160.Random()
 			d := ddisc.NewDiscovered(
@@ -69,7 +69,7 @@ func TestSearchProtocol(t *testing.T) {
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
-			require.NotEqual(t, uuid.Nil.String(), d.KnownMediaID)
+			require.NotEqual(t, uuidx.Nil().String(), d.KnownMediaID)
 		}
 		for idx := range records {
 			genrecord(t.Context(), pdb, idx)
@@ -125,7 +125,7 @@ func TestSearchProtocol(t *testing.T) {
 		)
 		defer tclient.Close()
 
-		knownmedia := ddiscapi.ImportedMediaUUID(t.Name(), uuid.Must(uuid.NewV7()))
+		knownmedia := ddiscapi.ImportedMediaUUID(t.Name(), uuidx.NewV7())
 		for range public {
 			id := int160.Random()
 			d := ddisc.NewDiscovered(

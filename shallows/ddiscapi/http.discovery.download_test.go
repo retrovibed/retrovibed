@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -20,6 +19,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -118,7 +118,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 
 		id := int160.Random()
 		uri := (&metainfo.Magnet{InfoHash: metainfo.Hash(id.Bytes())}).String()
-		ephemeralID := uuid.Must(uuid.NewV7()).String()
+		ephemeralID := uuidx.NewV7().String()
 
 		routes := mux.NewRouter()
 		ddiscapi.NewHTTPDiscovery(
@@ -214,7 +214,7 @@ func TestHTTPDiscoveryDownload(t *testing.T) {
 			ddiscapi.HTTPDiscoveryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		ephemeralID := uuid.Must(uuid.NewV7()).String()
+		ephemeralID := uuidx.NewV7().String()
 		claims := jwtx.NewJWTClaims(ephemeralID, jwtx.ClaimsOptionAuthnExpiration())
 		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 

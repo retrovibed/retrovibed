@@ -5,7 +5,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -14,6 +13,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -63,7 +63,7 @@ func TestHTTPTorrentInfo(t *testing.T) {
 			ddiscapi.HTTPTorrentInfoOptionRootStorage(vfs),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		resp2, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/"+md.ID+"/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -98,7 +98,7 @@ func TestHTTPTorrentInfo(t *testing.T) {
 			ddiscapi.HTTPTorrentInfoOptionRootStorage(vfs),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/non-existent-id/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)

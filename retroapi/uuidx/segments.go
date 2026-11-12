@@ -2,20 +2,18 @@ package uuidx
 
 import (
 	"bytes"
-
-	"github.com/gofrs/uuid/v5"
 )
 
 type Range struct {
-	Begin uuid.UUID
-	End   uuid.UUID
+	Begin UUID
+	End   UUID
 }
 
 // RangeFromStrings panics if the uuids are malformed
 func RangeFromStrings(begin, end string) Range {
 	return Range{
-		Begin: uuid.Must(uuid.FromString(begin)),
-		End:   uuid.Must(uuid.FromString(end)),
+		Begin: MustParse(begin),
+		End:   MustParse(end),
 	}
 }
 
@@ -23,21 +21,21 @@ func RangeFromStrings(begin, end string) Range {
 // from uuid.Nil to uuid.Max
 func RangeEverything() Range {
 	return Range{
-		Begin: uuid.Nil,
-		End:   uuid.Max,
+		Begin: Nil(),
+		End:   Max(),
 	}
 }
 
 func NewSegmenter() *Segmenter {
 	return &Segmenter{
-		current: uuid.Nil,
-		next:    uuid.Nil,
+		current: Nil(),
+		next:    Nil(),
 	}
 }
 
 type Segmenter struct {
-	current uuid.UUID
-	next    uuid.UUID
+	current UUID
+	next    UUID
 }
 
 func (t *Segmenter) Next() bool {
@@ -50,7 +48,7 @@ func (t *Segmenter) Next() bool {
 	t.current = t.next
 	t.next = Advance16(t.next, by)
 	future := Advance16(t.next, by)
-	max := uuid.Max
+	max := Max()
 	done := !bytes.Equal(t.next[:], max[:])
 
 	if bytes.Equal(t.next[:], future[:]) {

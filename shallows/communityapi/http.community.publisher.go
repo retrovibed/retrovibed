@@ -12,7 +12,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
@@ -21,6 +20,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -357,7 +357,7 @@ func (t *HTTPCommunityPublisher) clone(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dst := t.dir.Path(uuid.Must(uuid.NewV7()).String() + ".wasm")
+	dst := t.dir.Path(uuidx.NewV7().String() + ".wasm")
 	if err = os.Symlink(target, dst); err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to install publisher plugin clone: %s", dst))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))

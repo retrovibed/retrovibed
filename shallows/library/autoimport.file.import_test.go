@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -29,7 +29,7 @@ func TestAutoimportFileImport(t *testing.T) {
 		defer done()
 		q := sqltestx.Metadatabase(t)
 		root := t.TempDir()
-		mid := uuid.Must(uuid.NewV4()).String()
+		mid := uuidx.NewV4().String()
 
 		require.NoError(t, testx.Fake(&dir, library.AutoimportDirectoryOptionTestDefaults, library.AutoimportDirectoryOptionPath(root), library.AutoimportDirectoryOptionMode(library.AutoimportModeCopy)))
 		require.NoError(t, library.AutoimportDirectoryInsertWithDefaults(ctx, q, dir).Scan(&dir))
@@ -78,7 +78,7 @@ func TestAutoimportFileImport(t *testing.T) {
 		require.NoError(t, err)
 
 		require.NoError(t, library.AutoimportFileImport(ctx, q, library.AutoimportUploaderFunc(func(ctx context.Context, path string, directoryID string) (string, error) {
-			return uuid.Must(uuid.NewV4()).String(), nil
+			return uuidx.NewV4().String(), nil
 		}), dir, f))
 
 		require.NoFileExists(t, filepath.Join(root, "example.mkv"))
@@ -119,7 +119,7 @@ func TestAutoimportFileImport(t *testing.T) {
 		f, err = sqlx.ScanOne(library.AutoimportFileSearch(ctx, q, library.AutoimportFileSearchBuilder().Where(library.AutoimportFileQueryByDirectoryID(dir.ID))))
 		require.NoError(t, err)
 		require.WithinDuration(t, modified.Add(time.Hour), f.ImportAt, time.Millisecond)
-		require.Equal(t, uuid.Nil.String(), f.LibraryMetadataID)
+		require.Equal(t, uuidx.Nil().String(), f.LibraryMetadataID)
 		require.Equal(t, uint32(0), f.Attempts)
 
 		n, err := library.AutoimportFileCount(ctx, q, library.AutoimportFileQueryImported())

@@ -9,8 +9,8 @@ import (
 	"io"
 	"log"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 )
 
 func IO(s io.Reader) hash.Hash {
@@ -50,7 +50,7 @@ func String(s string) string {
 
 // format md5 hash to a uuid encoded string
 func FormatUUID(m hash.Hash) string {
-	return uuid.FromBytesOrNil(m.Sum(nil)).String()
+	return uuidx.FromBytesOrNil(m.Sum(nil)).String()
 }
 
 // format md5 hash to a hex encoded string

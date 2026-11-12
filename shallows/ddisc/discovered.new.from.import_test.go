@@ -4,11 +4,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -65,7 +65,7 @@ func TestNewDiscoveredFromImport(t *testing.T) {
 
 	t.Run("defaults known media id to the nil uuid", func(t *testing.T) {
 		d := ddisc.NewDiscoveredFromImport(&ddiscapi.Import{Uri: "https://tracker.example/download/1.torrent"})
-		require.Equal(t, uuid.Nil.String(), d.KnownMediaID)
+		require.Equal(t, uuidx.Nil().String(), d.KnownMediaID)
 	})
 
 	t.Run("defaults mimetype to binary since the import carries none", func(t *testing.T) {

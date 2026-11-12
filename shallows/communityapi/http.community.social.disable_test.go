@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
@@ -41,17 +40,17 @@ func TestHTTPSocialDisable(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-			ID: uuid.Must(uuid.NewV7()).String(), AccountID: uuid.Nil.String(),
+			ID: uuidx.NewV7().String(), AccountID: uuidx.Nil().String(),
 		}).Scan(&com))
 
 		var publisher community.PluginPublisher
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
+			ID: uuidx.NewV7().String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
 		}).Scan(&publisher))
 
 		var enabled community.CommunityPublisher
 		require.NoError(t, community.CommunityPublisherInsertWithDefaults(ctx, q, community.CommunityPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), CommunityID: com.ID, PublisherID: publisher.ID,
+			ID: uuidx.NewV7().String(), CommunityID: com.ID, PublisherID: publisher.ID,
 		}).Scan(&enabled))
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration(), jwtx.ClaimsOptionIssuer(aid)), metaapi.TokenOptionFromAuthz(v)))
@@ -100,12 +99,12 @@ func TestHTTPSocialDisable(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-			ID: uuid.Must(uuid.NewV7()).String(), AccountID: uuid.Nil.String(),
+			ID: uuidx.NewV7().String(), AccountID: uuidx.Nil().String(),
 		}).Scan(&com))
 
 		var publisher community.PluginPublisher
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
+			ID: uuidx.NewV7().String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
 		}).Scan(&publisher))
 
 		routes := mux.NewRouter()
@@ -146,17 +145,17 @@ func TestHTTPSocialDisable(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-			ID: uuid.Must(uuid.NewV7()).String(), AccountID: uuid.Nil.String(),
+			ID: uuidx.NewV7().String(), AccountID: uuidx.Nil().String(),
 		}).Scan(&com))
 
 		var publisher community.PluginPublisher
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
+			ID: uuidx.NewV7().String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
 		}).Scan(&publisher))
 
 		var enabled community.CommunityPublisher
 		require.NoError(t, community.CommunityPublisherInsertWithDefaults(ctx, q, community.CommunityPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), CommunityID: com.ID, PublisherID: publisher.ID,
+			ID: uuidx.NewV7().String(), CommunityID: com.ID, PublisherID: publisher.ID,
 		}).Scan(&enabled))
 		routes := mux.NewRouter()
 		communityapi.NewHTTPSocial(

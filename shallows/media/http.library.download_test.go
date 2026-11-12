@@ -14,7 +14,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
@@ -22,6 +21,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
@@ -49,7 +49,7 @@ func (m *deeppoolStore) Upload(_ context.Context, _ string, r io.Reader) (*deepp
 	if err != nil {
 		return nil, err
 	}
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuidx.NewV4().String()
 	m.mu.Lock()
 	m.store[id] = data
 	m.mu.Unlock()
@@ -135,8 +135,8 @@ func TestLibraryDownload(t *testing.T) {
 			p         meta.Profile
 			v         meta.Authz
 			md        library.Metadata
-			archiveID = errorsx.Must(uuid.NewV4())
-			seed      = errorsx.Must(uuid.NewV4())
+			archiveID = uuidx.NewV4()
+			seed      = uuidx.NewV4()
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -212,7 +212,7 @@ func TestLibraryDownload(t *testing.T) {
 			p         meta.Profile
 			v         meta.Authz
 			md        library.Metadata
-			archiveID = errorsx.Must(uuid.NewV4())
+			archiveID = uuidx.NewV4()
 		)
 		ctx, done := testx.Context(t)
 		defer done()
@@ -227,7 +227,7 @@ func TestLibraryDownload(t *testing.T) {
 		// EncryptionSeed = uuid.Nil causes MetadataChaCha8 to use md.ID as the PRNG seed.
 		require.NoError(t, testx.Fake(&md, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID,
 			library.MetadataOptionArchiveID(archiveID.String()),
-			library.MetadataOptionEncryptionSeed(uuid.Nil.String()),
+			library.MetadataOptionEncryptionSeed(uuidx.Nil().String()),
 		))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, md).Scan(&md))
 

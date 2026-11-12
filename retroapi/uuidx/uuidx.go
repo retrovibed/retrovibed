@@ -5,9 +5,13 @@ import (
 	"fmt"
 	"math"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
 )
+
+// T constrains to any type with the underlying layout of a uuid,
+// e.g. UUID and the stdlib uuid.UUID.
+type T interface {
+	~[16]byte
+}
 
 // WithSuffix makes an almost all balls UUID
 func WithSuffix(end int) string {
@@ -15,13 +19,12 @@ func WithSuffix(end int) string {
 }
 
 // prepend timestamp to a uuid; this is useful for ensuring timebased ordering.
-func WithTimestampPrefix(uid uuid.UUID, ts time.Time) uuid.UUID {
-	buf := uid.Bytes()
-	binary.BigEndian.PutUint64(buf[:8], uint64(ts.UnixMicro()))
-	return uuid.FromBytesOrNil(buf)
+func WithTimestampPrefix[V T](uid V, ts time.Time) V {
+	binary.BigEndian.PutUint64(uid[:8], uint64(ts.UnixMicro()))
+	return uid
 }
 
-func Advance16(u uuid.UUID, by uint16) uuid.UUID {
+func Advance16[V T](u V, by uint16) V {
 	dup := u
 
 	if v := binary.BigEndian.Uint16(dup[:]); math.MaxUint16-v < by {
@@ -36,23 +39,23 @@ func Advance16(u uuid.UUID, by uint16) uuid.UUID {
 // IsMinMax reports whether id is one of the two sentinel values used
 // throughout this codebase to mean "no real id": uuid.Nil (the all-zero
 // minimum) or uuid.Max (the all-ones maximum).
-func IsMinMax(id uuid.UUID) bool {
-	return id == uuid.Nil || id == uuid.Max
+func IsMinMax[V T](uid V) bool {
+	return UUID(uid).IsZero() || UUID(uid).IsMax()
 }
 
 // returns the first non-zero uuid or zero if all are zero.
-func FirstNonNil(uids ...uuid.UUID) uuid.UUID {
+func FirstNonNil[V T](uids ...V) V {
 	for _, uid := range uids {
-		if !uid.IsNil() {
+		if !UUID(uid).IsZero() {
 			return uid
 		}
 	}
 
-	return uuid.Nil
+	return V{}
 }
 
-func HighN(id uuid.UUID, n int) []byte {
-	ubytes := id.Bytes()
+func HighN[V T](id V, n int) []byte {
+	ubytes := id[:]
 
 	if n <= 0 {
 		return []byte(nil)
@@ -65,8 +68,8 @@ func HighN(id uuid.UUID, n int) []byte {
 	return ubytes[:n]
 }
 
-func LowN(id uuid.UUID, n int) []byte {
-	ubytes := id.Bytes()
+func LowN[V T](id V, n int) []byte {
+	ubytes := id[:]
 
 	if n <= 0 {
 		return []byte(nil)

@@ -4,12 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/pqueuetestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -46,7 +46,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 				videoProfileID, videoLanguage = req.ProfileId, req.Language
 			}
 		}
-		require.Equal(t, uuid.Nil.String(), videoProfileID)
+		require.Equal(t, uuidx.Nil().String(), videoProfileID)
 		require.Equal(t, userx.LocaleLanguage(), videoLanguage)
 	})
 
@@ -77,7 +77,7 @@ func TestRecommendationsBackgroundRun(t *testing.T) {
 				audioProfileID, audioLanguage = req.ProfileId, req.Language
 			}
 		}
-		require.Equal(t, uuid.Nil.String(), audioProfileID)
+		require.Equal(t, uuidx.Nil().String(), audioProfileID)
 		require.Equal(t, userx.LocaleLanguage(), audioLanguage)
 	})
 

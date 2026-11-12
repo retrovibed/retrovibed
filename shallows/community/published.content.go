@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
@@ -17,8 +17,8 @@ func NewPublishedContent(prototype PublishedContent, options ...PublishedContent
 	for _, o := range options {
 		o(&prototype)
 	}
-	prototype.KnownMediaID = langx.FirstNonZero(prototype.KnownMediaID, uuid.Nil.String())
-	prototype.OAuthGoogleID = langx.FirstNonZero(prototype.OAuthGoogleID, uuid.Nil.String())
+	prototype.KnownMediaID = langx.FirstNonZero(prototype.KnownMediaID, uuidx.Nil().String())
+	prototype.OAuthGoogleID = langx.FirstNonZero(prototype.OAuthGoogleID, uuidx.Nil().String())
 	prototype.PublishedAt = langx.FirstNonZero(prototype.PublishedAt, timex.Inf())
 	return prototype
 }
@@ -28,11 +28,11 @@ func NewPublishedContent(prototype PublishedContent, options ...PublishedContent
 // fields (Title, Description, MagnetURI, ...) are populated with non-empty fakes
 // rather than Go zero values, which would otherwise trip the title CHECK constraint.
 func PublishedContentOptionTestDefaults(t *PublishedContent) {
-	t.ID = uuid.Nil.String()
-	t.CommunityID = uuid.Nil.String()
-	t.KnownMediaID = uuid.Nil.String()
-	t.LibraryID = uuid.Nil.String()
-	t.OAuthGoogleID = uuid.Nil.String()
+	t.ID = uuidx.Nil().String()
+	t.CommunityID = uuidx.Nil().String()
+	t.KnownMediaID = uuidx.Nil().String()
+	t.LibraryID = uuidx.Nil().String()
+	t.OAuthGoogleID = uuidx.Nil().String()
 	t.PublishMode = 0
 	t.PublishedAt = timex.Inf()
 	t.TombstonedAt = timex.Inf()

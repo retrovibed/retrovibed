@@ -7,11 +7,11 @@ import (
 	"runtime/trace"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -46,7 +46,7 @@ func Locate(ctx context.Context, db sqlx.Queryer, disc *DiscoverySettings, dhts 
 	// equality, which is meaningless for an unresolved (Nil) known_media_id:
 	// every free-text locate would converge on the same partition/local scan
 	// and match unrelated Nil-tagged data from completely different searches.
-	if dhts != nil && partitions != nil && loc.KnownMediaID != uuid.Nil.String() {
+	if dhts != nil && partitions != nil && loc.KnownMediaID != uuidx.Nil().String() {
 		strategies = append(strategies, ddisctorrent.NewPartitionStrategy(dhts, partitions))
 	}
 	strategies = append(strategies, ddisc.SyncStrategies(db, plugins, peertube, loc.KnownMediaID)...)

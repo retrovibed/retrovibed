@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
@@ -63,8 +63,8 @@ func TestPublishPluginImport(t *testing.T) {
 		// survive reinstalling the identical module.
 		var selected community.CommunityPublisher
 		require.NoError(t, community.CommunityPublisherInsertWithDefaults(ctx, q, community.CommunityPublisher{
-			ID:          uuid.Must(uuid.NewV7()).String(),
-			CommunityID: uuid.Must(uuid.NewV7()).String(),
+			ID:          uuidx.NewV7().String(),
+			CommunityID: uuidx.NewV7().String(),
 			PublisherID: id,
 		}).Scan(&selected))
 
@@ -181,7 +181,7 @@ func TestPublishPluginImport(t *testing.T) {
 		// the shape a clone takes: a symlink under a stem of its own, which can
 		// never equal the id derived from it, so every pass has a label to
 		// offer for it.
-		require.NoError(t, os.Symlink("lemmy.wasm", filepath.Join(plugindir, uuid.Must(uuid.NewV7()).String()+".wasm")))
+		require.NoError(t, os.Symlink("lemmy.wasm", filepath.Join(plugindir, uuidx.NewV7().String()+".wasm")))
 
 		require.NoError(t, daemons.PublishPluginImport(ctx, q, plugindir))
 
@@ -220,7 +220,7 @@ func TestPublishPluginImport(t *testing.T) {
 		plugindir := filepath.Join(t.TempDir(), "publish.d")
 		require.NoError(t, os.MkdirAll(plugindir, 0o700))
 
-		id := uuid.Must(uuid.NewV7()).String()
+		id := uuidx.NewV7().String()
 		var seeded community.PluginPublisher
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
 			ID: id, Path: filepath.Join(plugindir, "uninstalled.wasm"), Description: "uninstalled",

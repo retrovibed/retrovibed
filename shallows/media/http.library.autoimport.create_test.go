@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -73,7 +73,7 @@ func TestHTTPAutoimportCreate(t *testing.T) {
 		require.Equal(t, root, d.Path)
 		require.Equal(t, "inbox", d.Description)
 		require.Equal(t, library.AutoimportModeMove, d.Mode)
-		require.Equal(t, uuid.Nil.String(), d.LibraryDirectoryID)
+		require.Equal(t, uuidx.Nil().String(), d.LibraryDirectoryID)
 		require.Equal(t, uint64(60), result.Directory.Debounce)
 	})
 

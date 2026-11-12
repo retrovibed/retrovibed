@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
@@ -45,17 +44,17 @@ func TestHTTPSocialUpdate(t *testing.T) {
 
 		var owned community.Community
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-			ID: uuid.Must(uuid.NewV7()).String(), AccountID: aid, Description: "owned",
+			ID: uuidx.NewV7().String(), AccountID: aid, Description: "owned",
 		}).Scan(&owned))
 
 		var publisher community.PluginPublisher
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/youtube", Description: "YouTube", Mimetype: "application/vnd.retrovibe.publisher.youtube",
+			ID: uuidx.NewV7().String(), Path: "/plugins/youtube", Description: "YouTube", Mimetype: "application/vnd.retrovibe.publisher.youtube",
 		}).Scan(&publisher))
 
 		var compub community.CommunityPublisher
 		require.NoError(t, community.CommunityPublisherInsertWithDefaults(ctx, q, community.CommunityPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), CommunityID: owned.ID, PublisherID: publisher.ID,
+			ID: uuidx.NewV7().String(), CommunityID: owned.ID, PublisherID: publisher.ID,
 		}).Scan(&compub))
 
 		routes := mux.NewRouter()
@@ -111,17 +110,17 @@ func TestHTTPSocialUpdate(t *testing.T) {
 
 		var owned community.Community
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-			ID: uuid.Must(uuid.NewV7()).String(), AccountID: aid, Description: "owned",
+			ID: uuidx.NewV7().String(), AccountID: aid, Description: "owned",
 		}).Scan(&owned))
 
 		var publisher community.PluginPublisher
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/youtube", Description: "YouTube", Mimetype: "application/vnd.retrovibe.publisher.youtube",
+			ID: uuidx.NewV7().String(), Path: "/plugins/youtube", Description: "YouTube", Mimetype: "application/vnd.retrovibe.publisher.youtube",
 		}).Scan(&publisher))
 
 		var compub community.CommunityPublisher
 		require.NoError(t, community.CommunityPublisherInsertWithDefaults(ctx, q, community.CommunityPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), CommunityID: owned.ID, PublisherID: publisher.ID,
+			ID: uuidx.NewV7().String(), CommunityID: owned.ID, PublisherID: publisher.ID,
 		}).Scan(&compub))
 
 		routes := mux.NewRouter()

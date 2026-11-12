@@ -11,13 +11,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/iox"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -128,9 +128,9 @@ func (t *fallback) ReadAt(p []byte, off int64) (n int, err error) {
 	q := sqlx.Scan(MetadataForTorrentArchiveRetrieval(ctx, t.q, t.id.Bytes(), uint64(off), uint64(len(p))))
 	for v := range q.Iter() {
 		switch v.ArchiveID {
-		case uuid.Nil.String():
+		case uuidx.Nil().String():
 			fallthrough
-		case uuid.Max.String():
+		case uuidx.Max().String():
 			continue
 		default:
 			// non min/max uuid.

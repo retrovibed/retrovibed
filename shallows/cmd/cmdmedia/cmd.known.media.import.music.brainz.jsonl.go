@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
@@ -71,9 +70,9 @@ func (t *mbjsonlimport) releases(ctx context.Context, r io.Reader) iter.Seq[libr
 		seq := jsonl.Iter[mbJSONRelease](jsonl.NewDecoderWithMax(t.RecordLimit, r))
 		for rel := range seq.Each(ctx) {
 			rawID := langx.FirstNonZero(rel.ReleaseGroup.ID, rel.ID)
-			id := uuid.FromStringOrNil(rawID)
+			id := uuidx.FromStringOrNil(rawID)
 
-			uidmd5 := uuid.FromBytesOrNil(md5x.JSON(rel).Sum(nil))
+			uidmd5 := uuidx.FromBytesOrNil(md5x.JSON(rel).Sum(nil))
 
 			lang := langx.FirstNonZero(
 				errorsx.ZeroDebug[language.Tag](debugx.Fn)(language.Parse(rel.TextRepresentation.Language)),
@@ -95,7 +94,7 @@ func (t *mbjsonlimport) releases(ctx context.Context, r io.Reader) iter.Seq[libr
 				PosterPath:       fmt.Sprintf("https://coverartarchive.org/release-group/%s/front-500", id),
 				OriginalLanguage: lang.String(),
 				Mimetype:         mimex.Audio,
-				ParentUID:        uuid.Nil.String(),
+				ParentUID:        uuidx.Nil().String(),
 			}
 
 			if !yield(v) {

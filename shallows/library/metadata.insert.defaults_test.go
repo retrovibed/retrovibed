@@ -3,8 +3,8 @@ package library_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -22,11 +22,11 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 
 		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
-		require.Equal(t, uuid.Nil.String(), tmp.ArchiveID)
+		require.Equal(t, uuidx.Nil().String(), tmp.ArchiveID)
 
 		tmp = langx.Clone(tmp, library.MetadataOptionArchivable(true))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
-		require.Equal(t, uuid.Max.String(), tmp.ArchiveID)
+		require.Equal(t, uuidx.Max().String(), tmp.ArchiveID)
 	})
 
 	t.Run("upsert should not overwrite a real archive_id", func(t *testing.T) {
@@ -37,12 +37,12 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 			Description: "Example",
 		}
 
-		realID := uuid.Must(uuid.NewV4()).String()
+		realID := uuidx.NewV4().String()
 		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionArchiveID(realID)))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
 		require.Equal(t, realID, tmp.ArchiveID)
 
-		differentID := uuid.Must(uuid.NewV4()).String()
+		differentID := uuidx.NewV4().String()
 		tmp = langx.Clone(tmp, library.MetadataOptionArchiveID(differentID))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
 		require.Equal(t, realID, tmp.ArchiveID)
@@ -58,9 +58,9 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 
 		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
-		require.Equal(t, uuid.Nil.String(), tmp.KnownMediaID)
+		require.Equal(t, uuidx.Nil().String(), tmp.KnownMediaID)
 
-		realID := uuid.Must(uuid.NewV4()).String()
+		realID := uuidx.NewV4().String()
 		tmp = langx.Clone(tmp, library.MetadataOptionKnownMediaID(realID))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
 		require.Equal(t, realID, tmp.KnownMediaID)
@@ -74,11 +74,11 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 			Description: "Example",
 		}
 
-		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionKnownMediaID(uuid.Max.String())))
+		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionKnownMediaID(uuidx.Max().String())))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
-		require.Equal(t, uuid.Max.String(), tmp.KnownMediaID)
+		require.Equal(t, uuidx.Max().String(), tmp.KnownMediaID)
 
-		realID := uuid.Must(uuid.NewV4()).String()
+		realID := uuidx.NewV4().String()
 		tmp = langx.Clone(tmp, library.MetadataOptionKnownMediaID(realID))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
 		require.Equal(t, realID, tmp.KnownMediaID)
@@ -92,12 +92,12 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 			Description: "Example",
 		}
 
-		realID := uuid.Must(uuid.NewV4()).String()
+		realID := uuidx.NewV4().String()
 		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionKnownMediaID(realID)))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
 		require.Equal(t, realID, tmp.KnownMediaID)
 
-		differentID := uuid.Must(uuid.NewV4()).String()
+		differentID := uuidx.NewV4().String()
 		tmp = langx.Clone(tmp, library.MetadataOptionKnownMediaID(differentID))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
 		require.Equal(t, realID, tmp.KnownMediaID)
@@ -111,13 +111,13 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 
 		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
-		require.Equal(t, uuid.Nil.String(), tmp.DirectoryID)
+		require.Equal(t, uuidx.Nil().String(), tmp.DirectoryID)
 
 		// directory_id is absent from the conflict clause, so organization is the
 		// filesystem's to change and never a side effect of re-inserting content.
-		tmp = langx.Clone(tmp, library.MetadataOptionDirectoryID(uuid.Must(uuid.NewV7()).String()))
+		tmp = langx.Clone(tmp, library.MetadataOptionDirectoryID(uuidx.NewV7().String()))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
-		require.Equal(t, uuid.Nil.String(), tmp.DirectoryID)
+		require.Equal(t, uuidx.Nil().String(), tmp.DirectoryID)
 	})
 
 	t.Run("upsert should not overwrite a directory the user already chose", func(t *testing.T) {
@@ -129,12 +129,12 @@ func TestMetadataInsertWithDefaults(t *testing.T) {
 		// id is the md5 of the content, so a torrent completion or a filesystem rescan
 		// re-inserts a row the user has already filed. an unguarded assignment here drags
 		// the whole library back into a flat pile.
-		directory := uuid.Must(uuid.NewV7()).String()
+		directory := uuidx.NewV7().String()
 		require.NoError(t, testx.Fake(&tmp, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionDirectoryID(directory)))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
 		require.Equal(t, directory, tmp.DirectoryID)
 
-		tmp = langx.Clone(tmp, library.MetadataOptionDirectoryID(uuid.Nil.String()))
+		tmp = langx.Clone(tmp, library.MetadataOptionDirectoryID(uuidx.Nil().String()))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, tmp).Scan(&tmp))
 		require.Equal(t, directory, tmp.DirectoryID)
 	})

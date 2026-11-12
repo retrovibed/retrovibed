@@ -7,9 +7,9 @@ import (
 	"os"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/unsafepretty"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -61,12 +61,12 @@ func (t reindex) run(ctx context.Context, db *sql.DB, c library.QueryCleaner, me
 
 	kid := ""
 	if t.Identification {
-		kid = uuid.Max.String()
+		kid = uuidx.Max().String()
 	}
 
 	s := sqlx.Scan(library.MetadataSearch(ctx, db, query))
 	for md := range s.Iter() {
-		if uuid.FromStringOrNil(md.TorrentID).IsNil() {
+		if uuidx.FromStringOrNil(md.TorrentID).IsZero() {
 			log.Println("unexpected nil torrent id on library.Metadata", md.ID)
 			continue
 		}

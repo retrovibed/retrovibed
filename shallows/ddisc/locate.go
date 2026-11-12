@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
@@ -61,8 +61,8 @@ func NewLocate(query, mimetype string, options ...LocateOption) (l Locate) {
 		ID:           md5x.FormatUUID(md5x.Digest(query, mimetype)),
 		Query:        query,
 		Mimetype:     mimetype,
-		KnownMediaID: uuid.Nil.String(),
-		ProfileID:    uuid.Nil.String(),
+		KnownMediaID: uuidx.Nil().String(),
+		ProfileID:    uuidx.Nil().String(),
 	}, options...)
 }
 

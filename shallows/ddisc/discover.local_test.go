@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
@@ -15,7 +15,7 @@ import (
 func TestLocalStrategyExactMatch(t *testing.T) {
 	q := sqltestx.Metadatabase(t)
 
-	kid := uuid.Must(uuid.NewV4()).String()
+	kid := uuidx.NewV4().String()
 	id := int160.Random()
 	d := ddisc.NewDiscovered(&id, ddisc.DiscoveredOptionKnownMedia(kid), ddisc.DiscoveredOptionMimetype(mimex.Binary), ddisc.DiscoveredOptionAutoMagnet)
 	require.NoError(t, ddisc.DiscoveredInsertWithDefaults(t.Context(), q, d).Scan(&d))
@@ -39,7 +39,7 @@ func TestLocalStrategyExactMatch(t *testing.T) {
 // dangling "WHERE" with nothing after it - which DuckDB's parser rejected
 // with "Parser Error: syntax error at end of input".
 func TestLocalStrategyReturnsEmpty(t *testing.T) {
-	for _, kid := range []string{"", uuid.Nil.String(), uuid.Must(uuid.NewV4()).String()} {
+	for _, kid := range []string{"", uuidx.Nil().String(), uuidx.NewV4().String()} {
 		t.Run(fmt.Sprintf("known_media_id=%q", kid), func(t *testing.T) {
 			q := sqltestx.Metadatabase(t)
 

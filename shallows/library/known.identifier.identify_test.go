@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -52,7 +52,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err := identifier.Identify(ctx, "", "xyzzy")
 		require.NoError(t, err)
-		require.Equal(t, uuid.Nil.String(), res.UID)
+		require.Equal(t, uuidx.Nil().String(), res.UID)
 		require.Zero(t, res.Relevance)
 	})
 
@@ -67,7 +67,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
-		require.Equal(t, uuid.Nil.String(), res.UID)
+		require.Equal(t, uuidx.Nil().String(), res.UID)
 	})
 
 	t.Run("prefers the candidate with the highest relevance", func(t *testing.T) {
@@ -115,7 +115,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
-		require.Equal(t, uuid.Nil.String(), res.UID)
+		require.Equal(t, uuidx.Nil().String(), res.UID)
 	})
 
 	t.Run("excludes adult content unless explicit", func(t *testing.T) {
@@ -136,7 +136,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
-		require.Equal(t, uuid.Nil.String(), res.UID)
+		require.Equal(t, uuidx.Nil().String(), res.UID)
 
 		identifier.Explicit = true
 		res, err = identifier.Identify(ctx, "", "Inception")
@@ -254,7 +254,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err = identifier.Identify(ctx, mimex.Audio, "Inception")
 		require.NoError(t, err)
-		require.Equal(t, uuid.Nil.String(), res.UID)
+		require.Equal(t, uuidx.Nil().String(), res.UID)
 
 		res, err = identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
@@ -288,7 +288,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
-		require.Equal(t, uuid.Nil.String(), res.UID)
+		require.Equal(t, uuidx.Nil().String(), res.UID)
 
 		identifier.Limit = 9
 		res, err = identifier.Identify(ctx, "", "Inception")
@@ -306,7 +306,7 @@ func TestKnownIdentifierIdentify(t *testing.T) {
 
 		res, err := identifier.Identify(ctx, "", "Inception")
 		require.NoError(t, err)
-		require.Equal(t, uuid.Nil.String(), res.UID)
+		require.Equal(t, uuidx.Nil().String(), res.UID)
 	})
 
 	t.Run("identifies a candidate ranked behind weaker candidates within the limit", func(t *testing.T) {

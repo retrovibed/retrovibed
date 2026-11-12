@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -22,18 +22,18 @@ func NewFeedRSS(id string, options ...func(*RSS)) (m RSS) {
 	r := langx.Clone(RSS{
 		ID:        id,
 		NextCheck: ts,
-		Digest:    uuid.Nil.String(),
+		Digest:    uuidx.Nil().String(),
 	}, langx.Compose(options...), RSSOptionDefaultEncryptionSeed)
 
 	return r
 }
 
 func RSSOptionTestDefaults(p *RSS) {
-	p.ID = langx.FirstNonZero(md5x.FormatUUID(md5x.Digest(p.URL)), errorsx.Must(uuid.NewV4()).String())
+	p.ID = langx.FirstNonZero(md5x.FormatUUID(md5x.Digest(p.URL)), uuidx.NewV4().String())
 	p.EncryptionSeed = ""
 	p.TTL = max(p.TTL, time.Millisecond)
 	p.TTLMinimum = max(p.TTLMinimum, time.Millisecond)
-	p.Digest = uuid.Nil.String()
+	p.Digest = uuidx.Nil().String()
 }
 
 func RSSOptionNextCheck(ts time.Time) RSSOption {
@@ -54,7 +54,7 @@ func RSSOptionDefaultEncryptionSeed(r *RSS) {
 		r.EncryptionSeed, md5x.FormatUUID(
 			md5x.Digest(stringsx.DefaultIfBlank(
 				errorsx.Zero(url.Parse(r.URL)).Host,
-				uuid.Must(uuid.NewV4()).String(),
+				uuidx.NewV4().String(),
 			)),
 		),
 	)
@@ -99,7 +99,7 @@ func RSSOptionDefaultFeeds(m RSS) RSSOption {
 	return func(r *RSS) {
 		*r = m
 		r.ID = md5x.FormatUUID(md5x.Digest(m.URL))
-		r.Digest = uuid.Nil.String()
+		r.Digest = uuidx.Nil().String()
 	}
 }
 

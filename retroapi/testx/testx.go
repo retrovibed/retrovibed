@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,7 +31,7 @@ func ReadString(path ...string) string {
 func ReadMD5(path ...string) string {
 	d := md5.New()
 	_ = errorsx.Must(d.Write(errorsx.Must(os.ReadFile(filepath.Join(path...)))))
-	return uuid.FromBytesOrNil(d.Sum(nil)).String()
+	return uuidx.FromBytesOrNil(d.Sum(nil)).String()
 }
 
 // Must is a small language extension for panicing on the common
@@ -56,7 +56,7 @@ func Tempenvvar(k, v string, do func()) {
 func IOMD5(in io.Reader) string {
 	digester := md5.New()
 	errorsx.Must(io.Copy(digester, in))
-	return uuid.FromBytesOrNil(digester.Sum(nil)).String()
+	return uuidx.FromBytesOrNil(digester.Sum(nil)).String()
 }
 
 func IOString(in io.Reader) string {

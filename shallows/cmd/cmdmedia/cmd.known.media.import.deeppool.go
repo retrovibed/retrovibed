@@ -10,8 +10,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
-
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
@@ -47,7 +45,7 @@ func (t deeppoolimport) run(ctx context.Context, enc *json.Encoder, httpc *http.
 	// UUIDv7 timestamps are an unsigned 48 bit count of milliseconds since the
 	// Unix epoch; offsets before the epoch wrap around instead of clamping.
 	// This is safe for now because retrovibed was created well after the Unix epoch.
-	cursor := uuid.Must(uuid.NewV7AtTime(timex.Max(t.StartAt, time.Unix(0, 0)))).String()
+	cursor := uuidx.NewV7AtTime(timex.Max(t.StartAt, time.Unix(0, 0))).String()
 
 	seq := iterx.FromFn(func(ctx context.Context, yield func(library.Known) bool) error {
 		for {
@@ -83,9 +81,9 @@ func (t deeppoolimport) run(ctx context.Context, enc *json.Encoder, httpc *http.
 
 func (t deeppoolimport) knownFromPublished(pc *communityapi.PublishedContent) library.Known {
 	_md5 := md5x.JSON(pc)
-	uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
+	uidmd5 := uuidx.FromBytesOrNil(_md5.Sum(nil))
 
-	uid := stringsx.FirstNonBlank(pc.KnownMediaId, ddiscapi.ImportedMediaUUID(t.Source, uuid.FromStringOrNil(pc.Id)).String())
+	uid := stringsx.FirstNonBlank(pc.KnownMediaId, ddiscapi.ImportedMediaUUID(t.Source, uuidx.FromStringOrNil(pc.Id)).String())
 
 	return library.Known{
 		Source:    t.Source,
@@ -96,6 +94,6 @@ func (t deeppoolimport) knownFromPublished(pc *communityapi.PublishedContent) li
 		Title:     pc.Title,
 		Overview:  pc.Description,
 		Mimetype:  stringsx.FirstNonBlank(pc.Mimetype, mimex.Video),
-		ParentUID: uuid.Nil.String(),
+		ParentUID: uuidx.Nil().String(),
 	}
 }

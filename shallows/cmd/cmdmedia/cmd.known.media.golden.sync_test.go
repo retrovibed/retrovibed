@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -28,12 +27,12 @@ func TestKnownGoldenSync(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		md5 := uuid.Must(uuid.NewV4())
-		s1 := uuid.Must(uuid.NewV7()).String()
-		s2 := uuid.Must(uuid.NewV7()).String()
+		md5 := uuidx.NewV4()
+		s1 := uuidx.NewV7().String()
+		s2 := uuidx.NewV7().String()
 		pages := [][]*deeppool.MediaMetadata{
-			{{Uid: uuid.Must(uuid.NewV4()).String(), SyncId: s1, Md5: md5.String(), Source: "tmdb", Title: "one", Released: "2020-01-01T00:00:00Z", TombstonedAt: "9999-12-31T23:59:59.999Z", ParentUid: uuid.Nil.String()}},
-			{{Uid: uuid.Must(uuid.NewV4()).String(), SyncId: s2, Md5: uuid.Must(uuid.NewV4()).String(), Source: "musicbrainz", Title: "two", Collation: 3, Released: "2021-01-01T00:00:00Z", TombstonedAt: "9999-12-31T23:59:59.999Z", ParentUid: uuid.Nil.String()}},
+			{{Uid: uuidx.NewV4().String(), SyncId: s1, Md5: md5.String(), Source: "tmdb", Title: "one", Released: "2020-01-01T00:00:00Z", TombstonedAt: "9999-12-31T23:59:59.999Z", ParentUid: uuidx.Nil().String()}},
+			{{Uid: uuidx.NewV4().String(), SyncId: s2, Md5: uuidx.NewV4().String(), Source: "musicbrainz", Title: "two", Collation: 3, Released: "2021-01-01T00:00:00Z", TombstonedAt: "9999-12-31T23:59:59.999Z", ParentUid: uuidx.Nil().String()}},
 			{},
 		}
 
@@ -49,10 +48,10 @@ func TestKnownGoldenSync(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		cmd := goldensync{Sync: uuid.Nil.String()}
+		cmd := goldensync{Sync: uuidx.Nil().String()}
 		require.NoError(t, cmd.run(ctx, json.NewEncoder(&buf), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
 
-		require.Equal(t, []string{uuid.Nil.String(), s1, s2}, cursors)
+		require.Equal(t, []string{uuidx.Nil().String(), s1, s2}, cursors)
 
 		dec := json.NewDecoder(&buf)
 		for dec.More() {
@@ -81,7 +80,7 @@ func TestKnownGoldenSync(t *testing.T) {
 		}))
 		defer srv.Close()
 
-		cmd := goldensync{Sync: uuid.Nil.String()}
+		cmd := goldensync{Sync: uuidx.Nil().String()}
 		require.Error(t, cmd.run(ctx, json.NewEncoder(&buf), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
 	})
 }

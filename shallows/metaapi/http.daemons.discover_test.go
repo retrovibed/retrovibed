@@ -10,11 +10,11 @@ import (
 	"time"
 
 	"github.com/coder/websocket"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/hashicorp/mdns"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -35,7 +35,7 @@ func TestHTTPDaemonDiscover(t *testing.T) {
 			metaapi.HTTPDaemonsOptionMDNSDiscovery(false),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims := jwtx.NewJWTClaims(testx.Must(uuid.NewV4())(t).String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.NewV4().String(), jwtx.ClaimsOptionAuthnExpiration())
 		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		resp, req, err := httptestx.BuildRequestContextBytes(context.Background(), http.MethodGet, "/discover", nil, httptestx.RequestOptionAuthorization(token), httptestx.RequestOptionHeader("Upgrade", "websocket"))
@@ -65,7 +65,7 @@ func TestHTTPDaemonDiscover(t *testing.T) {
 			}),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims := jwtx.NewJWTClaims(testx.Must(uuid.NewV4())(t).String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.NewV4().String(), jwtx.ClaimsOptionAuthnExpiration())
 		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		server := httptest.NewServer(routes)
@@ -119,7 +119,7 @@ func TestHTTPDaemonDiscover(t *testing.T) {
 			}),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims := jwtx.NewJWTClaims(testx.Must(uuid.NewV4())(t).String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.NewV4().String(), jwtx.ClaimsOptionAuthnExpiration())
 		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		server := httptest.NewServer(routes)

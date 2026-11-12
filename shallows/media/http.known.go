@@ -8,7 +8,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
@@ -249,7 +248,7 @@ func (t *HTTPKnown) create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	contentmd5 := md5x.Digest(known.Description + known.Summary)
-	uidmd5 := uuid.FromBytesOrNil(contentmd5.Sum(nil))
+	uidmd5 := uuidx.FromBytesOrNil(contentmd5.Sum(nil))
 
 	if err := library.KnownFindByMd5(r.Context(), t.q, uidmd5.String()).Scan(&meta); err == nil {
 		if err := httpx.WriteJSON(w, httpx.GetBuffer(r), &KnownCreateResponse{
@@ -265,7 +264,7 @@ func (t *HTTPKnown) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	localid := errorsx.Must(uuid.NewV7())
+	localid := uuidx.NewV7()
 	uid := ddiscapi.ImportedMediaUUID(ddiscapi.SourceUnspecified, localid)
 
 	meta = library.Known{
@@ -280,7 +279,7 @@ func (t *HTTPKnown) create(w http.ResponseWriter, r *http.Request) {
 		Adult:           known.Adult,
 		Source:          "retrovibed",
 		AutoDescription: known.Description,
-		ParentUID:       uuid.Nil.String(),
+		ParentUID:       uuidx.Nil().String(),
 	}
 
 	if err := library.KnownInsertWithDefaults(r.Context(), t.q, meta).Scan(&meta); err != nil {

@@ -11,7 +11,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -83,7 +82,7 @@ func TestVStorageFS(t *testing.T) {
 			var (
 				md0       library.Metadata
 				md1       library.Metadata
-				tid       = uuid.Nil.String()
+				tid       = uuidx.Nil().String()
 				expected0 = md5.New()
 				expected1 = md5.New()
 			)

@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
@@ -64,19 +64,19 @@ func TestDiscoveredProtocol(t *testing.T) {
 			id := int160.Random()
 			d := ddisc.NewDiscovered(
 				&id,
-				ddisc.DiscoveredOptionKnownMedia(uuid.Nil.String()),
+				ddisc.DiscoveredOptionKnownMedia(uuidx.Nil().String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionAutoMagnet,
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
-			require.Equal(t, uuid.Nil.String(), d.KnownMediaID)
+			require.Equal(t, uuidx.Nil().String(), d.KnownMediaID)
 		}
 		for range records {
 			genrecord(t.Context(), pdb)
 		}
 
-		req, err := ddisctorrent.NewDiscoveredRequest(cdht.ID(cdht.DynamicAddrPort()).AsByteArray(), 100, uuid.Nil.String())
+		req, err := ddisctorrent.NewDiscoveredRequest(cdht.ID(cdht.DynamicAddrPort()).AsByteArray(), 100, uuidx.Nil().String())
 		require.NoError(t, err)
 
 		ret := cdht.Query(t.Context(), dht.NewAddr(pdht.DynamicAddrPort()), req)

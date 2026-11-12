@@ -3,14 +3,14 @@ package ddisctorrent
 import (
 	"context"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 )
 
-func PeerWith(ctx context.Context, s *dht.Server, partition uuid.UUID, n krpc.NodeInfo) (_zero PeerInfo, err error) {
+func PeerWith(ctx context.Context, s *dht.Server, partition uuidx.UUID, n krpc.NodeInfo) (_zero PeerInfo, err error) {
 	var (
 		resp MetaResponse
 	)

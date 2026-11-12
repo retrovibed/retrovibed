@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -141,7 +141,7 @@ func TestHTTPSSHOauth2(t *testing.T) {
 
 		require.NoError(t, jwtx.Validate(authn.JWTRegistrationSecretFromEnv(env.JWTSecret), token.AccessToken, &claims))
 
-		require.Equal(t, uuid.Nil.String(), claims.Subject)
+		require.Equal(t, uuidx.Nil().String(), claims.Subject)
 		require.Equal(t, "3ace4786-0a48-4599-ff07-72bc411413ef", claims.Issuer)
 		require.True(t, claims.ExpiresAt.After(time.Now()))
 		require.True(t, claims.IssuedAt.Before(time.Now()))

@@ -5,7 +5,7 @@ import (
 	"hash/fnv"
 	"strconv"
 
-	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 )
 
 // Well-known known-media source ids, matching what shallows/cmd/cmdmedia's
@@ -69,7 +69,7 @@ func ImportedMediaUintID[P importprefix](prefix P, id uint64, namespaces ...P) s
 }
 
 // ImportedMediaUUID creates a unique import id from a uuid by mutating its first 4 bytes with the prefix checksum.
-func ImportedMediaUUID[P importprefix](prefix P, id uuid.UUID) uuid.UUID {
+func ImportedMediaUUID[P importprefix](prefix P, id uuidx.UUID) uuidx.UUID {
 	copy(id[:4], _prefix(prefix))
 	return id
 }

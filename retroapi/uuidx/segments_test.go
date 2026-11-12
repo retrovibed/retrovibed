@@ -3,7 +3,6 @@ package uuidx_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	. "github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/stretchr/testify/require"
 )
@@ -18,13 +17,13 @@ func TestSegmenter(t *testing.T) {
 		require.Equal(t, 1024, len(ranges), "Expected number of segments to be 1024")
 
 		require.Equal(t, Range{
-			Begin: uuid.Nil,
-			End:   Advance16(uuid.Nil, 64),
+			Begin: Nil(),
+			End:   Advance16(Nil(), 64),
 		}, ranges[0], "First segment range mismatch")
 
 		require.Equal(t, Range{
-			Begin: uuid.FromStringOrNil("ffc00000-0000-0000-0000-000000000000"),
-			End:   uuid.Max,
+			Begin: FromStringOrNil("ffc00000-0000-0000-0000-000000000000"),
+			End:   Max(),
 		}, ranges[1023], "Last segment range mismatch")
 	})
 }

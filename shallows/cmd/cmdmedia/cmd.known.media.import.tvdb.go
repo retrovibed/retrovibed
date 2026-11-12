@@ -12,7 +12,6 @@ import (
 
 	"github.com/dashotv/tvdb"
 	"github.com/dashotv/tvdb/openapi/models/shared"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
@@ -62,7 +61,7 @@ func (t *tvdbimport) records(c *tvdb.Client) iter.Seq[library.Known] {
 				}
 
 				_md5 := md5x.JSON(mr)
-				uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
+				uidmd5 := uuidx.FromBytesOrNil(_md5.Sum(nil))
 
 				alias := slicesx.FindOrZero(func(v shared.Alias) bool {
 					return langx.Autoderef(v.Language) == t.Lang
@@ -95,7 +94,7 @@ func (t *tvdbimport) records(c *tvdb.Client) iter.Seq[library.Known] {
 					PosterPath:       t.imgpath(langx.Autoderef(mr.Image)),
 					Released:         errorsx.Zero(time.Parse(time.DateOnly, langx.FirstNonZero(langx.Autoderef(mr.FirstAired), epochts))),
 					Mimetype:         mimex.Video,
-					ParentUID:        uuid.Nil.String(),
+					ParentUID:        uuidx.Nil().String(),
 					// Popularity:       max(langx.Autoderef(mr.Score)/100000, 1.0), // essentially a useless field, they only include it for sorting.
 				}
 

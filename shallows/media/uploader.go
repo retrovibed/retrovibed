@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 
 	"github.com/gabriel-vasile/mimetype"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 )
 
 // NewUploader uploads files into the library served at endpoint.
@@ -42,7 +42,7 @@ func (t Uploader) Upload(ctx context.Context, path string, directoryID string) (
 
 	contentType, body, err := httpx.Multipart(func(w *multipart.Writer) error {
 		// the library root is the upload default, only name a destination when one was configured.
-		if directoryID != uuid.Nil.String() {
+		if directoryID != uuidx.Nil().String() {
 			if lerr := w.WriteField("directory_id", directoryID); lerr != nil {
 				return errorsx.Wrap(lerr, "unable to write directory")
 			}

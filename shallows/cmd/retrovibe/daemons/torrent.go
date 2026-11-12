@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bep0051"
 	"github.com/james-lawrence/torrent/connections"
@@ -33,6 +32,7 @@ import (
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
@@ -400,7 +400,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		Method(ddisctorrent.MethodDisc, ddisctorrent.NewDiscovered(t.db, partitions)).
 		Method(ddisctorrent.MethodMedia, ddisctorrent.NewMediaRecorder(t.db))
 
-	if path := fsx.DirVirtual(t.wgconfigdir).Path(uuid.FromStringOrNil(wgcfg.ID).String()); fsx.Exists(path) {
+	if path := fsx.DirVirtual(t.wgconfigdir).Path(uuidx.FromStringOrNil(wgcfg.ID).String()); fsx.Exists(path) {
 		wcfg, err := wireguardx.Parse(path)
 		if err != nil {
 			return errorsx.Wrapf(err, "unable to parse wireguard configuration: %s", path)

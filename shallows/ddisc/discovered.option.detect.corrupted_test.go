@@ -3,7 +3,7 @@ package ddisc_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/stretchr/testify/require"
 )
@@ -24,6 +24,6 @@ func TestDiscoveredOptionDetectCorrupted(t *testing.T) {
 		ddisc.DiscoveredOptionDetectCorrupted(&d)
 
 		require.Equal(t, "broken�name", d.Title)
-		require.Equal(t, uuid.Nil.String(), d.SyncUID)
+		require.Equal(t, uuidx.Nil().String(), d.SyncUID)
 	})
 }

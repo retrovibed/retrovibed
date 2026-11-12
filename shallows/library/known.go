@@ -10,10 +10,9 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/ducktype"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -50,7 +49,7 @@ func (NoopQueryCleaner) Clean(_ context.Context, text string) (string, error) {
 }
 
 func KnownOptionRandomID(t *Known) {
-	t.ID = errorsx.Must(uuid.NewV4()).String()
+	t.ID = uuidx.NewV4().String()
 }
 
 func KnownOptionReleased(ts time.Time) func(*Known) {
@@ -98,7 +97,7 @@ func KnownOptionAutoDescription(t *Known) {
 // set ParentUID still carry Go's zero-value "" here, which the driver can't
 // convert.
 func KnownOptionAutoParentUID(t *Known) {
-	t.ParentUID = stringsx.FirstNonBlank(t.ParentUID, uuid.Nil.String())
+	t.ParentUID = stringsx.FirstNonBlank(t.ParentUID, uuidx.Nil().String())
 }
 
 // KnownCollationSpecialsSeason marks TMDB "Specials" (season_number == 0)
@@ -181,20 +180,20 @@ func KnownOptionTestNoPoster(t *Known) {
 }
 
 func KnownOptionTestDefaults(t *Known) {
-	t.UID = errorsx.Must(uuid.NewV4()).String()
-	t.Md5 = errorsx.Must(uuid.NewV4()).String()
+	t.UID = uuidx.NewV4().String()
+	t.Md5 = uuidx.NewV4().String()
 	t.Adult = false
 	t.Released = time.Now()
 	t.Mimetype = mimex.Application
 	t.Duplicates = 0
 	t.Popularity = 0
-	t.ParentUID = uuid.Nil.String()
+	t.ParentUID = uuidx.Nil().String()
 	t.OriginalLanguage = userx.LocaleLanguage()
 }
 
 func Unknown() Known {
 	return Known{
-		UID: uuid.Nil.String(),
+		UID: uuidx.Nil().String(),
 	}
 }
 
@@ -260,7 +259,7 @@ func KnownOrderTitleSimilarity(v string, cutoff float32) squirrel.Sqlizer {
 // KnownOrderParentUIDNilLast orders rows with a nil parent_uid (standalone
 // items, e.g. a show's own row) after rows that have a parent (e.g. episodes).
 func KnownOrderParentUIDNilLast() squirrel.Sqlizer {
-	return squirrel.Expr("(cache.library_known_media.parent_uid = ?) ASC", uuid.Nil.String())
+	return squirrel.Expr("(cache.library_known_media.parent_uid = ?) ASC", uuidx.Nil().String())
 }
 
 // KnownOrderCollationNearest orders rows by ascending distance between their

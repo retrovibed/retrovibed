@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/storage"
@@ -15,6 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
@@ -160,8 +160,8 @@ func TestPublishPluginTorrentImport(t *testing.T) {
 		// here with the mimetype already set - that is the difference between a
 		// module that installs itself and one that downloads and then sits there.
 		require.NoError(t, communityapi.SyncPublishedContentItem(t.Context(), q, &communityapi.PublishedContent{
-			Id:          uuid.Must(uuid.NewV7()).String(),
-			CommunityId: uuid.Must(uuid.NewV7()).String(),
+			Id:          uuidx.NewV7().String(),
+			CommunityId: uuidx.NewV7().String(),
 			MagnetUri:   fmt.Sprintf("magnet:?xt=urn:btih:%s&dn=plugin.wasm", md.ID.String()),
 			Title:       "plugin.wasm",
 			Mimetype:    mimex.RetrovibedPublishModule,

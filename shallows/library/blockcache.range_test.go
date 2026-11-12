@@ -5,8 +5,8 @@ import (
 	"math/rand/v2"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/stretchr/testify/require"
 )
@@ -38,7 +38,7 @@ func TestCalculateBlockRange(t *testing.T) {
 
 	t.Run("random lengths - every offset", func(t *testing.T) {
 		const blength = 64
-		prng := rand.New(cryptox.NewChaCha8(uuid.Must(uuid.NewV4()).Bytes()))
+		prng := rand.New(cryptox.NewChaCha8(uuidx.NewV4().Bytes()))
 		length := prng.Uint64N(128*bytesx.KiB) + bytesx.KiB
 		for offset := range length {
 			eoffset := (offset / blength) * blength
@@ -57,7 +57,7 @@ func TestCalculateBlockRange(t *testing.T) {
 
 	t.Run("random lengths - actual blocks", func(t *testing.T) {
 		const blength = 64
-		prng := rand.New(cryptox.NewChaCha8(uuid.Must(uuid.NewV4()).Bytes()))
+		prng := rand.New(cryptox.NewChaCha8(uuidx.NewV4().Bytes()))
 		length := prng.Uint64N(128*bytesx.KiB) + bytesx.KiB
 		for offset := uint64(0); offset < length; {
 			eoffset := (offset / blength) * blength

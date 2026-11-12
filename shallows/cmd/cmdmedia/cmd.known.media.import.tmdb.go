@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
@@ -90,7 +89,7 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 		media := asynccompute.New(func(ctx context.Context, results []tmdb.MovieResult) error {
 			for _, mr := range results {
 				_md5 := md5x.JSON(mr)
-				uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
+				uidmd5 := uuidx.FromBytesOrNil(_md5.Sum(nil))
 				v := library.Known{
 					Source:           t.Source,
 					UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(mr.ID), ddiscapi.KindMovie),
@@ -107,7 +106,7 @@ func (t *tmdbimport) movies(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 					Title:            mr.Title,
 					Released:         errorsx.ZeroDebug[time.Time](debugx.Fn)(time.Parse(time.DateOnly, mr.ReleaseDate)),
 					Mimetype:         mimex.Video,
-					ParentUID:        uuid.Nil.String(),
+					ParentUID:        uuidx.Nil().String(),
 				}
 
 				if !sendResult(ctx, rmedia, v) {
@@ -224,7 +223,7 @@ type retrieveEpisodesJob struct {
 
 func (t *tmdbimport) seriesKnown(mr tmdb.TVShowResult) library.Known {
 	_md5 := md5x.JSON(mr)
-	uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
+	uidmd5 := uuidx.FromBytesOrNil(_md5.Sum(nil))
 
 	return library.Known{
 		UID:              ddiscapi.ImportedMediaUintID(t.Source, uint64(mr.ID), ddiscapi.KindSeries),
@@ -242,7 +241,7 @@ func (t *tmdbimport) seriesKnown(mr tmdb.TVShowResult) library.Known {
 		Adult:            mr.Adult,
 		Released:         errorsx.ZeroDebug[time.Time](debugx.Fn)(time.Parse(time.DateOnly, mr.FirstAirDate)),
 		Mimetype:         mimex.Video,
-		ParentUID:        uuid.Nil.String(),
+		ParentUID:        uuidx.Nil().String(),
 	}
 }
 
@@ -310,7 +309,7 @@ func (t *tmdbimport) series(ctx context.Context, c *tmdb.Client) iter.Seq[librar
 
 			for _, ep := range sdetails.Episodes {
 				_md5 := md5x.JSON(ep)
-				uidmd5 := uuid.FromBytesOrNil(_md5.Sum(nil))
+				uidmd5 := uuidx.FromBytesOrNil(_md5.Sum(nil))
 				imgpath := t.imgpath(ep.StillPath)
 				v := library.Known{
 					Source:           t.Source,

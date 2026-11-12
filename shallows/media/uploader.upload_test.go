@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -55,13 +55,13 @@ func TestUploaderUpload(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "example.mkv")
 		require.NoError(t, os.WriteFile(path, []byte("example"), 0600))
 
-		id, err := media.NewUploader(c, "https://localhost:9998").Upload(ctx, path, uuid.Nil.String())
+		id, err := media.NewUploader(c, "https://localhost:9998").Upload(ctx, path, uuidx.Nil().String())
 		require.NoError(t, err)
 
 		require.NoError(t, library.MetadataFindByID(ctx, q, id).Scan(&md))
 		require.Equal(t, "example.mkv", md.Description)
 		require.Equal(t, uint64(len("example")), md.Bytes)
-		require.Equal(t, uuid.Nil.String(), md.DirectoryID)
+		require.Equal(t, uuidx.Nil().String(), md.DirectoryID)
 		require.DirExists(t, mediastore.Path(id)) // uploads are stored as a block cache directory.
 	})
 
@@ -75,7 +75,7 @@ func TestUploaderUpload(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 		mediastore := fsx.DirVirtual(t.TempDir())
-		libdir := uuid.Must(uuid.NewV4()).String()
+		libdir := uuidx.NewV4().String()
 
 		routes := mux.NewRouter()
 		media.NewHTTPLibrary(
@@ -110,7 +110,7 @@ func TestUploaderUpload(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		_, err := media.NewUploader(http.DefaultClient, "https://localhost:9998").Upload(ctx, filepath.Join(t.TempDir(), "missing.mkv"), uuid.Nil.String())
+		_, err := media.NewUploader(http.DefaultClient, "https://localhost:9998").Upload(ctx, filepath.Join(t.TempDir(), "missing.mkv"), uuidx.Nil().String())
 		require.Error(t, err)
 	})
 }

@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -64,7 +64,7 @@ func TestMetricsSearchEndpoint(t *testing.T) {
 			p   meta.Profile
 			v   meta.Authz
 			q   = sqltestx.Metadatabase(t)
-			cid = uuid.Must(uuid.NewV7()).String()
+			cid = uuidx.NewV7().String()
 		)
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
@@ -106,7 +106,7 @@ func TestMetricsSearchEndpoint(t *testing.T) {
 			p           meta.Profile
 			v           meta.Authz
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 			now         = time.Now()
 		)
 
@@ -156,7 +156,7 @@ func TestMetricsSearchEndpoint(t *testing.T) {
 			p                meta.Profile
 			v                meta.Authz
 			q                = sqltestx.Metadatabase(t)
-			communityID      = uuid.Must(uuid.NewV7()).String()
+			communityID      = uuidx.NewV7().String()
 			publishedContent community.PublishedContent
 			now              = time.Now()
 		)
@@ -168,7 +168,7 @@ func TestMetricsSearchEndpoint(t *testing.T) {
 
 		require.NoError(t, testx.Fake(&publishedContent, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.LibraryID = uuid.Nil.String()
+			p.LibraryID = uuidx.Nil().String()
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, publishedContent).Scan(&publishedContent))
 
@@ -220,7 +220,7 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 			p           meta.Profile
 			v           meta.Authz
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 			syncedAt    = time.Now().UTC().Truncate(time.Second)
 		)
 
@@ -276,7 +276,7 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 			p           meta.Profile
 			v           meta.Authz
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
@@ -312,7 +312,7 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 			p           meta.Profile
 			v           meta.Authz
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
@@ -349,7 +349,7 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 			p           meta.Profile
 			v           meta.Authz
 			q           = sqltestx.Metadatabase(t)
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 			header      = http.Header{"Retry-After": []string{"30"}}
 		)
 
@@ -391,7 +391,7 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 			p                meta.Profile
 			v                meta.Authz
 			q                = sqltestx.Metadatabase(t)
-			communityID      = uuid.Must(uuid.NewV7()).String()
+			communityID      = uuidx.NewV7().String()
 			publishedContent community.PublishedContent
 			syncedAt         = time.Now().UTC().Truncate(time.Second)
 			periodStart      = syncedAt.Add(-24 * time.Hour)
@@ -409,7 +409,7 @@ func TestMetricsSyncEndpoint(t *testing.T) {
 
 		require.NoError(t, testx.Fake(&publishedContent, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.LibraryID = uuid.Nil.String()
+			p.LibraryID = uuidx.Nil().String()
 		}))
 		require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, publishedContent).Scan(&publishedContent))
 

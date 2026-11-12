@@ -6,13 +6,13 @@ import (
 	"testing"
 
 	"github.com/alecthomas/kong"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/autobind"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/torrenttestx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
@@ -27,7 +27,7 @@ func TestMediaQuery(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		id := uuid.Must(uuid.NewV7()).String()
+		id := uuidx.NewV7().String()
 
 		pdb := sqltestx.Metadatabase(t)
 		defer pdb.Close()

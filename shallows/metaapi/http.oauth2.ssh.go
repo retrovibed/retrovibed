@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -15,6 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
@@ -137,7 +137,7 @@ func (t *HTTPSSHOauth2) auth(w http.ResponseWriter, req *http.Request) {
 	iden = identityssh.Identity{
 		ID:        sshx.FingerprintMD5(pub),
 		PublicKey: sshx.EncodeBase64PublicKey(pub),
-		ProfileID: uuid.Nil.String(),
+		ProfileID: uuidx.Nil().String(),
 	}
 
 	err = identityssh.IdentityInsertZeroWithDefaults(req.Context(), t.q, iden).Scan(&iden)
@@ -245,7 +245,7 @@ func (t *HTTPSSHOauth2) token(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		if err = pkey.Verify(uuid.FromStringOrNil(password).Bytes(), &sig); err != nil {
+		if err = pkey.Verify(uuidx.FromStringOrNil(password).Bytes(), &sig); err != nil {
 			log.Println("unable to verifcation failure", err)
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 			return
@@ -319,7 +319,7 @@ func (t *HTTPSSHOauth2) token(w http.ResponseWriter, req *http.Request) {
 		})
 	}
 
-	if uuid.FromStringOrNil(iden.ProfileID).String() == uuid.Nil.String() {
+	if uuidx.FromStringOrNil(iden.ProfileID).String() == uuidx.Nil().String() {
 		// in this case we only send an access token for registration.
 		log.Println("no profile associated with public key", iden.ID)
 		errorsx.Log(tmptoken())

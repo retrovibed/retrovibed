@@ -8,12 +8,12 @@ import (
 	"unicode/utf8"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/ducktype"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -36,7 +36,7 @@ func DiscoveredOptionNoop(*Discovered) {}
 func DiscoveredOptionIndex(b bool) DiscoveredOption {
 	if b {
 		return func(d *Discovered) {
-			d.KnownMediaID = uuid.Max.String()
+			d.KnownMediaID = uuidx.Max().String()
 		}
 	}
 
@@ -172,7 +172,7 @@ func DiscoveredOptionDetectCorrupted(d *Discovered) {
 	}
 
 	d.Title = strings.ToValidUTF8(d.Title, "�")
-	d.SyncUID = uuid.Nil.String()
+	d.SyncUID = uuidx.Nil().String()
 }
 
 func DiscoveredOptionKnownMedia(id string) DiscoveredOption {
@@ -205,8 +205,8 @@ func catalogURI(knownMediaID string) string {
 
 func DiscoveredOptionPartitionAuto(partitions *Partition) DiscoveredOption {
 	return func(d *Discovered) {
-		uid := uuid.FromStringOrNil(d.KnownMediaID)
-		if uid.IsZero() || uuid.Max == uid {
+		uid := uuidx.FromStringOrNil(d.KnownMediaID)
+		if uid.IsZero() || uuidx.Max() == uid {
 			// do nothing
 			return
 		}
@@ -276,12 +276,12 @@ func NewDiscovered(md *int160.T, options ...DiscoveredOption) (m Discovered) {
 	r := langx.Clone(Discovered{
 		ID:                     torrentx.HashUID(md),
 		Infohash:               md.Bytes(),
-		KnownMediaID:           uuid.Nil.String(),
+		KnownMediaID:           uuidx.Nil().String(),
 		Mimetype:               mimex.Binary,
 		Contentmime:            mimex.Bittorrent,
 		Category:               mimex.Application,
-		SyncUID:                uuid.Must(uuid.NewV7()).String(),
-		Partition:              uuid.Nil.String(),
+		SyncUID:                uuidx.NewV7().String(),
+		Partition:              uuidx.Nil().String(),
 		AudioDefaultLocale:     language.Und.String(),
 		SubtitlesDefaultLocale: language.Und.String(),
 		CreatedAt:              timex.NegInf(),
@@ -316,8 +316,8 @@ func NewDiscoveredFromKnown(md int160.T, known library.Known, options ...Discove
 		Mimetype:               langx.FirstNonZero(known.Mimetype, mimex.Binary),
 		Contentmime:            mimex.Bittorrent,
 		Category:               mimex.Category(langx.FirstNonZero(known.Mimetype, mimex.Application)),
-		SyncUID:                uuid.Must(uuid.NewV7()).String(),
-		Partition:              uuid.Nil.String(),
+		SyncUID:                uuidx.NewV7().String(),
+		Partition:              uuidx.Nil().String(),
 		AudioDefaultLocale:     language.Und.String(),
 		SubtitlesDefaultLocale: language.Und.String(),
 		CreatedAt:              timex.NegInf(),
@@ -369,12 +369,12 @@ func NewDiscoveredFromImport(imp *ddiscapi.Import, options ...DiscoveredOption) 
 		PosterURI:              imp.PosterPath,
 		Health:                 imp.Health,
 		Bytes:                  imp.Bytes,
-		KnownMediaID:           uuid.Nil.String(),
+		KnownMediaID:           uuidx.Nil().String(),
 		Mimetype:               mimex.Binary,
 		Contentmime:            mimex.Bittorrent,
 		Category:               mimex.Application,
-		SyncUID:                uuid.Must(uuid.NewV7()).String(),
-		Partition:              uuid.Nil.String(),
+		SyncUID:                uuidx.NewV7().String(),
+		Partition:              uuidx.Nil().String(),
 		AudioDefaultLocale:     language.Und.String(),
 		SubtitlesDefaultLocale: language.Und.String(),
 		CreatedAt:              timex.NegInf(),

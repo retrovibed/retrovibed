@@ -7,9 +7,9 @@ import (
 	"unicode"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/runesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -55,7 +55,7 @@ func MetadataOptionEncryptionSeed(d string) MetadataOption {
 func MetadataOptionArchivable(b bool) MetadataOption {
 	return func(m *Metadata) {
 		if b {
-			m.ArchiveID = uuid.Max.String()
+			m.ArchiveID = uuidx.Max().String()
 		}
 	}
 }
@@ -109,12 +109,12 @@ func MetadataOptionCompose(options ...func(*Metadata)) MetadataOption {
 }
 
 func MetadataOptionTestDefaults(p *Metadata) {
-	p.ID = uuid.Nil.String()
-	p.ArchiveID = uuid.Nil.String()
-	p.TorrentID = uuid.Nil.String()
-	p.KnownMediaID = uuid.Nil.String()
-	p.EncryptionSeed = uuid.Nil.String()
-	p.DirectoryID = uuid.Nil.String()
+	p.ID = uuidx.Nil().String()
+	p.ArchiveID = uuidx.Nil().String()
+	p.TorrentID = uuidx.Nil().String()
+	p.KnownMediaID = uuidx.Nil().String()
+	p.EncryptionSeed = uuidx.Nil().String()
+	p.DirectoryID = uuidx.Nil().String()
 	p.HiddenAt = timex.Inf()
 	p.Bytes = 16 * bytesx.KiB
 	p.Mimetype = mimex.Binary
@@ -128,17 +128,17 @@ func MetadataOptionTestID(id string) MetadataOption {
 }
 
 func MetadataOptionTestRandomID(p *Metadata) {
-	p.ID = uuid.Must(uuid.NewV4()).String()
+	p.ID = uuidx.NewV4().String()
 }
 
 func NewMetadata(id string, options ...func(*Metadata)) (m Metadata) {
 	r := langx.Clone(Metadata{
 		ID:             id,
-		TorrentID:      uuid.Nil.String(),
-		ArchiveID:      uuid.Nil.String(),
-		KnownMediaID:   uuid.Nil.String(),
-		EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
-		DirectoryID:    uuid.Nil.String(),
+		TorrentID:      uuidx.Nil().String(),
+		ArchiveID:      uuidx.Nil().String(),
+		KnownMediaID:   uuidx.Nil().String(),
+		EncryptionSeed: uuidx.NewV4().String(),
+		DirectoryID:    uuidx.Nil().String(),
 		HiddenAt:       timex.Inf(),
 	}, options...)
 

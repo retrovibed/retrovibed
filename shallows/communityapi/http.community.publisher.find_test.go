@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -37,10 +37,10 @@ func TestHTTPCommunityPublisherFind(t *testing.T) {
 			result  communityapi.PluginPublisherFindResponse
 		)
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/youtube", Description: "YouTube", Mimetype: "application/vnd.retrovibe.publisher.youtube",
+			ID: uuidx.NewV7().String(), Path: "/plugins/youtube", Description: "YouTube", Mimetype: "application/vnd.retrovibe.publisher.youtube",
 		}).Scan(&youtube))
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/spotify", Description: "Spotify", Mimetype: "application/vnd.retrovibe.publisher.spotify",
+			ID: uuidx.NewV7().String(), Path: "/plugins/spotify", Description: "Spotify", Mimetype: "application/vnd.retrovibe.publisher.spotify",
 		}).Scan(&spotify))
 
 		reg := testx.Must(publishplugin.NewRegistry(ctx, publishplugin.OptionConfigDir(t.TempDir()), publishplugin.OptionCacheDir(t.TempDir())))(t)
@@ -53,7 +53,7 @@ func TestHTTPCommunityPublisherFind(t *testing.T) {
 		).Bind(routes.PathPrefix("/").Subrouter())
 
 		require.NoError(t, testx.Fake(&v, meta.AuthzOptionAdmin))
-		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodGet,
 			fmt.Sprintf("/%s", spotify.ID),
@@ -92,10 +92,10 @@ func TestHTTPCommunityPublisherFind(t *testing.T) {
 		).Bind(routes.PathPrefix("/").Subrouter())
 
 		require.NoError(t, testx.Fake(&v, meta.AuthzOptionAdmin))
-		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodGet,
-			fmt.Sprintf("/%s", uuid.Must(uuid.NewV7()).String()),
+			fmt.Sprintf("/%s", uuidx.NewV7().String()),
 			nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
 		)

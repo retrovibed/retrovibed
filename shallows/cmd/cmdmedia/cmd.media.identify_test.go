@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -34,7 +34,7 @@ func TestIdentifyRun(t *testing.T) {
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
 
 		var lmd library.Metadata
-		require.NoError(t, testx.Fake(&lmd, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionDescription("The Grand Budapest Hotel"), library.MetadataOptionKnownMediaID(uuid.Max.String())))
+		require.NoError(t, testx.Fake(&lmd, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionDescription("The Grand Budapest Hotel"), library.MetadataOptionKnownMediaID(uuidx.Max().String())))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
 		require.NoError(t, db.Close())
 
@@ -60,7 +60,7 @@ func TestIdentifyRun(t *testing.T) {
 		require.NoError(t, err)
 
 		var lmd library.Metadata
-		require.NoError(t, testx.Fake(&lmd, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionDescription("xyzzy completely unknown title 99999"), library.MetadataOptionKnownMediaID(uuid.Max.String())))
+		require.NoError(t, testx.Fake(&lmd, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionDescription("xyzzy completely unknown title 99999"), library.MetadataOptionKnownMediaID(uuidx.Max().String())))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))
 		require.NoError(t, db.Close())
 
@@ -72,7 +72,7 @@ func TestIdentifyRun(t *testing.T) {
 		defer db.Close()
 
 		require.NoError(t, library.MetadataFindByID(ctx, db, lmd.ID).Scan(&lmd))
-		require.Equal(t, uuid.Nil.String(), lmd.KnownMediaID)
+		require.Equal(t, uuidx.Nil().String(), lmd.KnownMediaID)
 	})
 
 	t.Run("already identified records are left unchanged", func(t *testing.T) {
@@ -91,7 +91,7 @@ func TestIdentifyRun(t *testing.T) {
 		library.KnownOptionAutoDescription(&known)
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
 
-		kid := uuid.Must(uuid.NewV4()).String()
+		kid := uuidx.NewV4().String()
 		var lmd library.Metadata
 		require.NoError(t, testx.Fake(&lmd, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionDescription("The Grand Budapest Hotel"), library.MetadataOptionKnownMediaID(kid)))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, lmd).Scan(&lmd))

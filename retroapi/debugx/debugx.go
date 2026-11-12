@@ -14,11 +14,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/contextx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/iox"
 	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 
 	"github.com/pkg/profile"
 )
@@ -130,7 +130,7 @@ func run(ctx context.Context, dir string, strategy func(*profile.Profile)) (err 
 		return errorsx.Wrap(err, "unable to create profiling directory")
 	}
 
-	tmpdir, err := os.MkdirTemp(dir, strings.ReplaceAll("{}.*.pprof", "{}", uuid.Must(uuid.NewV7()).String()))
+	tmpdir, err := os.MkdirTemp(dir, strings.ReplaceAll("{}.*.pprof", "{}", uuidx.NewV7().String()))
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create profiling directory")
 	}

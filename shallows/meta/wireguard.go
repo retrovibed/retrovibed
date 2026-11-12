@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
@@ -34,7 +34,7 @@ func WireguardOptionDescription(s string) func(*Wireguard) {
 }
 
 func WireguardOptionAutoID(w *Wireguard) {
-	w.ID = uuid.Must(uuid.NewV4()).String()
+	w.ID = uuidx.NewV4().String()
 }
 
 func WireguardOptionDistribution(w *Wireguard) {
@@ -54,7 +54,7 @@ func WireguardOptionOutboundRateLimit(n uint32) func(*Wireguard) {
 }
 
 func WireguardOptionTestDefauts(w *Wireguard) {
-	w.ID = uuid.Must(uuid.NewV4()).String()
+	w.ID = uuidx.NewV4().String()
 	w.Nettype = w.Nettype % uint32(WireguardRingMax)
 }
 

@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/acoustics"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -76,7 +76,7 @@ func TestSimilar(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(authz)))
 
-		seedID := uuid.Must(uuid.NewV4())
+		seedID := uuidx.NewV4()
 		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodGet,
 			fmt.Sprintf("/%s", seedID),
@@ -168,7 +168,7 @@ func TestSimilar(t *testing.T) {
 		require.NoError(t, acoustics.StoreFeatures(ctx, q, seed.ID, vec, acoustics.StatsVersion))
 
 		// audio_features row with no corresponding (surviving) library_metadata row.
-		orphan := uuid.Must(uuid.NewV4())
+		orphan := uuidx.NewV4()
 		require.NoError(t, acoustics.StoreFeatures(ctx, q, orphan.String(), vec, acoustics.StatsVersion))
 
 		router := mux.NewRouter()

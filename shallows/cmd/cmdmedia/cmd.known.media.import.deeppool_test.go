@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -24,7 +24,7 @@ func TestDeeppoolImportKnownFromPublished(t *testing.T) {
 
 	t.Run("maps title and overview", func(t *testing.T) {
 		pc := &communityapi.PublishedContent{
-			Id:          uuid.Must(uuid.NewV7()).String(),
+			Id:          uuidx.NewV7().String(),
 			Title:       "My Movie",
 			Description: "A great film",
 			Mimetype:    mimex.Video,
@@ -37,13 +37,13 @@ func TestDeeppoolImportKnownFromPublished(t *testing.T) {
 		require.Equal(t, pc.Id, known.ID)
 		// parent_uid is a NOT NULL UUID column; a deeppool item is never
 		// anyone's child, so this must be the nil UUID, not Go's zero-value "".
-		require.Equal(t, uuid.Nil.String(), known.ParentUID)
+		require.Equal(t, uuidx.Nil().String(), known.ParentUID)
 	})
 
 	t.Run("prefers known_media_id as uid when present", func(t *testing.T) {
-		knownMediaID := uuid.Must(uuid.NewV7()).String()
+		knownMediaID := uuidx.NewV7().String()
 		pc := &communityapi.PublishedContent{
-			Id:           uuid.Must(uuid.NewV7()).String(),
+			Id:           uuidx.NewV7().String(),
 			KnownMediaId: knownMediaID,
 		}
 		known := m.knownFromPublished(pc)
@@ -51,7 +51,7 @@ func TestDeeppoolImportKnownFromPublished(t *testing.T) {
 	})
 
 	t.Run("falls back to namespaced pc id when known_media_id absent", func(t *testing.T) {
-		id := uuid.Must(uuid.NewV7())
+		id := uuidx.NewV7()
 		pc := &communityapi.PublishedContent{Id: id.String()}
 		known := m.knownFromPublished(pc)
 		require.NotEmpty(t, known.UID)
@@ -59,7 +59,7 @@ func TestDeeppoolImportKnownFromPublished(t *testing.T) {
 	})
 
 	t.Run("defaults mimetype to video when blank", func(t *testing.T) {
-		pc := &communityapi.PublishedContent{Id: uuid.Must(uuid.NewV7()).String()}
+		pc := &communityapi.PublishedContent{Id: uuidx.NewV7().String()}
 		known := m.knownFromPublished(pc)
 		require.Equal(t, mimex.Video, known.Mimetype)
 	})
@@ -112,9 +112,9 @@ func TestDeeppoolImportRun(t *testing.T) {
 		m := deeppoolimport{StartAt: startAt, Source: "deeppool"}
 		require.NoError(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
 
-		parsed := uuid.FromStringOrNil(firstCursor)
-		require.False(t, parsed.IsNil())
-		require.Equal(t, uuid.V7, parsed.Version())
+		parsed := uuidx.FromStringOrNil(firstCursor)
+		require.False(t, parsed.IsZero())
+		require.Equal(t, uuidx.V7, parsed.Version())
 		// top 48 bits of UUID v7 are milliseconds since Unix epoch
 		ms := int64(binary.BigEndian.Uint64(parsed[:8]) >> 16)
 		require.Equal(t, startAt.UnixMilli(), ms)
@@ -138,9 +138,9 @@ func TestDeeppoolImportRun(t *testing.T) {
 		m := deeppoolimport{StartAt: startAt, Source: "deeppool"}
 		require.NoError(t, m.run(ctx, json.NewEncoder(&bytes.Buffer{}), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
 
-		parsed := uuid.FromStringOrNil(firstCursor)
-		require.False(t, parsed.IsNil())
-		require.Equal(t, uuid.V7, parsed.Version())
+		parsed := uuidx.FromStringOrNil(firstCursor)
+		require.False(t, parsed.IsZero())
+		require.Equal(t, uuidx.V7, parsed.Version())
 		// top 48 bits of UUID v7 are milliseconds since Unix epoch; dates before
 		// 1970 clamp to the epoch instead of wrapping around.
 		ms := int64(binary.BigEndian.Uint64(parsed[:8]) >> 16)
@@ -151,8 +151,8 @@ func TestDeeppoolImportRun(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		id1 := uuid.Must(uuid.NewV7()).String()
-		id2 := uuid.Must(uuid.NewV7()).String()
+		id1 := uuidx.NewV7().String()
+		id2 := uuidx.NewV7().String()
 
 		call := 0
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

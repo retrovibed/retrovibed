@@ -5,8 +5,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
@@ -59,12 +59,11 @@ func (t cmdCommunityImport) Run(gctx *cmdopts.Global) (err error) {
 			err = enc.Encode(&pc)
 		} else {
 			dbpc := community.PublishedContent{
-				CommunityID:   pc.CommunityId,
-				KnownMediaID:  pc.KnownMediaId,
-				MagnetURI:     pc.MagnetUri,
-				LibraryID:     stringsx.FirstNonBlank(pc.LibraryId, uuid.Nil.String()),
-				OAuthGoogleID: uuid.Nil.String(),
-				PublishedAt:   timex.Inf(),
+				CommunityID:  pc.CommunityId,
+				KnownMediaID: pc.KnownMediaId,
+				MagnetURI:    pc.MagnetUri,
+				LibraryID:    stringsx.FirstNonBlank(pc.LibraryId, uuidx.Nil().String()), OAuthGoogleID: uuidx.Nil().String(),
+				PublishedAt: timex.Inf(),
 			}
 			err = community.PublishedContentInsertWithDefaults(gctx.Context, db, dbpc).Scan(&dbpc)
 		}

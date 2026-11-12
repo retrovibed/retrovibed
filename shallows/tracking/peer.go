@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
@@ -29,7 +28,7 @@ func PeerOptionBEP51(available uint64, ttl uint16) func(*Peer) {
 	}
 }
 
-func PeerOptionDdisc(partition, offset uuid.UUID) func(*Peer) {
+func PeerOptionDdisc(partition, offset uuidx.UUID) func(*Peer) {
 	return func(p *Peer) {
 		p.Ddisc = !partition.IsZero()
 		p.DdiscPartition = partition.String()
@@ -104,8 +103,8 @@ func NewPeer(id int160.T, options ...func(*Peer)) (m Peer) {
 		Port:            0,
 		TombstonedAt:    time.Now().Add(30 * 24 * time.Hour),
 		Ddisc:           false,
-		DdiscPartition:  uuid.Nil.String(),
-		DdiscSyncoffset: uuid.Nil.String(),
+		DdiscPartition:  uuidx.Nil().String(),
+		DdiscSyncoffset: uuidx.Nil().String(),
 	}, options...)
 }
 

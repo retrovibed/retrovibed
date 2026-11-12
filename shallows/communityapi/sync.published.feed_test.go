@@ -7,8 +7,8 @@ import (
 
 	"github.com/retrovibed/retrovibed/shallows/community"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
 )
@@ -19,8 +19,8 @@ func TestSyncFeed(t *testing.T) {
 			ctx, done    = testx.Context(t)
 			q            = sqltestx.Metadatabase(t)
 			feeds        = &mockFeedPublisher{}
-			communityID1 = uuid.Must(uuid.NewV7()).String()
-			communityID2 = uuid.Must(uuid.NewV7()).String()
+			communityID1 = uuidx.NewV7().String()
+			communityID2 = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -54,7 +54,7 @@ func TestSyncFeed(t *testing.T) {
 			ctx, done   = testx.Context(t)
 			q           = sqltestx.Metadatabase(t)
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 

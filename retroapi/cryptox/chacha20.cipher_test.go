@@ -7,10 +7,10 @@ import (
 	"io"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
-	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
+	"github.com/retrovibed/retrovibed/retroapi/cryptox"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/chacha20"
 )
@@ -59,7 +59,7 @@ func TestNewReaderChaCha20(t *testing.T) {
 	})
 
 	t.Run("returned cipher should be functional for encryption/decryption", func(t *testing.T) {
-		EncryptionTest(t, uuid.Must(uuid.NewV4()).Bytes(), bytesx.MiB, cryptox.NewReaderChaCha20, cryptox.NewWriterChaCha20)
+		EncryptionTest(t, uuidx.NewV4().Bytes(), bytesx.MiB, cryptox.NewReaderChaCha20, cryptox.NewWriterChaCha20)
 	})
 }
 

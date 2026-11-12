@@ -3,11 +3,11 @@ package ddisctorrent
 import (
 	"context"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/dht/krpc"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 )
 
 type MetaRequest struct {
@@ -59,12 +59,12 @@ func NewMetaResponse(from int160.T, partition, tid string) MetaResponse {
 	return req
 }
 
-func NewMeta(partition uuid.UUID) Meta {
+func NewMeta(partition uuidx.UUID) Meta {
 	return Meta{partition: partition}
 }
 
 type Meta struct {
-	partition uuid.UUID
+	partition uuidx.UUID
 }
 
 func (t Meta) Handle(ctx context.Context, source dht.Addr, s *dht.Server, b dht.Binding, raw []byte, _ *krpc.Msg) error {

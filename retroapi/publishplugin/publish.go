@@ -13,7 +13,6 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/fsx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
-	"github.com/retrovibed/retrovibed/retroapi/userx"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/sys"
 )
@@ -135,7 +134,7 @@ func (r *Registry) Environment(ctx context.Context, path string) ([]byte, error)
 		return nil, errorsx.Wrapf(ErrNotLoaded, "path: %s", path)
 	}
 
-	dir, err := os.MkdirTemp(userx.DefaultRuntimeDirectory(userx.DefaultRelRoot()), "retrovibed.publish.environ.*")
+	dir, err := os.MkdirTemp(r.runtimedir, "retrovibed.publish.environ.*")
 	if err != nil {
 		return nil, errorsx.Wrap(err, "unable to create temporary directory")
 	}

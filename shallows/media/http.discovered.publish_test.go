@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/metainfo"
@@ -106,7 +105,7 @@ func TestDiscoveredPublishTorrent(t *testing.T) {
 		require.Equal(t, grpcx.EncodeTime(langx.Autoderef(timex.JSONSafeEncode(new(timex.Inf())))), r.Published.ExpiresAt)
 		require.Equal(t, mimex.RetrovibedMediaArchive, r.Published.Mimetype)
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
-		require.Equal(t, md5x.FormatUUID(md5x.Digest(md.ID.Bytes(), uuid.FromStringOrNil(uuidx.WithSuffix(16)).Bytes())), testx.Must(sqlx.String(ctx, q, "SELECT encryption_seed::text FROM torrents_metadata"))(t))
+		require.Equal(t, md5x.FormatUUID(md5x.Digest(md.ID.Bytes(), uuidx.FromStringOrNil(uuidx.WithSuffix(16)).Bytes())), testx.Must(sqlx.String(ctx, q, "SELECT encryption_seed::text FROM torrents_metadata"))(t))
 		require.Equal(t, "", testx.Must(sqlx.String(ctx, q, "SELECT tracker FROM torrents_metadata"))(t))
 		require.Equal(t, mimex.RetrovibedMediaArchive, testx.Must(sqlx.String(ctx, q, "SELECT mimetype FROM torrents_metadata"))(t))
 		require.EqualValues(t, info.TotalLength(), testx.Must(sqlx.Value[int](ctx, q, "SELECT bytes FROM torrents_metadata"))(t))
@@ -196,7 +195,7 @@ func TestDiscoveredPublishTorrent(t *testing.T) {
 		require.NotEqual(t, grpcx.EncodeTime(langx.Autoderef(timex.JSONSafeEncode(new(timex.Inf())))), r.Published.ExpiresAt)
 		require.Equal(t, mimex.RetrovibedMediaArchive, r.Published.Mimetype)
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM torrents_metadata"))(t))
-		require.Equal(t, md5x.FormatUUID(md5x.Digest(md.ID.Bytes(), uuid.FromStringOrNil(uuidx.WithSuffix(16)).Bytes())), testx.Must(sqlx.String(ctx, q, "SELECT encryption_seed::text FROM torrents_metadata"))(t))
+		require.Equal(t, md5x.FormatUUID(md5x.Digest(md.ID.Bytes(), uuidx.FromStringOrNil(uuidx.WithSuffix(16)).Bytes())), testx.Must(sqlx.String(ctx, q, "SELECT encryption_seed::text FROM torrents_metadata"))(t))
 		require.Equal(t, "", testx.Must(sqlx.String(ctx, q, "SELECT tracker FROM torrents_metadata"))(t))
 		require.Equal(t, mimex.RetrovibedMediaArchive, testx.Must(sqlx.String(ctx, q, "SELECT mimetype FROM torrents_metadata"))(t))
 		require.EqualValues(t, info.TotalLength(), testx.Must(sqlx.Value[int](ctx, q, "SELECT bytes FROM torrents_metadata"))(t))

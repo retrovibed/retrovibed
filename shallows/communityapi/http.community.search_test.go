@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -47,7 +47,7 @@ func TestSearchEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -91,7 +91,7 @@ func TestSearchEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 

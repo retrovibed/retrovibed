@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
@@ -14,6 +13,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -43,12 +43,12 @@ func TestHTTPCommunityPublisherUpdate(t *testing.T) {
 
 	var v meta.Authz
 	require.NoError(t, testx.Fake(&v, meta.AuthzOptionAdmin))
-	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 	token := httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)
 
 	seed := func(t *testing.T) community.PluginPublisher {
 		var row community.PluginPublisher
-		id := uuid.Must(uuid.NewV7()).String()
+		id := uuidx.NewV7().String()
 		path := filepath.Join(dir, id+".wasm")
 		require.NoError(t, os.WriteFile(path, []byte("installed"), 0o600))
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
@@ -92,7 +92,7 @@ func TestHTTPCommunityPublisherUpdate(t *testing.T) {
 		// the filesystem, so neither is the client's to move.
 		body := errorsx.Must(jsonx.Marshal(&communityapi.PluginPublisherUpdateRequest{
 			Publisher: &communityapi.PluginPublisher{
-				Id:          uuid.Must(uuid.NewV7()).String(),
+				Id:          uuidx.NewV7().String(),
 				Path:        filepath.Join(dir, "elsewhere.wasm"),
 				Description: "renamed",
 				Mimetype:    row.Mimetype,
@@ -136,7 +136,7 @@ func TestHTTPCommunityPublisherUpdate(t *testing.T) {
 			Publisher: &communityapi.PluginPublisher{Description: "renamed"},
 		}))
 
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/"+uuid.Must(uuid.NewV7()).String(), body, httptestx.RequestOptionAuthorization(token))
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodPost, "/"+uuidx.NewV7().String(), body, httptestx.RequestOptionAuthorization(token))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)
@@ -156,7 +156,7 @@ func TestHTTPCommunityPublisherUpdate(t *testing.T) {
 	t.Run("requires a privileged token", func(t *testing.T) {
 		row := seed(t)
 
-		claims := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		unprivileged := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		body := errorsx.Must(jsonx.Marshal(&communityapi.PluginPublisherUpdateRequest{

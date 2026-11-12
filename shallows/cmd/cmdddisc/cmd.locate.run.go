@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -20,6 +19,7 @@ import (
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
@@ -65,7 +65,7 @@ func (t cmdLocateRun) Run(gctx *cmdopts.Global) (err error) {
 	}
 	defer db.Close()
 
-	loc := ddisc.NewLocate(t.Query, t.Mimetype, ddisc.LocateOptionKnownMedia(langx.FirstNonZero(t.KnownMediaID, uuid.Nil.String())), ddisc.LocateOptionAdult(t.Adult), ddisc.LocateOptionAutoDownload(t.Download))
+	loc := ddisc.NewLocate(t.Query, t.Mimetype, ddisc.LocateOptionKnownMedia(langx.FirstNonZero(t.KnownMediaID, uuidx.Nil().String())), ddisc.LocateOptionAdult(t.Adult), ddisc.LocateOptionAutoDownload(t.Download))
 	if err := ddisc.LocateInsertWithDefaults(gctx.Context, db, loc).Scan(&loc); err != nil {
 		return errorsx.Wrap(err, "failed to queue locate request")
 	}

@@ -4,8 +4,8 @@ import (
 	"math"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -95,14 +95,14 @@ func TestKnownOrderCollationNearest(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		parent := uuid.Must(uuid.NewV4()).String()
+		parent := uuidx.NewV4().String()
 		for _, r := range []struct {
 			parent    string
 			collation uint32
 		}{
-			{uuid.Nil.String(), 0},
+			{uuidx.Nil().String(), 0},
 			{parent, library.KnownCollationEpisode(3, 1)},
-			{uuid.Nil.String(), library.KnownCollationEpisode(1, 5)},
+			{uuidx.Nil().String(), library.KnownCollationEpisode(1, 5)},
 			{parent, library.KnownCollationEpisode(1, 9)},
 			{parent, library.KnownCollationEpisode(1, 4)},
 		} {
@@ -133,8 +133,8 @@ func TestKnownOrderCollationNearest(t *testing.T) {
 			{parent, library.KnownCollationEpisode(1, 4)},
 			{parent, library.KnownCollationEpisode(1, 9)},
 			{parent, library.KnownCollationEpisode(3, 1)},
-			{uuid.Nil.String(), library.KnownCollationEpisode(1, 5)},
-			{uuid.Nil.String(), 0},
+			{uuidx.Nil().String(), library.KnownCollationEpisode(1, 5)},
+			{uuidx.Nil().String(), 0},
 		}, actual)
 	})
 
@@ -143,14 +143,14 @@ func TestKnownOrderCollationNearest(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		parent := uuid.Must(uuid.NewV4()).String()
+		parent := uuidx.NewV4().String()
 		for _, r := range []struct {
 			parent    string
 			collation uint32
 		}{
-			{uuid.Nil.String(), library.KnownCollationEpisode(2, 1)},
+			{uuidx.Nil().String(), library.KnownCollationEpisode(2, 1)},
 			{parent, library.KnownCollationEpisode(1, 2)},
-			{uuid.Nil.String(), 0},
+			{uuidx.Nil().String(), 0},
 			{parent, 0},
 		} {
 			var known library.Known
@@ -178,8 +178,8 @@ func TestKnownOrderCollationNearest(t *testing.T) {
 		require.Equal(t, []row{
 			{parent, 0},
 			{parent, library.KnownCollationEpisode(1, 2)},
-			{uuid.Nil.String(), 0},
-			{uuid.Nil.String(), library.KnownCollationEpisode(2, 1)},
+			{uuidx.Nil().String(), 0},
+			{uuidx.Nil().String(), library.KnownCollationEpisode(2, 1)},
 		}, actual)
 	})
 }

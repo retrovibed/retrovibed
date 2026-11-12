@@ -3,7 +3,6 @@ package ddisc_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
@@ -30,7 +29,7 @@ func TestFindMedia(t *testing.T) {
 
 		partitions := ddisc.Partitions(16, cryptox.NewChaCha8(t.Name()))
 
-		p0 := uuid.FromStringOrNil("be526731-7bfc-40f5-8984-73f8ae033ead")
+		p0 := uuidx.FromStringOrNil("be526731-7bfc-40f5-8984-73f8ae033ead")
 		n0 := partitions.Max(p0.Bytes())
 
 		genrecord := func(idx int) {
@@ -40,7 +39,7 @@ func TestFindMedia(t *testing.T) {
 
 			d := ddisc.NewDiscovered(
 				&id,
-				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx%32))).String()),
+				ddisc.DiscoveredOptionKnownMedia(ddiscapi.ImportedMediaUUID("", uuidx.FromStringOrNil(uuidx.WithSuffix(idx%32))).String()),
 				ddisc.DiscoveredOptionMimetype(mimex.Binary),
 				ddisc.DiscoveredOptionFromTorrentInfo(info),
 				ddisc.DiscoveredOptionPartitionAuto(partitions),
@@ -48,8 +47,8 @@ func TestFindMedia(t *testing.T) {
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
-			require.NotEqual(t, uuid.Nil.String(), d.KnownMediaID)
-			require.NotEqual(t, uuid.Nil.String(), d.Partition)
+			require.NotEqual(t, uuidx.Nil().String(), d.KnownMediaID)
+			require.NotEqual(t, uuidx.Nil().String(), d.Partition)
 		}
 		for idx := range 128 {
 			genrecord(idx)
@@ -69,8 +68,8 @@ func TestFindMedia(t *testing.T) {
 				ddisc.DiscoveredOptionAutoMagnet,
 			)
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
-			require.Equal(t, uuid.Nil.String(), d.KnownMediaID)
-			require.Equal(t, uuid.Nil.String(), d.Partition)
+			require.Equal(t, uuidx.Nil().String(), d.KnownMediaID)
+			require.Equal(t, uuidx.Nil().String(), d.Partition)
 		}
 
 		require.EqualValues(t, 32, sqltestx.Count(t, q, "SELECT COUNT(*) FROM ddisc_media WHERE partition = '00000000-0000-0000-0000-000000000000'"))
@@ -82,7 +81,7 @@ func TestFindMedia(t *testing.T) {
 				count = 0
 			)
 			for d := range syncer.Each(t.Context()) {
-				require.NotEqual(t, uuid.Nil.String(), d.KnownMediaID)
+				require.NotEqual(t, uuidx.Nil().String(), d.KnownMediaID)
 				count++
 			}
 			require.NoError(t, syncer.Err())
@@ -90,7 +89,7 @@ func TestFindMedia(t *testing.T) {
 		}
 
 		for idx, n := range []int{4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4} {
-			assertbatch(idx, n, ddisc.FindMedia(q, ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(idx))).String()))
+			assertbatch(idx, n, ddisc.FindMedia(q, ddiscapi.ImportedMediaUUID("", uuidx.FromStringOrNil(uuidx.WithSuffix(idx))).String()))
 		}
 
 	})
@@ -103,7 +102,7 @@ func TestFindMedia(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		kid := ddiscapi.ImportedMediaUUID("", uuid.FromStringOrNil(uuidx.WithSuffix(0))).String()
+		kid := ddiscapi.ImportedMediaUUID("", uuidx.FromStringOrNil(uuidx.WithSuffix(0))).String()
 
 		for range 16 {
 			id := int160.Random()

@@ -11,7 +11,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"golang.org/x/time/rate"
 
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
@@ -116,7 +115,7 @@ func (t goldenupload) run(ctx context.Context, r io.Reader, httpc *http.Client) 
 	d := jsonl.Iter[library.Known](jsonl.NewDecoder(r))
 
 	limiter := rate.NewLimiter(rate.Every(t.RateLimit), 1)
-	last := uuid.Nil.String() // last successfully uploaded uid, the resume point for the export --offset.
+	last := uuidx.Nil().String() // last successfully uploaded uid, the resume point for the export --offset.
 
 	for chunk := range iterx.Chunk(d.Each(ctx), t.Batch) {
 		if err := limiter.Wait(ctx); err != nil {
@@ -197,7 +196,7 @@ func (t goldensync) run(ctx context.Context, enc *json.Encoder, httpc *http.Clie
 				return errorsx.Wrapf(err, "invalid tombstoned timestamp: %s", m.Uid)
 			}
 
-			md5 := uuid.FromStringOrNil(m.Md5)
+			md5 := uuidx.FromStringOrNil(m.Md5)
 
 			if err := enc.Encode(library.Known{
 				UID:              m.Uid,

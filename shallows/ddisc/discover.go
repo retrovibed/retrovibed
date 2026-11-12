@@ -7,11 +7,11 @@ import (
 	"iter"
 	"runtime/trace"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
@@ -322,7 +322,7 @@ func ExternalStrategies(plugins searchplugin.T, peertube DiscoverStrategy) []Dis
 // strategies coming up empty.
 func SyncStrategies(q sqlx.Queryer, plugins searchplugin.T, peertube DiscoverStrategy, knownMediaID string) []DiscoverStrategy {
 	strategies := append([]DiscoverStrategy{KnownStrategy(q)}, ExternalStrategies(plugins, peertube)...)
-	if knownMediaID != uuid.Nil.String() {
+	if knownMediaID != uuidx.Nil().String() {
 		strategies = append(strategies, LocalStrategy(q))
 	}
 	return strategies

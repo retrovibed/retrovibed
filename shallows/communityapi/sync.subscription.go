@@ -5,11 +5,11 @@ import (
 	"log"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
@@ -49,7 +49,7 @@ func SyncPublishedContentItem(ctx context.Context, q sqlx.Queryer, pc *Published
 		new(int160.FromByteArray(md.InfoHash)),
 		tracking.MetadataOptionFromMagnet(&md),
 		tracking.MetadataOptionDescription(md.DisplayName),
-		tracking.MetadataOptionKnownMediaID(stringsx.FirstNonBlank(pc.KnownMediaId, uuid.Max.String())),
+		tracking.MetadataOptionKnownMediaID(stringsx.FirstNonBlank(pc.KnownMediaId, uuidx.Max().String())),
 		tracking.MetadataOptionEntropySeed(md.InfoHash.Bytes()),
 		tracking.MetadataOptionMimetype(pc.Mimetype),
 		tracking.MetadataOptionAutoDescription,

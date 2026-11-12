@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -76,8 +75,8 @@ func TestSubscribeEndpoint(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		goodID := uuid.Must(uuid.NewV7()).String()
-		badID := uuid.Must(uuid.NewV7()).String()
+		goodID := uuidx.NewV7().String()
+		badID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -160,7 +159,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 
-		body, err := json.Marshal(&ftuxapi.SubscribeCommunitiesRequest{CommunityId: []string{uuid.Must(uuid.NewV7()).String()}})
+		body, err := json.Marshal(&ftuxapi.SubscribeCommunitiesRequest{CommunityId: []string{uuidx.NewV7().String()}})
 		require.NoError(t, err)
 
 		resp, req, err := httptestx.BuildRequestBytes(

@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -729,9 +729,9 @@ func TestLibrarySearch(t *testing.T) {
 
 		routes, token, q := testlibrary(t, ctx)
 
-		top := testdirectory(t, ctx, q, uuid.Nil.String(), "photos")
+		top := testdirectory(t, ctx, q, uuidx.Nil().String(), "photos")
 		held := testfile(t, ctx, q, top.ID, "held.bin")
-		loose := testfile(t, ctx, q, uuid.Nil.String(), "loose.bin")
+		loose := testfile(t, ctx, q, uuidx.Nil().String(), "loose.bin")
 
 		result := testsearch(t, routes, token, &media.MediaSearchRequest{Limit: 10})
 		require.ElementsMatch(t, []string{top.ID, held.ID, loose.ID}, testresultids(result))
@@ -743,10 +743,10 @@ func TestLibrarySearch(t *testing.T) {
 
 		routes, token, q := testlibrary(t, ctx)
 
-		top := testdirectory(t, ctx, q, uuid.Nil.String(), "photos")
+		top := testdirectory(t, ctx, q, uuidx.Nil().String(), "photos")
 		nested := testdirectory(t, ctx, q, top.ID, "2026")
 		testfile(t, ctx, q, top.ID, "held.bin")
-		testfile(t, ctx, q, uuid.Nil.String(), "loose.bin")
+		testfile(t, ctx, q, uuidx.Nil().String(), "loose.bin")
 
 		result := testsearch(t, routes, token, &media.MediaSearchRequest{Limit: 10, Mimetypes: []string{mimex.Directory}})
 		require.ElementsMatch(t, []string{top.ID, nested.ID}, testresultids(result))

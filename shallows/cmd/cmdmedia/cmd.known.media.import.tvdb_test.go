@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/dashotv/tvdb"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )
@@ -82,7 +82,7 @@ func TestTvdbImportRecords(t *testing.T) {
 		require.NotEmpty(t, got.Md5)
 		// parent_uid is a NOT NULL UUID column; a series is never anyone's
 		// child, so this must be the nil UUID, not Go's zero-value "".
-		require.Equal(t, uuid.Nil.String(), got.ParentUID)
+		require.Equal(t, uuidx.Nil().String(), got.ParentUID)
 	})
 
 	t.Run("skips records with no poster image", func(t *testing.T) {

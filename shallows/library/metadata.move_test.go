@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -17,8 +17,8 @@ func TestMetadataMoveByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		dst := testdirectory(t, ctx, db, uuid.Nil.String(), "dst")
-		md := testfile(t, ctx, db, uuid.Nil.String(), "loose")
+		dst := testdirectory(t, ctx, db, uuidx.Nil().String(), "dst")
+		md := testfile(t, ctx, db, uuidx.Nil().String(), "loose")
 
 		require.NoError(t, library.MetadataMoveByID(ctx, db, md.ID, dst.ID).Scan(&md))
 		require.Equal(t, dst.ID, md.DirectoryID)
@@ -29,11 +29,11 @@ func TestMetadataMoveByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		src := testdirectory(t, ctx, db, uuid.Nil.String(), "src")
+		src := testdirectory(t, ctx, db, uuidx.Nil().String(), "src")
 		md := testfile(t, ctx, db, src.ID, "filed")
 
-		require.NoError(t, library.MetadataMoveByID(ctx, db, md.ID, uuid.Nil.String()).Scan(&md))
-		require.Equal(t, uuid.Nil.String(), md.DirectoryID)
+		require.NoError(t, library.MetadataMoveByID(ctx, db, md.ID, uuidx.Nil().String()).Scan(&md))
+		require.Equal(t, uuidx.Nil().String(), md.DirectoryID)
 	})
 
 	t.Run("moves a folder and its contents travel with it", func(t *testing.T) {
@@ -41,8 +41,8 @@ func TestMetadataMoveByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		dst := testdirectory(t, ctx, db, uuid.Nil.String(), "dst")
-		src := testdirectory(t, ctx, db, uuid.Nil.String(), "src")
+		dst := testdirectory(t, ctx, db, uuidx.Nil().String(), "dst")
+		src := testdirectory(t, ctx, db, uuidx.Nil().String(), "src")
 		held := testfile(t, ctx, db, src.ID, "held")
 
 		require.NoError(t, library.MetadataMoveByID(ctx, db, src.ID, dst.ID).Scan(&src))
@@ -57,7 +57,7 @@ func TestMetadataMoveByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuidx.Nil().String(), "top")
 		nested := testdirectory(t, ctx, db, top.ID, "nested")
 
 		// left to run, this builds a directory_id cycle and every recursive descent then
@@ -66,7 +66,7 @@ func TestMetadataMoveByID(t *testing.T) {
 		require.ErrorIs(t, err, sql.ErrNoRows)
 
 		require.NoError(t, library.MetadataFindByID(ctx, db, top.ID).Scan(&top))
-		require.Equal(t, uuid.Nil.String(), top.DirectoryID)
+		require.Equal(t, uuidx.Nil().String(), top.DirectoryID)
 	})
 
 	t.Run("rejects a row into itself", func(t *testing.T) {
@@ -74,12 +74,12 @@ func TestMetadataMoveByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuidx.Nil().String(), "top")
 
 		require.ErrorIs(t, library.MetadataMoveByID(ctx, db, top.ID, top.ID).Scan(&top), sql.ErrNoRows)
 
 		require.NoError(t, library.MetadataFindByID(ctx, db, top.ID).Scan(&top))
-		require.Equal(t, uuid.Nil.String(), top.DirectoryID)
+		require.Equal(t, uuidx.Nil().String(), top.DirectoryID)
 	})
 
 	t.Run("rejects a parent deep inside the row's own subtree", func(t *testing.T) {
@@ -87,7 +87,7 @@ func TestMetadataMoveByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuidx.Nil().String(), "top")
 		nested := testdirectory(t, ctx, db, top.ID, "nested")
 		deeper := testdirectory(t, ctx, db, nested.ID, "deeper")
 
@@ -99,9 +99,9 @@ func TestMetadataMoveByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		dst := testdirectory(t, ctx, db, uuid.Nil.String(), "dst")
+		dst := testdirectory(t, ctx, db, uuidx.Nil().String(), "dst")
 
 		var md library.Metadata
-		require.ErrorIs(t, library.MetadataMoveByID(ctx, db, uuid.Must(uuid.NewV7()).String(), dst.ID).Scan(&md), sql.ErrNoRows)
+		require.ErrorIs(t, library.MetadataMoveByID(ctx, db, uuidx.NewV7().String(), dst.ID).Scan(&md), sql.ErrNoRows)
 	})
 }

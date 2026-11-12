@@ -8,12 +8,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
@@ -80,7 +80,7 @@ func testdirectory(t *testing.T, ctx context.Context, q sqlx.Queryer, parent, de
 	require.NoError(t, testx.Fake(
 		&md,
 		library.MetadataOptionTestDefaults,
-		library.MetadataOptionTestID(uuid.Must(uuid.NewV7()).String()),
+		library.MetadataOptionTestID(uuidx.NewV7().String()),
 		library.MetadataOptionMimetype(mimex.Directory),
 		library.MetadataOptionDescription(description),
 		library.MetadataOptionAutoDescription(description),
@@ -136,11 +136,11 @@ func TestFilesystemCreate(t *testing.T) {
 
 		require.Equal(t, mimex.Directory, result.Media.Mimetype)
 		require.Equal(t, "photos", result.Media.Description)
-		require.Equal(t, uuid.Nil.String(), result.Media.DirectoryId)
+		require.Equal(t, uuidx.Nil().String(), result.Media.DirectoryId)
 
 		// the id cannot be the md5 of the content the way every other row's is, because a
 		// directory has no content.
-		require.NotEqual(t, uuid.Nil.String(), result.Media.Id)
+		require.NotEqual(t, uuidx.Nil().String(), result.Media.Id)
 
 		var md library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, result.Media.Id).Scan(&md))
@@ -148,7 +148,7 @@ func TestFilesystemCreate(t *testing.T) {
 
 		// a directory that reached the identification daemon would be matched against
 		// known media and then published to the discovery network.
-		require.Equal(t, uuid.Nil.String(), md.KnownMediaID)
+		require.Equal(t, uuidx.Nil().String(), md.KnownMediaID)
 	})
 
 	t.Run("creates a directory inside another", func(t *testing.T) {

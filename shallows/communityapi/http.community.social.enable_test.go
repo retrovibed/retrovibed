@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
@@ -44,12 +43,12 @@ func TestHTTPSocialEnable(t *testing.T) {
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration(), jwtx.ClaimsOptionIssuer(aid)), metaapi.TokenOptionFromAuthz(v)))
 
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-			ID: uuid.Must(uuid.NewV7()).String(), AccountID: uuid.Nil.String(),
+			ID: uuidx.NewV7().String(), AccountID: uuidx.Nil().String(),
 		}).Scan(&com))
 
 		var publisher community.PluginPublisher
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
+			ID: uuidx.NewV7().String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
 		}).Scan(&publisher))
 
 		routes := mux.NewRouter()
@@ -103,12 +102,12 @@ func TestHTTPSocialEnable(t *testing.T) {
 		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration(), jwtx.ClaimsOptionIssuer(aid)), metaapi.TokenOptionFromAuthz(v)))
 
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-			ID: uuid.Must(uuid.NewV7()).String(), AccountID: uuid.Nil.String(),
+			ID: uuidx.NewV7().String(), AccountID: uuidx.Nil().String(),
 		}).Scan(&com))
 
 		var publisher community.PluginPublisher
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
+			ID: uuidx.NewV7().String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
 		}).Scan(&publisher))
 
 		routes := mux.NewRouter()
@@ -148,12 +147,12 @@ func TestHTTPSocialEnable(t *testing.T) {
 
 		var com community.Community
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-			ID: uuid.Must(uuid.NewV7()).String(), AccountID: uuid.Nil.String(),
+			ID: uuidx.NewV7().String(), AccountID: uuidx.Nil().String(),
 		}).Scan(&com))
 
 		var publisher community.PluginPublisher
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-			ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
+			ID: uuidx.NewV7().String(), Path: "/plugins/x", Description: "X", Mimetype: "application/vnd.retrovibe.publisher.x",
 		}).Scan(&publisher))
 
 		routes := mux.NewRouter()

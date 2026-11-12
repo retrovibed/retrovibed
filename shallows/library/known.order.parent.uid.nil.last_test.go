@@ -3,8 +3,8 @@ package library_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -17,8 +17,8 @@ func TestKnownOrderParentUIDNilLast(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		parent := uuid.Must(uuid.NewV4()).String()
-		for _, p := range []string{uuid.Nil.String(), parent, uuid.Nil.String(), parent} {
+		parent := uuidx.NewV4().String()
+		for _, p := range []string{uuidx.Nil().String(), parent, uuidx.Nil().String(), parent} {
 			var known library.Known
 			require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, library.KnownOptionParentUID(p)))
 			require.NoError(t, library.KnownInsertWithDefaults(ctx, db, known).Scan(&known))
@@ -31,7 +31,7 @@ func TestKnownOrderParentUIDNilLast(t *testing.T) {
 		require.Len(t, found, 4)
 		require.Equal(t, parent, found[0].ParentUID)
 		require.Equal(t, parent, found[1].ParentUID)
-		require.Equal(t, uuid.Nil.String(), found[2].ParentUID)
-		require.Equal(t, uuid.Nil.String(), found[3].ParentUID)
+		require.Equal(t, uuidx.Nil().String(), found[2].ParentUID)
+		require.Equal(t, uuidx.Nil().String(), found[3].ParentUID)
 	})
 }

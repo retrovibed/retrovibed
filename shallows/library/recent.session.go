@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
@@ -60,8 +60,8 @@ func RecentSessionOptionProfileID(id string) RecentSessionOption {
 }
 
 func RecentSessionOptionTestDefaults(s *RecentSession) {
-	s.ID = uuid.Nil.String()
-	s.MediaID = uuid.Nil.String()
+	s.ID = uuidx.Nil().String()
+	s.MediaID = uuidx.Nil().String()
 	s.Query = nil
 	s.Position = 0
 	s.Duration = 0

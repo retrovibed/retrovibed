@@ -7,12 +7,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/linxGnu/pqueue/entry"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -34,7 +34,7 @@ func TestTombstonedEndpoint(t *testing.T) {
 			q             = sqltestx.Metadatabase(t)
 			p             meta.Profile
 			v             meta.Authz
-			nonExistentID = uuid.Must(uuid.NewV7()).String()
+			nonExistentID = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -72,7 +72,7 @@ func TestTombstonedEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -82,14 +82,14 @@ func TestTombstonedEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		lmd := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Description:    "test media",
 			Bytes:          1024,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -137,7 +137,7 @@ func TestTombstonedEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -147,14 +147,14 @@ func TestTombstonedEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		lmd := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Description:    "test media",
 			Bytes:          1024,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -207,7 +207,7 @@ func TestTombstonedEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -221,11 +221,11 @@ func TestTombstonedEndpoint(t *testing.T) {
 				ID:             libraryID,
 				Description:    "test media " + libraryID,
 				Bytes:          512,
-				TorrentID:      uuid.Nil.String(),
-				KnownMediaID:   uuid.Nil.String(),
-				ArchiveID:      uuid.Nil.String(),
-				DirectoryID:    uuid.Nil.String(),
-				EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+				TorrentID:      uuidx.Nil().String(),
+				KnownMediaID:   uuidx.Nil().String(),
+				ArchiveID:      uuidx.Nil().String(),
+				DirectoryID:    uuidx.Nil().String(),
+				EncryptionSeed: uuidx.NewV4().String(),
 			}
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 			var pc community.PublishedContent
@@ -238,8 +238,8 @@ func TestTombstonedEndpoint(t *testing.T) {
 			return pc
 		}
 
-		pc1 := insertPC(uuid.Must(uuid.NewV7()).String())
-		pc2 := insertPC(uuid.Must(uuid.NewV7()).String())
+		pc1 := insertPC(uuidx.NewV7().String())
+		pc2 := insertPC(uuidx.NewV7().String())
 		require.NotEmpty(t, pc1.ID)
 		require.NotEmpty(t, pc2.ID)
 
@@ -283,7 +283,7 @@ func TestTombstonedEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -293,14 +293,14 @@ func TestTombstonedEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		lmd := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Description:    "test media",
 			Bytes:          1024,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 

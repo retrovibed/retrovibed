@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -54,7 +54,7 @@ func TestRecentTombstone(t *testing.T) {
 
 		var rs library.RecentSession
 		require.NoError(t, library.RecentSessionInsertWithDefaults(ctx, q, library.RecentSession{
-			ID:        uuid.Must(uuid.NewV4()).String(),
+			ID:        uuidx.NewV4().String(),
 			ProfileID: p.ID,
 			MediaID:   md.ID,
 			Query:     encoded,

@@ -11,12 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
-	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
@@ -47,7 +45,7 @@ func TestDeeppoolReaderAtDownload(t *testing.T) {
 
 		var (
 			digest = md5.New()
-			seed   = errorsx.Must(uuid.NewV4())
+			seed   = uuidx.NewV4()
 		)
 
 		md := library.NewMetadata(uuidx.WithSuffix(1), library.MetadataOptionEncryptionSeed(seed.String()), library.MetadataOptionBytes(nlen))
@@ -78,7 +76,7 @@ func TestDeeppoolReaderAtDownload(t *testing.T) {
 
 		var (
 			digest = md5.New()
-			seed   = errorsx.Must(uuid.NewV4())
+			seed   = uuidx.NewV4()
 		)
 
 		md := library.NewMetadata(uuidx.WithSuffix(1), library.MetadataOptionEncryptionSeed(seed.String()), library.MetadataOptionBytes(nlen))
@@ -108,7 +106,7 @@ func TestDeeppoolReaderAtDownload(t *testing.T) {
 
 		var (
 			digest = md5.New()
-			seed   = errorsx.Must(uuid.NewV4())
+			seed   = uuidx.NewV4()
 		)
 
 		md := library.NewMetadata(uuidx.WithSuffix(1), library.MetadataOptionEncryptionSeed(seed.String()), library.MetadataOptionBytes(nlen))
@@ -190,7 +188,7 @@ func TestDeeppoolReaderAtDownload(t *testing.T) {
 
 		var (
 			digest = md5.New()
-			seed   = errorsx.Must(uuid.NewV4())
+			seed   = uuidx.NewV4()
 		)
 
 		md := library.NewMetadata(

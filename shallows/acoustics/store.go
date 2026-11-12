@@ -3,7 +3,7 @@ package acoustics
 import (
 	"context"
 
-	"github.com/gofrs/uuid/v5"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
@@ -35,13 +35,13 @@ func StoreFailed(ctx context.Context, q sqlx.Queryer, id string, statsVersion ui
 }
 
 // DeleteFeatures removes a row from audio_features. The HNSW index updates automatically.
-func DeleteFeatures(ctx context.Context, q sqlx.Queryer, id uuid.UUID) error {
+func DeleteFeatures(ctx context.Context, q sqlx.Queryer, id uuidx.UUID) error {
 	var a AudioFeatures
 	return sqlx.IgnoreNoRows(AudioFeaturesDeleteByID(ctx, q, id.String()).Scan(&a))
 }
 
 // FetchFeatures retrieves a single feature vector by media_id.
-func FetchFeatures(ctx context.Context, q sqlx.Queryer, id uuid.UUID) (FeatureVector, error) {
+func FetchFeatures(ctx context.Context, q sqlx.Queryer, id uuidx.UUID) (FeatureVector, error) {
 	var (
 		a  AudioFeatures
 		fv FeatureVector
@@ -56,7 +56,7 @@ func FetchFeatures(ctx context.Context, q sqlx.Queryer, id uuid.UUID) (FeatureVe
 // SimilarMediaIDs returns up to n media IDs nearest to vec by cosine similarity,
 // filtered by threshold (cosine sim >= threshold), excluding any IDs in `exclude`.
 // Backed by the HNSW index on audio_features.features.
-func SimilarMediaIDs(ctx context.Context, q sqlx.Queryer, vec FeatureVector, exclude []uuid.UUID, n int, threshold float64) ([]uuid.UUID, error) {
+func SimilarMediaIDs(ctx context.Context, q sqlx.Queryer, vec FeatureVector, exclude []uuidx.UUID, n int, threshold float64) ([]uuidx.UUID, error) {
 	excludeStrs := make([]string, len(exclude))
 	for i, uid := range exclude {
 		excludeStrs[i] = uid.String()
@@ -65,7 +65,7 @@ func SimilarMediaIDs(ctx context.Context, q sqlx.Queryer, vec FeatureVector, exc
 	v := sqlx.Scan(AudioFeaturesSimilarByVec(ctx, q, vec[:], excludeStrs, n))
 
 	var (
-		ids    []uuid.UUID
+		ids    []uuidx.UUID
 		rowVec FeatureVector
 	)
 	for a := range v.Iter() {
@@ -73,7 +73,7 @@ func SimilarMediaIDs(ctx context.Context, q sqlx.Queryer, vec FeatureVector, exc
 		if CosineSimilarity(vec, rowVec) < threshold {
 			continue
 		}
-		id, err := uuid.FromString(a.MediaID)
+		id, err := uuidx.FromString(a.MediaID)
 		if err != nil {
 			continue
 		}

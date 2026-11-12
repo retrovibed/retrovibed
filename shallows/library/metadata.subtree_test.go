@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
@@ -21,7 +21,7 @@ func testdirectory(t *testing.T, ctx context.Context, q sqlx.Queryer, parent, de
 	require.NoError(t, testx.Fake(
 		&md,
 		library.MetadataOptionTestDefaults,
-		library.MetadataOptionTestID(uuid.Must(uuid.NewV7()).String()),
+		library.MetadataOptionTestID(uuidx.NewV7().String()),
 		library.MetadataOptionMimetype(mimex.Directory),
 		library.MetadataOptionDescription(description),
 		library.MetadataOptionDirectoryID(parent),
@@ -58,10 +58,10 @@ func TestMetadataSubtreeByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuidx.Nil().String(), "top")
 		nested := testdirectory(t, ctx, db, top.ID, "nested")
 		deep := testfile(t, ctx, db, nested.ID, "deep")
-		outside := testfile(t, ctx, db, uuid.Nil.String(), "outside")
+		outside := testfile(t, ctx, db, uuidx.Nil().String(), "outside")
 
 		found := testids(t, library.MetadataSubtreeByID(ctx, db, top.ID))
 		require.ElementsMatch(t, []string{top.ID, nested.ID, deep.ID}, found)
@@ -73,7 +73,7 @@ func TestMetadataSubtreeByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		lone := testfile(t, ctx, db, uuid.Nil.String(), "lone")
+		lone := testfile(t, ctx, db, uuidx.Nil().String(), "lone")
 
 		require.Equal(t, []string{lone.ID}, testids(t, library.MetadataSubtreeByID(ctx, db, lone.ID)))
 	})
@@ -83,7 +83,7 @@ func TestMetadataSubtreeByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		require.Empty(t, testids(t, library.MetadataSubtreeByID(ctx, db, uuid.Must(uuid.NewV7()).String())))
+		require.Empty(t, testids(t, library.MetadataSubtreeByID(ctx, db, uuidx.NewV7().String())))
 	})
 }
 
@@ -93,7 +93,7 @@ func TestMetadataAncestorsByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuidx.Nil().String(), "top")
 		nested := testdirectory(t, ctx, db, top.ID, "nested")
 		deep := testfile(t, ctx, db, nested.ID, "deep")
 
@@ -105,7 +105,7 @@ func TestMetadataAncestorsByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuidx.Nil().String(), "top")
 
 		require.Equal(t, []string{top.ID}, testids(t, library.MetadataAncestorsByID(ctx, db, top.ID)))
 	})
@@ -117,10 +117,10 @@ func TestMetadataTombstoneSubtreeByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		top := testdirectory(t, ctx, db, uuid.Nil.String(), "top")
+		top := testdirectory(t, ctx, db, uuidx.Nil().String(), "top")
 		nested := testdirectory(t, ctx, db, top.ID, "nested")
 		deep := testfile(t, ctx, db, nested.ID, "deep")
-		outside := testfile(t, ctx, db, uuid.Nil.String(), "outside")
+		outside := testfile(t, ctx, db, uuidx.Nil().String(), "outside")
 
 		tombstoned := testids(t, library.MetadataTombstoneSubtreeByID(ctx, db, top.ID))
 		require.ElementsMatch(t, []string{top.ID, nested.ID, deep.ID}, tombstoned)
@@ -136,8 +136,8 @@ func TestMetadataTombstoneSubtreeByID(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		keep := testfile(t, ctx, db, uuid.Nil.String(), "keep")
-		drop := testfile(t, ctx, db, uuid.Nil.String(), "drop")
+		keep := testfile(t, ctx, db, uuidx.Nil().String(), "keep")
+		drop := testfile(t, ctx, db, uuidx.Nil().String(), "drop")
 
 		require.Equal(t, []string{drop.ID}, testids(t, library.MetadataTombstoneSubtreeByID(ctx, db, drop.ID)))
 

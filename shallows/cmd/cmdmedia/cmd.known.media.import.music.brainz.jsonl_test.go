@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
@@ -61,7 +61,7 @@ func TestMBJSONLImportReleases(t *testing.T) {
 		require.Equal(t, "musicbrainz", results[0].Source)
 		// parent_uid is a NOT NULL UUID column; a release is never anyone's
 		// child, so this must be the nil UUID, not Go's zero-value "".
-		require.Equal(t, uuid.Nil.String(), results[0].ParentUID)
+		require.Equal(t, uuidx.Nil().String(), results[0].ParentUID)
 	})
 
 	t.Run("falls back to release title when release group title is absent", func(t *testing.T) {

@@ -8,13 +8,13 @@ import (
 	"testing"
 
 	"github.com/coder/websocket"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/searchplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -31,7 +31,7 @@ func TestHTTPDiscoveryLocateSocket(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		kid := uuid.Must(uuid.NewV4()).String()
+		kid := uuidx.NewV4().String()
 
 		worseID := int160.Random()
 		worse := ddisc.NewDiscovered(&worseID,

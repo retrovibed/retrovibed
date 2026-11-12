@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/lucenex"
@@ -31,10 +31,10 @@ const (
 )
 
 func AutoimportDirectoryOptionTestDefaults(d *AutoimportDirectory) {
-	d.ID = uuid.Nil.String()
+	d.ID = uuidx.Nil().String()
 	d.Debounce = time.Hour
 	d.Mode = AutoimportModeCopy
-	d.LibraryDirectoryID = uuid.Nil.String()
+	d.LibraryDirectoryID = uuidx.Nil().String()
 	d.LastScannedAt = timex.NegInf()
 }
 
@@ -51,9 +51,9 @@ func AutoimportDirectoryOptionMode(m uint32) func(*AutoimportDirectory) {
 }
 
 func AutoimportFileOptionTestDefaults(f *AutoimportFile) {
-	f.ID = uuid.Nil.String()
-	f.DirectoryID = uuid.Nil.String()
-	f.LibraryMetadataID = uuid.Nil.String()
+	f.ID = uuidx.Nil().String()
+	f.DirectoryID = uuidx.Nil().String()
+	f.LibraryMetadataID = uuidx.Nil().String()
 	f.LastImportedAt = timex.NegInf()
 	f.Attempts = 0
 	f.Error = ""

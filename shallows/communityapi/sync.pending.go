@@ -7,12 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/linxGnu/pqueue"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -34,7 +34,7 @@ func magnetURI(tmd tracking.Metadata, name string) string {
 }
 
 func ensureTorrent(ctx context.Context, q sqlx.Queryer, mvfs, tvfs fsx.Virtual, lmd *library.Metadata) (tmd tracking.Metadata, err error) {
-	if lmd.TorrentID != uuid.Nil.String() {
+	if lmd.TorrentID != uuidx.Nil().String() {
 		if err = tracking.MetadataFindByID(ctx, q, lmd.TorrentID).Scan(&tmd); err != nil {
 			return tmd, err
 		}

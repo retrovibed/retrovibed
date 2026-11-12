@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
@@ -40,20 +39,20 @@ func TestHTTPSocialSearch(t *testing.T) {
 
 	var owned, other community.Community
 	require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-		ID: uuid.Must(uuid.NewV7()).String(), AccountID: aid, Description: "owned by profile",
+		ID: uuidx.NewV7().String(), AccountID: aid, Description: "owned by profile",
 	}).Scan(&owned))
 	require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-		ID: uuid.Must(uuid.NewV7()).String(), AccountID: uuid.Must(uuid.NewV7()).String(), Description: "owned by someone else",
+		ID: uuidx.NewV7().String(), AccountID: uuidx.NewV7().String(), Description: "owned by someone else",
 	}).Scan(&other))
 
 	var publisher community.PluginPublisher
 	require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-		ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/youtube", Description: "YouTube", Mimetype: "application/vnd.retrovibe.publisher.youtube",
+		ID: uuidx.NewV7().String(), Path: "/plugins/youtube", Description: "YouTube", Mimetype: "application/vnd.retrovibe.publisher.youtube",
 	}).Scan(&publisher))
 
 	var enabled community.CommunityPublisher
 	require.NoError(t, community.CommunityPublisherInsertWithDefaults(ctx, q, community.CommunityPublisher{
-		ID: uuid.Must(uuid.NewV7()).String(), CommunityID: owned.ID, PublisherID: publisher.ID,
+		ID: uuidx.NewV7().String(), CommunityID: owned.ID, PublisherID: publisher.ID,
 	}).Scan(&enabled))
 
 	routes := mux.NewRouter()
@@ -90,7 +89,7 @@ func TestHTTPSocialSearch(t *testing.T) {
 	t.Run("returns a community with no publishers", func(t *testing.T) {
 		var unconfigured community.Community
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, community.Community{
-			ID: uuid.Must(uuid.NewV7()).String(), AccountID: aid, Description: "nothing enabled yet",
+			ID: uuidx.NewV7().String(), AccountID: aid, Description: "nothing enabled yet",
 		}).Scan(&unconfigured))
 
 		resp, req, err := httptestx.BuildRequestBytes(

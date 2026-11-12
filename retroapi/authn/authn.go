@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/env"
@@ -28,6 +27,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/internal/stringsx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/oauth2"
 )
@@ -163,7 +163,7 @@ func oauth2Bearer(ctx context.Context, signer ssh.Signer, c *http.Client, cfg oa
 	c = httpx.BindRetryTransport(c, http.StatusBadGateway, http.StatusTooManyRequests)
 
 	state, err := jwtx.EncodeJSON(exstate{
-		Entropy:   errorsx.Must(uuid.NewV4()).String(),
+		Entropy:   uuidx.NewV4().String(),
 		PublicKey: signer.PublicKey().Marshal(),
 		Email:     email,
 		Display:   displayname,
@@ -343,7 +343,7 @@ func OAuth2SSHToken(ctx context.Context, signer ssh.Signer, endpoint oauth2.Endp
 		sig *ssh.Signature
 	)
 
-	password := uuid.Must(uuid.NewV4())
+	password := uuidx.NewV4()
 
 	cfg = OAuth2SSHConfig(signer, password.String(), endpoint)
 	if sig, err = signer.Sign(rand.Reader, password.Bytes()); err != nil {
@@ -362,10 +362,7 @@ func AutoTokenState(signer ssh.Signer) (encoded string, err error) {
 		PublicKey []byte `json:"pkey"`
 	}
 
-	id, err := uuid.NewV4()
-	if err != nil {
-		return "", err
-	}
+	id := uuidx.NewV4()
 	rawstate := reqstate{
 		ID:        id.String(),
 		PublicKey: signer.PublicKey().Marshal(),

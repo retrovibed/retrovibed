@@ -6,18 +6,18 @@ import (
 	"net/netip"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 )
 
 // announce the provided partitions, and identify any useful peers for syncing.
-func Announce(ctx context.Context, cln *torrent.Client, s *dht.Server, partitions ...uuid.UUID) (err error) {
+func Announce(ctx context.Context, cln *torrent.Client, s *dht.Server, partitions ...uuidx.UUID) (err error) {
 	log.Println("----------------------------------------- announce initiated", len(partitions))
 	defer log.Println("----------------------------------------- announce completed", len(partitions))
 	for {
@@ -49,7 +49,7 @@ func Announce(ctx context.Context, cln *torrent.Client, s *dht.Server, partition
 				dctx, done := context.WithTimeout(ctx, time.Second)
 				defer done()
 
-				req, err := NewSyncRequest(id, p.String(), uuid.Nil.String())
+				req, err := NewSyncRequest(id, p.String(), uuidx.Nil().String())
 				if err != nil {
 					return errorsx.Wrap(err, "failed to create sync request")
 				}

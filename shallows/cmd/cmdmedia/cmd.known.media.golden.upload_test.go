@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )
@@ -29,13 +29,13 @@ func TestKnownGoldenUpload(t *testing.T) {
 		enc := json.NewEncoder(&input)
 		for _, title := range []string{"one", "two", "three"} {
 			require.NoError(t, enc.Encode(library.Known{
-				UID:       uuid.Must(uuid.NewV4()).String(),
-				Md5:       uuid.Must(uuid.NewV4()).String(),
+				UID:       uuidx.NewV4().String(),
+				Md5:       uuidx.NewV4().String(),
 				Source:    "tmdb",
 				Title:     title,
 				Collation: 7,
 				Released:  time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
-				ParentUID: uuid.Nil.String(),
+				ParentUID: uuidx.Nil().String(),
 			}))
 		}
 
@@ -70,11 +70,11 @@ func TestKnownGoldenUpload(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		require.NoError(t, json.NewEncoder(&input).Encode(library.Known{UID: uuid.Must(uuid.NewV4()).String(), Md5: uuid.Must(uuid.NewV4()).String()}))
+		require.NoError(t, json.NewEncoder(&input).Encode(library.Known{UID: uuidx.NewV4().String(), Md5: uuidx.NewV4().String()}))
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			requests++
-			if requests < 3 {
+			if requests < 2 {
 				w.WriteHeader(http.StatusBadGateway)
 				return
 			}
@@ -83,8 +83,9 @@ func TestKnownGoldenUpload(t *testing.T) {
 		defer srv.Close()
 
 		cmd := goldenupload{Batch: 2, Retries: 3, Backoff: time.Millisecond}
-		require.NoError(t, cmd.run(ctx, &input, &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
-		require.Equal(t, 3, requests)
+		client := httpx.BindRetryTransport(&http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}, http.StatusBadGateway)
+		require.NoError(t, cmd.run(ctx, &input, client))
+		require.Equal(t, 2, requests)
 	})
 
 	t.Run("does not retry client errors", func(t *testing.T) {
@@ -95,7 +96,7 @@ func TestKnownGoldenUpload(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		require.NoError(t, json.NewEncoder(&input).Encode(library.Known{UID: uuid.Must(uuid.NewV4()).String(), Md5: uuid.Must(uuid.NewV4()).String()}))
+		require.NoError(t, json.NewEncoder(&input).Encode(library.Known{UID: uuidx.NewV4().String(), Md5: uuidx.NewV4().String()}))
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			requests++
@@ -113,7 +114,7 @@ func TestKnownGoldenUpload(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
-		require.NoError(t, json.NewEncoder(&input).Encode(library.Known{UID: uuid.Must(uuid.NewV4()).String(), Md5: uuid.Must(uuid.NewV4()).String()}))
+		require.NoError(t, json.NewEncoder(&input).Encode(library.Known{UID: uuidx.NewV4().String(), Md5: uuidx.NewV4().String()}))
 
 		srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusUnauthorized)

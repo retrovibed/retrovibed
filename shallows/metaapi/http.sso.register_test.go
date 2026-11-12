@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
@@ -14,6 +13,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -64,9 +64,9 @@ func TestHTTPSSORegister(t *testing.T) {
 
 		token := httpauthtest.UnsafeClaimsToken(
 			jwtx.NewJWTClaims(
-				uuid.Nil.String(),
+				uuidx.Nil().String(),
 				jwtx.ClaimsOptionAuthnExpiration(),
-				jwtx.ClaimsOptionID(uuid.Nil.String()),
+				jwtx.ClaimsOptionID(uuidx.Nil().String()),
 				jwtx.ClaimsOptionIssuer(iden.ID),
 			),
 			authn.JWTRegistrationSecretFromEnv(env.JWTSecret),
@@ -96,7 +96,7 @@ func TestHTTPSSORegister(t *testing.T) {
 
 		require.WithinRange(t, claims.NotBefore.Time, time.Now().Add(-1*time.Minute), time.Now().Add(time.Hour))
 		require.WithinRange(t, claims.ExpiresAt.Time, time.Now().Add(-1*time.Minute), time.Now().Add(7*24*time.Hour))
-		require.NotEqual(t, uuid.Nil.String(), claims.Subject)
+		require.NotEqual(t, uuidx.Nil().String(), claims.Subject)
 		require.NoError(t, meta.ProfileFindByID(t.Context(), q, claims.Subject).Scan(&p))
 		require.Equal(t, p.Display, "derp")
 		require.NoError(t, identityssh.IdentityFindByID(t.Context(), q, sqlx.NewNullString(iden.ID)).Scan(&iden))
@@ -123,7 +123,7 @@ func TestHTTPSSORegister(t *testing.T) {
 		require.NoError(
 			t,
 			testx.Fake(&iden, func(a *identityssh.Identity) {
-				a.ID = uuid.Must(uuid.NewV4()).String()
+				a.ID = uuidx.NewV4().String()
 				a.ProfileID = p.ID
 			}),
 		)
@@ -134,9 +134,9 @@ func TestHTTPSSORegister(t *testing.T) {
 
 		token := httpauthtest.UnsafeClaimsToken(
 			jwtx.NewJWTClaims(
-				uuid.Nil.String(),
+				uuidx.Nil().String(),
 				jwtx.ClaimsOptionAuthnExpiration(),
-				jwtx.ClaimsOptionID(uuid.Nil.String()),
+				jwtx.ClaimsOptionID(uuidx.Nil().String()),
 				jwtx.ClaimsOptionIssuer(iden.ID),
 			),
 			authn.JWTRegistrationSecretFromEnv(env.JWTSecret),

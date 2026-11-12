@@ -39,6 +39,7 @@ import (
 )
 
 type logging interface {
+	Writer() io.Writer
 	Println(v ...any)
 	Printf(format string, v ...any)
 	Print(v ...any)

@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -59,7 +58,7 @@ func TestSyncProtocol(t *testing.T) {
 		)
 		defer tclient.Close()
 
-		knownmedia := ddiscapi.ImportedMediaUUID(t.Name(), uuid.Must(uuid.NewV7()))
+		knownmedia := ddiscapi.ImportedMediaUUID(t.Name(), uuidx.NewV7())
 		genrecord := func(ctx context.Context, q sqlx.Queryer, idx int) {
 			id := int160.Random()
 			d := ddisc.NewDiscovered(
@@ -71,13 +70,13 @@ func TestSyncProtocol(t *testing.T) {
 			)
 
 			require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
-			require.NotEqual(t, uuid.Nil.String(), d.KnownMediaID)
+			require.NotEqual(t, uuidx.Nil().String(), d.KnownMediaID)
 		}
 		for idx := range records {
 			genrecord(t.Context(), pdb, idx)
 		}
 
-		req, err := ddisctorrent.NewSyncRequest(cdht.ID(cdht.DynamicAddrPort()), uuidx.WithSuffix(0), uuid.Nil.String())
+		req, err := ddisctorrent.NewSyncRequest(cdht.ID(cdht.DynamicAddrPort()), uuidx.WithSuffix(0), uuidx.Nil().String())
 		require.NoError(t, err)
 
 		ret := cdht.Query(t.Context(), dht.NewAddr(pdht.DynamicAddrPort()), req)

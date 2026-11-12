@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -36,7 +36,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		)
 		defer done()
 
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -44,26 +44,26 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		lmd1 := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Description:    "first media",
 			Bytes:          1024,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
 
 		lmd2 := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Description:    "second media",
 			Bytes:          2048,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
@@ -133,7 +133,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		)
 		defer done()
 
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -141,26 +141,26 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		lmd1 := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Description:    "active media",
 			Bytes:          1024,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
 
 		lmd2 := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Description:    "tombstoned media",
 			Bytes:          2048,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
@@ -223,7 +223,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		)
 		defer done()
 
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -231,24 +231,24 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		lmd1 := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Bytes:          1024,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
 
 		lmd2 := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Bytes:          2048,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
@@ -315,7 +315,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		)
 		defer done()
 
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -323,24 +323,24 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		lmd1 := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Bytes:          1024,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
 
 		lmd2 := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Bytes:          2048,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd2).Scan(&lmd2))
 
@@ -411,7 +411,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		)
 		defer done()
 
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -419,13 +419,13 @@ func TestPublishedListEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		lmd1 := library.Metadata{
-			ID:             uuid.Must(uuid.NewV7()).String(),
+			ID:             uuidx.NewV7().String(),
 			Bytes:          1024,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd1).Scan(&lmd1))
 
@@ -482,7 +482,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 		)
@@ -532,7 +532,7 @@ func TestPublishedListEndpoint(t *testing.T) {
 		)
 		defer done()
 
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -544,13 +544,13 @@ func TestPublishedListEndpoint(t *testing.T) {
 		pcs := make([]community.PublishedContent, 3)
 		for i := range lmds {
 			lmds[i] = library.Metadata{
-				ID:             uuid.Must(uuid.NewV7()).String(),
+				ID:             uuidx.NewV7().String(),
 				Bytes:          1024,
-				TorrentID:      uuid.Nil.String(),
-				KnownMediaID:   uuid.Nil.String(),
-				ArchiveID:      uuid.Nil.String(),
-				DirectoryID:    uuid.Nil.String(),
-				EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+				TorrentID:      uuidx.Nil().String(),
+				KnownMediaID:   uuidx.Nil().String(),
+				ArchiveID:      uuidx.Nil().String(),
+				DirectoryID:    uuidx.Nil().String(),
+				EncryptionSeed: uuidx.NewV4().String(),
 			}
 			require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmds[i]).Scan(&lmds[i]))
 

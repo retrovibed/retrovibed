@@ -9,11 +9,11 @@ import (
 	"time"
 
 	tmdb "github.com/cyruzin/golang-tmdb"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )
@@ -184,7 +184,7 @@ func TestTmdbImportSeries(t *testing.T) {
 		require.NotEmpty(t, got.Md5)
 		// parent_uid is a NOT NULL UUID column; a show is never anyone's
 		// child, so this must be the nil UUID, not Go's zero-value "".
-		require.Equal(t, uuid.Nil.String(), got.ParentUID)
+		require.Equal(t, uuidx.Nil().String(), got.ParentUID)
 	})
 
 	t.Run("a movie, a show, and an episode sharing the same tmdb numeric id never collide into the same UID", func(t *testing.T) {
@@ -223,7 +223,7 @@ func TestTmdbImportSeries(t *testing.T) {
 		require.NotEmpty(t, movieUID)
 
 		for v := range tm.series(ctx, client) {
-			if v.ParentUID == uuid.Nil.String() {
+			if v.ParentUID == uuidx.Nil().String() {
 				showUID = v.UID
 			} else {
 				episodeUID = v.UID
@@ -444,7 +444,7 @@ func TestTmdbImportMovies(t *testing.T) {
 		require.NotEmpty(t, got.Md5)
 		// parent_uid is a NOT NULL UUID column; a movie is never anyone's
 		// child, so this must be the nil UUID, not Go's zero-value "".
-		require.Equal(t, uuid.Nil.String(), got.ParentUID)
+		require.Equal(t, uuidx.Nil().String(), got.ParentUID)
 	})
 
 	t.Run("records the cause and stops once tmdb persistently errors", func(t *testing.T) {

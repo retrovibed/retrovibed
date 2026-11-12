@@ -6,10 +6,10 @@ import (
 	"io"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -101,7 +101,7 @@ func TestExportJSONLRun(t *testing.T) {
 		db := sqltestx.Metadatabase(t)
 		vfs := fsx.DirVirtual(t.TempDir())
 
-		realKnownID := uuid.Must(uuid.NewV4()).String()
+		realKnownID := uuidx.NewV4().String()
 		var withKnown, withoutKnown library.Metadata
 		require.NoError(t, testx.Fake(&withKnown, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionKnownMediaID(realKnownID)))
 		require.NoError(t, testx.Fake(&withoutKnown, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
@@ -126,7 +126,7 @@ func TestExportJSONLRun(t *testing.T) {
 		db := sqltestx.Metadatabase(t)
 		vfs := fsx.DirVirtual(t.TempDir())
 
-		realKnownID := uuid.Must(uuid.NewV4()).String()
+		realKnownID := uuidx.NewV4().String()
 		var withKnown, withoutKnown library.Metadata
 		require.NoError(t, testx.Fake(&withKnown, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionKnownMediaID(realKnownID)))
 		require.NoError(t, testx.Fake(&withoutKnown, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
@@ -174,7 +174,7 @@ func TestExportJSONLRun(t *testing.T) {
 		db := sqltestx.Metadatabase(t)
 		vfs := fsx.DirVirtual(t.TempDir())
 
-		torrentID := uuid.Must(uuid.NewV4()).String()
+		torrentID := uuidx.NewV4().String()
 		var withTorrent, withoutTorrent library.Metadata
 		require.NoError(t, testx.Fake(&withTorrent, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionTorrentID(torrentID)))
 		require.NoError(t, testx.Fake(&withoutTorrent, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))

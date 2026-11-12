@@ -37,7 +37,7 @@ func TestPublish(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		r, err := newRegistry(ctx, defaultSocket(), OptionConfigDir(t.TempDir()), OptionCacheDir(t.TempDir()))
+		r, err := newRegistry(ctx, defaultSocket(), OptionConfigDir(t.TempDir()), OptionCacheDir(t.TempDir()), OptionRuntimeDir(t.TempDir()))
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 

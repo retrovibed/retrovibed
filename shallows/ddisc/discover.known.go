@@ -8,7 +8,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/iterx"
@@ -79,7 +78,7 @@ func (t *knownSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 			// TEMPORARY: exclude episode rows (they share their show's
 			// title) until real episode-aware matching exists; otherwise
 			// a popular show's episodes crowd out its own row here.
-			library.KnownQueryParentUID(uuid.Nil.String()),
+			library.KnownQueryParentUID(uuidx.Nil().String()),
 		}).Limit(knownStrategyLimit)
 
 		s := sqlx.Scan(library.KnownSearch(ctx, t.q, qq))
@@ -141,7 +140,7 @@ func (t *knownMediaDetectSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 				return d, errorsx.Wrap(err, "unable to detect known media")
 			}
 
-			if !uuidx.IsMinMax(uuid.FromStringOrNil(known.UID)) {
+			if !uuidx.IsMinMax(uuidx.FromStringOrNil(known.UID)) {
 				log.Println("known media", d.Title, "->", spew.Sdump(known))
 				d.KnownMediaID = known.UID
 			} else {
@@ -194,8 +193,8 @@ type knownMediaDynamicSeq struct {
 func (t *knownMediaDynamicSeq) Each(ctx context.Context) iter.Seq[Discovered] {
 	return func(yield func(Discovered) bool) {
 		for d := range t.inner.Each(ctx) {
-			if uuidx.IsMinMax(uuid.FromStringOrNil(d.KnownMediaID)) && stringsx.Present(d.Title) && stringsx.Present(d.PosterURI) {
-				kid := uuid.Must(uuid.NewV4())
+			if uuidx.IsMinMax(uuidx.FromStringOrNil(d.KnownMediaID)) && stringsx.Present(d.Title) && stringsx.Present(d.PosterURI) {
+				kid := uuidx.NewV4()
 				known := KnownMediaFromDiscovered(kid, d)
 				if err := library.KnownInsertWithDefaultsTOFU(ctx, t.q, known).Scan(&known); err != nil {
 					log.Println("unable to record known media from discovered candidate", err)

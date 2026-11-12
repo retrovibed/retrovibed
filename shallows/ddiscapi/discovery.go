@@ -1,9 +1,9 @@
 package ddiscapi
 
 import (
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -20,7 +20,7 @@ func NewDiscoveryFromTrackingUnknownHash(mu tracking.UnknownHash) *Discovery {
 		NextCheck:    grpcx.EncodeTime(timex.RFC3339NanoEncode(mu.NextCheck)),
 		CreatedAt:    grpcx.EncodeTime(timex.RFC3339NanoEncode(mu.CreatedAt)),
 		UpdatedAt:    grpcx.EncodeTime(timex.RFC3339NanoEncode(mu.UpdatedAt)),
-		KnownMediaId: uuid.Nil.String(),
+		KnownMediaId: uuidx.Nil().String(),
 		Uri:          mg.String(),
 	}
 }
@@ -45,7 +45,7 @@ func NewDiscoveryFromDiscovered(d ddisc.Discovered) *Discovery {
 		Health:           d.Health,
 		Bytes:            d.Bytes,
 		PolicyRank:       uint32(d.PolicyRank),
-		KnownMediaId:     uuid.FromStringOrNil(d.KnownMediaID).String(),
+		KnownMediaId:     uuidx.FromStringOrNil(d.KnownMediaID).String(),
 		Uri:              d.URI,
 		AcquisitionState: AcquisitionState(d.AcquisitionState),
 	}
@@ -65,7 +65,7 @@ func NewDiscoveredFromDiscovery(d *Discovery) ddisc.Discovered {
 		ddisc.DiscoveredOptionDescription(d.Description),
 		ddisc.DiscoveredOptionHealth(d.Health),
 		ddisc.DiscoveredOptionURI(d.Uri),
-		ddisc.DiscoveredOptionKnownMedia(uuid.FromStringOrNil(d.KnownMediaId).String()),
+		ddisc.DiscoveredOptionKnownMedia(uuidx.FromStringOrNil(d.KnownMediaId).String()),
 	)
 	m.ID = d.Id
 	m.Source = d.Source

@@ -3,8 +3,8 @@ package communityapi_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -17,7 +17,7 @@ func TestSubscribeCommunity(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		sub, err := communityapi.SubscribeCommunity(ctx, q, newCommunityMockClient(communityID), communityID)
 		require.NoError(t, err)
@@ -31,7 +31,7 @@ func TestSubscribeCommunity(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 		client := newCommunityMockClient(communityID)
 
 		_, err := communityapi.SubscribeCommunity(ctx, q, client, communityID)

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
@@ -16,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/cryptox"
@@ -60,7 +60,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader("application/octet-stream", "content", "example.bin"))
@@ -101,7 +101,7 @@ func TestLibraryUploadFile(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, result.Media.Id, testx.IOMD5(io.NewSectionReader(bcache, 0, int64(md.Bytes))))
-		require.Equal(t, uuid.Max.String(), md.KnownMediaID, "uploaded media should be marked for auto identification")
+		require.Equal(t, uuidx.Max().String(), md.KnownMediaID, "uploaded media should be marked for auto identification")
 	})
 
 	t.Run("simple_filename", func(t *testing.T) {
@@ -132,7 +132,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "example.mp4"))
@@ -199,7 +199,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "my-example-video.mp4"))
@@ -266,7 +266,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "my_example_video.mp4"))
@@ -333,7 +333,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "video.file.name.mp4"))
@@ -400,7 +400,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "my video file.mp4"))
@@ -467,7 +467,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "video:part.two.mp4"))
@@ -534,7 +534,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "movie-2024.v1.mp4"))
@@ -601,7 +601,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "test_upload.mp4"))
@@ -641,9 +641,9 @@ func TestLibraryUploadFile(t *testing.T) {
 		require.Equal(t, mimex.RetrovibedMediaArchive, md.Mimetype)
 		require.Equal(t, "test_upload.mp4", md.Description)
 		require.Equal(t, "test upload mp4", md.AutoDescription)
-		require.Equal(t, uuid.Nil.String(), md.ArchiveID)
-		require.Equal(t, uuid.Nil.String(), md.TorrentID)
-		require.NotEqual(t, uuid.Nil.String(), md.EncryptionSeed)
+		require.Equal(t, uuidx.Nil().String(), md.ArchiveID)
+		require.Equal(t, uuidx.Nil().String(), md.TorrentID)
+		require.NotEqual(t, uuidx.Nil().String(), md.EncryptionSeed)
 		require.Equal(t, timex.Inf(), md.HiddenAt)
 		require.Equal(t, timex.Inf(), md.TombstonedAt)
 		require.False(t, md.CreatedAt.IsZero())
@@ -687,7 +687,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "duplicate.mp4"))
@@ -778,7 +778,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "tombstoned.mp4"))
@@ -932,7 +932,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RetrovibedMediaArchive, "content", "archive.mp4"))
@@ -998,7 +998,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.Binary, "content", "binary.bin"))
@@ -1064,7 +1064,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.JSON, "content", "data.json"))
@@ -1130,7 +1130,7 @@ func TestLibraryUploadFile(t *testing.T) {
 			media.HTTPLibraryOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		prng := cryptox.NewChaCha8(errorsx.Must(uuid.NewV4()).String())
+		prng := cryptox.NewChaCha8(uuidx.NewV4().String())
 
 		mimetype, buf, err := httpx.Multipart(func(w *multipart.Writer) error {
 			part, lerr := w.CreatePart(httpx.NewMultipartHeader(mimex.RSS, "content", "feed.rss"))

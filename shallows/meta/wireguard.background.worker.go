@@ -7,10 +7,10 @@ import (
 	"log"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/atomicx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/fsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/dnscache"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/netx"
@@ -75,7 +75,7 @@ func NewWireguardNetworkBackgroundAuto(ctx context.Context, dir string, ring Wir
 			return nil, err
 		}
 
-		path := fsx.DirVirtual(dir).Path(uuid.FromStringOrNil(wg.ID).String())
+		path := fsx.DirVirtual(dir).Path(uuidx.FromStringOrNil(wg.ID).String())
 		if !fsx.Exists(path) {
 			return nil, nil
 		}
@@ -100,7 +100,7 @@ func NewWireguardNetworkBackgroundAuto(ctx context.Context, dir string, ring Wir
 			return err
 		}
 
-		path := fsx.DirVirtual(dir).Path(uuid.FromStringOrNil(wg.ID).String())
+		path := fsx.DirVirtual(dir).Path(uuidx.FromStringOrNil(wg.ID).String())
 		if !fsx.Exists(path) {
 			return nil
 		}

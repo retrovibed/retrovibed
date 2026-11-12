@@ -8,7 +8,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
@@ -16,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
@@ -259,9 +259,9 @@ func (t *HTTPLocate) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	d = ddisc.NewLocate(d.Query, d.Mimetype, ddisc.LocateOptionKnownMedia(langx.FirstNonZero(d.KnownMediaID, uuid.Nil.String())), ddisc.LocateOptionAdult(d.Adult))
+	d = ddisc.NewLocate(d.Query, d.Mimetype, ddisc.LocateOptionKnownMedia(langx.FirstNonZero(d.KnownMediaID, uuidx.Nil().String())), ddisc.LocateOptionAdult(d.Adult))
 
-	if d.KnownMediaID == uuid.Nil.String() && d.Query == "" {
+	if d.KnownMediaID == uuidx.Nil().String() && d.Query == "" {
 		log.Println("locate requires a known media id or a query")
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

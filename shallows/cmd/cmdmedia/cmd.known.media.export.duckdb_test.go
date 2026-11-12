@@ -5,8 +5,8 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -20,7 +20,7 @@ func TestDuckdbexportRun(t *testing.T) {
 		db := sqltestx.Metadatabase(t)
 
 		var out bytes.Buffer
-		require.NoError(t, duckdbexport{Offset: uuid.Nil.String()}.run(ctx, db, &out))
+		require.NoError(t, duckdbexport{Offset: uuidx.Nil().String()}.run(ctx, db, &out))
 		require.Equal(t, 0, out.Len())
 	})
 
@@ -41,7 +41,7 @@ func TestDuckdbexportRun(t *testing.T) {
 		require.NoError(t, knownimport{}.run(ctx, db, &input))
 
 		var out bytes.Buffer
-		require.NoError(t, duckdbexport{Offset: uuid.Nil.String()}.run(ctx, db, &out))
+		require.NoError(t, duckdbexport{Offset: uuidx.Nil().String()}.run(ctx, db, &out))
 
 		var got []library.Known
 		for v := range jsonl.Iter[library.Known](jsonl.NewDecoder(&out)).Each(ctx) {
@@ -69,7 +69,7 @@ func TestDuckdbexportRun(t *testing.T) {
 		require.NoError(t, knownimport{}.run(ctx, db, &input))
 
 		var out bytes.Buffer
-		require.NoError(t, duckdbexport{Offset: uuid.Nil.String()}.run(ctx, db, &out))
+		require.NoError(t, duckdbexport{Offset: uuidx.Nil().String()}.run(ctx, db, &out))
 
 		var got []library.Known
 		for v := range jsonl.Iter[library.Known](jsonl.NewDecoder(&out)).Each(ctx) {
@@ -127,7 +127,7 @@ func TestDuckdbexportRun(t *testing.T) {
 		require.NoError(t, knownimport{}.run(ctx, db, &input))
 
 		var out bytes.Buffer
-		require.NoError(t, duckdbexport{Offset: uuid.Nil.String(), ID: []string{a.UID}}.run(ctx, db, &out))
+		require.NoError(t, duckdbexport{Offset: uuidx.Nil().String(), ID: []string{a.UID}}.run(ctx, db, &out))
 
 		var got []library.Known
 		for v := range jsonl.Iter[library.Known](jsonl.NewDecoder(&out)).Each(ctx) {
@@ -156,7 +156,7 @@ func TestDuckdbexportRun(t *testing.T) {
 		require.NoError(t, knownimport{}.run(ctx, db, &input))
 
 		var out bytes.Buffer
-		require.NoError(t, duckdbexport{Offset: uuid.Nil.String(), Language: "fr"}.run(ctx, db, &out))
+		require.NoError(t, duckdbexport{Offset: uuidx.Nil().String(), Language: "fr"}.run(ctx, db, &out))
 
 		var got []library.Known
 		for v := range jsonl.Iter[library.Known](jsonl.NewDecoder(&out)).Each(ctx) {
@@ -183,7 +183,7 @@ func TestDuckdbexportRun(t *testing.T) {
 		require.NoError(t, knownimport{}.run(ctx, db, &input))
 
 		var out bytes.Buffer
-		require.NoError(t, duckdbexport{Offset: uuid.Nil.String(), Mimetype: "video/mp4"}.run(ctx, db, &out))
+		require.NoError(t, duckdbexport{Offset: uuidx.Nil().String(), Mimetype: "video/mp4"}.run(ctx, db, &out))
 
 		var got []library.Known
 		for v := range jsonl.Iter[library.Known](jsonl.NewDecoder(&out)).Each(ctx) {
@@ -210,7 +210,7 @@ func TestDuckdbexportRun(t *testing.T) {
 		require.NoError(t, knownimport{}.run(ctx, db, &input))
 
 		var out bytes.Buffer
-		require.NoError(t, duckdbexport{Offset: uuid.Nil.String(), Source: []string{"tmdb"}}.run(ctx, db, &out))
+		require.NoError(t, duckdbexport{Offset: uuidx.Nil().String(), Source: []string{"tmdb"}}.run(ctx, db, &out))
 
 		var got []library.Known
 		for v := range jsonl.Iter[library.Known](jsonl.NewDecoder(&out)).Each(ctx) {
@@ -239,7 +239,7 @@ func TestDuckdbexportRun(t *testing.T) {
 		require.NoError(t, knownimport{}.run(ctx, db, &input))
 
 		var out bytes.Buffer
-		require.NoError(t, duckdbexport{Offset: uuid.Nil.String(), Explicit: false}.run(ctx, db, &out))
+		require.NoError(t, duckdbexport{Offset: uuidx.Nil().String(), Explicit: false}.run(ctx, db, &out))
 
 		var got []library.Known
 		for v := range jsonl.Iter[library.Known](jsonl.NewDecoder(&out)).Each(ctx) {
@@ -268,7 +268,7 @@ func TestDuckdbexportRun(t *testing.T) {
 		require.NoError(t, knownimport{}.run(ctx, db, &input))
 
 		var out bytes.Buffer
-		require.NoError(t, duckdbexport{Offset: uuid.Nil.String(), Explicit: true}.run(ctx, db, &out))
+		require.NoError(t, duckdbexport{Offset: uuidx.Nil().String(), Explicit: true}.run(ctx, db, &out))
 
 		var got []library.Known
 		for v := range jsonl.Iter[library.Known](jsonl.NewDecoder(&out)).Each(ctx) {
@@ -292,7 +292,7 @@ func TestDuckdbexportRun(t *testing.T) {
 		}
 
 		var out bytes.Buffer
-		require.NoError(t, duckdbexport{Offset: uuid.Nil.String(), Limit: 2}.run(ctx, db, &out))
+		require.NoError(t, duckdbexport{Offset: uuidx.Nil().String(), Limit: 2}.run(ctx, db, &out))
 
 		var got []library.Known
 		for v := range jsonl.Iter[library.Known](jsonl.NewDecoder(&out)).Each(ctx) {

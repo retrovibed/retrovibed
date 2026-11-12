@@ -4,13 +4,13 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -32,10 +32,10 @@ func TestHTTPCommunityPublisherSearch(t *testing.T) {
 		spotify community.PluginPublisher
 	)
 	require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-		ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/youtube", Description: "YouTube", Mimetype: "application/vnd.retrovibe.publisher.youtube",
+		ID: uuidx.NewV7().String(), Path: "/plugins/youtube", Description: "YouTube", Mimetype: "application/vnd.retrovibe.publisher.youtube",
 	}).Scan(&youtube))
 	require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
-		ID: uuid.Must(uuid.NewV7()).String(), Path: "/plugins/spotify", Description: "Spotify", Mimetype: "application/vnd.retrovibe.publisher.spotify",
+		ID: uuidx.NewV7().String(), Path: "/plugins/spotify", Description: "Spotify", Mimetype: "application/vnd.retrovibe.publisher.spotify",
 	}).Scan(&spotify))
 
 	reg := testx.Must(publishplugin.NewRegistry(ctx, publishplugin.OptionConfigDir(t.TempDir()), publishplugin.OptionCacheDir(t.TempDir())))(t)
@@ -49,7 +49,7 @@ func TestHTTPCommunityPublisherSearch(t *testing.T) {
 
 	var v meta.Authz
 	require.NoError(t, testx.Fake(&v, meta.AuthzOptionAdmin))
-	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 
 	t.Run("lists the catalog", func(t *testing.T) {
 		resp, req, err := httptestx.BuildRequestBytes(
@@ -107,7 +107,7 @@ func TestHTTPCommunityPublisherSearch(t *testing.T) {
 		require.Empty(t, ids(t, "?excluded="+youtube.ID+"&excluded="+spotify.ID))
 
 		// an id nobody installed leaves the catalog alone.
-		require.ElementsMatch(t, []string{youtube.ID, spotify.ID}, ids(t, "?excluded="+uuid.Must(uuid.NewV7()).String()))
+		require.ElementsMatch(t, []string{youtube.ID, spotify.ID}, ids(t, "?excluded="+uuidx.NewV7().String()))
 
 		// and it composes with the text query.
 		require.Equal(t, []string{spotify.ID}, ids(t, "?excluded="+youtube.ID+"&query=Spotify"))
@@ -115,7 +115,7 @@ func TestHTTPCommunityPublisherSearch(t *testing.T) {
 	})
 
 	t.Run("requires a privileged token", func(t *testing.T) {
-		claims := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		unprivileged := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/", nil, httptestx.RequestOptionAuthorization(unprivileged))

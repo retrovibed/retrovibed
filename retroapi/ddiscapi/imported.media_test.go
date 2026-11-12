@@ -4,8 +4,8 @@ import (
 	"math"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/ddiscapi"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/stretchr/testify/require"
 )
 
@@ -50,8 +50,8 @@ func TestImportedMediaUintID(t *testing.T) {
 }
 
 func TestImportedMediaUUID(t *testing.T) {
-	mustParse := func(s string) uuid.UUID {
-		u, err := uuid.FromString(s)
+	mustParse := func(s string) uuidx.UUID {
+		u, err := uuidx.FromString(s)
 		require.NoError(t, err)
 		return u
 	}

@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -112,7 +112,7 @@ func TestPublishDiscoveredMediaOne(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		var lmd library.Metadata
-		require.NoError(t, testx.Fake(&lmd, library.MetadataOptionTestDefaults, library.MetadataOptionTorrentID(uuid.Must(uuid.NewV4()).String())))
+		require.NoError(t, testx.Fake(&lmd, library.MetadataOptionTestDefaults, library.MetadataOptionTorrentID(uuidx.NewV4().String())))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		require.Error(t, publishDiscoveredMediaOne(ctx, q, lmd))
@@ -129,7 +129,7 @@ func TestPublishDiscoveredMediaOne(t *testing.T) {
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, tmd).Scan(&tmd))
 
 		var lmd library.Metadata
-		require.NoError(t, testx.Fake(&lmd, library.MetadataOptionTestDefaults, library.MetadataOptionKnownMediaID(uuid.Must(uuid.NewV4()).String()), library.MetadataOptionTorrentID(tmd.ID)))
+		require.NoError(t, testx.Fake(&lmd, library.MetadataOptionTestDefaults, library.MetadataOptionKnownMediaID(uuidx.NewV4().String()), library.MetadataOptionTorrentID(tmd.ID)))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		require.Error(t, publishDiscoveredMediaOne(ctx, q, lmd))

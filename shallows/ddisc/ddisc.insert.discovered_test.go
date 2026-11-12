@@ -5,12 +5,12 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -215,7 +215,7 @@ func TestDiscoveredInsertWithDefaults(t *testing.T) {
 		)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, d).Scan(&d))
 		require.True(t, utf8.ValidString(d.Title))
-		require.Equal(t, uuid.Nil.String(), d.SyncUID)
+		require.Equal(t, uuidx.Nil().String(), d.SyncUID)
 	})
 
 	t.Run("round trips hidden_at infinity sentinels", func(t *testing.T) {

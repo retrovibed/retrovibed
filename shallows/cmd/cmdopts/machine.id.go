@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 )
 
 func MachineID() string {
@@ -27,7 +27,7 @@ func MachineID() string {
 	}
 
 	// log.Println("failed to read a valid machine id, generating a random uuid", err)
-	uid := uuid.Must(uuid.NewV7()).String()
+	uid := uuidx.NewV7().String()
 	if err = os.WriteFile(midpath, []byte(uid), 0600); err == nil {
 		return strings.TrimSpace(uid)
 	}

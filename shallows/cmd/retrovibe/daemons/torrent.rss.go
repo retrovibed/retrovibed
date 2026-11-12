@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/storage"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
@@ -143,8 +142,8 @@ func DiscoverFromRSSFeedsOnce(
 
 		importer := tracking.NewURIImport(q, c, rootstore)
 		encryptionseed := uuidx.FirstNonNil(
-			uuid.FromStringOrNil(feed.EncryptionSeed),
-			uuid.FromStringOrNil(channel.Retrovibed.Entropy),
+			uuidx.FromStringOrNil(feed.EncryptionSeed),
+			uuidx.FromStringOrNil(channel.Retrovibed.Entropy),
 		).Bytes()
 
 		for _, item := range items {
@@ -158,7 +157,7 @@ func DiscoverFromRSSFeedsOnce(
 				uri.URL,
 				tracking.MetadataOptionMimetype(stringsx.FirstNonBlank(channel.Retrovibed.Mimetype, uri.Mimetype)),
 				tracking.MetadataOptionDescriptionDefault(item.Title),
-				tracking.MetadataOptionKnownMediaID(uuid.Max.String()),
+				tracking.MetadataOptionKnownMediaID(uuidx.Max().String()),
 				tracking.MetadataOptionAutoEntropySeed(encryptionseed),
 				tracking.MetadataOptionAutoArchive(feed.Autoarchive),
 				tracking.MetadataOptionAutoBytes(uri.Length),

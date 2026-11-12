@@ -8,12 +8,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -46,12 +46,12 @@ func TestHTTPPublisherEnvironment(t *testing.T) {
 
 	var v meta.Authz
 	require.NoError(t, testx.Fake(&v, meta.AuthzOptionAdmin))
-	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+	claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
 	token := httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)
 
 	t.Run("declaration is served when nothing is configured yet", func(t *testing.T) {
 		var row community.PluginPublisher
-		id := uuid.Must(uuid.NewV7()).String()
+		id := uuidx.NewV7().String()
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
 			ID: id, Path: filepath.Join(dir, id+".wasm"), Description: "lemmy",
 		}).Scan(&row))
@@ -73,7 +73,7 @@ func TestHTTPPublisherEnvironment(t *testing.T) {
 
 	t.Run("configured values are merged over the declaration, hints intact", func(t *testing.T) {
 		var row community.PluginPublisher
-		id := uuid.Must(uuid.NewV7()).String()
+		id := uuidx.NewV7().String()
 		path := filepath.Join(dir, id+".wasm")
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
 			ID: id, Path: path, Description: "lemmy",
@@ -102,7 +102,7 @@ func TestHTTPPublisherEnvironment(t *testing.T) {
 
 	t.Run("an unreadable plugin still serves what was configured", func(t *testing.T) {
 		var row community.PluginPublisher
-		id := uuid.Must(uuid.NewV7()).String()
+		id := uuidx.NewV7().String()
 		path := filepath.Join(dir, id+".wasm")
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
 			ID: id, Path: path, Description: "lemmy",
@@ -126,7 +126,7 @@ func TestHTTPPublisherEnvironment(t *testing.T) {
 
 	t.Run("update writes the sidecar and delete removes it", func(t *testing.T) {
 		var row community.PluginPublisher
-		id := uuid.Must(uuid.NewV7()).String()
+		id := uuidx.NewV7().String()
 		path := filepath.Join(dir, id+".wasm")
 		require.NoError(t, community.PluginPublisherInsertWithDefaults(ctx, q, community.PluginPublisher{
 			ID: id, Path: path, Description: "lemmy",
@@ -166,7 +166,7 @@ func TestHTTPPublisherEnvironment(t *testing.T) {
 			communityapi.HTTPPublisherEnvironmentOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+uuid.Must(uuid.NewV7()).String(), nil, httptestx.RequestOptionAuthorization(token))
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+uuidx.NewV7().String(), nil, httptestx.RequestOptionAuthorization(token))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)
@@ -174,7 +174,7 @@ func TestHTTPPublisherEnvironment(t *testing.T) {
 	})
 
 	t.Run("requires a privileged token", func(t *testing.T) {
-		unprivileged := jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		unprivileged := jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 
 		routes := mux.NewRouter()
 		communityapi.NewHTTPPublisherEnvironment(
@@ -183,7 +183,7 @@ func TestHTTPPublisherEnvironment(t *testing.T) {
 			communityapi.HTTPPublisherEnvironmentOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+uuid.Must(uuid.NewV7()).String(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&unprivileged, httpauthtest.UnsafeJWTSecretSource)))
+		resp, req, err := httptestx.BuildRequestBytes(http.MethodGet, "/"+uuidx.NewV7().String(), nil, httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&unprivileged, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
 
 		routes.ServeHTTP(resp, req)

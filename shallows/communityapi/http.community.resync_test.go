@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
@@ -58,7 +57,7 @@ func TestResyncEndpoint(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -66,7 +65,7 @@ func TestResyncEndpoint(t *testing.T) {
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
 		before := time.Now().Add(-time.Hour)
-		sub = community.Community{ID: communityID, AccountID: uuid.Nil.String(), NextSyncAt: before}
+		sub = community.Community{ID: communityID, AccountID: uuidx.Nil().String(), NextSyncAt: before}
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, sub).Scan(&sub))
 
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
@@ -117,22 +116,22 @@ func TestResyncEndpoint(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
 		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
 		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
 
-		sub = community.Community{ID: communityID, AccountID: uuid.Nil.String(), NextSyncAt: time.Now().Add(-time.Hour)}
+		sub = community.Community{ID: communityID, AccountID: uuidx.Nil().String(), NextSyncAt: time.Now().Add(-time.Hour)}
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, sub).Scan(&sub))
 
 		for range 2 {
 			var pc community.PublishedContent
 			require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
-				p.ID = uuid.Must(uuid.NewV7()).String()
+				p.ID = uuidx.NewV7().String()
 				p.CommunityID = communityID
-				p.LibraryID = uuid.Must(uuid.NewV7()).String()
+				p.LibraryID = uuidx.NewV7().String()
 				p.PublishedAt = time.Now()
 			}))
 			require.NoError(t, community.PublishedContentInsertWithDefaults(ctx, q, pc).Scan(&pc))
@@ -195,7 +194,7 @@ func TestResyncEndpoint(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))

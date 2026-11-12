@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
@@ -68,7 +67,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -124,7 +123,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
@@ -188,7 +187,7 @@ func TestSubscribeEndpoint(t *testing.T) {
 		defer done()
 
 		q := sqltestx.Metadatabase(t)
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
 		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))

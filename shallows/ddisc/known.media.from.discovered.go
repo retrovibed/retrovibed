@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -19,14 +18,14 @@ import (
 // from now, since this only ever feeds KnownInsertWithDefaultsTOFU - a
 // discovery placeholder self-expires unless rediscovered (see that
 // function's ON CONFLICT, which refreshes tombstoned_at on every write).
-func KnownMediaFromDiscovered(kid uuid.UUID, d Discovered) library.Known {
+func KnownMediaFromDiscovered(kid uuidx.UUID, d Discovered) library.Known {
 	// kid is folded into the hash (not just Title/Description) so the md5
 	// column's UNIQUE NOT NULL constraint can't collide across two
 	// different known-media ids that happen to share a blank/identical
 	// title+description - a collision would fail the insert outright,
 	// since ON CONFLICT (uid) only covers a uid conflict, not a md5 one.
 	contentmd5 := md5x.Digest(kid.String(), d.Title, d.Description)
-	uidmd5 := uuid.FromBytesOrNil(contentmd5.Sum(nil))
+	uidmd5 := uuidx.FromBytesOrNil(contentmd5.Sum(nil))
 
 	return library.Known{
 		UID:             kid.String(),
@@ -39,7 +38,7 @@ func KnownMediaFromDiscovered(kid uuid.UUID, d Discovered) library.Known {
 		Mimetype:        Generalize(d.Mimetype),
 		Released:        timex.Inf(), // no release date available from the wire format
 		AutoDescription: d.Title,
-		ParentUID:       uuid.Nil.String(), // standalone entry - discovery never yields episodes/children directly
+		ParentUID:       uuidx.Nil().String(), // standalone entry - discovery never yields episodes/children directly
 		TombstonedAt:    time.Now().Add(knownMediaTOFUTTL),
 	}
 }

@@ -3,8 +3,8 @@ package acoustics_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/acoustics"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
@@ -21,11 +21,11 @@ func TestStoreFailed(t *testing.T) {
 			vec[i] = float32(i%7) + 1
 		}
 
-		good := uuid.Must(uuid.NewV4())
+		good := uuidx.NewV4()
 		require.NoError(t, acoustics.StoreFeatures(ctx, db, good.String(), vec, acoustics.StatsVersion))
 
 		// an undecodable file: zero vector, failed=true.
-		bad := uuid.Must(uuid.NewV4())
+		bad := uuidx.NewV4()
 		require.NoError(t, acoustics.StoreFailed(ctx, db, bad.String(), acoustics.StatsVersion))
 
 		// only the good track counts toward the cold-start threshold.

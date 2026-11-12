@@ -6,7 +6,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
@@ -15,6 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -103,7 +103,7 @@ func (t *HTTPFilesystem) search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	msg.Next.Limit = numericx.Min(msg.Next.Limit, 100)
-	msg.Next.DirectoryId = stringsx.FirstNonBlank(msg.Next.DirectoryId, uuid.Nil.String())
+	msg.Next.DirectoryId = stringsx.FirstNonBlank(msg.Next.DirectoryId, uuidx.Nil().String())
 
 	// directories float to the top of their own listing, which is the ordering every file
 	// manager uses. the mimetype is bound rather than interpolated.
@@ -143,7 +143,7 @@ func (t *HTTPFilesystem) search(w http.ResponseWriter, r *http.Request) {
 
 // the listed directory and its ancestors. the root is not itself a row and has no path.
 func (t *HTTPFilesystem) path(r *http.Request, msg *FilesystemSearchResponse) error {
-	if uuid.FromStringOrNil(msg.Next.DirectoryId) == uuid.Nil {
+	if uuidx.FromStringOrNil(msg.Next.DirectoryId) == uuidx.Nil() {
 		return nil
 	}
 
@@ -179,11 +179,11 @@ func (t *HTTPFilesystem) create(w http.ResponseWriter, r *http.Request) {
 	// known_media_id stays at the zero uuid, which keeps directories out of the
 	// identification daemon and, through it, off the discovery network.
 	md := library.NewMetadata(
-		uuid.Must(uuid.NewV7()).String(),
+		uuidx.NewV7().String(),
 		library.MetadataOptionDescription(req.Name),
 		library.MetadataOptionAutoDescription(library.NormalizedDescription(req.Name)),
 		library.MetadataOptionMimetype(mimex.Directory),
-		library.MetadataOptionDirectoryID(stringsx.FirstNonBlank(req.DirectoryId, uuid.Nil.String())),
+		library.MetadataOptionDirectoryID(stringsx.FirstNonBlank(req.DirectoryId, uuidx.Nil().String())),
 	)
 
 	if err := library.DirectoryUpsert(r.Context(), t.q, md).Scan(&md); err != nil {
@@ -217,7 +217,7 @@ func (t *HTTPFilesystem) move(w http.ResponseWriter, r *http.Request) {
 	// recursive descent here would then run until the process is killed. such a move
 	// matches no row, which is indistinguishable from a missing id and equally a bad
 	// request either way.
-	if err := library.MetadataMoveByID(r.Context(), t.q, id, stringsx.FirstNonBlank(req.DirectoryId, uuid.Nil.String())).Scan(&md); sqlx.ErrNoRows(err) != nil {
+	if err := library.MetadataMoveByID(r.Context(), t.q, id, stringsx.FirstNonBlank(req.DirectoryId, uuidx.Nil().String())).Scan(&md); sqlx.ErrNoRows(err) != nil {
 		log.Println("move rejected", id, "into", req.DirectoryId)
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return

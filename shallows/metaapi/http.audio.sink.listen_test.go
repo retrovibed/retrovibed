@@ -10,11 +10,11 @@ import (
 	"testing"
 
 	"github.com/coder/websocket"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/audiox"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -32,7 +32,7 @@ func TestHTTPAudioSinkListen(t *testing.T) {
 			metaapi.HTTPAudioSinkOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims := jwtx.NewJWTClaims(testx.Must(uuid.NewV4())(t).String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.NewV4().String(), jwtx.ClaimsOptionAuthnExpiration())
 		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		resp, req, err := httptestx.BuildRequestContextBytes(context.Background(), http.MethodGet, "/", nil, httptestx.RequestOptionAuthorization(token), httptestx.RequestOptionHeader("Upgrade", "websocket"))
@@ -61,7 +61,7 @@ func TestHTTPAudioSinkListen(t *testing.T) {
 			metaapi.HTTPAudioSinkOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims := jwtx.NewJWTClaims(testx.Must(uuid.NewV4())(t).String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.NewV4().String(), jwtx.ClaimsOptionAuthnExpiration())
 		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		server := httptest.NewServer(routes)
@@ -99,7 +99,7 @@ func TestHTTPAudioSinkListen(t *testing.T) {
 			metaapi.HTTPAudioSinkOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims := jwtx.NewJWTClaims(testx.Must(uuid.NewV4())(t).String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.NewV4().String(), jwtx.ClaimsOptionAuthnExpiration())
 		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		server := httptest.NewServer(routes)
@@ -131,7 +131,7 @@ func TestHTTPAudioSinkListen(t *testing.T) {
 			metaapi.HTTPAudioSinkOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims := jwtx.NewJWTClaims(testx.Must(uuid.NewV4())(t).String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims := jwtx.NewJWTClaims(uuidx.NewV4().String(), jwtx.ClaimsOptionAuthnExpiration())
 		token := httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)
 
 		server := httptest.NewServer(routes)

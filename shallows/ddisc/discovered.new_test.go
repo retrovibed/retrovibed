@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/internal/torrentx"
@@ -36,8 +36,8 @@ func TestNewDiscovered(t *testing.T) {
 		id := int160.Random()
 		d := ddisc.NewDiscovered(&id)
 
-		require.Equal(t, uuid.Nil.String(), d.KnownMediaID)
-		require.Equal(t, uuid.Nil.String(), d.Partition)
+		require.Equal(t, uuidx.Nil().String(), d.KnownMediaID)
+		require.Equal(t, uuidx.Nil().String(), d.Partition)
 	})
 
 	t.Run("defaults locales to undetermined", func(t *testing.T) {

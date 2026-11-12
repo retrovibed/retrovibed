@@ -6,13 +6,13 @@ import (
 	"net/http"
 
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpauth"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/acoustics"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
@@ -62,7 +62,7 @@ func (t *HTTPSimilar) Bind(r *mux.Router) {
 func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 	var (
 		err     error
-		mediaID uuid.UUID
+		mediaID uuidx.UUID
 		md      library.Metadata
 		result  MediaFindResponse
 		req     MediaSearchRequest
@@ -70,7 +70,7 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("acoustic similarity initiated")
 	defer log.Println("acoustic similarity completed")
-	mediaID, err = uuid.FromString(mux.Vars(r)["media_id"])
+	mediaID, err = uuidx.FromString(mux.Vars(r)["media_id"])
 	if err != nil {
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -92,8 +92,8 @@ func (t *HTTPSimilar) similar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	parsed := slicesx.MapTransform(uuid.FromStringOrNil, req.Excluded...)
-	exclude := append([]uuid.UUID{mediaID}, parsed...)
+	parsed := slicesx.MapTransform(uuidx.FromStringOrNil, req.Excluded...)
+	exclude := append([]uuidx.UUID{mediaID}, parsed...)
 
 	ids, err := acoustics.SimilarMediaIDs(r.Context(), t.q, seedVec, exclude, similarLimit, similarityThreshold)
 	if err != nil {

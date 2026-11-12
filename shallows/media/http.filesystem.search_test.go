@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/formx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
@@ -46,9 +46,9 @@ func TestFilesystemSearch(t *testing.T) {
 
 		routes, token, q := testfilesystem(t, ctx)
 
-		top := testdirectory(t, ctx, q, uuid.Nil.String(), "photos")
+		top := testdirectory(t, ctx, q, uuidx.Nil().String(), "photos")
 		testfile(t, ctx, q, top.ID, "held.bin")
-		loose := testfile(t, ctx, q, uuid.Nil.String(), "loose.bin")
+		loose := testfile(t, ctx, q, uuidx.Nil().String(), "loose.bin")
 
 		result := testfssearch(t, routes, token, &media.FilesystemSearchRequest{Limit: 10})
 		require.ElementsMatch(t, []string{top.ID, loose.ID}, testfsids(result))
@@ -61,10 +61,10 @@ func TestFilesystemSearch(t *testing.T) {
 
 		routes, token, q := testfilesystem(t, ctx)
 
-		top := testdirectory(t, ctx, q, uuid.Nil.String(), "photos")
+		top := testdirectory(t, ctx, q, uuidx.Nil().String(), "photos")
 		nested := testdirectory(t, ctx, q, top.ID, "2026")
 		held := testfile(t, ctx, q, top.ID, "held.bin")
-		testfile(t, ctx, q, uuid.Nil.String(), "loose.bin")
+		testfile(t, ctx, q, uuidx.Nil().String(), "loose.bin")
 
 		result := testfssearch(t, routes, token, &media.FilesystemSearchRequest{Limit: 10, DirectoryId: top.ID})
 		require.ElementsMatch(t, []string{nested.ID, held.ID}, testfsids(result))
@@ -76,7 +76,7 @@ func TestFilesystemSearch(t *testing.T) {
 
 		routes, token, q := testfilesystem(t, ctx)
 
-		top := testdirectory(t, ctx, q, uuid.Nil.String(), "photos")
+		top := testdirectory(t, ctx, q, uuidx.Nil().String(), "photos")
 		zzz := testdirectory(t, ctx, q, top.ID, "zzz")
 		aaa := testfile(t, ctx, q, top.ID, "aaa.bin")
 
@@ -90,7 +90,7 @@ func TestFilesystemSearch(t *testing.T) {
 
 		routes, token, q := testfilesystem(t, ctx)
 
-		top := testdirectory(t, ctx, q, uuid.Nil.String(), "photos")
+		top := testdirectory(t, ctx, q, uuidx.Nil().String(), "photos")
 		nested := testdirectory(t, ctx, q, top.ID, "2026")
 		held := testfile(t, ctx, q, nested.ID, "held.bin")
 
@@ -108,10 +108,10 @@ func TestFilesystemDelete(t *testing.T) {
 
 		routes, token, q := testfilesystem(t, ctx)
 
-		top := testdirectory(t, ctx, q, uuid.Nil.String(), "photos")
+		top := testdirectory(t, ctx, q, uuidx.Nil().String(), "photos")
 		nested := testdirectory(t, ctx, q, top.ID, "2026")
 		testfile(t, ctx, q, nested.ID, "held.bin")
-		outside := testfile(t, ctx, q, uuid.Nil.String(), "loose.bin")
+		outside := testfile(t, ctx, q, uuidx.Nil().String(), "loose.bin")
 
 		resp, req, err := httptestx.BuildRequestBytes(
 			http.MethodDelete,

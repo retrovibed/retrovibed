@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -15,6 +14,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -40,7 +40,7 @@ func TestHTTPDiagnosticsDiscovery(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		ddiscp = tracking.NewPeer(int160.Random(), tracking.PeerOptionDdisc(uuid.Must(uuid.NewV4()), uuid.Must(uuid.NewV4())))
+		ddiscp = tracking.NewPeer(int160.Random(), tracking.PeerOptionDdisc(uuidx.NewV4(), uuidx.NewV4()))
 		require.NoError(t, tracking.PeerInsertWithDefaults(ctx, q, ddiscp).Scan(&ddiscp))
 
 		bep51p = tracking.NewPeer(int160.Random(), tracking.PeerOptionBEP51(5, 60))
@@ -67,7 +67,7 @@ func TestHTTPDiagnosticsDiscovery(t *testing.T) {
 			metaapi.HTTPDiscoveryDiagnosticsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)
@@ -101,7 +101,7 @@ func TestHTTPDiagnosticsDiscovery(t *testing.T) {
 			metaapi.HTTPDiscoveryDiagnosticsOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
 		).Bind(routes.PathPrefix("/").Subrouter())
 
-		claims = jwtx.NewJWTClaims(uuid.Nil.String(), jwtx.ClaimsOptionAuthnExpiration())
+		claims = jwtx.NewJWTClaims(uuidx.Nil().String(), jwtx.ClaimsOptionAuthnExpiration())
 		resp, req, err := httptestx.BuildRequestContextBytes(ctx, http.MethodGet, "/", nil,
 			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(&claims, httpauthtest.UnsafeJWTSecretSource)))
 		require.NoError(t, err)

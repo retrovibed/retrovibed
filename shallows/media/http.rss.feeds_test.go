@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
@@ -161,7 +160,7 @@ func TestRSSFeedCreate(t *testing.T) {
 				Autodownload: true,
 				Autoarchive:  true,
 				Contributing: false,
-				Digest:       uuid.Nil.String(),
+				Digest:       uuidx.Nil().String(),
 			},
 		})
 		require.NoError(t, err)
@@ -185,14 +184,14 @@ func TestRSSFeedCreate(t *testing.T) {
 		require.True(t, result.Feed.Autodownload)
 		require.True(t, result.Feed.Autoarchive)
 		require.False(t, result.Feed.Contributing)
-		require.Equal(t, uuid.Nil.String(), result.Feed.Digest)
+		require.Equal(t, uuidx.Nil().String(), result.Feed.Digest)
 
 		// clone and update the next check timestamp
 		ts := time.Now()
 		tmp := proto.CloneOf(&result)
 		tmp.Feed.Description = tmp.Feed.Description + " 2"
 		tmp.Feed.NextCheck = grpcx.EncodeTime(timex.RFC3339NanoEncode(ts.Truncate(time.Second).UTC()))
-		tmp.Feed.Digest = errorsx.Must(uuid.NewV7()).String()
+		tmp.Feed.Digest = uuidx.NewV7().String()
 
 		encoded, err = json.Marshal(tmp)
 		require.NoError(t, err)

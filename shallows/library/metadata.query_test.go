@@ -3,8 +3,8 @@ package library_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -12,7 +12,7 @@ import (
 )
 
 func TestMetadataQueryHasKnownMedia(t *testing.T) {
-	realID := uuid.Must(uuid.NewV4()).String()
+	realID := uuidx.NewV4().String()
 
 	t.Run("true returns only items with a resolved known_media_id", func(t *testing.T) {
 		ctx, done := testx.Context(t)
@@ -22,7 +22,7 @@ func TestMetadataQueryHasKnownMedia(t *testing.T) {
 		var withKnown, withNil, withMax library.Metadata
 		require.NoError(t, testx.Fake(&withKnown, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionKnownMediaID(realID)))
 		require.NoError(t, testx.Fake(&withNil, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID)) // nil UUID
-		require.NoError(t, testx.Fake(&withMax, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionKnownMediaID(uuid.Max.String())))
+		require.NoError(t, testx.Fake(&withMax, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionKnownMediaID(uuidx.Max().String())))
 
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, withKnown).Scan(&withKnown))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, withNil).Scan(&withNil))
@@ -47,7 +47,7 @@ func TestMetadataQueryHasKnownMedia(t *testing.T) {
 		var withKnown, withNil, withMax library.Metadata
 		require.NoError(t, testx.Fake(&withKnown, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionKnownMediaID(realID)))
 		require.NoError(t, testx.Fake(&withNil, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID))
-		require.NoError(t, testx.Fake(&withMax, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionKnownMediaID(uuid.Max.String())))
+		require.NoError(t, testx.Fake(&withMax, library.MetadataOptionTestDefaults, library.MetadataOptionTestRandomID, library.MetadataOptionKnownMediaID(uuidx.Max().String())))
 
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, withKnown).Scan(&withKnown))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, db, withNil).Scan(&withNil))
@@ -65,7 +65,7 @@ func TestMetadataQueryHasKnownMedia(t *testing.T) {
 }
 
 func TestMetadataQueryHasTorrent(t *testing.T) {
-	torrentID := uuid.Must(uuid.NewV4()).String()
+	torrentID := uuidx.NewV4().String()
 
 	t.Run("true returns only items with a torrent_id set", func(t *testing.T) {
 		ctx, done := testx.Context(t)

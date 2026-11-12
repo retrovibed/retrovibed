@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/localex"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
@@ -74,10 +74,10 @@ func RecommendationSearchBuilder() squirrel.SelectBuilder {
 }
 
 func RecommendationOptionTestDefaults(r *Recommendation) {
-	r.ID = uuid.Nil.String()
+	r.ID = uuidx.Nil().String()
 	r.Source = md5x.String(RecommendationSourceRandom)
-	r.ContentID = uuid.Nil.String()
-	r.KnownMediaID = uuid.Nil.String()
+	r.ContentID = uuidx.Nil().String()
+	r.KnownMediaID = uuidx.Nil().String()
 	r.TombstoneAt = timex.Inf()
 	r.Mimetype = mimex.Binary
 }
@@ -105,7 +105,7 @@ func RecommendationOptionID(id string) RecommendationOption {
 
 func RecommendationOptionContentID(kid string) RecommendationOption {
 	return func(r *Recommendation) {
-		r.ContentID = errorsx.Must(uuid.FromString(kid)).String()
+		r.ContentID = errorsx.Must(uuidx.FromString(kid)).String()
 	}
 }
 

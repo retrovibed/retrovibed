@@ -10,7 +10,6 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/asynccompute"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/fsx"
@@ -71,7 +70,7 @@ func (t knownquery) run(ctx context.Context, in io.Reader, db *sql.DB, cleaner l
 			tw  = tabwriter.NewWriter(&buf, 1, 0, 2, ' ', 0)
 		)
 
-		if !uuidx.IsMinMax(uuid.FromStringOrNil(rpt.Result.UID)) {
+		if !uuidx.IsMinMax(uuidx.FromStringOrNil(rpt.Result.UID)) {
 			c.Compact(fmt.Fprintf(tw, "\n--------------------- result found ---------------------\n"))
 			c.Compact(fmt.Fprintf(tw, "input:\t%s\n", rpt.Input))
 			c.Compact(fmt.Fprintf(tw, "result relevance:\t%v\n", rpt.Result.Relevance))

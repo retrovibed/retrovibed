@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/squirrelx"
@@ -27,7 +27,7 @@ func DaemonOptionEnsureDescription(v *Daemon) {
 
 func DaemonOptionTestDefaults(v *Daemon) {
 	v.ID = ""
-	v.Hostname = fmt.Sprintf("%s.lan", uuid.Must(uuid.NewV7()).String())
+	v.Hostname = fmt.Sprintf("%s.lan", uuidx.NewV7().String())
 	v.Downloads = false
 }
 
@@ -48,7 +48,7 @@ func DaemonFromHost() Daemon {
 		CreatedAt:   time.Now(),
 		Description: "local device",
 		Hostname:    stringsx.FirstNonBlank(fmt.Sprintf("%s:9998", errorsx.Zero(os.Hostname())), "localhost"),
-		ID:          uuid.Max.String(),
+		ID:          uuidx.Max().String(),
 		UpdatedAt:   time.Now(),
 	}
 }

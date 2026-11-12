@@ -3,11 +3,11 @@ package ddisctorrent_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht"
 	"github.com/james-lawrence/torrent/dht/krpc"
 	"github.com/james-lawrence/torrent/torrenttestx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc/ddisctorrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
@@ -19,7 +19,7 @@ func TestPeerWith(t *testing.T) {
 		defer pdb.Close()
 
 		ptm := dht.DefaultMuxer().
-			Method(ddisctorrent.MethodMeta, ddisctorrent.NewMeta(uuid.Max))
+			Method(ddisctorrent.MethodMeta, ddisctorrent.NewMeta(uuidx.Max()))
 		pdht, err := dht.NewServer(
 			32,
 			dht.OptionMuxer(ptm),
@@ -36,7 +36,7 @@ func TestPeerWith(t *testing.T) {
 		defer cdb.Close()
 
 		ctm := dht.DefaultMuxer().
-			Method(ddisctorrent.MethodMeta, ddisctorrent.NewMeta(uuid.Max))
+			Method(ddisctorrent.MethodMeta, ddisctorrent.NewMeta(uuidx.Max()))
 		cdht, err := dht.NewServer(
 			32,
 			dht.OptionMuxer(ctm),
@@ -52,7 +52,7 @@ func TestPeerWith(t *testing.T) {
 		info, err := ddisctorrent.PeerWith(
 			t.Context(),
 			cdht,
-			uuid.Nil,
+			uuidx.Nil(),
 			krpc.NewInfo(
 				pdht.ID(pdht.DynamicAddrPort()).AsByteArray(),
 				krpc.NewNodeAddrFromAddrPort(
@@ -61,7 +61,7 @@ func TestPeerWith(t *testing.T) {
 			),
 		)
 		require.NoError(t, err)
-		require.Equal(t, uuid.Max.String(), info.Partition)
+		require.Equal(t, uuidx.Max().String(), info.Partition)
 		require.Equal(t, pdht.ID(pdht.DynamicAddrPort()), info.Peer.Int160())
 		require.Equal(t, ddisctorrent.ExtensionName, info.Version)
 	})
@@ -87,7 +87,7 @@ func TestPeerWith(t *testing.T) {
 		defer cdb.Close()
 
 		ctm := dht.DefaultMuxer().
-			Method(ddisctorrent.MethodMeta, ddisctorrent.NewMeta(uuid.Max))
+			Method(ddisctorrent.MethodMeta, ddisctorrent.NewMeta(uuidx.Max()))
 		cdht, err := dht.NewServer(
 			32,
 			dht.OptionMuxer(ctm),
@@ -103,7 +103,7 @@ func TestPeerWith(t *testing.T) {
 		info, err := ddisctorrent.PeerWith(
 			t.Context(),
 			cdht,
-			uuid.Nil,
+			uuidx.Nil(),
 			krpc.NewInfo(
 				pdht.ID(pdht.DynamicAddrPort()).AsByteArray(),
 				krpc.NewNodeAddrFromAddrPort(

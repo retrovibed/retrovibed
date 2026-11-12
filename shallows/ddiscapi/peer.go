@@ -1,8 +1,8 @@
 package ddiscapi
 
 import (
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -31,7 +31,7 @@ func NewTrackingPeerFromPeer(p *Peer, options ...tracking.PeerOption) (mp tracki
 
 	mp = tracking.NewPeer(
 		int160.FromBytesOrZero(p.Infohash),
-		tracking.PeerOptionDdisc(uuid.FromStringOrNil(p.Partition), uuid.FromStringOrNil(p.Syncoffset)),
+		tracking.PeerOptionDdisc(uuidx.FromStringOrNil(p.Partition), uuidx.FromStringOrNil(p.Syncoffset)),
 		tracking.PeerOptionTimestampClone(mp),
 		tracking.PeerOptionDescription(mp.Description),
 		timex.JSONSafeDecodeOption,

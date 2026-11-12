@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
 )
@@ -20,7 +20,7 @@ func TestCommunityMetricInsert(t *testing.T) {
 
 	now := time.Now()
 	metric := CommunityMetric{
-		CommunityID: uuid.Nil.String(),
+		CommunityID: uuidx.Nil().String(),
 		PeriodStart: now.Add(-24 * time.Hour),
 		PeriodEnd:   now,
 		Subscribers: 100,
@@ -39,7 +39,7 @@ func TestCommunityMetricUpsert(t *testing.T) {
 
 	now := time.Now()
 	metric := CommunityMetric{
-		CommunityID: uuid.Nil.String(),
+		CommunityID: uuidx.Nil().String(),
 		PeriodStart: now.Add(-24 * time.Hour),
 		PeriodEnd:   now,
 		Subscribers: 100,
@@ -61,7 +61,7 @@ func TestPublishedCASMetricInsert(t *testing.T) {
 
 	now := time.Now()
 	metric := PublishedCASMetric{
-		PublishedContentID: uuid.Nil.String(),
+		PublishedContentID: uuidx.Nil().String(),
 		PeriodStart:        now.Add(-24 * time.Hour),
 		PeriodEnd:          now,
 		Archivers:          50,
@@ -84,14 +84,14 @@ func TestCommunityInsert(t *testing.T) {
 
 	now := time.Now()
 	state := Community{
-		ID:                         uuid.Nil.String(),
-		AccountID:                  uuid.Nil.String(),
-		SyncCursorPublishedContent: uuid.Nil.String(),
+		ID:                         uuidx.Nil().String(),
+		AccountID:                  uuidx.Nil().String(),
+		SyncCursorPublishedContent: uuidx.Nil().String(),
 		NextSyncAt:                 now,
 	}
 
 	require.NoError(t, CommunityInsertWithDefaults(ctx, q, state).Scan(&state))
-	require.Equal(t, uuid.Nil.String(), state.ID)
+	require.Equal(t, uuidx.Nil().String(), state.ID)
 }
 
 func TestCommunityUpsert(t *testing.T) {
@@ -102,9 +102,9 @@ func TestCommunityUpsert(t *testing.T) {
 
 	now := time.Now()
 	state := Community{
-		ID:                         uuid.Nil.String(),
-		AccountID:                  uuid.Nil.String(),
-		SyncCursorPublishedContent: uuid.Nil.String(),
+		ID:                         uuidx.Nil().String(),
+		AccountID:                  uuidx.Nil().String(),
+		SyncCursorPublishedContent: uuidx.Nil().String(),
 		NextSyncAt:                 now,
 	}
 
@@ -124,16 +124,16 @@ func TestCommunityFindByID(t *testing.T) {
 
 	now := time.Now()
 	state := Community{
-		ID:                         uuid.Nil.String(),
-		AccountID:                  uuid.Nil.String(),
-		SyncCursorPublishedContent: uuid.Nil.String(),
+		ID:                         uuidx.Nil().String(),
+		AccountID:                  uuidx.Nil().String(),
+		SyncCursorPublishedContent: uuidx.Nil().String(),
 		NextSyncAt:                 now,
 	}
 
 	require.NoError(t, CommunityInsertWithDefaults(ctx, q, state).Scan(&state))
 
 	var found Community
-	require.NoError(t, CommunityFindByID(ctx, q, uuid.Nil.String()).Scan(&found))
+	require.NoError(t, CommunityFindByID(ctx, q, uuidx.Nil().String()).Scan(&found))
 	require.Equal(t, state.ID, found.ID)
 }
 
@@ -145,15 +145,15 @@ func TestPublishedCASMetricPerContentSearch(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		now := time.Now()
-		communityID := uuid.Must(uuid.NewV4()).String()
+		communityID := uuidx.NewV4().String()
 
 		var pcA PublishedContent
 		require.NoError(t, testx.Fake(&pcA, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
-			p.ID = uuid.Must(uuid.NewV4()).String()
+			p.ID = uuidx.NewV4().String()
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV4()).String()
+			p.KnownMediaID = uuidx.NewV4().String()
 			p.MagnetURI = "magnet:?xt=urn:btih:contentA"
-			p.LibraryID = uuid.Must(uuid.NewV4()).String()
+			p.LibraryID = uuidx.NewV4().String()
 		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pcA).Scan(&pcA))
 
@@ -199,10 +199,10 @@ func TestPublishedContentMultipleCommunities(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		libraryID := uuid.Must(uuid.NewV4()).String()
-		knownMediaID := uuid.Must(uuid.NewV4()).String()
-		communityA := uuid.Must(uuid.NewV4()).String()
-		communityB := uuid.Must(uuid.NewV4()).String()
+		libraryID := uuidx.NewV4().String()
+		knownMediaID := uuidx.NewV4().String()
+		communityA := uuidx.NewV4().String()
+		communityB := uuidx.NewV4().String()
 
 		var pcA PublishedContent
 		require.NoError(t, testx.Fake(&pcA, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
@@ -244,9 +244,9 @@ func TestPublishedContentRepublish(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		libraryID := uuid.Must(uuid.NewV4()).String()
-		knownMediaID := uuid.Must(uuid.NewV4()).String()
-		communityID := uuid.Must(uuid.NewV4()).String()
+		libraryID := uuidx.NewV4().String()
+		knownMediaID := uuidx.NewV4().String()
+		communityID := uuidx.NewV4().String()
 
 		var pc PublishedContent
 		require.NoError(t, testx.Fake(&pc, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
@@ -281,10 +281,10 @@ func TestPublishedContentRepublish(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		libraryID := uuid.Must(uuid.NewV4()).String()
-		knownMediaIDOriginal := uuid.Must(uuid.NewV4()).String()
-		knownMediaIDUpdated := uuid.Must(uuid.NewV4()).String()
-		communityID := uuid.Must(uuid.NewV4()).String()
+		libraryID := uuidx.NewV4().String()
+		knownMediaIDOriginal := uuidx.NewV4().String()
+		knownMediaIDUpdated := uuidx.NewV4().String()
+		communityID := uuidx.NewV4().String()
 
 		var pc PublishedContent
 		require.NoError(t, testx.Fake(&pc, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
@@ -320,25 +320,25 @@ func TestPublishedCASMetricAggregateSearch(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		now := time.Now()
-		communityID := uuid.Must(uuid.NewV4()).String()
+		communityID := uuidx.NewV4().String()
 
 		var pcA PublishedContent
 		require.NoError(t, testx.Fake(&pcA, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
-			p.ID = uuid.Must(uuid.NewV4()).String()
+			p.ID = uuidx.NewV4().String()
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV4()).String()
+			p.KnownMediaID = uuidx.NewV4().String()
 			p.MagnetURI = "magnet:?xt=urn:btih:contentA"
-			p.LibraryID = uuid.Must(uuid.NewV4()).String()
+			p.LibraryID = uuidx.NewV4().String()
 		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pcA).Scan(&pcA))
 
 		var pcB PublishedContent
 		require.NoError(t, testx.Fake(&pcB, PublishedContentOptionTestDefaults, func(p *PublishedContent) {
-			p.ID = uuid.Must(uuid.NewV4()).String()
+			p.ID = uuidx.NewV4().String()
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV4()).String()
+			p.KnownMediaID = uuidx.NewV4().String()
 			p.MagnetURI = "magnet:?xt=urn:btih:contentB"
-			p.LibraryID = uuid.Must(uuid.NewV4()).String()
+			p.LibraryID = uuidx.NewV4().String()
 		}))
 		require.NoError(t, PublishedContentInsertWithDefaults(ctx, q, pcB).Scan(&pcB))
 

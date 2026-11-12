@@ -18,7 +18,6 @@ import (
 	"github.com/anacrolix/missinggo/pubsub"
 	"github.com/coder/websocket"
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/dht/int160"
@@ -32,6 +31,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -359,7 +359,7 @@ func (t *HTTPDiscovered) publish(w http.ResponseWriter, r *http.Request) {
 		tracking.MetadataOptionFromInfo(&info),
 		tracking.MetadataOptionAvailable(n),
 		tracking.MetadataOptionTrackers(slicesx.Flatten(meta.UpvertedAnnounceList()...)...),
-		tracking.MetadataOptionEntropySeed(meta.ID().Bytes(), uuid.FromStringOrNil(decoded.Entropy).Bytes()),
+		tracking.MetadataOptionEntropySeed(meta.ID().Bytes(), uuidx.FromStringOrNil(decoded.Entropy).Bytes()),
 		tracking.MetadataOptionMimetype(decoded.Mimetype),
 		tracking.MetadataOptionExpiresAtTTL(time.Duration(decoded.Ttl)),
 		tracking.MetadataOptionCompleted,

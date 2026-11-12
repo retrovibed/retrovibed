@@ -4,10 +4,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdddisc"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtestx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
@@ -56,7 +56,7 @@ func TestMediaLs(t *testing.T) {
 
 		cmdtestx.Admin(t, ctx, q, keypath)
 
-		knownMediaID := uuid.Must(uuid.NewV7()).String()
+		knownMediaID := uuidx.NewV7().String()
 
 		matchID := int160.Random()
 		match := ddisc.NewDiscovered(&matchID, ddisc.DiscoveredOptionKnownMedia(knownMediaID), ddisc.DiscoveredOptionAutoMagnet)
@@ -93,11 +93,11 @@ func TestMediaLs(t *testing.T) {
 		cmdtestx.Admin(t, ctx, q, keypath)
 
 		offloadID := int160.Random()
-		offload := ddisc.NewDiscovered(&offloadID, ddisc.DiscoveredOptionKnownMedia(uuid.Nil.String()), ddisc.DiscoveredOptionAutoMagnet)
+		offload := ddisc.NewDiscovered(&offloadID, ddisc.DiscoveredOptionKnownMedia(uuidx.Nil().String()), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, offload).Scan(&offload))
 
 		otherID := int160.Random()
-		other := ddisc.NewDiscovered(&otherID, ddisc.DiscoveredOptionKnownMedia(uuid.Must(uuid.NewV7()).String()), ddisc.DiscoveredOptionAutoMagnet)
+		other := ddisc.NewDiscovered(&otherID, ddisc.DiscoveredOptionKnownMedia(uuidx.NewV7().String()), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, other).Scan(&other))
 
 		routes := mux.NewRouter()
@@ -125,11 +125,11 @@ func TestMediaLs(t *testing.T) {
 		cmdtestx.Admin(t, ctx, q, keypath)
 
 		pendingID := int160.Random()
-		pending := ddisc.NewDiscovered(&pendingID, ddisc.DiscoveredOptionKnownMedia(uuid.Max.String()), ddisc.DiscoveredOptionAutoMagnet)
+		pending := ddisc.NewDiscovered(&pendingID, ddisc.DiscoveredOptionKnownMedia(uuidx.Max().String()), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, pending).Scan(&pending))
 
 		otherID := int160.Random()
-		other := ddisc.NewDiscovered(&otherID, ddisc.DiscoveredOptionKnownMedia(uuid.Must(uuid.NewV7()).String()), ddisc.DiscoveredOptionAutoMagnet)
+		other := ddisc.NewDiscovered(&otherID, ddisc.DiscoveredOptionKnownMedia(uuidx.NewV7().String()), ddisc.DiscoveredOptionAutoMagnet)
 		require.NoError(t, ddisc.DiscoveredInsertWithDefaults(ctx, q, other).Scan(&other))
 
 		routes := mux.NewRouter()

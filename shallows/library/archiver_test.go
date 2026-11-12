@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/deeppool"
@@ -89,7 +88,7 @@ func TestArchive(t *testing.T) {
 		require.Equal(t, v.Bytes, uint64(n))
 
 		archiver := &md5archive{
-			seed: uuidx.FirstNonNil(uuid.FromStringOrNil(v.EncryptionSeed), uuid.FromStringOrNil(v.ID)).Bytes(),
+			seed: uuidx.FirstNonNil(uuidx.FromStringOrNil(v.EncryptionSeed), uuidx.FromStringOrNil(v.ID)).Bytes(),
 		}
 
 		require.NoError(t, library.Archive(ctx, q, &v, root, archiver))
@@ -189,7 +188,7 @@ func TestNewSlowDiskReclaim(t *testing.T) {
 		var v library.Metadata
 		require.NoError(t, testx.Fake(&v, library.MetadataOptionTestDefaults, func(md *library.Metadata) {
 			md.Bytes = 128 * bytesx.MiB
-			md.ArchiveID = uuid.Must(uuid.NewV4()).String()
+			md.ArchiveID = uuidx.NewV4().String()
 		}))
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, v).Scan(&v))
 		storageDir := filepath.Join(tempDir, "storage", v.ID)

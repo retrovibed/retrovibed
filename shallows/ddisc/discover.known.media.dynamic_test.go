@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -45,7 +45,7 @@ func TestDiscoverKnownMediaDynamic(t *testing.T) {
 		}
 		require.NoError(t, seq.Err())
 		require.Len(t, got, 1)
-		require.NotEqual(t, uuid.Nil.String(), got[0].KnownMediaID, "candidate must be stamped with the newly minted known-media id")
+		require.NotEqual(t, uuidx.Nil().String(), got[0].KnownMediaID, "candidate must be stamped with the newly minted known-media id")
 
 		var known library.Known
 		require.NoError(t, library.KnownFindByID(context.Background(), q, got[0].KnownMediaID).Scan(&known))
@@ -57,7 +57,7 @@ func TestDiscoverKnownMediaDynamic(t *testing.T) {
 
 	t.Run("skips a candidate that already has a resolved known-media id", func(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
-		kid := uuid.Must(uuid.NewV4()).String()
+		kid := uuidx.NewV4().String()
 
 		id := int160.Random()
 		hit := ddisc.NewDiscovered(&id,
@@ -108,7 +108,7 @@ func TestDiscoverKnownMediaDynamic(t *testing.T) {
 		}
 		require.NoError(t, seq.Err())
 		require.Len(t, got, 1)
-		require.Equal(t, uuid.Nil.String(), got[0].KnownMediaID)
+		require.Equal(t, uuidx.Nil().String(), got[0].KnownMediaID)
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM cache.library_known_media"), "a candidate with no title isn't worth cataloging")
 	})
 
@@ -135,12 +135,12 @@ func TestDiscoverKnownMediaDynamic(t *testing.T) {
 		}
 		require.NoError(t, seq.Err())
 		require.Len(t, got, 1)
-		require.Equal(t, uuid.Nil.String(), got[0].KnownMediaID)
+		require.Equal(t, uuidx.Nil().String(), got[0].KnownMediaID)
 		require.Equal(t, 0, sqltestx.Count(t, q, "SELECT COUNT(*) FROM cache.library_known_media"), "a candidate with nothing to show in the UI isn't worth cataloging")
 	})
 
 	t.Run("does nothing when the option is omitted", func(t *testing.T) {
-		kid := uuid.Must(uuid.NewV4()).String()
+		kid := uuidx.NewV4().String()
 		hit := newDiscoverHit(kid)
 
 		seq := ddisc.Discover(

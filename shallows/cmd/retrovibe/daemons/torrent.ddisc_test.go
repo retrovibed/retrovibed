@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent"
 	"github.com/james-lawrence/torrent/bencode"
 	"github.com/james-lawrence/torrent/dht"
@@ -18,6 +17,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -99,7 +99,7 @@ func TestDiscoverMedia(t *testing.T) {
 			if err := ddisc.DiscoveredFindByID(ctx, q, disc.ID).Scan(&updated); err != nil {
 				return false
 			}
-			return updated.KnownMediaID == uuid.Max.String() && updated.Mimetype != ""
+			return updated.KnownMediaID == uuidx.Max().String() && updated.Mimetype != ""
 		}, 30*time.Second, 100*time.Millisecond, "expected discovered media to be identified and indexed")
 
 		// Stop both background goroutines and wait for them to actually
@@ -138,7 +138,7 @@ func TestDiscoverMedia(t *testing.T) {
 			if err := ddisc.DiscoveredFindByID(ctx, q, disc.ID).Scan(&updated); err != nil {
 				return false
 			}
-			return updated.Attempts > disc.Attempts && updated.KnownMediaID == uuid.Nil.String()
+			return updated.Attempts > disc.Attempts && updated.KnownMediaID == uuidx.Nil().String()
 		}, 10*time.Second, 100*time.Millisecond, "expected unreachable media to be pushed into cooldown")
 	})
 

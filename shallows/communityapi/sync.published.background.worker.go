@@ -11,12 +11,12 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -133,7 +133,7 @@ func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (e
 		}
 	}
 
-	if decoded.OAuthGoogleID != uuid.Nil.String() {
+	if decoded.OAuthGoogleID != uuidx.Nil().String() {
 		if uerr := community.YouTubeUpload(ctx, t.q, t.httpc, t.mvfs, decoded.OAuthGoogleID, lmd, stringsx.FirstNonBlank(known.Title, lmd.Description), known.Overview); uerr != nil {
 			log.Println(errorsx.Wrap(uerr, "youtube cross-post failed"))
 		}
@@ -186,9 +186,9 @@ func (t SyncPublishedBackgroundWorker) Message(ctx context.Context, m []byte) (e
 		return nil
 	}
 
-	if lmd.ArchiveID == uuid.Max.String() {
+	if lmd.ArchiveID == uuidx.Max().String() {
 		return nil // archival in progress, waiting
-	} else if lmd.ArchiveID == uuid.Nil.String() {
+	} else if lmd.ArchiveID == uuidx.Nil().String() {
 		if err := library.Archive(ctx, t.q, &lmd, t.mvfs, t.archiver); err != nil {
 			log.Println(errorsx.Wrap(err, "failed to archive media"))
 			return nil

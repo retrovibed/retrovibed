@@ -3,12 +3,12 @@ package ddisc_test
 import (
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/torrenttest"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/ddisc"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
@@ -22,7 +22,7 @@ func TestEnqueueUnknownWrapFound(t *testing.T) {
 	tmpdir := t.TempDir()
 	q := sqltestx.Metadatabase(t)
 
-	kid := uuid.Must(uuid.NewV4()).String()
+	kid := uuidx.NewV4().String()
 
 	id := int160.Random()
 	info, _, err := torrenttest.Random(tmpdir, 128*bytesx.KiB)
@@ -54,7 +54,7 @@ func TestEnqueueUnknownWrapNotFoundEnqueues(t *testing.T) {
 
 	q := sqltestx.Metadatabase(t)
 
-	kid := uuid.Must(uuid.NewV4()).String()
+	kid := uuidx.NewV4().String()
 
 	seq := ddisc.EnqueueUnknown().Wrap(q, kid, ddisc.FindMedia(q, kid))
 
@@ -80,7 +80,7 @@ func TestEnqueueUnknownWrapRateLimited(t *testing.T) {
 
 	q := sqltestx.Metadatabase(t)
 
-	kid := uuid.Must(uuid.NewV4()).String()
+	kid := uuidx.NewV4().String()
 
 	denied := rate.NewLimiter(rate.Limit(0), 0)
 	seq := ddisc.EnqueueUnknown(ddisc.UnknownEnqueueOptionLimiter(denied)).Wrap(q, kid, ddisc.FindMedia(q, kid))

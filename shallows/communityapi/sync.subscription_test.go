@@ -8,13 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/retrovibed/retrovibed/retroapi/backoffx"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
@@ -33,8 +33,8 @@ func TestSyncPublishedContentItem(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		pc := &PublishedContent{
-			Id:          uuid.Must(uuid.NewV7()).String(),
-			CommunityId: uuid.Must(uuid.NewV7()).String(),
+			Id:          uuidx.NewV7().String(),
+			CommunityId: uuidx.NewV7().String(),
 			MagnetUri:   "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33",
 			Title:       "Test Title",
 			Description: "a detailed description of the content",
@@ -54,12 +54,12 @@ func TestSyncPublishedContentItem(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		pc := &PublishedContent{
-			Id:            uuid.Must(uuid.NewV7()).String(),
-			CommunityId:   uuid.Must(uuid.NewV7()).String(),
+			Id:            uuidx.NewV7().String(),
+			CommunityId:   uuidx.NewV7().String(),
 			MagnetUri:     "magnet:?xt=urn:btih:2beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a35",
 			Title:         "Test Title",
 			Description:   "a detailed description of the content",
-			OauthGoogleId: uuid.Must(uuid.NewV7()).String(),
+			OauthGoogleId: uuidx.NewV7().String(),
 			Bytes:         uint64(3 * bytesx.MiB),
 			Mimetype:      "video/mp4",
 		}
@@ -87,16 +87,16 @@ func TestSyncPublishedContentItem(t *testing.T) {
 
 		q := sqltestx.Metadatabase(t)
 
-		communityID := uuid.Must(uuid.NewV7()).String()
+		communityID := uuidx.NewV7().String()
 
 		pc1 := &PublishedContent{
-			Id:          uuid.Must(uuid.NewV7()).String(),
+			Id:          uuidx.NewV7().String(),
 			CommunityId: communityID,
 			MagnetUri:   "magnet:?xt=urn:btih:3beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a36",
 			Title:       "Test Title 1",
 		}
 		pc2 := &PublishedContent{
-			Id:          uuid.Must(uuid.NewV7()).String(),
+			Id:          uuidx.NewV7().String(),
 			CommunityId: communityID,
 			MagnetUri:   "magnet:?xt=urn:btih:4beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a37",
 			Title:       "Test Title 2",
@@ -117,8 +117,8 @@ func TestSyncPublishedContentItem(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		pc := &PublishedContent{
-			Id:          uuid.Must(uuid.NewV7()).String(),
-			CommunityId: uuid.Must(uuid.NewV7()).String(),
+			Id:          uuidx.NewV7().String(),
+			CommunityId: uuidx.NewV7().String(),
 			MagnetUri:   "magnet:?xt=urn:btih:5beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a38&dn=lemmy.wasm",
 			Title:       "lemmy.wasm",
 			Mimetype:    mimex.RetrovibedPublishModule,
@@ -146,8 +146,8 @@ func TestSyncPublishedContentItem(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		pc := &PublishedContent{
-			Id:          uuid.Must(uuid.NewV7()).String(),
-			CommunityId: uuid.Must(uuid.NewV7()).String(),
+			Id:          uuidx.NewV7().String(),
+			CommunityId: uuidx.NewV7().String(),
 			MagnetUri:   "magnet:?xt=urn:btih:6beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a39&dn=lemmy.wasm",
 			Title:       "lemmy.wasm",
 			Mimetype:    mimex.RetrovibedPublishModule,
@@ -169,8 +169,8 @@ func TestSyncPublishedContentItem(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		pc := &PublishedContent{
-			Id:          uuid.Must(uuid.NewV7()).String(),
-			CommunityId: uuid.Must(uuid.NewV7()).String(),
+			Id:          uuidx.NewV7().String(),
+			CommunityId: uuidx.NewV7().String(),
 			MagnetUri:   "magnet:?xt=urn:btih:7beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a40&dn=noop.wasm",
 			Title:       "noop.wasm",
 			Mimetype:    mimex.RetrovibedPublishModule,
@@ -206,9 +206,9 @@ func TestSyncSubscriptions(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		sub := community.Community{
-			ID:                         uuid.Must(uuid.NewV7()).String(),
-			AccountID:                  uuid.Nil.String(),
-			SyncCursorPublishedContent: uuid.Nil.String(),
+			ID:                         uuidx.NewV7().String(),
+			AccountID:                  uuidx.Nil().String(),
+			SyncCursorPublishedContent: uuidx.Nil().String(),
 			NextSyncAt:                 time.Now(),
 		}
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, sub).Scan(&sub))
@@ -233,9 +233,9 @@ func TestSyncSubscriptions(t *testing.T) {
 
 		before := time.Now().Add(-time.Hour)
 		sub := community.Community{
-			ID:                         uuid.Must(uuid.NewV7()).String(),
-			AccountID:                  uuid.Nil.String(),
-			SyncCursorPublishedContent: uuid.Nil.String(),
+			ID:                         uuidx.NewV7().String(),
+			AccountID:                  uuidx.Nil().String(),
+			SyncCursorPublishedContent: uuidx.Nil().String(),
 			NextSyncAt:                 before,
 		}
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, sub).Scan(&sub))
@@ -263,9 +263,9 @@ func TestSyncSubscriptions(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 
 		sub := community.Community{
-			ID:                         uuid.Must(uuid.NewV7()).String(),
-			AccountID:                  uuid.Nil.String(),
-			SyncCursorPublishedContent: uuid.Nil.String(),
+			ID:                         uuidx.NewV7().String(),
+			AccountID:                  uuidx.Nil().String(),
+			SyncCursorPublishedContent: uuidx.Nil().String(),
 			NextSyncAt:                 time.Now().Add(-time.Hour),
 		}
 		require.NoError(t, community.CommunityInsertWithDefaults(ctx, q, sub).Scan(&sub))

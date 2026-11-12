@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/ddiscapi"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
@@ -34,9 +34,9 @@ func (t cmdMediaLs) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdopt
 	knownMediaID := t.KnownMediaID
 	switch {
 	case t.Offload:
-		knownMediaID = uuid.Nil.String()
+		knownMediaID = uuidx.Nil().String()
 	case t.Indexing:
-		knownMediaID = uuid.Max.String()
+		knownMediaID = uuidx.Max().String()
 	}
 
 	result, err := ddiscapi.MediaSearch(gctx.Context, cc, daemon.Endpoint, &ddiscapi.MediaSearchRequest{

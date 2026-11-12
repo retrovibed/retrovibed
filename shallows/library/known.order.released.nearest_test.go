@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/library"
@@ -81,13 +81,13 @@ func TestKnownOrderReleasedNearest(t *testing.T) {
 		defer done()
 		db := sqltestx.Metadatabase(t)
 
-		parent := uuid.Must(uuid.NewV4()).String()
+		parent := uuidx.NewV4().String()
 		for _, r := range []struct {
 			parent    string
 			collation uint32
 			released  string
 		}{
-			{uuid.Nil.String(), 0, "2018-07-27"},
+			{uuidx.Nil().String(), 0, "2018-07-27"},
 			{parent, library.KnownCollationEpisode(1, 1), "2018-07-27"},
 			{parent, library.KnownCollationEpisode(1, 1), "2018-08-27"},
 			{parent, library.KnownCollationEpisode(1, 1), "2018-07-26"},
@@ -128,7 +128,7 @@ func TestKnownOrderReleasedNearest(t *testing.T) {
 			{parent, library.KnownCollationEpisode(1, 1), "2018-07-26"},
 			{parent, library.KnownCollationEpisode(1, 1), "2018-08-27"},
 			{parent, library.KnownCollationEpisode(1, 2), "2018-07-27"},
-			{uuid.Nil.String(), 0, "2018-07-27"},
+			{uuidx.Nil().String(), 0, "2018-07-27"},
 		}, actual)
 	})
 

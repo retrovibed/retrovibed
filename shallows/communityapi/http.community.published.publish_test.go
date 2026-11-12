@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/communityapi"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
@@ -33,8 +33,8 @@ func TestPublishEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 		)
@@ -50,15 +50,15 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "test media",
 			Bytes:          1024,
 			Mimetype:       "audio/mpeg",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
-		require.Equal(t, uuid.Nil.String(), lmd.TorrentID)
-		require.Equal(t, uuid.Nil.String(), lmd.ArchiveID)
+		require.Equal(t, uuidx.Nil().String(), lmd.TorrentID)
+		require.Equal(t, uuidx.Nil().String(), lmd.ArchiveID)
 
 		routes := mux.NewRouter()
 		communityapi.NewHTTPPublished(
@@ -106,7 +106,7 @@ func TestPublishEndpoint(t *testing.T) {
 
 		var updatedLmd library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, libraryID).Scan(&updatedLmd))
-		require.Equal(t, uuid.Nil.String(), updatedLmd.ArchiveID)
+		require.Equal(t, uuidx.Nil().String(), updatedLmd.ArchiveID)
 	})
 
 	t.Run("listed stores publish mode and skips archival marking", func(t *testing.T) {
@@ -115,8 +115,8 @@ func TestPublishEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 		)
@@ -132,11 +132,11 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "test media",
 			Bytes:          1024,
 			Mimetype:       "audio/mpeg",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -185,7 +185,7 @@ func TestPublishEndpoint(t *testing.T) {
 
 		var updatedLmd library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, libraryID).Scan(&updatedLmd))
-		require.Equal(t, uuid.Nil.String(), updatedLmd.ArchiveID)
+		require.Equal(t, uuidx.Nil().String(), updatedLmd.ArchiveID)
 	})
 
 	t.Run("syndicated stores publish mode and skips archival marking", func(t *testing.T) {
@@ -194,8 +194,8 @@ func TestPublishEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 		)
@@ -211,11 +211,11 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "test media",
 			Bytes:          1024,
 			Mimetype:       "audio/mpeg",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -263,7 +263,7 @@ func TestPublishEndpoint(t *testing.T) {
 
 		var updatedLmd library.Metadata
 		require.NoError(t, library.MetadataFindByID(ctx, q, libraryID).Scan(&updatedLmd))
-		require.Equal(t, uuid.Nil.String(), updatedLmd.ArchiveID)
+		require.Equal(t, uuidx.Nil().String(), updatedLmd.ArchiveID)
 	})
 
 	t.Run("timestamps are set by db on insert when not provided in request", func(t *testing.T) {
@@ -272,8 +272,8 @@ func TestPublishEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 			before      = time.Now()
@@ -290,11 +290,11 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "test media",
 			Bytes:          1024,
 			Mimetype:       "audio/mpeg",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -349,8 +349,8 @@ func TestPublishEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 		)
@@ -366,11 +366,11 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "test media",
 			Bytes:          1024,
 			Mimetype:       "audio/mpeg",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -435,9 +435,9 @@ func TestPublishEndpoint(t *testing.T) {
 			q             = sqltestx.Metadatabase(t)
 			p             meta.Profile
 			v             meta.Authz
-			communityID   = uuid.Must(uuid.NewV7()).String()
-			libraryID     = uuid.Must(uuid.NewV7()).String()
-			oauthGoogleID = uuid.Must(uuid.NewV4()).String()
+			communityID   = uuidx.NewV7().String()
+			libraryID     = uuidx.NewV7().String()
+			oauthGoogleID = uuidx.NewV4().String()
 			description   = "a detailed description of the content"
 			mediaDir      = t.TempDir()
 			torrentDir    = t.TempDir()
@@ -454,11 +454,11 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "test media",
 			Bytes:          1024,
 			Mimetype:       "audio/mpeg",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -515,10 +515,10 @@ func TestPublishEndpoint(t *testing.T) {
 			q               = sqltestx.Metadatabase(t)
 			p               meta.Profile
 			v               meta.Authz
-			communityID     = uuid.Must(uuid.NewV7()).String()
-			libraryID       = uuid.Must(uuid.NewV7()).String()
-			lmdKnownMediaID = uuid.Must(uuid.NewV4()).String()
-			reqKnownMediaID = uuid.Must(uuid.NewV4()).String()
+			communityID     = uuidx.NewV7().String()
+			libraryID       = uuidx.NewV7().String()
+			lmdKnownMediaID = uuidx.NewV4().String()
+			reqKnownMediaID = uuidx.NewV4().String()
 			mediaDir        = t.TempDir()
 			torrentDir      = t.TempDir()
 		)
@@ -534,11 +534,11 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "test media",
 			Bytes:          1024,
 			Mimetype:       "audio/mpeg",
-			TorrentID:      uuid.Nil.String(),
+			TorrentID:      uuidx.Nil().String(),
 			KnownMediaID:   lmdKnownMediaID,
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -589,9 +589,9 @@ func TestPublishEndpoint(t *testing.T) {
 			q               = sqltestx.Metadatabase(t)
 			p               meta.Profile
 			v               meta.Authz
-			communityID     = uuid.Must(uuid.NewV7()).String()
-			libraryID       = uuid.Must(uuid.NewV7()).String()
-			lmdKnownMediaID = uuid.Must(uuid.NewV4()).String()
+			communityID     = uuidx.NewV7().String()
+			libraryID       = uuidx.NewV7().String()
+			lmdKnownMediaID = uuidx.NewV4().String()
 			mediaDir        = t.TempDir()
 			torrentDir      = t.TempDir()
 		)
@@ -607,11 +607,11 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "test media",
 			Bytes:          1024,
 			Mimetype:       "audio/mpeg",
-			TorrentID:      uuid.Nil.String(),
+			TorrentID:      uuidx.Nil().String(),
 			KnownMediaID:   lmdKnownMediaID,
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -661,8 +661,8 @@ func TestPublishEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 		)
@@ -678,11 +678,11 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "",
 			Bytes:          1024,
 			Mimetype:       "audio/mpeg",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -725,9 +725,9 @@ func TestPublishEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
-			torrentID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
+			torrentID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 		)
@@ -742,8 +742,8 @@ func TestPublishEndpoint(t *testing.T) {
 			ID:             torrentID,
 			Description:    "test torrent",
 			Infohash:       []byte{0x0b, 0xee, 0xc7, 0xb5, 0xea, 0x3f, 0x0f, 0xdb, 0xc9, 0x5d, 0x0d, 0xd4, 0x7f, 0x3c, 0x5b, 0xc2, 0x75, 0xda, 0x8a, 0x33},
-			KnownMediaID:   uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, tracking.MetadataInsertWithDefaults(ctx, q, tmd).Scan(&tmd))
 
@@ -752,10 +752,10 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "test media",
 			Bytes:          1024,
 			TorrentID:      torrentID,
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -802,8 +802,8 @@ func TestPublishEndpoint(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			p           meta.Profile
 			v           meta.Authz
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 		)
@@ -819,11 +819,11 @@ func TestPublishEndpoint(t *testing.T) {
 			Description:    "test media",
 			Bytes:          1024,
 			Mimetype:       "audio/mpeg",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			ArchiveID:      uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			ArchiveID:      uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 

@@ -19,7 +19,7 @@ func TestRegistry(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		r, err := newRegistry(ctx, defaultSocket())
+		r, err := newRegistry(ctx, defaultSocket(), OptionCacheDir(t.TempDir()), OptionRuntimeDir(t.TempDir()))
 		require.NoError(t, err)
 
 		var reg T = r
@@ -38,7 +38,7 @@ func TestRegistry(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		r, err := newRegistry(ctx, defaultSocket())
+		r, err := newRegistry(ctx, defaultSocket(), OptionCacheDir(t.TempDir()), OptionRuntimeDir(t.TempDir()))
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 
@@ -62,7 +62,7 @@ func TestRegistry(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		r, err := newRegistry(ctx, defaultSocket())
+		r, err := newRegistry(ctx, defaultSocket(), OptionCacheDir(t.TempDir()), OptionRuntimeDir(t.TempDir()))
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 
@@ -88,7 +88,7 @@ func TestRegistry(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		r, err := newRegistry(ctx, defaultSocket())
+		r, err := newRegistry(ctx, defaultSocket(), OptionCacheDir(t.TempDir()), OptionRuntimeDir(t.TempDir()))
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 
@@ -104,7 +104,7 @@ func TestRegistry(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		r, err := newRegistry(ctx, defaultSocket())
+		r, err := newRegistry(ctx, defaultSocket(), OptionCacheDir(t.TempDir()), OptionRuntimeDir(t.TempDir()))
 		require.NoError(t, err)
 
 		_, err = r.Environment(ctx, filepath.Join(t.TempDir(), "missing.wasm"))
@@ -122,7 +122,7 @@ func TestRegistry(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		r, err := newRegistry(ctx, defaultSocket())
+		r, err := newRegistry(ctx, defaultSocket(), OptionCacheDir(t.TempDir()), OptionRuntimeDir(t.TempDir()))
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 
@@ -141,7 +141,7 @@ func TestRegistry(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		r, err := newRegistry(ctx, defaultSocket())
+		r, err := newRegistry(ctx, defaultSocket(), OptionCacheDir(t.TempDir()), OptionRuntimeDir(t.TempDir()))
 		require.NoError(t, err)
 		require.NoError(t, r.Load(ctx, wasmPath))
 		r.Unload(wasmPath)
@@ -161,10 +161,10 @@ func TestPluginDirs(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
-		r, err := newRegistry(ctx, defaultSocket())
+		r, err := newRegistry(ctx, defaultSocket(), OptionCacheDir(t.TempDir()), OptionRuntimeDir(t.TempDir()))
 		require.NoError(t, err)
-		r.configDir = "/tmp/config"
-		r.cacheDir = "/tmp/cache"
+		r.configdir = "/tmp/config"
+		r.cachedir = "/tmp/cache"
 
 		require.Equal(t, filepath.Join("/tmp/config", "publish.d", "noop.config.d"), r.PluginConfigDir("noop"))
 		require.Equal(t, filepath.Join("/tmp/cache", "publish.d", "noop.cache.d"), r.PluginCacheDir("noop"))

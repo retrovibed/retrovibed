@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/httpauthtest"
 	"github.com/retrovibed/retrovibed/shallows/internal/grpcx"
 	"github.com/retrovibed/retrovibed/shallows/internal/httptestx"
@@ -67,7 +67,7 @@ func TestKnownCreate(t *testing.T) {
 
 		var result media.KnownCreateResponse
 		require.NoError(t, jsonx.UnmarshalRead(resp.Body, &result))
-		require.Equal(t, uuid.Nil.String(), result.Known.ParentUid, "a newly created known-media record is never anyone's child")
+		require.Equal(t, uuidx.Nil().String(), result.Known.ParentUid, "a newly created known-media record is never anyone's child")
 	})
 
 	t.Run("rejects a request with no description", func(t *testing.T) {

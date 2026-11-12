@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/james-lawrence/torrent/dht/int160"
 	"github.com/james-lawrence/torrent/metainfo"
 	"github.com/james-lawrence/torrent/torrenttest"
@@ -22,6 +21,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/mimex"
 	"github.com/retrovibed/retrovibed/retroapi/publishplugin"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/community"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -78,26 +78,26 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 		)
 		defer done()
 
 		lmd := library.Metadata{
 			ID:             libraryID,
 			Description:    "test media",
-			ArchiveID:      uuid.Max.String(),
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			ArchiveID:      uuidx.Max().String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
@@ -119,9 +119,9 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
-			archiveID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
+			archiveID   = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -130,17 +130,17 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			Description:    "test media",
 			ArchiveID:      archiveID,
 			Mimetype:       "video/mp4",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
@@ -169,9 +169,9 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
-			archiveID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
+			archiveID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 			testContent = []byte("test media content for torrent generation")
@@ -187,17 +187,17 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			Description:    "test media",
 			ArchiveID:      archiveID,
 			Bytes:          uint64(len(testContent)),
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = ""
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
@@ -224,8 +224,8 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 			testContent = []byte("test media content for full async flow")
@@ -239,19 +239,19 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 		lmd := library.Metadata{
 			ID:             libraryID,
 			Description:    "test media for async",
-			ArchiveID:      uuid.Max.String(),
+			ArchiveID:      uuidx.Max().String(),
 			Bytes:          uint64(len(testContent)),
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = ""
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
@@ -270,7 +270,7 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 		require.NoError(t, community.PublishedContentFindByID(ctx, q, pc.ID).Scan(&afterFirstSync))
 		require.True(t, strings.HasPrefix(afterFirstSync.MagnetURI, "magnet:?"))
 
-		archiveID := uuid.Must(uuid.NewV7()).String()
+		archiveID := uuidx.NewV7().String()
 		require.NoError(t, library.MetadataArchivedByID(ctx, q, libraryID, archiveID, 0).Scan(&lmd))
 
 		worker = NewSyncPublishedBackgroundWorker(q, http.DefaultClient, mock, feeds, publishplugin.Unimplemented{}, nil, fsx.DirVirtual(mediaDir), fsx.DirVirtual(torrentDir))
@@ -294,9 +294,9 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
-			archiveID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
+			archiveID   = uuidx.NewV7().String()
 			torrentDir  = t.TempDir()
 			ih          = int160.FromBytes([]byte{0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd})
 		)
@@ -305,7 +305,7 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 		tmd := tracking.NewMetadata(
 			&ih,
 			tracking.MetadataOptionDescription("existing torrent"),
-			tracking.MetadataOptionKnownMediaID(uuid.Nil.String()),
+			tracking.MetadataOptionKnownMediaID(uuidx.Nil().String()),
 			tracking.MetadataOptionBytes(1024),
 			tracking.MetadataOptionDownloaded(1024),
 			tracking.MetadataOptionAvailable(1024),
@@ -325,17 +325,17 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			Description:    "test media with existing torrent",
 			ArchiveID:      archiveID,
 			TorrentID:      tmd.ID,
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
 			Bytes:          1024,
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = ""
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
@@ -361,9 +361,9 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
-			archiveID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
+			archiveID   = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -371,17 +371,17 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			ID:             libraryID,
 			Description:    "test media",
 			ArchiveID:      archiveID,
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_UNLISTED)
@@ -403,9 +403,9 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
-			archiveID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
+			archiveID   = uuidx.NewV7().String()
 			tvfs        = fsx.DirVirtual(t.TempDir())
 		)
 		defer done()
@@ -449,17 +449,17 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			Description:    "test media with incomplete torrent",
 			ArchiveID:      archiveID,
 			TorrentID:      tmd.ID,
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
 			Bytes:          uint64(info.TotalLength()),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = ""
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
@@ -483,8 +483,8 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 			testContent = []byte("test media content for idempotency check")
@@ -498,19 +498,19 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 		lmd := library.Metadata{
 			ID:             libraryID,
 			Description:    "test media",
-			ArchiveID:      uuid.Max.String(),
+			ArchiveID:      uuidx.Max().String(),
 			Bytes:          uint64(len(testContent)),
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = ""
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
@@ -546,8 +546,8 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 			testContent = []byte("test media content for description change test")
@@ -561,19 +561,19 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 		lmd := library.Metadata{
 			ID:             libraryID,
 			Description:    "description alpha",
-			ArchiveID:      uuid.Max.String(),
+			ArchiveID:      uuidx.Max().String(),
 			Bytes:          uint64(len(testContent)),
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
 		}))
@@ -616,26 +616,26 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 		)
 		defer done()
 
 		lmd := library.Metadata{
 			ID:             libraryID,
 			Description:    "test media",
-			ArchiveID:      uuid.Nil.String(),
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			ArchiveID:      uuidx.Nil().String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_LISTED)
@@ -662,9 +662,9 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
-			archiveID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
+			archiveID   = uuidx.NewV7().String()
 		)
 		defer done()
 
@@ -678,10 +678,10 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			Description:    "test media",
 			ArchiveID:      archiveID,
 			Mimetype:       "video/mp4",
-			TorrentID:      uuid.Nil.String(),
+			TorrentID:      uuidx.Nil().String(),
 			KnownMediaID:   known.UID,
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
@@ -711,10 +711,10 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q              = sqltestx.Metadatabase(t)
 			mock           = &mockMetrics{}
 			feeds          = &mockFeedPublisher{}
-			communityID    = uuid.Must(uuid.NewV7()).String()
-			libraryID      = uuid.Must(uuid.NewV7()).String()
-			archiveID      = uuid.Must(uuid.NewV7()).String()
-			encryptionSeed = uuid.Must(uuid.NewV4()).String()
+			communityID    = uuidx.NewV7().String()
+			libraryID      = uuidx.NewV7().String()
+			archiveID      = uuidx.NewV7().String()
+			encryptionSeed = uuidx.NewV4().String()
 		)
 		defer done()
 
@@ -723,9 +723,9 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			Description:    "test media",
 			ArchiveID:      archiveID,
 			Mimetype:       "video/mp4",
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
 			EncryptionSeed: encryptionSeed,
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
@@ -733,7 +733,7 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
@@ -756,26 +756,26 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 		)
 		defer done()
 
 		lmd := library.Metadata{
 			ID:             libraryID,
 			Description:    "test media",
-			ArchiveID:      uuid.Max.String(),
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			ArchiveID:      uuidx.Max().String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = "magnet:?xt=urn:btih:0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33"
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
@@ -802,10 +802,10 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			archiveID   = uuid.Must(uuid.NewV7()).String()
+			archiveID   = uuidx.NewV7().String()
 			archiver    = &mockArchiver{archiveID: archiveID}
-			communityID = uuid.Must(uuid.NewV7()).String()
-			libraryID   = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
+			libraryID   = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 			testContent = []byte("test media content for inline archival")
@@ -819,19 +819,19 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 		lmd := library.Metadata{
 			ID:             libraryID,
 			Description:    "test media",
-			ArchiveID:      uuid.Nil.String(),
+			ArchiveID:      uuidx.Nil().String(),
 			Bytes:          uint64(len(testContent)),
-			TorrentID:      uuid.Nil.String(),
-			KnownMediaID:   uuid.Nil.String(),
-			DirectoryID:    uuid.Nil.String(),
-			EncryptionSeed: uuid.Must(uuid.NewV4()).String(),
+			TorrentID:      uuidx.Nil().String(),
+			KnownMediaID:   uuidx.Nil().String(),
+			DirectoryID:    uuidx.Nil().String(),
+			EncryptionSeed: uuidx.NewV4().String(),
 		}
 		require.NoError(t, library.MetadataInsertWithDefaults(ctx, q, lmd).Scan(&lmd))
 
 		var pc community.PublishedContent
 		require.NoError(t, testx.Fake(&pc, community.PublishedContentOptionTestDefaults, func(p *community.PublishedContent) {
 			p.CommunityID = communityID
-			p.KnownMediaID = uuid.Must(uuid.NewV7()).String()
+			p.KnownMediaID = uuidx.NewV7().String()
 			p.MagnetURI = ""
 			p.LibraryID = libraryID
 			p.PublishMode = int32(PublishMode_SYNDICATED)
@@ -865,7 +865,7 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 			q           = sqltestx.Metadatabase(t)
 			mock        = &mockMetrics{}
 			feeds       = &mockFeedPublisher{}
-			communityID = uuid.Must(uuid.NewV7()).String()
+			communityID = uuidx.NewV7().String()
 			mediaDir    = t.TempDir()
 			torrentDir  = t.TempDir()
 			testContent = []byte("test media content for mid-sync feed race")
@@ -876,7 +876,7 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 		// triggers a feed regeneration for communityID.
 		var lmd1 library.Metadata
 		require.NoError(t, testx.Fake(&lmd1, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
-			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.ID = uuidx.NewV7().String()
 			m.Description = "ready media"
 			m.Bytes = uint64(len(testContent))
 		}))
@@ -901,7 +901,7 @@ func TestSyncPublishedBackgroundWorker(t *testing.T) {
 		// sibling row mid-flight when a regeneration fires.
 		var lmd2 library.Metadata
 		require.NoError(t, testx.Fake(&lmd2, library.MetadataOptionTestDefaults, func(m *library.Metadata) {
-			m.ID = uuid.Must(uuid.NewV7()).String()
+			m.ID = uuidx.NewV7().String()
 			m.Description = "pending media"
 			m.Bytes = bytesx.KiB
 		}))

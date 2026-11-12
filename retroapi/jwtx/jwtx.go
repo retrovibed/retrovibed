@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/internal/slicesx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 )
 
 const (
@@ -112,7 +112,7 @@ func NewJWTClaims(subject string, options ...Option) (c jwt.RegisteredClaims) {
 	ts := time.Now()
 
 	c = jwt.RegisteredClaims{
-		ID:        uuid.Must(uuid.NewV4()).String(),
+		ID:        uuidx.NewV4().String(),
 		Subject:   subject,
 		IssuedAt:  jwt.NewNumericDate(ts),
 		NotBefore: jwt.NewNumericDate(ts),

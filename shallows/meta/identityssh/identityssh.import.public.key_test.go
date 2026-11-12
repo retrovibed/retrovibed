@@ -3,8 +3,8 @@ package identityssh_test
 import (
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
@@ -26,7 +26,7 @@ func TestImportPublicKey(t *testing.T) {
 
 		pid, err := sqlx.String(ctx, q, "SELECT profile_id FROM meta_sso_identity_ssh")
 		require.NoError(t, err)
-		require.Equal(t, uuid.UUID([]byte(pid)).String(), sshx.FingerprintMD5(id.PublicKey()))
+		require.Equal(t, uuidx.UUID([]byte(pid)).String(), sshx.FingerprintMD5(id.PublicKey()))
 	})
 
 	t.Run("is idempotent", func(t *testing.T) {
@@ -42,12 +42,12 @@ func TestImportPublicKey(t *testing.T) {
 
 		pid, err := sqlx.String(ctx, q, "SELECT profile_id FROM meta_sso_identity_ssh")
 		require.NoError(t, err)
-		require.Equal(t, uuid.UUID([]byte(pid)).String(), sshx.FingerprintMD5(id.PublicKey()))
+		require.Equal(t, uuidx.UUID([]byte(pid)).String(), sshx.FingerprintMD5(id.PublicKey()))
 
 		require.NoError(t, identityssh.ImportPublicKey(ctx, q, id.PublicKey()))
 		require.Equal(t, 1, testx.Must(sqlx.Count(ctx, q, "SELECT COUNT(*) FROM meta_profiles"))(t))
 		pid, err = sqlx.String(ctx, q, "SELECT profile_id FROM meta_sso_identity_ssh")
 		require.NoError(t, err)
-		require.Equal(t, uuid.UUID([]byte(pid)).String(), sshx.FingerprintMD5(id.PublicKey()))
+		require.Equal(t, uuidx.UUID([]byte(pid)).String(), sshx.FingerprintMD5(id.PublicKey()))
 	})
 }

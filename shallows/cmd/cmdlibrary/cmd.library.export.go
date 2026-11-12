@@ -12,10 +12,10 @@ import (
 	"os"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gofrs/uuid/v5"
 	"github.com/retrovibed/retrovibed/retroapi/blockcache"
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
 	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
@@ -99,7 +99,7 @@ func (t exportJSONL) export(enc *json.Encoder, vfs fsx.Virtual, md library.Metad
 
 		_, err := io.CopyN(w, io.NewSectionReader(dcache, off, chunksize), chunksize)
 		if errorsx.Ignore(err, io.EOF) != nil {
-			failed := enc.Encode(exportTrailer{Metadata: langx.Clone(md, timex.JSONSafeEncodeOption), MD5: uuid.Nil.String()})
+			failed := enc.Encode(exportTrailer{Metadata: langx.Clone(md, timex.JSONSafeEncodeOption), MD5: uuidx.Nil().String()})
 			return errors.Join(errorsx.Wrapf(err, "read chunk %d at offset %d", i, off), failed)
 		}
 

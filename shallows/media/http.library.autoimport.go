@@ -8,7 +8,6 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/go-playground/form/v4"
-	"github.com/gofrs/uuid/v5"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
@@ -16,6 +15,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
+	"github.com/retrovibed/retrovibed/retroapi/uuidx"
 	"github.com/retrovibed/retrovibed/shallows/internal/asyncx"
 	"github.com/retrovibed/retrovibed/shallows/internal/duckdbx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
@@ -198,7 +198,7 @@ func (t *HTTPAutoimport) create(w http.ResponseWriter, r *http.Request) {
 
 	d := NewLibraryAutoimportDirectory(msg.Directory)
 	d.Path = filepath.Clean(d.Path)
-	d.LibraryDirectoryID = stringsx.FirstNonBlank(d.LibraryDirectoryID, uuid.Nil.String())
+	d.LibraryDirectoryID = stringsx.FirstNonBlank(d.LibraryDirectoryID, uuidx.Nil().String())
 
 	if !filepath.IsAbs(d.Path) {
 		log.Println("autoimport directory path must be absolute", d.Path)
@@ -254,7 +254,7 @@ func (t *HTTPAutoimport) update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	d := NewLibraryAutoimportDirectory(msg.Directory)
-	d.LibraryDirectoryID = stringsx.FirstNonBlank(d.LibraryDirectoryID, uuid.Nil.String())
+	d.LibraryDirectoryID = stringsx.FirstNonBlank(d.LibraryDirectoryID, uuidx.Nil().String())
 
 	// mode and debounce are enforced by the table's check constraints.
 	if err = library.AutoimportDirectoryUpdateByID(r.Context(), t.q, id, d).Scan(&d); duckdbx.ErrUniqueConstraintViolation(err) != nil {
