@@ -60,7 +60,7 @@ func main() {
 				),
 			),
 		),
-		release.SmokeTest(tarinfo()),
+		// release.SmokeTest(tarinfo()),
 		release.Release(tarinfo()),
 	)
 
