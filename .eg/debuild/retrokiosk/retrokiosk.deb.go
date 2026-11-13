@@ -35,7 +35,7 @@ func gpgoptions() []eggpg.Option {
 	// eggpg.Options() takes GNUPGHOME from the environment, which inside the container is the
 	// host-provided /eg.mnt/.gnupg (not writable by us: "unsafe ownership", "Permission denied").
 	// pin the isolated per-container home instead.
-	return eggpg.Options().Home("/home/egd/.gnupg")
+	return eggpg.Options().IgnoreLocalGNU().Home("/home/egd/.gnupg")
 }
 
 func init() {
@@ -69,7 +69,6 @@ func Runner() eg.C8S {
 
 func Build(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
-		egbug.Log("DERP DERP 0"),
 		// override eg compute local's setting of the home directory.
 		// ideally we should default to this except when performing local
 		// compute workloads.
@@ -77,19 +76,16 @@ func Build(ctx context.Context, o eg.Op) error {
 			eggpg.Seed(gpgoptions()...),
 			eggpg.Debug(gpgoptions()...),
 		),
-		egbug.Log("DERP DERP 1"),
-		eg.Parallel(
-			egdebuild.Build(
-				gcfg,
-				egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
-				egdebuild.Option.NoLint(),
-			),
-			egdebuild.Build(
-				gcfg,
-				egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
-				egdebuild.Option.BuildBinary(20*time.Minute),
-				egdebuild.Option.NoLint(),
-			),
+		egdebuild.Build(
+			gcfg,
+			egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
+			egdebuild.Option.NoLint(),
+		),
+		egdebuild.Build(
+			gcfg,
+			egdebuild.Option.Distro(egdebuild.UbuntuLatestCodename),
+			egdebuild.Option.BuildBinary(20*time.Minute),
+			egdebuild.Option.NoLint(),
 		),
 	)(ctx, o)
 }
