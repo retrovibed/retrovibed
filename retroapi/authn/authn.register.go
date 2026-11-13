@@ -282,6 +282,34 @@ func ProfileState(p *Profile) string {
 	return "disabled"
 }
 
+// PrintSession prints only the account and profile of the session, see PrintIdentity for the key details.
+func PrintSession(w io.Writer, session *Session) (err error) {
+	line := func(label string, value string) error {
+		_, err := fmt.Fprintf(w, "%-11s %s\n", label, value)
+		return err
+	}
+
+	if session == nil {
+		return nil
+	}
+
+	if session.Account != nil {
+		err = line("account", session.Account.Id)
+	}
+
+	if session.Profile != nil {
+		err = errorsx.Compact(
+			err,
+			line("profile", session.Profile.Id),
+			line("display", session.Profile.Display),
+			line("email", session.Profile.Email),
+			line("status", ProfileState(session.Profile)),
+		)
+	}
+
+	return err
+}
+
 func PrintIdentity(w io.Writer, s ssh.Signer, session *Session) error {
 	var (
 		err3 error
