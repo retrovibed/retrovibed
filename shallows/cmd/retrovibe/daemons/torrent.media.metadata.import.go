@@ -100,7 +100,7 @@ func MediaMetadataImport(ctx context.Context, db sqlx.Queryer, tvfs fsx.Virtual,
 			d := jsonl.Iter[library.Known](jsonl.NewDecoder(content))
 			for chunk := range iterx.Chunk(d.Each(ctx), 8192) {
 				chunk = slicesx.Map(func(v library.Known) library.Known {
-					return langx.Clone(v, library.KnownOptionAutoDescription, library.KnownOptionAutoParentUID)
+					return langx.Clone(v, library.KnownOptionAutoDescription, library.KnownOptionAutoParentUID, library.KnownOptionAutoSyncID)
 				}, chunk...)
 
 				if err := insert.Run(ctx, metadataImportBatch{metadata: _md, records: chunk}); err != nil {

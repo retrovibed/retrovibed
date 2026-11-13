@@ -2,6 +2,7 @@ package cmdmedia
 
 import (
 	"context"
+	"database/sql"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
@@ -22,6 +23,8 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
 	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
+	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/timex"
 	"github.com/retrovibed/retrovibed/shallows/library"
 )
@@ -159,16 +162,50 @@ func (t goldenupload) run(ctx context.Context, r io.Reader, httpc *http.Client) 
 }
 
 type goldensync struct {
-	Sync string `flag:"" name:"sync" help:"uuidv7 sync id to resume from" default:"00000000-0000-0000-0000-000000000000"`
+	Database string `flag:"" name:"database" help:"cache database used to determine the sync id to resume from when --sync is not provided" default:"${vars_user_cache_directory}/cache.db"`
+	Sync     string `flag:"" name:"sync" help:"uuidv7 sync id to resume from, defaults to the latest sync id recorded in the cache database" default:""`
 }
 
-func (t goldensync) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) error {
+func (t goldensync) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) {
+	if stringsx.Blank(t.Sync) {
+		var db *sql.DB
+
+		if db, err = cmdopts.DatabaseCache(gctx.Context, t.Database); err != nil {
+			return err
+		}
+
+		t.Sync, err = t.cursor(gctx.Context, db)
+		// close before syncing so the database isn't held open (and locked)
+		// while we page through deeppool.
+		if cerr := db.Close(); err == nil {
+			err = cerr
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("syncing media metadata from", t.Sync)
+
 	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid, Global: gctx}.HTTPClient(gctx.Context)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to create deeppool client")
 	}
 
 	return t.run(gctx.Context, json.NewEncoder(os.Stdout), httpc)
+}
+
+// cursor returns the latest golden copy sync id already imported into the
+// cache database, or the nil uuid when nothing has been imported from the
+// golden copy yet.
+func (t goldensync) cursor(ctx context.Context, q sqlx.Queryer) (string, error) {
+	sync, err := sqlx.String(ctx, q, "SELECT COALESCE(MAX(sync_id), ?::UUID)::VARCHAR FROM cache.library_known_media", uuidx.Nil().String())
+	if err != nil {
+		return "", errorsx.Wrap(err, "unable to determine latest sync id from cache database")
+	}
+
+	return sync, nil
 }
 
 func (t goldensync) run(ctx context.Context, enc *json.Encoder, httpc *http.Client) error {
@@ -200,6 +237,7 @@ func (t goldensync) run(ctx context.Context, enc *json.Encoder, httpc *http.Clie
 
 			if err := enc.Encode(library.Known{
 				UID:              m.Uid,
+				SyncID:           m.SyncId,
 				Md5:              md5.String(),
 				Md5Lower:         binary.LittleEndian.Uint64(uuidx.LowN(md5, 64)),
 				Source:           m.Source,

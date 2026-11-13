@@ -39,6 +39,7 @@ func KnownMediaFromDiscovered(kid uuidx.UUID, d Discovered) library.Known {
 		Released:        timex.Inf(), // no release date available from the wire format
 		AutoDescription: d.Title,
 		ParentUID:       uuidx.Nil().String(), // standalone entry - discovery never yields episodes/children directly
+		SyncID:          uuidx.Nil().String(), // not sourced from the deeppool golden copy
 		TombstonedAt:    time.Now().Add(knownMediaTOFUTTL),
 	}
 }

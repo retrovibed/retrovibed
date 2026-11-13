@@ -88,6 +88,12 @@ func KnownOptionParentUID(v string) func(*Known) {
 	}
 }
 
+func KnownOptionSyncID(v string) func(*Known) {
+	return func(t *Known) {
+		t.SyncID = v
+	}
+}
+
 func KnownOptionAutoDescription(t *Known) {
 	t.AutoDescription = stringsx.Join("\n", t.Title, t.OriginalTitle, t.Overview)
 }
@@ -98,6 +104,14 @@ func KnownOptionAutoDescription(t *Known) {
 // convert.
 func KnownOptionAutoParentUID(t *Known) {
 	t.ParentUID = stringsx.First(t.ParentUID, uuidx.Nil().String())
+}
+
+// KnownOptionAutoSyncID defaults a blank SyncID to the nil UUID.
+// sync_id is a NOT NULL UUID column that only records sourced from the
+// deeppool golden copy carry; every other producer leaves Go's zero-value ""
+// here, which the driver can't convert.
+func KnownOptionAutoSyncID(t *Known) {
+	t.SyncID = stringsx.First(t.SyncID, uuidx.Nil().String())
 }
 
 // KnownCollationSpecialsSeason marks TMDB "Specials" (season_number == 0)
@@ -188,6 +202,7 @@ func KnownOptionTestDefaults(t *Known) {
 	t.Duplicates = 0
 	t.Popularity = 0
 	t.ParentUID = uuidx.Nil().String()
+	t.SyncID = uuidx.Nil().String()
 	t.OriginalLanguage = userx.LocaleLanguage()
 }
 

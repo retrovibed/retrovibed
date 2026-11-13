@@ -13,6 +13,8 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
+	"github.com/retrovibed/retrovibed/shallows/internal/jsonl"
+	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/retrovibed/retrovibed/shallows/library"
 	"github.com/stretchr/testify/require"
 )
@@ -66,7 +68,9 @@ func TestKnownGoldenSync(t *testing.T) {
 		require.Equal(t, md5.String(), results[0].Md5)
 		require.Equal(t, binary.LittleEndian.Uint64(uuidx.LowN(md5, 64)), results[0].Md5Lower)
 		require.Equal(t, 2020, results[0].Released.Year())
+		require.Equal(t, s1, results[0].SyncID)
 		require.Equal(t, "two", results[1].Title)
+		require.Equal(t, s2, results[1].SyncID)
 		require.EqualValues(t, 3, results[1].Collation)
 	})
 
@@ -82,5 +86,59 @@ func TestKnownGoldenSync(t *testing.T) {
 
 		cmd := goldensync{Sync: uuidx.Nil().String()}
 		require.Error(t, cmd.run(ctx, json.NewEncoder(&buf), &http.Client{Transport: httpx.RewriteHostTransport(testx.Must(url.ParseRequestURI(srv.URL))(t), nil)}))
+	})
+
+	t.Run("cursor defaults to the nil uuid for an empty cache", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		sync, err := goldensync{}.cursor(ctx, db)
+		require.NoError(t, err)
+		require.Equal(t, uuidx.Nil().String(), sync)
+	})
+
+	t.Run("cursor resumes from the latest imported sync id", func(t *testing.T) {
+		var a, b, c library.Known
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		s1 := uuidx.NewV7().String()
+		s2 := uuidx.NewV7().String()
+		require.NoError(t, testx.Fake(&a, library.KnownOptionTestDefaults, library.KnownOptionSyncID(s1)))
+		require.NoError(t, testx.Fake(&b, library.KnownOptionTestDefaults, library.KnownOptionSyncID(s2)))
+		require.NoError(t, testx.Fake(&c, library.KnownOptionTestDefaults))
+
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(a, b, c))
+		require.NoError(t, knownimport{}.run(ctx, db, &input))
+
+		sync, err := goldensync{}.cursor(ctx, db)
+		require.NoError(t, err)
+		require.Equal(t, s2, sync)
+	})
+
+	t.Run("reimporting from a non golden source does not reset the sync id", func(t *testing.T) {
+		var a library.Known
+		ctx, done := testx.Context(t)
+		defer done()
+		db := sqltestx.Metadatabase(t)
+
+		s1 := uuidx.NewV7().String()
+		require.NoError(t, testx.Fake(&a, library.KnownOptionTestDefaults, library.KnownOptionSyncID(s1)))
+
+		var input bytes.Buffer
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(a))
+		require.NoError(t, knownimport{}.run(ctx, db, &input))
+
+		a.SyncID = ""
+		input.Reset()
+		require.NoError(t, jsonl.NewEncoder(&input).Encode(a))
+		require.NoError(t, knownimport{}.run(ctx, db, &input))
+
+		sync, err := goldensync{}.cursor(ctx, db)
+		require.NoError(t, err)
+		require.Equal(t, s1, sync)
 	})
 }
