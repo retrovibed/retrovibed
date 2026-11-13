@@ -70,7 +70,8 @@ RETROVIBED_SELF_SIGNED_HOSTS=127.0.0.1
 EOF
 
 # generate an account. essentially used to create a static id for your account.
-retrovibed identity generate '{username}:{password}'
+# --bootstrap adds the user as an admin of the local retrovibe instance.
+retrovibed identity generate --bootstrap '{username}:{password}'
 
 # authorize initial users using ssh keys. can be located by using `retrovibed identity show`
 retrovibed identity bootstrap public-key "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBEdpDo/fUPKK7OUuZ4VM6JeBJmyZ882tQYPBN6nQwIk"
@@ -211,13 +212,6 @@ multiple pairs:
 ```bash
 retrovibed ddisc search plugin install ../myplugin -e API_KEY=... -e file://./myplugin.env
 retrovibed ddisc search plugin config myplugin -e API_KEY=updated
-```
-
-#### run flatpak from cli
-
-```bash
-flatpak run --user space.retrovibe.Console
-flatpak run --command=sh --user space.retrovibe.Console # for debugging the runtime
 ```
 
 #### manually moving a storage device.
