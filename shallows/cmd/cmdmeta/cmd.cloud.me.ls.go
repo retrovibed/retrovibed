@@ -22,14 +22,28 @@ func (t CloudMeLs) Run(gctx *cmdopts.Global, id *cmdopts.SSHID) (err error) {
 		return err
 	}
 
+	// the local identity is printed first so it is available even when the session is not.
+	if err = authn.PrintIdentity(os.Stdout, signer, nil); err != nil {
+		return err
+	}
+
 	c, session, err := cloudClient(gctx.Context, gctx, signer)
 	if err != nil {
+		return err
+	}
+
+	if err = authn.PrintSession(os.Stdout, session); err != nil {
 		return err
 	}
 
 	profiles, err := me.Profiles(gctx.Context, c)
 	if err != nil {
 		return errorsx.Wrap(err, "unable to list profiles")
+	}
+
+	// separate the identity and session from the list.
+	if _, err = fmt.Fprintln(os.Stdout); err != nil {
+		return err
 	}
 
 	return t.render(os.Stdout, session.Profile.GetId(), profiles)

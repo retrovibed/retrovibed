@@ -9,16 +9,14 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
-	"github.com/retrovibed/retrovibed/shallows/internal/env"
-	"github.com/retrovibed/retrovibed/shallows/internal/sshx"
 )
 
 type CloudRegister struct {
 	Account string `name:"account" help:"optional id of the account to register with, an administrator of the account must approve the registration"`
 }
 
-func (t CloudRegister) Run(gctx *cmdopts.Global) (err error) {
-	id, err := sshx.Load(env.PrivateKeyPath())
+func (t CloudRegister) Run(gctx *cmdopts.Global, _id *cmdopts.SSHID) (err error) {
+	id, err := _id.Signer()
 	if err != nil {
 		return err
 	}

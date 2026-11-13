@@ -1,15 +1,18 @@
 package cmdmeta
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"syscall"
 
 	"github.com/retrovibed/retrovibed/retroapi/authn"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jsonx"
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdopts"
+	"golang.org/x/crypto/ssh"
 )
 
 type IdenDisplay struct{}
@@ -20,6 +23,22 @@ func (t IdenDisplay) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdop
 		return err
 	}
 
+	// the local identity is printed first so it is available even when the endpoint is not.
+	if err = authn.PrintIdentity(os.Stdout, signer, nil); err != nil {
+		return err
+	}
+
+	// the session is optional, an unavailable endpoint is not a failure of displaying the identity.
+	if err = t.session(gctx, tls, signer, daemon); errors.Is(err, syscall.ECONNREFUSED) {
+		fmt.Fprintf(os.Stderr, "session unavailable: connection refused %s\n", daemon.Endpoint)
+	} else if err != nil {
+		fmt.Fprintf(os.Stderr, "session unavailable: %v\n", err)
+	}
+
+	return nil
+}
+
+func (t IdenDisplay) session(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, signer ssh.Signer, daemon *cmdopts.Endpoint) (err error) {
 	c := authn.AutoOauth2Client(
 		gctx.Context,
 		tls.Config(),
@@ -48,7 +67,7 @@ func (t IdenDisplay) Run(gctx *cmdopts.Global, tls *cmdopts.TLSConfig, id *cmdop
 		return errorsx.Wrap(err, "unable to retrieve local permissions")
 	}
 
-	if err = authn.PrintIdentity(os.Stdout, signer, &authn.Session{Profile: current.Profile, Account: current.Account}); err != nil {
+	if err = authn.PrintSession(os.Stdout, &authn.Session{Profile: current.Profile, Account: current.Account}); err != nil {
 		return err
 	}
 
