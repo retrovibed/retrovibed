@@ -61,6 +61,7 @@ func Main(args ...string) {
 		Cloud     cmdmeta.Cloud          `cmd:"" name:"cloud" help:"retrovibe.space cloud service commands"`
 		U12t      cmdmeta.Usermanagement `cmd:"" name:"u12t" help:"user management commands"`
 		Device    cmdmeta.Device         `cmd:"" name:"device" help:"manage known devices/peer daemons"`
+		Meta      cmdmeta.Meta           `cmd:"" name:"meta" help:"metadata database management commands"`
 		Media     cmdmedia.Commands      `cmd:"" help:"media metadata management (import/export)"`
 		Library   cmdlibrary.Commands    `cmd:"" help:"manage your media library"`
 		Torrent   cmdtorrent.Commands    `cmd:"" help:"torrent commands"`
