@@ -193,6 +193,40 @@ func TestInit(t *testing.T) {
 		require.NotSame(t, first, second)
 	})
 
+	t.Run("dht is served when enabled", func(t *testing.T) {
+		q := sqltestx.Metadatabase(t)
+		tr := newTestTorrenting(t, q)
+
+		cfg := AutoTorrentSettings(&TorrentSettings{Dht: true})
+		disc := &DiscoverySettings{}
+
+		ctx, cancel := context.WithCancel(t.Context())
+		defer cancel()
+
+		noop := func(e error) { require.NoError(t, e) }
+
+		require.NoError(t, tr.Init(ctx, noop, cfg, disc))
+		require.NotNil(t, tr._tclient.Load())
+		require.True(t, tr._dhts.Load().Available())
+	})
+
+	t.Run("dht is passive when disabled", func(t *testing.T) {
+		q := sqltestx.Metadatabase(t)
+		tr := newTestTorrenting(t, q)
+
+		cfg := AutoTorrentSettings(&TorrentSettings{Dht: false})
+		disc := &DiscoverySettings{}
+
+		ctx, cancel := context.WithCancel(t.Context())
+		defer cancel()
+
+		noop := func(e error) { require.NoError(t, e) }
+
+		require.NoError(t, tr.Init(ctx, noop, cfg, disc))
+		require.NotNil(t, tr._tclient.Load())
+		require.False(t, tr._dhts.Load().Available())
+	})
+
 	t.Run("creates a valid client when Firewalled is true", func(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		tr := newTestTorrenting(t, q)

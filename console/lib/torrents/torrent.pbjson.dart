@@ -60,6 +60,7 @@ const TorrentSettings$json = {
     {'1': 'ip4', '3': 7, '4': 1, '5': 9, '10': 'ip4'},
     {'1': 'ip6', '3': 8, '4': 1, '5': 9, '10': 'ip6'},
     {'1': 'port', '3': 9, '4': 1, '5': 13, '10': 'port'},
+    {'1': 'dht', '3': 10, '4': 1, '5': 8, '10': 'dht'},
     {'1': 'log', '3': 998, '4': 1, '5': 8, '10': 'log'},
     {'1': 'debug', '3': 999, '4': 1, '5': 8, '10': 'debug'},
     {
@@ -111,7 +112,7 @@ const TorrentSettings$json = {
     },
   ],
   '9': [
-    {'1': 10, '2': 998},
+    {'1': 11, '2': 998},
   ],
 };
 
@@ -121,13 +122,13 @@ final $typed_data.Uint8List torrentSettingsDescriptor = $convert.base64Decode(
     'ImCg5hdXRvX2Jvb3RzdHJhcBgDIAEoCFIOYXV0b19ib290c3RyYXASLAoRYXV0b19sb2NhdGVf'
     'bWVkaWEYBCABKAhSEWF1dG9fbG9jYXRlX21lZGlhEh4KCmZpcmV3YWxsZWQYBSABKAhSCmZpcm'
     'V3YWxsZWQSHAoJcmVzdW1hYmxlGAYgASgIUglyZXN1bWFibGUSEAoDaXA0GAcgASgJUgNpcDQS'
-    'EAoDaXA2GAggASgJUgNpcDYSEgoEcG9ydBgJIAEoDVIEcG9ydBIRCgNsb2cY5gcgASgIUgNsb2'
-    'cSFQoFZGVidWcY5wcgASgIUgVkZWJ1ZxIsCghkb3dubG9hZBjoByABKAsyDy50b3JyZW50cy5M'
-    'aW1pdFIIZG93bmxvYWQSKAoGdXBsb2FkGOkHIAEoCzIPLnRvcnJlbnRzLkxpbWl0UgZ1cGxvYW'
-    'QSKgoHaW5ib3VuZBjqByABKAsyDy50b3JyZW50cy5MaW1pdFIHaW5ib3VuZBIsCghvdXRib3Vu'
-    'ZBjrByABKAsyDy50b3JyZW50cy5MaW1pdFIIb3V0Ym91bmQSJgoFcGVlcnMY7AcgASgLMg8udG'
-    '9ycmVudHMuUGVlcnNSBXBlZXJzEisKEG1heGltdW1fcmVxdWVzdHMY7QcgASgEUhBtYXhpbXVt'
-    'X3JlcXVlc3RzSgUIChDmBw==');
+    'EAoDaXA2GAggASgJUgNpcDYSEgoEcG9ydBgJIAEoDVIEcG9ydBIQCgNkaHQYCiABKAhSA2RodB'
+    'IRCgNsb2cY5gcgASgIUgNsb2cSFQoFZGVidWcY5wcgASgIUgVkZWJ1ZxIsCghkb3dubG9hZBjo'
+    'ByABKAsyDy50b3JyZW50cy5MaW1pdFIIZG93bmxvYWQSKAoGdXBsb2FkGOkHIAEoCzIPLnRvcn'
+    'JlbnRzLkxpbWl0UgZ1cGxvYWQSKgoHaW5ib3VuZBjqByABKAsyDy50b3JyZW50cy5MaW1pdFIH'
+    'aW5ib3VuZBIsCghvdXRib3VuZBjrByABKAsyDy50b3JyZW50cy5MaW1pdFIIb3V0Ym91bmQSJg'
+    'oFcGVlcnMY7AcgASgLMg8udG9ycmVudHMuUGVlcnNSBXBlZXJzEisKEG1heGltdW1fcmVxdWVz'
+    'dHMY7QcgASgEUhBtYXhpbXVtX3JlcXVlc3RzSgUICxDmBw==');
 
 @$core.Deprecated('Use discoverySettingsDescriptor instead')
 const DiscoverySettings$json = {

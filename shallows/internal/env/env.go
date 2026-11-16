@@ -65,6 +65,7 @@ const (
 	WireguardAutohealFrequency  = "RETROVIBED_WIREGUARD_AUTOHEAL_FREQUENCY"     // base interval for wireguard autoheal exponential backoff. time.Duration format.
 	WireguardAutohealMax        = "RETROVIBED_WIREGUARD_AUTOHEAL_MAX"           // maximum interval between wireguard autoheal recovery attempts. time.Duration format.
 	TorrentPEX                  = "RETROVIBED_TORRENT_PEX"                      // enable/disable torrent pex functionality. strconv.ParseBool
+	TorrentDHT                  = "RETROVIBED_TORRENT_DHT"                      // enable/disable torrent dht participation. strconv.ParseBool
 	TorrentAllowSeeding         = "RETROVIBED_TORRENT_ALLOW_SEEDING"            // enable/disable torrent allow the daemon to seed. strconv.ParseBool
 	TorrentDownloadStats        = "RETROVIBED_TORRENT_DOWNLOAD_STATS_FREQUENCY" // adjust the frequency at which download stats are logged. time.Duration format.
 	TorrentPrivateNetwork       = "RETROVIBED_TORRENT_PRIVATE"                  // specify that the torrent system should firewall to only private networks.

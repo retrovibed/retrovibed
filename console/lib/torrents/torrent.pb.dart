@@ -162,6 +162,7 @@ class TorrentSettings extends $pb.GeneratedMessage {
     $core.String? ip4,
     $core.String? ip6,
     $core.int? port,
+    $core.bool? dht,
     $core.bool? log,
     $core.bool? debug,
     Limit? download,
@@ -181,6 +182,7 @@ class TorrentSettings extends $pb.GeneratedMessage {
     if (ip4 != null) result.ip4 = ip4;
     if (ip6 != null) result.ip6 = ip6;
     if (port != null) result.port = port;
+    if (dht != null) result.dht = dht;
     if (log != null) result.log = log;
     if (debug != null) result.debug = debug;
     if (download != null) result.download = download;
@@ -214,6 +216,7 @@ class TorrentSettings extends $pb.GeneratedMessage {
     ..aOS(7, _omitFieldNames ? '' : 'ip4')
     ..aOS(8, _omitFieldNames ? '' : 'ip6')
     ..aI(9, _omitFieldNames ? '' : 'port', fieldType: $pb.PbFieldType.OU3)
+    ..aOB(10, _omitFieldNames ? '' : 'dht')
     ..aOB(998, _omitFieldNames ? '' : 'log')
     ..aOB(999, _omitFieldNames ? '' : 'debug')
     ..aOM<Limit>(1000, _omitFieldNames ? '' : 'download',
@@ -334,85 +337,94 @@ class TorrentSettings extends $pb.GeneratedMessage {
   @$pb.TagNumber(9)
   void clearPort() => $_clearField(9);
 
+  @$pb.TagNumber(10)
+  $core.bool get dht => $_getBF(9);
+  @$pb.TagNumber(10)
+  set dht($core.bool value) => $_setBool(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasDht() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearDht() => $_clearField(10);
+
   @$pb.TagNumber(998)
-  $core.bool get log => $_getBF(9);
+  $core.bool get log => $_getBF(10);
   @$pb.TagNumber(998)
-  set log($core.bool value) => $_setBool(9, value);
+  set log($core.bool value) => $_setBool(10, value);
   @$pb.TagNumber(998)
-  $core.bool hasLog() => $_has(9);
+  $core.bool hasLog() => $_has(10);
   @$pb.TagNumber(998)
   void clearLog() => $_clearField(998);
 
   @$pb.TagNumber(999)
-  $core.bool get debug => $_getBF(10);
+  $core.bool get debug => $_getBF(11);
   @$pb.TagNumber(999)
-  set debug($core.bool value) => $_setBool(10, value);
+  set debug($core.bool value) => $_setBool(11, value);
   @$pb.TagNumber(999)
-  $core.bool hasDebug() => $_has(10);
+  $core.bool hasDebug() => $_has(11);
   @$pb.TagNumber(999)
   void clearDebug() => $_clearField(999);
 
   @$pb.TagNumber(1000)
-  Limit get download => $_getN(11);
+  Limit get download => $_getN(12);
   @$pb.TagNumber(1000)
   set download(Limit value) => $_setField(1000, value);
   @$pb.TagNumber(1000)
-  $core.bool hasDownload() => $_has(11);
+  $core.bool hasDownload() => $_has(12);
   @$pb.TagNumber(1000)
   void clearDownload() => $_clearField(1000);
   @$pb.TagNumber(1000)
-  Limit ensureDownload() => $_ensure(11);
+  Limit ensureDownload() => $_ensure(12);
 
   @$pb.TagNumber(1001)
-  Limit get upload => $_getN(12);
+  Limit get upload => $_getN(13);
   @$pb.TagNumber(1001)
   set upload(Limit value) => $_setField(1001, value);
   @$pb.TagNumber(1001)
-  $core.bool hasUpload() => $_has(12);
+  $core.bool hasUpload() => $_has(13);
   @$pb.TagNumber(1001)
   void clearUpload() => $_clearField(1001);
   @$pb.TagNumber(1001)
-  Limit ensureUpload() => $_ensure(12);
+  Limit ensureUpload() => $_ensure(13);
 
   @$pb.TagNumber(1002)
-  Limit get inbound => $_getN(13);
+  Limit get inbound => $_getN(14);
   @$pb.TagNumber(1002)
   set inbound(Limit value) => $_setField(1002, value);
   @$pb.TagNumber(1002)
-  $core.bool hasInbound() => $_has(13);
+  $core.bool hasInbound() => $_has(14);
   @$pb.TagNumber(1002)
   void clearInbound() => $_clearField(1002);
   @$pb.TagNumber(1002)
-  Limit ensureInbound() => $_ensure(13);
+  Limit ensureInbound() => $_ensure(14);
 
   @$pb.TagNumber(1003)
-  Limit get outbound => $_getN(14);
+  Limit get outbound => $_getN(15);
   @$pb.TagNumber(1003)
   set outbound(Limit value) => $_setField(1003, value);
   @$pb.TagNumber(1003)
-  $core.bool hasOutbound() => $_has(14);
+  $core.bool hasOutbound() => $_has(15);
   @$pb.TagNumber(1003)
   void clearOutbound() => $_clearField(1003);
   @$pb.TagNumber(1003)
-  Limit ensureOutbound() => $_ensure(14);
+  Limit ensureOutbound() => $_ensure(15);
 
   @$pb.TagNumber(1004)
-  Peers get peers => $_getN(15);
+  Peers get peers => $_getN(16);
   @$pb.TagNumber(1004)
   set peers(Peers value) => $_setField(1004, value);
   @$pb.TagNumber(1004)
-  $core.bool hasPeers() => $_has(15);
+  $core.bool hasPeers() => $_has(16);
   @$pb.TagNumber(1004)
   void clearPeers() => $_clearField(1004);
   @$pb.TagNumber(1004)
-  Peers ensurePeers() => $_ensure(15);
+  Peers ensurePeers() => $_ensure(16);
 
   @$pb.TagNumber(1005)
-  $fixnum.Int64 get maximumRequests => $_getI64(16);
+  $fixnum.Int64 get maximumRequests => $_getI64(17);
   @$pb.TagNumber(1005)
-  set maximumRequests($fixnum.Int64 value) => $_setInt64(16, value);
+  set maximumRequests($fixnum.Int64 value) => $_setInt64(17, value);
   @$pb.TagNumber(1005)
-  $core.bool hasMaximumRequests() => $_has(16);
+  $core.bool hasMaximumRequests() => $_has(17);
   @$pb.TagNumber(1005)
   void clearMaximumRequests() => $_clearField(1005);
 }

@@ -136,6 +136,7 @@ type TorrentSettings struct {
 	Ip4             string                 `protobuf:"bytes,7,opt,name=ip4,proto3" json:"ip4,omitempty"`
 	Ip6             string                 `protobuf:"bytes,8,opt,name=ip6,proto3" json:"ip6,omitempty"`
 	Port            uint32                 `protobuf:"varint,9,opt,name=port,proto3" json:"port,omitempty"`
+	Dht             bool                   `protobuf:"varint,10,opt,name=dht,proto3" json:"dht,omitempty"`
 	Log             bool                   `protobuf:"varint,998,opt,name=log,proto3" json:"log,omitempty"`
 	Debug           bool                   `protobuf:"varint,999,opt,name=debug,proto3" json:"debug,omitempty"`
 	Download        *Limit                 `protobuf:"bytes,1000,opt,name=download,proto3" json:"download,omitempty"`
@@ -239,6 +240,13 @@ func (x *TorrentSettings) GetPort() uint32 {
 		return x.Port
 	}
 	return 0
+}
+
+func (x *TorrentSettings) GetDht() bool {
+	if x != nil {
+		return x.Dht
+	}
+	return false
 }
 
 func (x *TorrentSettings) GetLog() bool {
@@ -391,7 +399,7 @@ const file_torrents_torrent_proto_rawDesc = "" +
 	"\x03max\x18\x02 \x01(\rR\x03max\"1\n" +
 	"\x05Limit\x12\x12\n" +
 	"\x04rate\x18\x01 \x01(\rR\x04rate\x12\x14\n" +
-	"\x05burst\x18\x02 \x01(\rR\x05burst\"\xbb\x04\n" +
+	"\x05burst\x18\x02 \x01(\rR\x05burst\"\xcd\x04\n" +
 	"\x0fTorrentSettings\x12\x12\n" +
 	"\x04seed\x18\x01 \x01(\bR\x04seed\x12\x10\n" +
 	"\x03pex\x18\x02 \x01(\bR\x03pex\x12&\n" +
@@ -403,7 +411,9 @@ const file_torrents_torrent_proto_rawDesc = "" +
 	"\tresumable\x18\x06 \x01(\bR\tresumable\x12\x10\n" +
 	"\x03ip4\x18\a \x01(\tR\x03ip4\x12\x10\n" +
 	"\x03ip6\x18\b \x01(\tR\x03ip6\x12\x12\n" +
-	"\x04port\x18\t \x01(\rR\x04port\x12\x11\n" +
+	"\x04port\x18\t \x01(\rR\x04port\x12\x10\n" +
+	"\x03dht\x18\n" +
+	" \x01(\bR\x03dht\x12\x11\n" +
 	"\x03log\x18\xe6\a \x01(\bR\x03log\x12\x15\n" +
 	"\x05debug\x18\xe7\a \x01(\bR\x05debug\x12,\n" +
 	"\bdownload\x18\xe8\a \x01(\v2\x0f.torrents.LimitR\bdownload\x12(\n" +
@@ -411,8 +421,7 @@ const file_torrents_torrent_proto_rawDesc = "" +
 	"\ainbound\x18\xea\a \x01(\v2\x0f.torrents.LimitR\ainbound\x12,\n" +
 	"\boutbound\x18\xeb\a \x01(\v2\x0f.torrents.LimitR\boutbound\x12&\n" +
 	"\x05peers\x18\xec\a \x01(\v2\x0f.torrents.PeersR\x05peers\x12+\n" +
-	"\x10maximum_requests\x18\xed\a \x01(\x04R\x10maximum_requestsJ\x05\b\n" +
-	"\x10\xe6\a\"\xb6\x01\n" +
+	"\x10maximum_requests\x18\xed\a \x01(\x04R\x10maximum_requestsJ\x05\b\v\x10\xe6\a\"\xb6\x01\n" +
 	"\x11DiscoverySettings\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x14\n" +
 	"\x05ratio\x18\x02 \x01(\rR\x05ratio\x12\x1e\n" +

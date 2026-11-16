@@ -55,6 +55,14 @@ const Wireguard$json = {
       '5': 13,
       '10': 'rate_limit_outbound'
     },
+    {'1': 'dht', '3': 10, '4': 1, '5': 8, '10': 'dht'},
+    {
+      '1': 'rate_limit_inbound',
+      '3': 11,
+      '4': 1,
+      '5': 13,
+      '10': 'rate_limit_inbound'
+    },
   ],
 };
 
@@ -65,7 +73,8 @@ final $typed_data.Uint8List wireguardDescriptor = $convert.base64Decode(
     'CVILZGVzY3JpcHRpb24SGAoHbmV0dHlwZRgFIAEoDVIHbmV0dHlwZRISCgRwb3J0GAYgASgNUg'
     'Rwb3J0EiYKDnJhdGVfbGltaXRfZG5zGAcgASgNUg5yYXRlX2xpbWl0X2RucxIwChNtYXhpbXVt'
     'X2Nvbm5lY3Rpb25zGAggASgEUhNtYXhpbXVtX2Nvbm5lY3Rpb25zEjAKE3JhdGVfbGltaXRfb3'
-    'V0Ym91bmQYCSABKA1SE3JhdGVfbGltaXRfb3V0Ym91bmQ=');
+    'V0Ym91bmQYCSABKA1SE3JhdGVfbGltaXRfb3V0Ym91bmQSEAoDZGh0GAogASgIUgNkaHQSLgoS'
+    'cmF0ZV9saW1pdF9pbmJvdW5kGAsgASgNUhJyYXRlX2xpbWl0X2luYm91bmQ=');
 
 @$core.Deprecated('Use wireguardSearchRequestDescriptor instead')
 const WireguardSearchRequest$json = {

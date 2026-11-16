@@ -30,6 +30,8 @@ class Wireguard extends $pb.GeneratedMessage {
     $core.int? rateLimitDns,
     $fixnum.Int64? maximumConnections,
     $core.int? rateLimitOutbound,
+    $core.bool? dht,
+    $core.int? rateLimitInbound,
   }) {
     final result = Wireguard._();
     if (id != null) result.id = id;
@@ -42,6 +44,8 @@ class Wireguard extends $pb.GeneratedMessage {
     if (maximumConnections != null)
       result.maximumConnections = maximumConnections;
     if (rateLimitOutbound != null) result.rateLimitOutbound = rateLimitOutbound;
+    if (dht != null) result.dht = dht;
+    if (rateLimitInbound != null) result.rateLimitInbound = rateLimitInbound;
     return result;
   }
 
@@ -70,6 +74,9 @@ class Wireguard extends $pb.GeneratedMessage {
         8, _omitFieldNames ? '' : 'maximum_connections', $pb.PbFieldType.OU6,
         defaultOrMaker: $fixnum.Int64.ZERO)
     ..aI(9, _omitFieldNames ? '' : 'rate_limit_outbound',
+        fieldType: $pb.PbFieldType.OU3)
+    ..aOB(10, _omitFieldNames ? '' : 'dht')
+    ..aI(11, _omitFieldNames ? '' : 'rate_limit_inbound',
         fieldType: $pb.PbFieldType.OU3)
     ..hasRequiredFields = false;
 
@@ -173,6 +180,24 @@ class Wireguard extends $pb.GeneratedMessage {
   $core.bool hasRateLimitOutbound() => $_has(8);
   @$pb.TagNumber(9)
   void clearRateLimitOutbound() => $_clearField(9);
+
+  @$pb.TagNumber(10)
+  $core.bool get dht => $_getBF(9);
+  @$pb.TagNumber(10)
+  set dht($core.bool value) => $_setBool(9, value);
+  @$pb.TagNumber(10)
+  $core.bool hasDht() => $_has(9);
+  @$pb.TagNumber(10)
+  void clearDht() => $_clearField(10);
+
+  @$pb.TagNumber(11)
+  $core.int get rateLimitInbound => $_getIZ(10);
+  @$pb.TagNumber(11)
+  set rateLimitInbound($core.int value) => $_setUnsignedInt32(10, value);
+  @$pb.TagNumber(11)
+  $core.bool hasRateLimitInbound() => $_has(10);
+  @$pb.TagNumber(11)
+  void clearRateLimitInbound() => $_clearField(11);
 }
 
 class WireguardSearchRequest extends $pb.GeneratedMessage {

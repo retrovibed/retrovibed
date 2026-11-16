@@ -53,6 +53,18 @@ func WireguardOptionOutboundRateLimit(n uint32) func(*Wireguard) {
 	}
 }
 
+func WireguardOptionInboundRateLimit(n uint32) func(*Wireguard) {
+	return func(w *Wireguard) {
+		w.RateLimitInbound = n
+	}
+}
+
+func WireguardOptionDHT(enabled bool) func(*Wireguard) {
+	return func(w *Wireguard) {
+		w.Dht = enabled
+	}
+}
+
 func WireguardOptionTestDefauts(w *Wireguard) {
 	w.ID = uuidx.NewV4().String()
 	w.Nettype = w.Nettype % uint32(WireguardRingMax)
@@ -63,5 +75,6 @@ func NewWireguard(uid string, options ...func(*Wireguard)) Wireguard {
 		ID:          uid,
 		Description: "",
 		Nettype:     uint32(WireguardRingUnspecified),
+		Dht:         true,
 	}, options...)
 }

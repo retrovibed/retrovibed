@@ -70,6 +70,8 @@ func TestHTTPWireguardUpdate(t *testing.T) {
 				Description:        "updated description",
 				MaximumConnections: 100,
 				RateLimitOutbound:  10,
+				RateLimitInbound:   20,
+				Dht:                false,
 			},
 		}
 
@@ -85,5 +87,7 @@ func TestHTTPWireguardUpdate(t *testing.T) {
 		require.Equal(t, "updated description", result.Wireguard.Description)
 		require.Equal(t, uint64(100), result.Wireguard.MaximumConnections)
 		require.Equal(t, uint32(10), result.Wireguard.RateLimitOutbound)
+		require.Equal(t, uint32(20), result.Wireguard.RateLimitInbound)
+		require.False(t, result.Wireguard.Dht)
 	})
 }

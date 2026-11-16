@@ -22,9 +22,10 @@ message TorrentSettings {
   string ip4 = 7 [ json_name = "ip4" ];
   string ip6 = 8 [ json_name = "ip6" ];
   uint32 port = 9 [ json_name = "port" ];
+  bool dht = 10 [ json_name = "dht" ];
   bool log = 998 [ json_name = "log" ];
   bool debug = 999 [ json_name = "debug" ];
-  reserved 10 to 997;
+  reserved 11 to 997;
   Limit download = 1000 [ json_name = "download" ];
   Limit upload = 1001 [ json_name = "upload" ];
   Limit inbound = 1002 [ json_name = "inbound" ];

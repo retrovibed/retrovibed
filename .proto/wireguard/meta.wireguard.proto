@@ -18,6 +18,8 @@ message Wireguard {
   uint32 rate_limit_dns = 7 [ json_name = "rate_limit_dns" ];
   uint64 maximum_connections = 8 [ json_name = "maximum_connections" ];
   uint32 rate_limit_outbound = 9 [ json_name = "rate_limit_outbound" ];
+  bool dht = 10 [ json_name = "dht" ];
+  uint32 rate_limit_inbound = 11 [ json_name = "rate_limit_inbound" ];
 }
 
 message WireguardSearchRequest {

@@ -9,6 +9,7 @@ class Settings extends StatefulWidget {
   static api.TorrentSettings zero = api.TorrentSettings(
     seed: true,
     pex: true,
+    dht: true,
     log: false,
     debug: false,
   );
@@ -217,6 +218,14 @@ class _EditView extends State<Settings> {
                   value: current.firewalled,
                   onChanged: (v) {
                     final _update = current.deepCopy()..firewalled = v ?? current.firewalled;
+                    setState(() => current = _update);
+                  },
+                ),
+                forms.Checkbox(
+                  const Text("dht"),
+                  value: current.dht,
+                  onChanged: (v) {
+                    final _update = current.deepCopy()..dht = v ?? current.dht;
                     setState(() => current = _update);
                   },
                 ),

@@ -72,6 +72,7 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 		Resumable:       defaults.Resumable,
 		Firewalled:      defaults.Firewalled,
 		Port:            defaults.Port,
+		Dht:             defaults.Dht,
 		AutoBootstrap:   defaults.AutoBootstrap,
 		AutoLocateMedia: defaults.AutoLocateMedia,
 		Peers:           &Peers{Min: 16, Max: 64},
@@ -430,6 +431,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 			torrentx.AutomaticIP(wcfg, wgnet, wgcfg.Port),
 			dhtdebug,
 			bootstrap,
+			dht.OptionPassive(!(wgcfg.Dht && cfg.Dht)),
 		)
 		if err != nil {
 			return errorsx.Wrap(err, "unable to setup dht server")
@@ -466,6 +468,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 			dht.OptionUPnP,
 			dhtdebug,
 			bootstrap,
+			dht.OptionPassive(!cfg.Dht),
 		)
 		if err != nil {
 			return errorsx.Wrap(err, "unable to setup dht server")
@@ -512,7 +515,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		torrent.ClientConfigHandshakeTimeout(30*time.Second),
 		torrent.ClientConfigDialPoolSize(128*runtime.NumCPU()),
 		torrent.ClientConfigDialRateLimit(rate.NewLimiter(rate.Limit(langx.FirstNonZero(wgcfg.RateLimitOutbound, cfg.Outbound.Rate, math.MaxUint32)), int(cfg.Outbound.Burst))),
-		torrent.ClientConfigAcceptLimit(rate.NewLimiter(rate.Limit(cfg.Inbound.Rate), int(cfg.Inbound.Burst))),
+		torrent.ClientConfigAcceptLimit(rate.NewLimiter(rate.Limit(langx.FirstNonZero(wgcfg.RateLimitInbound, cfg.Inbound.Rate, math.MaxUint32)), int(cfg.Inbound.Burst))),
 		torrent.ClientConfigMaxOutstandingRequests(int(cfg.MaximumRequests)),
 		torrent.ClientConfigPeerLimits(cfg.Peers.Min, cfg.Peers.Max),
 		torrent.ClientConfigUploadLimit(rate.NewLimiter(rate.Limit(cfg.Upload.Rate), int(cfg.Upload.Burst))),

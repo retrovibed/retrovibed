@@ -81,6 +81,8 @@ type Wireguard struct {
 	RateLimitDns       uint32                 `protobuf:"varint,7,opt,name=rate_limit_dns,proto3" json:"rate_limit_dns,omitempty"`
 	MaximumConnections uint64                 `protobuf:"varint,8,opt,name=maximum_connections,proto3" json:"maximum_connections,omitempty"`
 	RateLimitOutbound  uint32                 `protobuf:"varint,9,opt,name=rate_limit_outbound,proto3" json:"rate_limit_outbound,omitempty"`
+	Dht                bool                   `protobuf:"varint,10,opt,name=dht,proto3" json:"dht,omitempty"`
+	RateLimitInbound   uint32                 `protobuf:"varint,11,opt,name=rate_limit_inbound,proto3" json:"rate_limit_inbound,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -174,6 +176,20 @@ func (x *Wireguard) GetMaximumConnections() uint64 {
 func (x *Wireguard) GetRateLimitOutbound() uint32 {
 	if x != nil {
 		return x.RateLimitOutbound
+	}
+	return 0
+}
+
+func (x *Wireguard) GetDht() bool {
+	if x != nil {
+		return x.Dht
+	}
+	return false
+}
+
+func (x *Wireguard) GetRateLimitInbound() uint32 {
+	if x != nil {
+		return x.RateLimitInbound
 	}
 	return 0
 }
@@ -742,7 +758,7 @@ var File_wireguard_meta_wireguard_proto protoreflect.FileDescriptor
 
 const file_wireguard_meta_wireguard_proto_rawDesc = "" +
 	"\n" +
-	"\x1ewireguard/meta.wireguard.proto\x12\x04meta\"\xb7\x02\n" +
+	"\x1ewireguard/meta.wireguard.proto\x12\x04meta\"\xf9\x02\n" +
 	"\tWireguard\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
 	"\n" +
@@ -756,7 +772,10 @@ const file_wireguard_meta_wireguard_proto_rawDesc = "" +
 	"\x04port\x18\x06 \x01(\rR\x04port\x12&\n" +
 	"\x0erate_limit_dns\x18\a \x01(\rR\x0erate_limit_dns\x120\n" +
 	"\x13maximum_connections\x18\b \x01(\x04R\x13maximum_connections\x120\n" +
-	"\x13rate_limit_outbound\x18\t \x01(\rR\x13rate_limit_outbound\"\\\n" +
+	"\x13rate_limit_outbound\x18\t \x01(\rR\x13rate_limit_outbound\x12\x10\n" +
+	"\x03dht\x18\n" +
+	" \x01(\bR\x03dht\x12.\n" +
+	"\x12rate_limit_inbound\x18\v \x01(\rR\x12rate_limit_inbound\"\\\n" +
 	"\x16WireguardSearchRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x04R\x06offset\x12\x14\n" +

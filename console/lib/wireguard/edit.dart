@@ -161,6 +161,20 @@ class _EditState extends State<Edit> with LoadingState {
             ),
           ),
           forms.Field(
+            label: Text("inbound rate limit"),
+            input: inputs.RateLimit(
+              value: current.rateLimitInbound,
+              presets: const [
+                (label: '4/sec', value: 4, unit: 'sec'),
+                (label: '10/sec', value: 10, unit: 'sec'),
+                (label: '100/sec', value: 100, unit: 'sec'),
+              ],
+              onChanged: (v) {
+                _onChange(current..rateLimitInbound = v);
+              },
+            ),
+          ),
+          forms.Field(
             label: Text("maximum connections"),
             input: inputs.Uint64(
               value: current.maximumConnections,
@@ -174,6 +188,13 @@ class _EditState extends State<Edit> with LoadingState {
                 _onChange(current..maximumConnections = v);
               },
             ),
+          ),
+          forms.Checkbox(
+            const Text("dht"),
+            value: current.dht,
+            onChanged: (v) {
+              _onChange(current..dht = v ?? current.dht);
+            },
           ),
           const Divider(),
           forms.Presets<api.Wireguard>(

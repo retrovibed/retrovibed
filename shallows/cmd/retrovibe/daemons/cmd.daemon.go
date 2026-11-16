@@ -114,6 +114,7 @@ func (t Command) torrentsettings() *TorrentSettings {
 		Resumable:       t.TorrentResume,
 		Firewalled:      t.TorrentFirewalled,
 		Port:            uint32(t.TorrentPort),
+		Dht:             envx.Boolean(true, env.TorrentDHT),
 		AutoBootstrap:   t.AutoBootstrap,
 		AutoLocateMedia: t.AutoLocateMedia,
 	})

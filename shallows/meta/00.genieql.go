@@ -243,5 +243,5 @@ func WireguardUpdate(
 	gql genieql.Function,
 	pattern func(ctx context.Context, q sqlx.Queryer, a Wireguard) NewWireguardScannerStaticRow,
 ) {
-	gql = gql.Query(`UPDATE meta_wireguard SET description = {a.Description}, port = {a.Port}, rate_limit_dns = {a.RateLimitDNS}, maximum_connections = {a.MaximumConnections}, rate_limit_outbound = {a.RateLimitOutbound} WHERE id = {a.ID} RETURNING ` + WireguardScannerStaticColumns)
+	gql = gql.Query(`UPDATE meta_wireguard SET description = {a.Description}, port = {a.Port}, rate_limit_dns = {a.RateLimitDNS}, maximum_connections = {a.MaximumConnections}, rate_limit_outbound = {a.RateLimitOutbound}, rate_limit_inbound = {a.RateLimitInbound}, dht = {a.Dht} WHERE id = {a.ID} RETURNING ` + WireguardScannerStaticColumns)
 }
