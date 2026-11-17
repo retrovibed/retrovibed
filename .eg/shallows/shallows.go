@@ -143,8 +143,8 @@ func GenerateProtocol(ctx context.Context, op eg.Op) error {
 	)
 }
 
-func Install(b *tarballs.Build) eg.OpFn {
-	dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed(b)), "usr", "lib", "retrovibed")
+func Install() eg.OpFn {
+	dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed()), "usr", "lib", "retrovibed")
 	gruntime := shellruntime()
 
 	return shell.Op(

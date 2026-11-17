@@ -2,51 +2,36 @@ package tarballs
 
 import (
 	"context"
-	"strings"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
+	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
-type Build struct {
-	Arch string
-	OS   string
-}
-
-// Replace patterns in a string with their values from information from go env.
-// %goenv.arch%            -> machine architecture. amd, amd64, arm64, ..., etc.
-// %goenv.os%              -> operating system. linux, darwin, windows, ..., etc.
-func (c Build) StringReplace(pattern string) string {
-	s := strings.ReplaceAll(pattern, "%goenv.arch%", c.Arch)
-	s = strings.ReplaceAll(s, "%goenv.os%", c.OS)
-
-	return s
-}
-
-func Retrovibed(b *Build) string {
-	return egtarball.Tarxz(b.StringReplace("retrovibed.%goenv.os%.%goenv.arch%"))
+func Retrovibed() string {
+	return egtarball.Tarxz(egenv.Pattern("retrovibed.{eg.host.os}.{eg.host.arch}"))
 }
 
 func RetrovibedSource() string {
 	return egtarball.Targz("retrovibed.source")
 }
 
-func Flatpak(b *Build) string {
-	return b.StringReplace("space.retrovibe.Console.yml")
+func Flatpak() string {
+	return "space.retrovibe.Console.yml"
 }
 
-func AppImage(b *Build) string {
-	return b.StringReplace("retrovibed.%goenv.os%.%goenv.arch%.AppImage")
+func AppImage() string {
+	return egenv.Pattern("retrovibed.{eg.host.os}.{eg.host.arch}.AppImage")
 }
 
-func AppImageZsync(b *Build) string {
-	return AppImage(b) + ".zsync"
+func AppImageZsync() string {
+	return AppImage() + ".zsync"
 }
 
-func AppImageBuild(b *Build) string {
-	return b.StringReplace("retrovibed.%goenv.os%.%goenv.arch%.AppImageBuild")
+func AppImageBuild() string {
+	return egenv.Pattern("retrovibed.{eg.host.os}.{eg.host.arch}.AppImageBuild")
 }
 
 // Version returns the date-based build version string from git commit metadata.

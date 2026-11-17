@@ -78,14 +78,14 @@ func flatpak(final egflatpak.Module) *egflatpak.Builder {
 }
 
 // Manifest generates the manifest for distribution.
-func FlatpakManifest(b *tarballs.Build) eg.OpFn {
+func FlatpakManifest() eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		// needs to be in an op so that the sha256 and download url are defered until this command actually runs.
 		return eg.Sequential(
 			egflatpak.ManifestOp(
-				egenv.DirectoryCache(tarballs.Flatpak(b)),
+				egenv.DirectoryCache(tarballs.Flatpak()),
 				flatpak(
-					moduleTarball(eggithub.DownloadURL(tarballs.Retrovibed(b)), egtarball.SHA256(tarballs.Retrovibed(b))),
+					moduleTarball(eggithub.DownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
 				),
 			),
 		)(ctx, o)

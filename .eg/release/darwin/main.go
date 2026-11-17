@@ -20,20 +20,13 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
 )
 
-func tarinfo() *tarballs.Build {
-	return &tarballs.Build{
-		OS:   egenv.String("darwin", "EG_COMPUTE_HOST_OS"),
-		Arch: egenv.String("arm64", "EG_COMPUTE_HOST_ARCH"),
-	}
-}
-
 // Baremetal command for darwin due to macosx nonsense for no cloud vms.
 func main() {
 	log.SetFlags(log.Flags() | log.Lshortfile)
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
-	tarballapp := filepath.Join(egtarball.Path(tarballs.Retrovibed(tarinfo())), "retrovibed.app")
+	tarballapp := filepath.Join(egtarball.Path(tarballs.Retrovibed()), "retrovibed.app")
 	appstoreapp := egenv.DirectoryCache("retrovibed.appstore.app")
 	dmgpath := egenv.DirectoryCache("retrovibed.darwin.arm64.dmg")
 	pkgpath := egenv.DirectoryCache("retrovibed.darwin.arm64.pkg")
@@ -87,7 +80,7 @@ func main() {
 				egenv.Base64URL(nil, "RETROVIBED_APPLE_AUTH_KEY"),
 			),
 			egapplex.Sign("Developer ID Application", keychainPath, tarballapp, egapplex.SignDeep(), egapplex.SignRuntime()),
-			release.DarwinDmg(tarinfo()),
+			release.DarwinDmg(),
 			egapplex.Sign("Developer ID Application", keychainPath, dmgpath),
 			egapplex.Notarize(apikey, issuerid, dmgpath),
 			shell.Op(

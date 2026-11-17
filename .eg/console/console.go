@@ -199,10 +199,10 @@ func GenerateProtocol(ctx context.Context, _ eg.Op) error {
 	)
 }
 
-func Install(b *tarballs.Build) eg.OpFn {
+func Install() eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
-		dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed(b)), "usr", "lib", "retrovibed")
-		bundledir := egenv.DirectoryWorking("console", "build", "linux", egarch.DartFrom(b.Arch), "release", "bundle")
+		dstdir := filepath.Join(egtarball.Path(tarballs.Retrovibed()), "usr", "lib", "retrovibed")
+		bundledir := egenv.DirectoryWorking("console", "build", "linux", egarch.Dart(), "release", "bundle")
 		runtime := shell.Runtime().
 			Environ("FLUTTER_RELEASE_BUNDLE", bundledir).
 			Environ("OUTPUTDIR", dstdir)

@@ -29,25 +29,25 @@ func Dist(files ...string) eg.OpFn {
 	)
 }
 
-func Release(b *tarballs.Build) eg.OpFn {
+func Release() eg.OpFn {
 	return eg.Sequential(
 		eggithub.Draft(
 			egtarball.Archive(tarballs.RetrovibedSource()),
-			egtarball.Archive(tarballs.Retrovibed(b)),
-			egenv.DirectoryCache(tarballs.Flatpak(b)),
-			egenv.DirectoryWorkload(tarballs.AppImage(b)),
-			egenv.DirectoryWorkload(tarballs.AppImageZsync(b)),
+			egtarball.Archive(tarballs.Retrovibed()),
+			egenv.DirectoryCache(tarballs.Flatpak()),
+			egenv.DirectoryWorkload(tarballs.AppImage()),
+			egenv.DirectoryWorkload(tarballs.AppImageZsync()),
 		),
 	)
 }
 
-func AppImageBuild(b *tarballs.Build) eg.OpFn {
+func AppImageBuild() eg.OpFn {
 	// packaging metainfo.
 	// https://docs.appimage.org/packaging-guide/optional/appstream.html
 	// runtime to look into.
 	// https://github.com/pkgforge-dev/Anylinux-AppImages
-	appimage := tarballs.AppImage(b)
-	builddir := egenv.DirectoryWorkload("build", tarballs.AppImageBuild(b))
+	appimage := tarballs.AppImage()
+	builddir := egenv.DirectoryWorkload("build", tarballs.AppImageBuild())
 	return shell.Op(
 		shell.Newf("mkdir -p %s", builddir),
 		shell.Newf(
@@ -56,10 +56,10 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 			builddir,
 		).Directory(egenv.DirectoryWorkload()).
 			Timeout(egenv.TTL()).
-			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed(b))).
+			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed())).
 			Environ("VERSION", tarballs.Version()).
-			Environ("APT_ARCH", b.Arch).
-			Environ("APPIMAGE_ARCH", egarch.POSIXFrom(b.Arch)).
+			Environ("APT_ARCH", egarch.Host()).
+			Environ("APPIMAGE_ARCH", egarch.POSIX()).
 			Environ("APPIMAGE_COMP", "zstd").
 			Environ("APPIMAGE_FILE_NAME", appimage).
 			Environ("GPG_ID", maintainer.GPGID),
@@ -74,11 +74,11 @@ func AppImageBuild(b *tarballs.Build) eg.OpFn {
 // mpv/ffmpeg/libmpv preinstalled -- so this can't pass by accident off
 // libraries the AppImage should be bundling itself, it only proves the
 // AppImage is self-contained.
-func SmokeTest(b *tarballs.Build) eg.OpFn {
+func SmokeTest() eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		const dir = ".dist/distrobuilds"
-		appimage := egenv.DirectoryCache(tarballs.AppImage(b))
-		if b.Arch != "amd64" {
+		appimage := egenv.DirectoryCache(tarballs.AppImage())
+		if egarch.Host() != "amd64" {
 			log.Println("skipping smoke tests on non-amd64 systems")
 			return nil
 		}
@@ -116,19 +116,19 @@ func SmokeTest(b *tarballs.Build) eg.OpFn {
 	}
 }
 
-func Tarball(b *tarballs.Build) eg.OpFn {
-	archive := tarballs.Retrovibed(b)
+func Tarball() eg.OpFn {
+	archive := tarballs.Retrovibed()
 	return eg.Sequential(
 		egtarball.Pack(archive),
 		egtarball.SHA256Op(archive),
 	)
 }
 
-func DarwinDmg(b1 *tarballs.Build) eg.OpFn {
-	path := tarballs.Retrovibed(b1)
+func DarwinDmg() eg.OpFn {
+	path := tarballs.Retrovibed()
 	dmg := egdmg.New(path, egdmg.OptionBuildDir(egenv.DirectoryCache()))
 	return eg.Sequential(
-		egdmg.Build(dmg, egtarball.Path(tarballs.Retrovibed(b1))),
+		egdmg.Build(dmg, egtarball.Path(tarballs.Retrovibed())),
 		shell.Op(
 			shell.Newf("echo mv %s %s", egdmg.Path(path), egenv.DirectoryCache("retrovibed.darwin.arm64.dmg")),
 			shell.Newf("mv %s %s", egdmg.Path(path), egenv.DirectoryCache("retrovibed.darwin.arm64.dmg")),

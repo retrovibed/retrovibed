@@ -60,8 +60,8 @@ func main() {
 				),
 			),
 		),
-		// release.SmokeTest(tarinfo()),
-		release.Release(tarinfo()),
+
+		release.Release(),
 	)
 
 	if err != nil {
@@ -69,23 +69,15 @@ func main() {
 	}
 }
 
-func tarinfo() *tarballs.Build {
-	return &tarballs.Build{
-		OS:   egenv.String("linux", "EG_COMPUTE_HOST_OS"),
-		Arch: egarch.Host(),
-	}
-}
-
 func build() eg.OpFn {
-	b := tarinfo()
-	archive := tarballs.Retrovibed(b)
+	archive := tarballs.Retrovibed()
 	return eg.Sequential(
 		shell.Op(
 			shell.Newf("mkdir -p %s", egtarball.Path(archive)),
 		),
 		eg.Sequential(
-			console.Install(b),
-			shallows.Install(b),
+			console.Install(),
+			shallows.Install(),
 			shell.Op(
 				shell.Newf("cp --verbose -R .dist/linux/* %s", egtarball.Path(archive)),
 				shell.Newf(
@@ -93,21 +85,21 @@ func build() eg.OpFn {
 					egtarball.Path(archive),
 				).
 					Environ("VERSION", tarballs.Version()).
-					Environ("ARCH", b.Arch),
+					Environ("ARCH", egarch.Host()),
 				shell.Newf(
 					"cat usr/share/applications/space.retrovibe.Console.desktop",
 				).Directory(egtarball.Path(archive)),
 			),
-			flathub.Metainfo(b),
+			flathub.Metainfo(),
 		),
 		shell.Op(
 			shell.Newf("echo 'tarballing %s -> %s'", egtarball.Path(archive), egtarball.Archive(archive)),
 		),
 		eg.Sequential(
-			release.Tarball(b),
+			release.Tarball(),
 			eg.Parallel(
-				release.AppImageBuild(b),
-				console.FlatpakManifest(b),
+				release.AppImageBuild(),
+				console.FlatpakManifest(),
 			),
 		),
 	)

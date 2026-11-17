@@ -36,7 +36,7 @@ func cloneAssets(dir string) eg.OpFn {
 }
 
 // Metainfo generates the AppStream metainfo file into the tarball staging directory.
-func Metainfo(b *tarballs.Build) eg.OpFn {
+func Metainfo() eg.OpFn {
 	return func(ctx context.Context, o eg.Op) error {
 		c := eggit.EnvCommit()
 		skel, err := fs.Sub(metainfoskel, ".metainfoskel")
@@ -49,7 +49,7 @@ func Metainfo(b *tarballs.Build) eg.OpFn {
 			return err
 		}
 
-		dir := filepath.Join(egtarball.Path(tarballs.Retrovibed(b)), "usr", "share", "metainfo")
+		dir := filepath.Join(egtarball.Path(tarballs.Retrovibed()), "usr", "share", "metainfo")
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return err
 		}

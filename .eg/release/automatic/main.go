@@ -34,7 +34,7 @@ func main() {
 			gh.New("gh workflow run release.macosx.yml --ref main").Attempts(3),
 		),
 		uploads.Run(egpool.Slice(
-			"eg compute upload --no-follow --arch=amd64 --cores=8 --memory=6g release/archlinux",
+			// "eg compute upload --no-follow --arch=amd64 --cores=8 --memory=6g release/archlinux",
 			"eg compute upload --no-follow --ttl=1h --arch=amd64 --cores=8 --memory=12g release/linux",
 			"eg compute upload --no-follow --ttl=3h --arch=arm64 --cores=3 --memory=3g release/linux",
 			"eg compute upload --no-follow --ttl=1h --arch=amd64 --cores=8 --memory=12g -e EG_GPG_KEYRING_NAME -e EG_GPG_KEYRING_EMAIL -e EG_GPG_KEYRING_SEED release/debian",
