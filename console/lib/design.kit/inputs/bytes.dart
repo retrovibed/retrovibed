@@ -86,23 +86,13 @@ class _ByteInputWidgetState extends State<Bytes> {
   Widget build(BuildContext context) {
     final defaults = Defaults.of(context);
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      spacing: defaults.spacing,
-      children: [
-        Flexible(
-          child: TextField(
-            controller: _controller,
-            keyboardType: TextInputType.number, // Shows numeric keyboard
-            inputFormatters: <TextInputFormatter>[
-              FilteringTextInputFormatter.digitsOnly, // Allows only digits
-            ],
-            decoration: _decoration,
-          ),
-        ),
-        DropdownButton<int>(
+    final suffix = Padding(
+      padding: EdgeInsets.only(left: defaults.spacing),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
           value: _magnitude,
-          underline: const SizedBox(),
+          isDense: true,
+          focusColor: Colors.transparent,
           onChanged: (v) {
             setState(() {
               _magnitude = v ?? _magnitude;
@@ -110,17 +100,30 @@ class _ByteInputWidgetState extends State<Bytes> {
             final Int64 y = (_bytes * Int64(_magnitude));
             widget.onChange?.call(y);
           },
-          items:
-              [bytesx.KiB, bytesx.MiB, bytesx.GiB, bytesx.TiB].map((
-                int magnitude,
-              ) {
-                return DropdownMenuItem<int>(
-                  value: magnitude,
-                  child: Text(bytesx.getName(magnitude)),
-                );
-              }).toList(),
+          items: [bytesx.KiB, bytesx.MiB, bytesx.GiB, bytesx.TiB].map((
+            int magnitude,
+          ) {
+            return DropdownMenuItem<int>(
+              value: magnitude,
+              child: Text(bytesx.getName(magnitude)),
+            );
+          }).toList(),
         ),
+      ),
+    );
+
+    // the dropdown lives inside the decoration so the field's underline
+    // spans the full width of the component, including the unit suffix.
+    return TextField(
+      controller: _controller,
+      keyboardType: TextInputType.number, // Shows numeric keyboard
+      inputFormatters: <TextInputFormatter>[
+        FilteringTextInputFormatter.digitsOnly, // Allows only digits
       ],
+      decoration: (_decoration ?? const InputDecoration()).copyWith(
+        suffixIcon: suffix,
+        suffixIconConstraints: const BoxConstraints(),
+      ),
     );
   }
 }
