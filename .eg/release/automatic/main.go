@@ -44,7 +44,8 @@ func main() {
 		eg.Sequential(
 			egx.Retry(0).Delay(30*time.Second).Run(
 				eggithub.Promote(
-					"retrovibed.darwin.arm64.dmg",
+					// disabling darwin until we get back around to it.
+					// "retrovibed.darwin.arm64.dmg",
 					"PKGBUILD",
 					"retrovibed_*.deb",
 					"retrovibed.linux.amd64.AppImage",

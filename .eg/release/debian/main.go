@@ -18,9 +18,7 @@ func main() {
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,
-		eg.Parallel(
-			debian.Prepare,
-		),
+		debian.Prepare,
 		eg.Module(
 			ctx,
 			debian.Runner(),
