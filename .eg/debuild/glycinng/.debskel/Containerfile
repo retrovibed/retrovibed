@@ -11,3 +11,11 @@ RUN echo "cache buster 4f1c7a3e-9b0d-4a2e-8f3a-6c2e1d9b7a42"
 RUN apt-get update && apt-get -y install golang-1.27 egworkload cargo rustc lld
 
 RUN ln -s /usr/lib/go-1.27/bin/go /usr/local/bin/go
+
+# resolute ships libgcrypt 1.12.0 which has upstream bug T8080 (gpg-agent rejects valid ECDH keys on import with
+# "Bad secret key"), fixed in >= 1.12.1. manually install libgcrypt20 1.12.2 from stonking until resolute backports it.
+RUN arch="$(dpkg --print-architecture)"; \
+    if [ "${arch}" = "amd64" ]; then mirror="http://archive.ubuntu.com/ubuntu"; else mirror="http://ports.ubuntu.com/ubuntu-ports"; fi; \
+    curl -fsSL -o /tmp/libgcrypt20.deb "${mirror}/pool/main/libg/libgcrypt20/libgcrypt20_1.12.2-1ubuntu2_${arch}.deb"; \
+    dpkg -i /tmp/libgcrypt20.deb; \
+    rm -f /tmp/libgcrypt20.deb

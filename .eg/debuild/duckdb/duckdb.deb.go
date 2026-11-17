@@ -12,9 +12,10 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
-	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egccache"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggpg"
 )
 
 //go:embed .debskel
@@ -24,6 +25,13 @@ const (
 	container = "retrovibed.deb.duckdb"
 	version   = "1.5.5"
 )
+
+func gpgoptions() []eggpg.Option {
+	// eggpg.Options() takes GNUPGHOME from the environment, which inside the container is the
+	// host-provided /eg.mnt/.gnupg (not writable by us: "unsafe ownership", "Permission denied").
+	// pin the isolated per-container home instead.
+	return eggpg.Options().Home("/home/egd/.gnupg")
+}
 
 var (
 	gcfg egdebuild.Config
@@ -45,9 +53,7 @@ func init() {
 		egdebuild.Option.DependsBuild("rsync", "curl", "tree", "ca-certificates", "cmake", "ninja-build", "libssl-dev", "git"),
 		egdebuild.Option.Envvar("PACKAGE_VERSION", version),
 		egdebuild.Option.Envvar("GIT_COMMIT_HASH", c.Hash.String()),
-		egdebuild.Option.Runtime(func(r shell.Command) shell.Command {
-			return r.Privileged()
-		}),
+		egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...),
 	)
 }
 
@@ -65,6 +71,10 @@ func Runner() eg.ContainerRunner {
 
 func Build(ctx context.Context, o eg.Op) error {
 	return eg.Sequential(
+		egbug.DebugFailure(
+			eggpg.Seed(gpgoptions()...),
+			eggpg.Debug(gpgoptions()...),
+		),
 		eg.Parallel(
 			// build the package to improve the chances it'll actually build in within ubuntu launchpad.
 			// egdebuild.Build(
