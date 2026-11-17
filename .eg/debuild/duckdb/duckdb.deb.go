@@ -53,8 +53,14 @@ func init() {
 		egdebuild.Option.DependsBuild("rsync", "curl", "tree", "ca-certificates", "cmake", "ninja-build", "libssl-dev", "git"),
 		egdebuild.Option.Envvar("PACKAGE_VERSION", version),
 		egdebuild.Option.Envvar("GIT_COMMIT_HASH", c.Hash.String()),
-		egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...),
 	)
+}
+
+// withgpg adds the gpg environment to the config. resolved at build time instead of in init
+// because eggpg.Env panics when the EG_GPG_KEYRING_* variables are unset, which would break
+// every module that merely imports this package.
+func withgpg(c egdebuild.Config) egdebuild.Config {
+	return egdebuild.From(c, egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...))
 }
 
 func Prepare(ctx context.Context, o eg.Op) error {
@@ -70,6 +76,7 @@ func Runner() eg.ContainerRunner {
 }
 
 func Build(ctx context.Context, o eg.Op) error {
+	gcfg := withgpg(gcfg)
 	return eg.Sequential(
 		egbug.DebugFailure(
 			eggpg.Seed(gpgoptions()...),
@@ -93,5 +100,5 @@ func Build(ctx context.Context, o eg.Op) error {
 }
 
 func Upload(ctx context.Context, o eg.Op) error {
-	return egdebuild.UploadDPut(gcfg, errorsx.Must(fs.Sub(debskel, ".debskel")))(ctx, o)
+	return egdebuild.UploadDPut(withgpg(gcfg), errorsx.Must(fs.Sub(debskel, ".debskel")))(ctx, o)
 }

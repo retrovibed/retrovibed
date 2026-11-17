@@ -52,8 +52,14 @@ func init() {
 		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("rsync", "tree"),
 		egdebuild.Option.Depends("avahi-daemon", "cage", "kbd", "libfuse2", "pipewire-audio", "retrozsync", "ssh"),
-		egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...),
 	)
+}
+
+// withgpg adds the gpg environment to the config. resolved at build time instead of in init
+// because eggpg.Env panics when the EG_GPG_KEYRING_* variables are unset, which would break
+// every module that merely imports this package.
+func withgpg(c egdebuild.Config) egdebuild.Config {
+	return egdebuild.From(c, egdebuild.Option.Environ(eggpg.Env(gpgoptions()...)...))
 }
 
 func Prepare(ctx context.Context, o eg.Op) error {
@@ -68,6 +74,7 @@ func Runner() eg.C8S {
 }
 
 func Build(ctx context.Context, o eg.Op) error {
+	gcfg := withgpg(gcfg)
 	return eg.Sequential(
 		// override eg compute local's setting of the home directory.
 		// ideally we should default to this except when performing local
@@ -91,6 +98,7 @@ func Build(ctx context.Context, o eg.Op) error {
 }
 
 func Upload(ctx context.Context, o eg.Op) error {
+	gcfg := withgpg(gcfg)
 	return egdebuild.UploadDPut(
 		gcfg,
 		errorsx.Must(fs.Sub(debskel, ".debskel")),
