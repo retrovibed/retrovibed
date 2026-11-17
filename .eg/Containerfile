@@ -68,3 +68,6 @@ RUN systemd-tmpfiles --create
 RUN systemd-tmpfiles --clean
 RUN rm -rf /tmp/gomod /tmp/gocache
 RUN du -xsh /tmp/*
+
+RUN apt-get -y install openssh-server npm
+RUN npm install -g @anthropic-ai/claude-code
