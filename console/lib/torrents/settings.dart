@@ -228,23 +228,29 @@ class _EditView extends State<Settings> {
             spacing: defaults.spacing,
             children: [
               Expanded(
-                child: forms.Checkbox(
-                  const Text("log"),
-                  value: current.log,
-                  onChanged: (v) {
-                    final _update = current.deepCopy()..log = v ?? current.log;
-                    setState(() => current = _update);
-                  },
+                child: Tooltip(
+                  message: "log torrent client activity to the daemon's output",
+                  child: forms.Checkbox(
+                    const Text("log"),
+                    value: current.log,
+                    onChanged: (v) {
+                      final _update = current.deepCopy()..log = v ?? current.log;
+                      setState(() => current = _update);
+                    },
+                  ),
                 ),
               ),
               Expanded(
-                child: forms.Checkbox(
-                  const Text("debug"),
-                  value: current.debug,
-                  onChanged: (v) {
-                    final _update = current.deepCopy()..debug = v ?? current.debug;
-                    setState(() => current = _update);
-                  },
+                child: Tooltip(
+                  message: "log verbose torrent client diagnostics to the daemon's output, very noisy",
+                  child: forms.Checkbox(
+                    const Text("debug"),
+                    value: current.debug,
+                    onChanged: (v) {
+                      final _update = current.deepCopy()..debug = v ?? current.debug;
+                      setState(() => current = _update);
+                    },
+                  ),
                 ),
               ),
             ],
@@ -253,23 +259,29 @@ class _EditView extends State<Settings> {
             spacing: defaults.spacing,
             children: [
               Expanded(
-                child: forms.Checkbox(
-                  const Text("firewall"),
-                  value: current.firewalled,
-                  onChanged: (v) {
-                    final _update = current.deepCopy()..firewalled = v ?? current.firewalled;
-                    setState(() => current = _update);
-                  },
+                child: Tooltip(
+                  message: "restrict torrent connections to private networks, public peers will be blocked",
+                  child: forms.Checkbox(
+                    const Text("firewall"),
+                    value: current.firewalled,
+                    onChanged: (v) {
+                      final _update = current.deepCopy()..firewalled = v ?? current.firewalled;
+                      setState(() => current = _update);
+                    },
+                  ),
                 ),
               ),
               Expanded(
-                child: forms.Checkbox(
-                  const Text("dht"),
-                  value: current.dht,
-                  onChanged: (v) {
-                    final _update = current.deepCopy()..dht = v ?? current.dht;
-                    setState(() => current = _update);
-                  },
+                child: Tooltip(
+                  message: "actively participate in the distributed hash table to find peers, passive when disabled",
+                  child: forms.Checkbox(
+                    const Text("dht"),
+                    value: current.dht,
+                    onChanged: (v) {
+                      final _update = current.deepCopy()..dht = v ?? current.dht;
+                      setState(() => current = _update);
+                    },
+                  ),
                 ),
               ),
             ],
