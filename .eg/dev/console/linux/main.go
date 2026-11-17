@@ -41,7 +41,7 @@ func main() {
 				console.Generate,
 				console.GenerateDevBinding(
 					shell.Runtime(),
-					egenv.DirectoryWorking("console", "build", "nativelib"),
+					egenv.DirectoryCache("dev.native.libs"),
 					egenv.DirectoryCache("dev.native.libs"),
 				),
 				console.BuildLinux,
