@@ -16,8 +16,8 @@ require (
 	github.com/dashotv/tvdb v0.5.2
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/duckdb/duckdb-go/v2 v2.10505.0
-	github.com/egdaemon/gdx v0.0.0-20261106002238-59fe7b8df603
-	github.com/egdaemon/gdx/konggdx v0.0.0-20261106002238-59fe7b8df603
+	github.com/egdaemon/gdx v0.0.0-20261115232526-a70109276a78
+	github.com/egdaemon/gdx/konggdx v0.0.0-20261115232526-a70109276a78
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/gabriel-vasile/mimetype v1.4.13

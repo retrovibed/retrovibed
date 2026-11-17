@@ -118,10 +118,11 @@ github.com/duckdb/duckdb-go-bindings/windows-amd64 v0.1.5/go.mod h1:yghI/cr7VUFb
 github.com/duckdb/duckdb-go/v2 v2.5.1/go.mod h1:DRMOapsta2PlFZtlWrxyC5CqucD0q5GZH/KRkTTnPUU=
 github.com/duckdb/duckdb-go/v2 v2.10503.1/go.mod h1:3trgI3LZo7TTgJYAP9+xCDJYdAF+E+TKE41JWKeWE5I=
 github.com/ebitengine/purego v0.8.2/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
-github.com/egdaemon/duckproxy v0.0.0-20261114115105-8cd7c751218f/go.mod h1:LvAlbnY/z3glFhk1nQM8YEw4E8xqSzHu3zARGfQQMHQ=
 github.com/egdaemon/gdx v0.0.0-20261106002238-59fe7b8df603/go.mod h1:zXd9WfJPRaoir/hXAwJcf6AhbNB0r3vqIFqhZdMswFg=
+github.com/egdaemon/gdx v0.0.0-20261115232526-a70109276a78/go.mod h1:zXd9WfJPRaoir/hXAwJcf6AhbNB0r3vqIFqhZdMswFg=
 github.com/egdaemon/gdx/konggdx v0.0.0-20260818142539-2af0a2bf0a1c/go.mod h1:JUCHrXljOiOKMplnhcZyEeHst3+3vqn0c1sg6bluDv4=
 github.com/egdaemon/gdx/konggdx v0.0.0-20261106002238-59fe7b8df603/go.mod h1:sxFiDGA2e8ATW1MfyDsiVv21OwmQLMjuA5XC8iwDp3k=
+github.com/egdaemon/gdx/konggdx v0.0.0-20261115232526-a70109276a78/go.mod h1:sxFiDGA2e8ATW1MfyDsiVv21OwmQLMjuA5XC8iwDp3k=
 github.com/egdaemon/wasinet/wazeronet v0.0.0-20250205011224-d5f0e1da96d7/go.mod h1:64MD4OgWyYuKHTji15b9N8BXtzipKtR8+uLOSMEz2Es=
 github.com/egdaemon/wasinet/wazeronet v0.0.0-20260714110034-97594e9655ad/go.mod h1:24MLedTkSsszJFr4scqXeDTqieTAtdymhflkj1joXB4=
 github.com/elastic/go-sysinfo v1.8.1/go.mod h1:JfllUnzoQV/JRYymbH3dO1yggI3mV2oTKSXsDHM+uIM=

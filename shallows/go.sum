@@ -209,8 +209,8 @@ github.com/ebitengine/purego v0.10.1 h1:dewVBCBT2GaMu1SrNTYxQhgQBethzfhiwvZiLGP/
 github.com/ebitengine/purego v0.10.1/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 github.com/edsrzf/mmap-go v1.2.0 h1:hXLYlkbaPzt1SaQk+anYwKSRNhufIDCchSPkUD6dD84=
 github.com/edsrzf/mmap-go v1.2.0/go.mod h1:19H/e8pUPLicwkyNgOykDXkJ9F0MHE+Z52B8EIth78Q=
-github.com/egdaemon/gdx v0.0.0-20261106002238-59fe7b8df603 h1:PX/Ow5iCDRXk8Gp5xvCjPYBc0BomzJqvpOt9FQ1FslQ=
-github.com/egdaemon/gdx/konggdx v0.0.0-20261106002238-59fe7b8df603 h1:haFyPbgVBMhSiI55oeDqnZ0c6GZ4lrqqec4ZRXFMQEY=
+github.com/egdaemon/gdx v0.0.0-20261115232526-a70109276a78 h1:oDEdKaNmWJlQR65agX6cF2ndV2yR1r7uxJq7ubhcdtE=
+github.com/egdaemon/gdx/konggdx v0.0.0-20261115232526-a70109276a78 h1:KRMR8rOtkB2zGP9niOyfCEnoVyoEzn3/e5LJMFoZSvA=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d h1:vpuyri6vixAcYsEBsCI9wk32/fGI/ZpJp0z4zkZ3oS0=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d/go.mod h1:2/G25/idU+fUZa8vElMrvgKi2RRkNM/0z0hHRsIfvkQ=
 github.com/egdaemon/wasinet/wazeronet v0.0.0-20260928194155-07f223337a8d h1:7Q86hXF6BAjqT28Xc9HTBi3Yyi6JzFTFP4QzfSuSnos=
