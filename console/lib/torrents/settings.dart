@@ -77,127 +77,158 @@ class _EditView extends State<Settings> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: defaults.spacing,
         children: [
-          forms.Field(
-            label: Text("download rate"),
-            input: Tooltip(
-              message: "maximum download rate allowed per second across all downloads, default (0) is unlimited",
-              child: inputs.Bytes(
-                decoration: new InputDecoration(hintText: "0"),
-                magnitude: ds.bytesx.MiB,
-                value: current.download.rate.toInt(),
-                onChange: (v) {
-                  final _update =
-                      current.deepCopy()
-                        ..download = api.Limit(
-                          rate: v.toInt(),
-                          burst: current.download.burst,
-                        );
-                  setState(() => current = _update);
-                },
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: defaults.spacing,
+            children: [
+              Expanded(
+                child: forms.Field(
+                  label: Text("download rate"),
+                  input: Tooltip(
+                    message: "maximum download rate allowed per second across all downloads, default (0) is unlimited",
+                    child: inputs.Bytes(
+                      decoration: new InputDecoration(hintText: "0"),
+                      magnitude: ds.bytesx.MiB,
+                      value: current.download.rate.toInt(),
+                      onChange: (v) {
+                        final _update =
+                            current.deepCopy()
+                              ..download = api.Limit(
+                                rate: v.toInt(),
+                                burst: current.download.burst,
+                              );
+                        setState(() => current = _update);
+                      },
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-          forms.Field(
-            label: Text("upload rate"),
-            input: Tooltip(
-              message: "maximum upload rate allowed per second across all content, default (0) is unlimited",
-              child: inputs.Bytes(
-                decoration: new InputDecoration(hintText: "0"),
-                value: current.upload.rate.toInt(),
-                magnitude: ds.bytesx.MiB,
-                onChange: (v) {
-                  final _update =
-                      current.deepCopy()
-                        ..upload = api.Limit(
-                          rate: v.toInt(),
-                          burst: current.upload.burst,
-                        );
-                  setState(() => current = _update);
-                },
+              Expanded(
+                child: forms.Field(
+                  label: Text("upload rate"),
+                  input: Tooltip(
+                    message: "maximum upload rate allowed per second across all content, default (0) is unlimited",
+                    child: inputs.Bytes(
+                      decoration: new InputDecoration(hintText: "0"),
+                      value: current.upload.rate.toInt(),
+                      magnitude: ds.bytesx.MiB,
+                      onChange: (v) {
+                        final _update =
+                            current.deepCopy()
+                              ..upload = api.Limit(
+                                rate: v.toInt(),
+                                burst: current.upload.burst,
+                              );
+                        setState(() => current = _update);
+                      },
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-          forms.Field(
-            label: Text("peers"),
-            input: TextFormField(
-              decoration: new InputDecoration(
-                hintText: "8",
-                helperText: "minimum number of peers wanted when downloading",
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: defaults.spacing,
+            children: [
+              Expanded(
+                child: forms.Field(
+                  label: Text("peers"),
+                  input: TextFormField(
+                    decoration: new InputDecoration(
+                      hintText: "8",
+                      helperText: "minimum number of peers wanted when downloading",
+                    ),
+                    initialValue: current.peers.min.toString(),
+                    keyboardType: TextInputType.number,
+                    onChanged: (v) {
+                      final _update =
+                          current.deepCopy()
+                            ..peers = api.Peers(
+                              min: int.tryParse(v) ?? current.peers.min,
+                              max: current.peers.max,
+                            );
+                      setState(() => current = _update);
+                    },
+                  ),
+                ),
               ),
-              initialValue: current.peers.min.toString(),
-              keyboardType: TextInputType.number,
-              onChanged: (v) {
-                final _update =
-                    current.deepCopy()
-                      ..peers = api.Peers(
-                        min: int.tryParse(v) ?? current.peers.min,
-                        max: current.peers.max,
-                      );
-                setState(() => current = _update);
-              },
-            ),
-          ),
-          forms.Field(
-            input: TextFormField(
-              decoration: new InputDecoration(
-                hintText: "32",
-                helperText: "maximum number of peers wanted when downloading",
+              Expanded(
+                child: forms.Field(
+                  input: TextFormField(
+                    decoration: new InputDecoration(
+                      hintText: "32",
+                      helperText: "maximum number of peers wanted when downloading",
+                    ),
+                    keyboardType: TextInputType.number,
+                    initialValue: current.peers.max.toString(),
+                    onChanged: (v) {
+                      final _update =
+                          current.deepCopy()
+                            ..peers = api.Peers(
+                              min: current.peers.min,
+                              max: int.tryParse(v) ?? current.peers.max,
+                            );
+                      setState(() => current = _update);
+                    },
+                  ),
+                ),
               ),
-              keyboardType: TextInputType.number,
-              initialValue: current.peers.max.toString(),
-              onChanged: (v) {
-                final _update =
-                    current.deepCopy()
-                      ..peers = api.Peers(
-                        min: current.peers.min,
-                        max: int.tryParse(v) ?? current.peers.max,
-                      );
-                setState(() => current = _update);
-              },
-            ),
+            ],
           ),
-          forms.Field(
-            input: TextFormField(
-              decoration: new InputDecoration(
-                hintText: "32",
-                helperText: "maximum number of outbound connections allowed per second",
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: defaults.spacing,
+            children: [
+              Expanded(
+                child: forms.Field(
+                  input: TextFormField(
+                    decoration: new InputDecoration(
+                      hintText: "32",
+                      helperText: "maximum number of outbound connections allowed per second",
+                    ),
+                    keyboardType: TextInputType.number,
+                    initialValue: current.outbound.rate.toString(),
+                    onChanged: (v) {
+                      final _update =
+                          current.deepCopy()
+                            ..outbound = api.Limit(
+                              rate: int.tryParse(v) ?? current.outbound.rate,
+                              burst: max(current.outbound.burst, 1),
+                            );
+                      setState(() => current = _update);
+                    },
+                  ),
+                ),
               ),
-              keyboardType: TextInputType.number,
-              initialValue: current.outbound.rate.toString(),
-              onChanged: (v) {
-                final _update =
-                    current.deepCopy()
-                      ..outbound = api.Limit(
-                        rate: int.tryParse(v) ?? current.outbound.rate,
-                        burst: max(current.outbound.burst, 1),
-                      );
-                setState(() => current = _update);
-              },
-            ),
-          ),
-          forms.Field(
-            input: TextFormField(
-              decoration: new InputDecoration(
-                hintText: "32",
-                helperText: "maximum number of inbound connections allowed per second",
+              Expanded(
+                child: forms.Field(
+                  input: TextFormField(
+                    decoration: new InputDecoration(
+                      hintText: "32",
+                      helperText: "maximum number of inbound connections allowed per second",
+                    ),
+                    keyboardType: TextInputType.number,
+                    initialValue: current.inbound.rate.toString(),
+                    onChanged: (v) {
+                      final _update =
+                          current.deepCopy()
+                            ..inbound = api.Limit(
+                              rate: int.tryParse(v) ?? current.inbound.rate,
+                              burst: max(current.inbound.burst, 1),
+                            );
+                      setState(() => current = _update);
+                    },
+                  ),
+                ),
               ),
-              keyboardType: TextInputType.number,
-              initialValue: current.inbound.rate.toString(),
-              onChanged: (v) {
-                final _update =
-                    current.deepCopy()
-                      ..inbound = api.Limit(
-                        rate: int.tryParse(v) ?? current.inbound.rate,
-                        burst: max(current.inbound.burst, 1),
-                      );
-                setState(() => current = _update);
-              },
-            ),
+            ],
           ),
-          ds.Container(
-            Wrap(
-              children: [
-                forms.Checkbox(
+          Row(
+            spacing: defaults.spacing,
+            children: [
+              Expanded(
+                child: forms.Checkbox(
                   const Text("log"),
                   value: current.log,
                   onChanged: (v) {
@@ -205,7 +236,9 @@ class _EditView extends State<Settings> {
                     setState(() => current = _update);
                   },
                 ),
-                forms.Checkbox(
+              ),
+              Expanded(
+                child: forms.Checkbox(
                   const Text("debug"),
                   value: current.debug,
                   onChanged: (v) {
@@ -213,7 +246,14 @@ class _EditView extends State<Settings> {
                     setState(() => current = _update);
                   },
                 ),
-                forms.Checkbox(
+              ),
+            ],
+          ),
+          Row(
+            spacing: defaults.spacing,
+            children: [
+              Expanded(
+                child: forms.Checkbox(
                   const Text("firewall"),
                   value: current.firewalled,
                   onChanged: (v) {
@@ -221,7 +261,9 @@ class _EditView extends State<Settings> {
                     setState(() => current = _update);
                   },
                 ),
-                forms.Checkbox(
+              ),
+              Expanded(
+                child: forms.Checkbox(
                   const Text("dht"),
                   value: current.dht,
                   onChanged: (v) {
@@ -229,8 +271,8 @@ class _EditView extends State<Settings> {
                     setState(() => current = _update);
                   },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
