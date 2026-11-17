@@ -16,6 +16,8 @@ func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
+	pkgbuild := egenv.DirectoryCache("PKGBUILD")
+
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,
@@ -23,12 +25,14 @@ func main() {
 		archlinux.Prepare,
 		eg.Module(
 			ctx,
-			archlinux.AURRunner(),
+			archlinux.Runner(),
 			eg.Sequential(
-				archlinux.Generate(egenv.DirectoryCache("PKGBUILD")),
-				eg.Parallel(
-					// archlinux.Publish(egenv.CacheDirectory("PKGBUILD")),
-					eggithub.Draft(egenv.DirectoryCache("PKGBUILD")),
+				archlinux.Generate(pkgbuild),
+				archlinux.Build(pkgbuild),
+				// archlinux.Publish(pkgbuild),
+				eggithub.Draft(
+					pkgbuild,
+					egenv.DirectoryCache("pacman", "*.pkg.tar.*"),
 				),
 			),
 		),

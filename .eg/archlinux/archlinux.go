@@ -4,6 +4,7 @@ import (
 	"context"
 	"eg/compute/maintainer"
 	"fmt"
+	"path/filepath"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
@@ -12,9 +13,9 @@ import (
 )
 
 const (
-	// AURContainerName is the ubuntu based container used by Publish; built
-	// from .aurskel/Containerfile on top of the maintainer.Container image.
-	AURContainerName = "retrovibe.archlinux.build"
+	// ContainerName is the arch based container used by Generate, Build and Publish; built from
+	// .buildskel/Containerfile. makepkg needs a real arch environment to resolve dependencies.
+	ContainerName = "retrovibe.archlinux.build"
 
 	// AURRepoSSHURI is the AUR git remote for the retrovibed package.
 	AURRepoSSHURI = "ssh://aur@aur.archlinux.org/retrovibed.git"
@@ -30,14 +31,41 @@ func pkgver() string {
 	return fmt.Sprintf("0.0.%d", eggit.EnvCommit().Committer.When.UnixMilli())
 }
 
-// AURRunner is the container used to publish the retrovibed package to the AUR.
-func AURRunner() eg.ContainerRunner {
-	return Builder(AURContainerName)
+// Runner is the container used to generate, build and publish the retrovibed package.
+func Runner() eg.ContainerRunner {
+	return Builder(ContainerName)
 }
 
-// Prepare builds the container image used by Publish.
+// Prepare builds the container image used by Generate, Build and Publish.
 func Prepare(ctx context.Context, o eg.Op) error {
-	return eg.Build(AURRunner().BuildFromFile(".eg/archlinux/.aurskel/Containerfile"))(ctx, o)
+	return eg.Build(Runner().BuildFromFile(".eg/archlinux/.buildskel/Containerfile"))(ctx, o)
+}
+
+// PackageDirectory is where Build places the resulting *.pkg.tar.* files.
+func PackageDirectory() string {
+	return egenv.DirectoryCache("pacman")
+}
+
+// Build runs makepkg against the PKGBUILD rendered by Generate (at pkgbuild),
+// building the checked out commit instead of the upstream default branch. the
+// resulting packages are written to PackageDirectory.
+func Build(pkgbuild string) eg.OpFn {
+	pkgdir := PackageDirectory()
+	workdir := egenv.DirectoryTemp("makepkg-retrovibed")
+
+	runtime := shell.Runtime().
+		Environ("PKGDEST", pkgdir).
+		Environ("BUILDDIR", filepath.Join("/", "tmp", "build")).
+		Environ("SRCDEST", filepath.Join("/", "tmp", "src")).
+		Environ("PACKAGER", fmt.Sprintf("%s <%s>", maintainer.Name, maintainer.Email))
+
+	return shell.Op(
+		runtime.Newf("mkdir -p %s %s", pkgdir, workdir),
+		runtime.Newf("cp %s %s/PKGBUILD", pkgbuild, workdir),
+		// build the checked out commit instead of the upstream default branch.
+		runtime.Newf("sed -i 's|git+https://github.com/retrovibed/retrovibed.git|git+file://%s|' %s/PKGBUILD", egenv.DirectoryWorking(), workdir),
+		runtime.New("makepkg -f --noconfirm --syncdeps").Directory(workdir),
+	)
 }
 
 // Generate renders the PKGBUILD template (substituting $PKGVER) into path.
@@ -50,7 +78,10 @@ func Generate(path string) eg.OpFn {
 	runtime := shell.Runtime().Environ("PKGVER", pkgver())
 
 	return shell.Op(
-		runtime.Newf("envsubst '$PKGVER' < %s/PKGBUILD > %s", templatedir, path),
+		runtime.Newf("id; sudo ls -ldn /workload /workload/eg /workload/eg/.eg"),
+		runtime.Newf("ls -lha %s", templatedir),
+		runtime.Newf("ls -lha %s", path),
+		runtime.Newf("cat %s/PKGBUILD | envsubst '$PKGVER' | tee %s > /dev/null", templatedir, path),
 	)
 }
 

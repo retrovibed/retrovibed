@@ -1,0 +1,37 @@
+FROM docker.io/library/archlinux:latest
+
+RUN echo "cache buster 6d1c1c0e-6a53-4a55-9a53-1f5e0f7a2b11"
+# base-devel provides makepkg (also used to generate the AUR's .SRCINFO).
+# gettext provides envsubst, used to inject pkgver into PKGBUILD.
+# openssh is required for pushing the AUR package over git+ssh.
+RUN pacman --noconfirm -Syu base base-devel sudo git go rust cargo pkgconf pacman-contrib ccache openssh gettext rsync github-cli btrfs-progs fuse3 podman netavark
+# retrovibed build dependencies and runtime dependencies (see PKGBUILD).
+RUN pacman --noconfirm -S duckdb ffmpeg
+
+# mirror the egworkload deb: the egd user (sysusers), sudoers, and the /workload, /eg.mnt, /eg.mod
+# directories (tmpfiles). makepkg refuses to run as root, builds run as the unprivileged egd user.
+COPY rootfs /
+RUN chmod 0440 /etc/sudoers.d/egd
+RUN systemd-sysusers
+RUN systemd-tmpfiles --create
+
+# preload the AUR's host key so git+ssh pushes don't prompt for host verification.
+RUN ssh-keyscan -H aur.archlinux.org >> /etc/ssh/ssh_known_hosts
+
+# install the latest published egd release. asset names embed the version (egd-<ver>-<pkgrel>-<arch>.pkg.tar.zst)
+# so /releases/latest/download/<name> can't be used; resolve the asset url via the api instead (no auth needed for public repos).
+# egd runtime dependencies. bindfs is only available from the AUR, build it as the unprivileged user
+# (-s resolves its dependencies through sudo, -i installs the result).
+RUN pacman --noconfirm -S aardvark-dns acl pciutils waypipe
+RUN sudo -H -u egd git clone --depth 1 https://aur.archlinux.org/bindfs.git /home/egd/bindfs
+RUN cd /home/egd/bindfs && sudo -H -u egd makepkg -si --noconfirm && rm -rf /home/egd/bindfs
+
+# the release also contains egd-debug-* so anchor on the version ("egd-v"). download first, pacman -U on a url
+# also tries to fetch a .sig which isn't published.
+RUN url="$(curl -fsSL https://api.github.com/repos/egdaemon/eg/releases/latest | grep -o "https://[^\"]*/egd-v[^\"/]*-$(uname -m)\.pkg\.tar\.zst" | head -n1)" \
+    && test -n "${url}" \
+    && curl -fsSL -o /tmp/egd.pkg.tar.zst "${url}" \
+    && pacman --noconfirm -U /tmp/egd.pkg.tar.zst \
+    && rm /tmp/egd.pkg.tar.zst
+
+CMD /usr/sbin/init

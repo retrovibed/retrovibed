@@ -94,8 +94,9 @@ github.com/duckdb/duckdb-go/v2 v2.10505.0/go.mod h1:m0PW4J4FG9hlFlVdXi6Ds9owpyID
 github.com/dustin/go-humanize v1.1.0 h1:dbKTrvD0klcbBV/h4AWJdMuZogJACoMlvWIWZ5b2xWg=
 github.com/dustin/go-humanize v1.1.0/go.mod h1:hc1CvRkJMsgxqjmjMQF3QNRAZBwY8AXBAzKYoSX9sFI=
 github.com/egdaemon/duckproxy v0.0.0-20261114115105-8cd7c751218f h1:JKgH95MPa4Q1c/O6PMl0rgojVwBClYHOuPNyJAzAkJA=
-github.com/egdaemon/eg v0.0.0-20261116234455-8f701da73e09 h1:3T7qeSEM6dpMEm2KBKuVafp5yCfGt2PHl5+oiZ9q4a0=
-github.com/egdaemon/eg v0.0.0-20261116234455-8f701da73e09/go.mod h1:TY86jYk5olYgGQ+NyesjSUKhqGkr3jiO2gRXgabe3yE=
+github.com/egdaemon/duckproxy v0.0.0-20261114115105-8cd7c751218f/go.mod h1:LvAlbnY/z3glFhk1nQM8YEw4E8xqSzHu3zARGfQQMHQ=
+github.com/egdaemon/eg v0.0.0-20261117142352-fa321ebf2753 h1:Sqs5XSO0FIUU/bpJEFcQU4f3IiH3W1V4L8xUbNebSCI=
+github.com/egdaemon/eg v0.0.0-20261117142352-fa321ebf2753/go.mod h1:TY86jYk5olYgGQ+NyesjSUKhqGkr3jiO2gRXgabe3yE=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d h1:vpuyri6vixAcYsEBsCI9wk32/fGI/ZpJp0z4zkZ3oS0=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d/go.mod h1:2/G25/idU+fUZa8vElMrvgKi2RRkNM/0z0hHRsIfvkQ=
 github.com/egdaemon/wasinet/wazeronet v0.0.0-20260928194155-07f223337a8d h1:7Q86hXF6BAjqT28Xc9HTBi3Yyi6JzFTFP4QzfSuSnos=
@@ -455,8 +456,8 @@ golang.org/x/tools v0.0.0-20191119224855-298f0cb1881e/go.mod h1:b+2E5dAYhXwXZwtn
 golang.org/x/tools v0.0.0-20200103221440-774c71fcf114/go.mod h1:TB2adYChydJhpapKDTa4BR/hXlZSLoq2Wpct/0txZ28=
 golang.org/x/tools v0.1.12/go.mod h1:hNGJHUnrk76NpqgfD5Aqm5Crs+Hm0VOH/i9J2+nxYbc=
 golang.org/x/tools v0.6.0/go.mod h1:Xwgl3UAJ/d3gWutnCtw505GrjyAbvKui8lOU390QaIU=
-golang.org/x/tools v0.52.1-0.20261116230331-147c2dec2f56 h1:VdTQQ8c31IAZgI7AHt6mZEtJnIN+J0HkGPouc6j33Is=
-golang.org/x/tools v0.52.1-0.20261116230331-147c2dec2f56/go.mod h1:ItcP5UNaVGG+Yc4eIYmaFLNJ4soEopkx5Y2d4lcEurs=
+golang.org/x/tools v0.52.1-0.20261117052324-6bc5e25e1abb h1:7hNpcO7MXYyMddmO+k9pfv2LwwZF0lF92eoTKwdPDL4=
+golang.org/x/tools v0.52.1-0.20261117052324-6bc5e25e1abb/go.mod h1:ItcP5UNaVGG+Yc4eIYmaFLNJ4soEopkx5Y2d4lcEurs=
 golang.org/x/xerrors v0.0.0-20190410155217-1f06c39b4373/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20190513163551-3ee3066db522/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
