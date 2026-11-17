@@ -137,7 +137,7 @@ class _EditView extends State<Settings> {
                   input: TextFormField(
                     decoration: new InputDecoration(
                       hintText: "8",
-                      helperText: "minimum number of peers wanted when downloading",
+                      helperText: "low watermark for peers",
                     ),
                     initialValue: current.peers.min.toString(),
                     keyboardType: TextInputType.number,
@@ -158,7 +158,7 @@ class _EditView extends State<Settings> {
                   input: TextFormField(
                     decoration: new InputDecoration(
                       hintText: "32",
-                      helperText: "maximum number of peers wanted when downloading",
+                      helperText: "high watermark for peers",
                     ),
                     keyboardType: TextInputType.number,
                     initialValue: current.peers.max.toString(),
