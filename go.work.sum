@@ -26,7 +26,6 @@ github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.27.0
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.31.0/go.mod h1:P4WPRUkOhJC13W//jWpyfJNDAIpvRbAUIYLX/4jtlE0=
 github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c/go.mod h1:X0CRv0ky0k6m906ixxpzmDRLvX58TFUKS2eePweuyxk=
 github.com/KimMachineGun/automemlimit v0.7.1/go.mod h1:QZxpHaGOQoYvFhv/r4u3U0JTC2ZcOwbSr11UZF46UBM=
-github.com/KimMachineGun/automemlimit v1.0.1/go.mod h1:n+BSXxQWDFS1DKh67Rqo0lgTsowsg6x65ak5uyngML0=
 github.com/MarvinJWendt/testza v0.1.0/go.mod h1:7AxNvlfeHP7Z/hDQ5JtE3OKYT3XFUeLCDE2DQninSqs=
 github.com/MarvinJWendt/testza v0.2.1/go.mod h1:God7bhG8n6uQxwdScay+gjm9/LnO4D3kkcZX4hv9Rp8=
 github.com/MarvinJWendt/testza v0.2.8/go.mod h1:nwIcjmr0Zz+Rcwfh3/4UhBp7ePKVhuBExvZqnKYWlII=
@@ -119,7 +118,10 @@ github.com/duckdb/duckdb-go-bindings/windows-amd64 v0.1.5/go.mod h1:yghI/cr7VUFb
 github.com/duckdb/duckdb-go/v2 v2.5.1/go.mod h1:DRMOapsta2PlFZtlWrxyC5CqucD0q5GZH/KRkTTnPUU=
 github.com/duckdb/duckdb-go/v2 v2.10503.1/go.mod h1:3trgI3LZo7TTgJYAP9+xCDJYdAF+E+TKE41JWKeWE5I=
 github.com/ebitengine/purego v0.8.2/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
+github.com/egdaemon/duckproxy v0.0.0-20261114115105-8cd7c751218f/go.mod h1:LvAlbnY/z3glFhk1nQM8YEw4E8xqSzHu3zARGfQQMHQ=
+github.com/egdaemon/gdx v0.0.0-20261106002238-59fe7b8df603/go.mod h1:zXd9WfJPRaoir/hXAwJcf6AhbNB0r3vqIFqhZdMswFg=
 github.com/egdaemon/gdx/konggdx v0.0.0-20260818142539-2af0a2bf0a1c/go.mod h1:JUCHrXljOiOKMplnhcZyEeHst3+3vqn0c1sg6bluDv4=
+github.com/egdaemon/gdx/konggdx v0.0.0-20261106002238-59fe7b8df603/go.mod h1:sxFiDGA2e8ATW1MfyDsiVv21OwmQLMjuA5XC8iwDp3k=
 github.com/egdaemon/wasinet/wazeronet v0.0.0-20250205011224-d5f0e1da96d7/go.mod h1:64MD4OgWyYuKHTji15b9N8BXtzipKtR8+uLOSMEz2Es=
 github.com/egdaemon/wasinet/wazeronet v0.0.0-20260714110034-97594e9655ad/go.mod h1:24MLedTkSsszJFr4scqXeDTqieTAtdymhflkj1joXB4=
 github.com/elastic/go-sysinfo v1.8.1/go.mod h1:JfllUnzoQV/JRYymbH3dO1yggI3mV2oTKSXsDHM+uIM=
@@ -328,7 +330,6 @@ github.com/opencontainers/selinux v1.11.1/go.mod h1:E5dMC3VPuVvVHDYmi78qvhJp8+M5
 github.com/ostreedev/ostree-go v0.0.0-20210805093236-719684c64e4f/go.mod h1:J6OG6YJVEWopen4avK3VNQSnALmmjvniMmni/YFYAwc=
 github.com/paulmach/orb v0.11.1/go.mod h1:5mULz1xQfs3bmQm63QEJA6lNGujuRafwA5S/EnuLaLU=
 github.com/paulmach/orb v0.13.0/go.mod h1:6scRWINywA2Jf05dcjOfLfxrUIMECvTSG2MVbRLxu/k=
-github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58/go.mod h1:DXv8WO4yhMYhSNPKjeNKa5WY9YCIEBRbNzFFPJbWO6Y=
 github.com/pierrec/lz4 v2.0.5+incompatible h1:2xWsjqPFWcplujydGg4WmhC/6fZqK42wMM8aXeqhl0I=
 github.com/pierrec/lz4/v4 v4.1.25/go.mod h1:EoQMVJgeeEOMsCqCzqFm2O0cJvljX2nGZjcRIPL34O4=
 github.com/pion/datachannel v1.5.10/go.mod h1:p/jJfC9arb29W7WrxyKbepTU20CFgyx5oLo8Rs4Py/M=

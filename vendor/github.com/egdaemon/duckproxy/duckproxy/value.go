@@ -15,7 +15,7 @@ import (
 // produced directly by duckdb-go's driver.Rows.Next -- into the wire
 // representation. Unlike a Postgres OID table, this only has to describe
 // DuckDB's own native types. duckdb.Interval/duckdb.Decimal aren't handled
-// here directly -- only the server side (duckproxyserver) ever actually
+// here directly -- only the server side (server) ever actually
 // produces those from a real DuckDB row, and importing duckdb-go at all
 // pulls in its cgo bindings, which this package must stay free of so it can
 // build for GOOS=wasip1 (the wasm guest is a client of this package).

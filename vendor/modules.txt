@@ -458,14 +458,16 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/eg v0.0.0-20261112204526-574b4cf9c8c2
+# github.com/egdaemon/duckproxy v0.0.0-20261114115105-8cd7c751218f
+## explicit; go 1.27.2
+github.com/egdaemon/duckproxy/duckproxy
+# github.com/egdaemon/eg v0.0.0-20261116234455-8f701da73e09
 ## explicit; go 1.27.2
 github.com/egdaemon/eg
 github.com/egdaemon/eg/astcodec
 github.com/egdaemon/eg/authn
 github.com/egdaemon/eg/backoff
 github.com/egdaemon/eg/compute
-github.com/egdaemon/eg/duckproxy
 github.com/egdaemon/eg/internal/asynccompute
 github.com/egdaemon/eg/internal/bytesx
 github.com/egdaemon/eg/internal/contextx
@@ -499,6 +501,7 @@ github.com/egdaemon/eg/internal/systemx
 github.com/egdaemon/eg/internal/timex
 github.com/egdaemon/eg/internal/tracex
 github.com/egdaemon/eg/internal/userx
+github.com/egdaemon/eg/internal/uuidx
 github.com/egdaemon/eg/interp/c8s
 github.com/egdaemon/eg/interp/dbproxy
 github.com/egdaemon/eg/interp/events
@@ -512,6 +515,7 @@ github.com/egdaemon/eg/runtime/wasi/eggit
 github.com/egdaemon/eg/runtime/wasi/egunsafe
 github.com/egdaemon/eg/runtime/wasi/egunsafe/fficoverage
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiegcontainer
+github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiegenv
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiexec
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigit
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigraph
@@ -537,14 +541,14 @@ github.com/egdaemon/eg/runtime/x/wasi/egtarball
 github.com/egdaemon/eg/runtime/x/wasi/egx
 github.com/egdaemon/eg/runtime/x/wasi/execx
 github.com/egdaemon/eg/secrets
-# github.com/egdaemon/gdx v0.0.0-20261031085230-c2c1dd829dc4
+# github.com/egdaemon/gdx v0.0.0-20261106002238-59fe7b8df603
 ## explicit; go 1.25.8
 github.com/egdaemon/gdx
 github.com/egdaemon/gdx/gdxapi
 github.com/egdaemon/gdx/internal/envx
 github.com/egdaemon/gdx/internal/errorsx
 github.com/egdaemon/gdx/internal/langx
-# github.com/egdaemon/gdx/konggdx v0.0.0-20261031085230-c2c1dd829dc4
+# github.com/egdaemon/gdx/konggdx v0.0.0-20261106002238-59fe7b8df603
 ## explicit; go 1.25.8
 github.com/egdaemon/gdx/konggdx
 github.com/egdaemon/gdx/konggdx/cmdopts
@@ -843,7 +847,7 @@ github.com/jackc/pgx/v5/pgproto3
 github.com/jackc/pgx/v5/pgtype
 github.com/jackc/pgx/v5/pgxpool
 github.com/jackc/pgx/v5/stdlib
-# github.com/jackc/puddle/v2 v2.2.3
+# github.com/jackc/puddle/v2 v2.2.4
 ## explicit; go 1.19
 github.com/jackc/puddle/v2
 github.com/jackc/puddle/v2/internal/genstack
@@ -1088,6 +1092,8 @@ github.com/rivo/uniseg
 # github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab
 ## explicit
 github.com/riywo/loginshell
+# github.com/rogpeppe/go-internal v1.16.0
+## explicit; go 1.25
 # github.com/serenize/snaker v0.0.0-20201027110005-a7ad2135616e
 ## explicit
 github.com/serenize/snaker
@@ -1329,7 +1335,7 @@ golang.org/x/text/width
 # golang.org/x/time v0.16.0
 ## explicit; go 1.26.0
 golang.org/x/time/rate
-# golang.org/x/tools v0.52.1-0.20261112194858-d8abf824d126
+# golang.org/x/tools v0.52.1-0.20261116230331-147c2dec2f56
 ## explicit; go 1.26.0
 golang.org/x/tools/cmd/goimports
 golang.org/x/tools/cmd/stringer

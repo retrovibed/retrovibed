@@ -3,7 +3,7 @@ module eg/compute
 go 1.27.2
 
 require (
-	github.com/egdaemon/eg v0.0.0-20261112204526-574b4cf9c8c2
+	github.com/egdaemon/eg v0.0.0-20261116234455-8f701da73e09
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d
 	golang.org/x/net v0.62.0
 	google.golang.org/api v0.307.0
@@ -39,6 +39,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/duckdb/duckdb-go/v2 v2.10505.0 // indirect
 	github.com/dustin/go-humanize v1.1.0 // indirect
+	github.com/egdaemon/duckproxy v0.0.0-20261114115105-8cd7c751218f // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect
@@ -60,7 +61,7 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgtype v1.14.4 // indirect
 	github.com/jackc/pgx/v5 v5.13.0 // indirect
-	github.com/jackc/puddle/v2 v2.2.3 // indirect
+	github.com/jackc/puddle/v2 v2.2.4 // indirect
 	github.com/james-lawrence/genieql v0.0.0-20260917171911-8038e3e1d315 // indirect
 	github.com/kevinburke/ssh_config v1.6.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
@@ -74,6 +75,7 @@ require (
 	github.com/pkg/profile v1.7.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/pressly/goose/v3 v3.29.0 // indirect
+	github.com/rogpeppe/go-internal v1.16.0 // indirect
 	github.com/serenize/snaker v0.0.0-20201027110005-a7ad2135616e // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/sethvargo/go-retry v0.5.0 // indirect
@@ -96,7 +98,7 @@ require (
 	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/text v0.44.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	golang.org/x/tools v0.52.1-0.20261112194858-d8abf824d126 // indirect
+	golang.org/x/tools v0.52.1-0.20261116230331-147c2dec2f56 // indirect
 	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261005182115-fad411399dd8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect

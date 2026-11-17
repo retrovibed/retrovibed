@@ -9,12 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/egdaemon/eg/internal/errorsx"
 	"github.com/egdaemon/eg/internal/md5x"
 	"github.com/egdaemon/eg/internal/slicesx"
 	"github.com/egdaemon/eg/internal/stringsx"
 	"github.com/egdaemon/eg/internal/tracex"
-	"github.com/gofrs/uuid/v5"
+	"github.com/egdaemon/eg/internal/uuidx"
 )
 
 var (
@@ -57,6 +56,14 @@ const (
 	EnvEGSSHHost          = "EG_SSH_REVERSE_PROXY_HOST"
 	EnvEGSSHProxyDisabled = "EG_SSH_REVERSE_PROXY_DISABLED"
 	EnvEGSSHHostDefault   = "api.egdaemon.com:8090"
+)
+
+// GPG keyring settings, shared by eggpg (seeds the keyring in a workload) and eg gpg keyring (generates it).
+const (
+	EnvGPGKeyringHome  = "EG_GPG_KEYRING_HOME"  // directory holding the generated private.asc and public.asc.
+	EnvGPGKeyringName  = "EG_GPG_KEYRING_NAME"  // identity name embedded in the key.
+	EnvGPGKeyringEmail = "EG_GPG_KEYRING_EMAIL" // identity email embedded in the key.
+	EnvGPGKeyringSeed  = "EG_GPG_KEYRING_SEED"  // seed the key is deterministically generated from, this is a sensitive value.
 )
 
 const (
@@ -116,6 +123,7 @@ const (
 	EnvScheduleSystemLoadFreq        = "EG_COMPUTE_SCHEDULER_SYSTEM_LOAD_FREQUENCY" // how frequently we measure system load, small enough we can saturate, high enough its not a burden.
 	EnvPingMinimumDelay              = "EG_COMPUTE_PING_MINIMUM_DELAY"              // minimum delay for pings
 	EnvComputeBin                    = "EG_COMPUTE_BIN"                             // hotswap the binary, used for development testing
+	EnvComputeSystemdFailedReset     = "EG_COMPUTE_SYSTEMD_FAILED_RESET"            // units, separated by commas or whitespace, whose failed state is reset before the system health check, in addition to the built-in set.
 	EnvComputeBinAlt                 = "EG_COMPUTE_BIN_ALTERNATE"                   // absolute path to an alternate binary to inject into the host environment when hotswapping.
 	EnvComputeContainerImpure        = "EG_COMPUTE_C8S_IMPURE"                      // informs the container runner that the container depends on the repository being present.
 	EnvComputeGPU                    = "EG_COMPUTE_GPU"                             // enable gpu support for the compute workload, propagated to nested module containers.
@@ -210,12 +218,12 @@ const (
 
 // generate unique daemon socket
 func SocketDaemon() string {
-	return fmt.Sprintf("main.%s.socket", errorsx.Must(uuid.NewV7()).String())
+	return fmt.Sprintf("main.%s.socket", uuidx.NewV7().String())
 }
 
 // generate unique module socket
 func SocketModule() string {
-	return fmt.Sprintf("module.%s.socket", errorsx.Must(uuid.NewV7()).String())
+	return fmt.Sprintf("module.%s.socket", uuidx.NewV7().String())
 }
 
 func DefaultModuleDirectory(rel ...string) string {

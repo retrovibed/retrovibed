@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 
+	_eg "github.com/egdaemon/eg"
 	"github.com/egdaemon/eg/internal/envx"
 	"github.com/egdaemon/eg/internal/errorsx"
 	"github.com/egdaemon/eg/internal/gpgx"
@@ -33,10 +34,10 @@ import (
 
 const (
 	EnvHome        = "GNUPGHOME"
-	EnvName        = "EG_GPG_KEYRING_NAME"
-	EnvEmail       = "EG_GPG_KEYRING_EMAIL"
-	EnvSeed        = "EG_GPG_KEYRING_SEED"
-	envKeyringHome = "EG_GPG_KEYRING_HOME"
+	EnvName        = _eg.EnvGPGKeyringName
+	EnvEmail       = _eg.EnvGPGKeyringEmail
+	EnvSeed        = _eg.EnvGPGKeyringSeed
+	envKeyringHome = _eg.EnvGPGKeyringHome
 )
 
 // the well known isolated gnupg home used so Seed never touches a real
@@ -197,6 +198,9 @@ func Debug(options ...Option) eg.OpFn {
 			runtime.New("ls -lha ${GNUPGHOME}"),
 			runtime.New("gpg --version"),
 			runtime.New("gpg-agent --version"),
+			runtime.New("id"),
+			runtime.New("gpgconf --list-dirs"),
+			runtime.New("gpg-connect-agent --verbose /bye"),
 			runtime.New("gpg --list-keys"),
 			runtime.New("sha256sum ${EG_GPG_KEYRING_HOME}/private.asc ${EG_GPG_KEYRING_HOME}/public.asc"),
 		)
@@ -226,10 +230,15 @@ func Seed(options ...Option) eg.OpFn {
 		runtime := opts.runtime()
 		return shell.Run(
 			ctx,
+			// the agent is launched against GNUPGHOME and it does not create the directory, it must exist with the
+			// permissions gpg requires.
+			runtime.New("mkdir -p -m 700 ${GNUPGHOME}"),
 			// launch the gpg agent for this environment ensuring its available prior to importing.
 			runtime.New("gpgconf --launch gpg-agent"),
 			runtime.New("gpg-connect-agent /bye").Attempts(32),
 			runtime.New("gpg --import ${EG_GPG_KEYRING_HOME}/private.asc"),
+			// print the fingerprint of what was imported, it is what signing (debuild -k) and launchpad are keyed on.
+			runtime.New("gpg --list-secret-keys --fingerprint"),
 		)
 	}
 }

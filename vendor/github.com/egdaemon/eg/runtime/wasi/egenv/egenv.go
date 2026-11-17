@@ -1,6 +1,7 @@
 package egenv
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -9,7 +10,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"uuid"
 
 	"github.com/egdaemon/eg"
 	"github.com/egdaemon/eg/internal/envx"
@@ -17,6 +17,8 @@ import (
 	"github.com/egdaemon/eg/internal/fsx"
 	"github.com/egdaemon/eg/internal/patternx"
 	"github.com/egdaemon/eg/internal/userx"
+	"github.com/egdaemon/eg/internal/uuidx"
+	"github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiegenv"
 	"github.com/egdaemon/eg/runtime/wasi/env"
 )
 
@@ -46,12 +48,12 @@ func Release() bool {
 
 // Read the run ID from the environment
 func RunID() string {
-	return env.String(uuid.Nil().String(), eg.EnvComputeRunID)
+	return env.String(uuidx.Nil().String(), eg.EnvComputeRunID)
 }
 
 // Read the account ID from the environment
 func AccountID() string {
-	return env.String(uuid.Nil().String(), eg.EnvComputeAccountID)
+	return env.String(uuidx.Nil().String(), eg.EnvComputeAccountID)
 }
 
 func HostOS() string {
@@ -73,6 +75,12 @@ var initiated = sync.OnceValue(func() time.Time {
 // the environment is only parsed once.
 func Initiated() time.Time {
 	return initiated()
+}
+
+// Environ provides the environ the runner stored for the workload. the host reads it since commands run as an
+// unprivileged user that cannot.
+func Environ() ([]string, error) {
+	return ffiegenv.Environ(context.Background())
 }
 
 // Read the entry path of the workload from the environment, empty when the runtime did not provide it.
@@ -309,6 +317,20 @@ func Int(fallback int, keys ...string) int {
 
 func Build() *envx.Builder {
 	return envx.Build()
+}
+
+// Inherit a builder pre-populated with a copy of the process environment. the runtime/x/wasi packages' Env()
+// functions deliberately don't copy it, start from here when the host environment is wanted. later entries win,
+// so add the packages' variables afterwards:
+//
+//	egenv.MustEnviron(egenv.Inherit().FromEnviron(eggolang.Env()...))
+func Inherit() *envx.Builder {
+	return envx.Build().FromEnviron(os.Environ()...)
+}
+
+// InheritEnv a copy of the process environment as a []string, shorthand for MustEnviron(Inherit()).
+func InheritEnv() []string {
+	return MustEnviron(Inherit())
 }
 
 func MustEnviron(env *envx.Builder) []string {

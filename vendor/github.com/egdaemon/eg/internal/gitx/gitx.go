@@ -13,9 +13,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/go-git/go-git/v6"
@@ -46,6 +44,9 @@ import (
 	"github.com/egdaemon/eg/internal/timex"
 	"github.com/egdaemon/eg/internal/userx"
 )
+
+// CloneBaseRef is the ref within a clone made by LocalClone naming the commit it started at.
+const CloneBaseRef = "refs/eg/base"
 
 func DetectRoot() string {
 	return filepath.Dir(fsx.Locate(".git"))
@@ -225,7 +226,24 @@ func LocalClone(ctx context.Context, repo, dir, basetreeish, headtreeish string)
 		}
 	}
 
+	// record the commit the clone started at, commits made within the clone move HEAD so it is the only way
+	// to tell them apart from the history that was cloned, see CloneBase.
+	if _, err = run("-C", dir, "update-ref", CloneBaseRef, head); err != nil {
+		return errorsx.Wrapf(err, "unable to record the clone base: %s", dir)
+	}
+
 	return nil
+}
+
+// CloneBase returns the commit the clone at dir started at, blank when it isn't known,
+// e.g.) the clone wasn't made by LocalClone.
+func CloneBase(ctx context.Context, dir string) string {
+	out, err := execx.RunAs(ctx, RepositoryUsername(dir), "git", "-C", dir, "rev-parse", "--verify", "--quiet", CloneBaseRef+"^{commit}").Output()
+	if err != nil {
+		return ""
+	}
+
+	return strings.TrimSpace(string(out))
 }
 
 // DefaultBase finds the base branch of repo, the one workloads are compared against, and the commit it is at.
@@ -280,6 +298,50 @@ func User(dir string) (name, email string) {
 		envx.String(email, "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_EMAIL")
 }
 
+// UserEnv the environment that makes git commit as the configured user for the repository, workloads run
+// without a git config of their own. it uses GIT_CONFIG_* instead of GIT_AUTHOR_* so a workload can still
+// override the identity with `git -c`. empty when no identity is configured or the environment already
+// defines GIT_CONFIG_COUNT.
+func UserEnv(repo *git.Repository) (env []string) {
+	if _, set := os.LookupEnv("GIT_CONFIG_COUNT"); set {
+		return nil
+	}
+
+	var name, email string
+
+	if cfg, err := config.LoadConfig(config.GlobalScope); err == nil {
+		name, email = cfg.User.Name, cfg.User.Email
+	}
+
+	if cfg, err := repo.Config(); err == nil {
+		name = stringsx.FirstNonBlank(cfg.User.Name, name)
+		email = stringsx.FirstNonBlank(cfg.User.Email, email)
+	}
+
+	name = envx.String(name, "GIT_AUTHOR_NAME", "GIT_COMMITTER_NAME")
+	email = envx.String(email, "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_EMAIL")
+
+	var kv []string
+	if stringsx.Present(name) {
+		kv = append(kv, "user.name", name)
+	}
+
+	if stringsx.Present(email) {
+		kv = append(kv, "user.email", email)
+	}
+
+	if len(kv) == 0 {
+		return nil
+	}
+
+	env = append(env, fmt.Sprintf("GIT_CONFIG_COUNT=%d", len(kv)/2))
+	for i := 0; i < len(kv); i += 2 {
+		env = append(env, fmt.Sprintf("GIT_CONFIG_KEY_%d=%s", i/2, kv[i]), fmt.Sprintf("GIT_CONFIG_VALUE_%d=%s", i/2, kv[i+1]))
+	}
+
+	return env
+}
+
 // RepositoryUsername returns the username owning the repository at path,
 // falling back to the current user when it can't be determined.
 func RepositoryUsername(path string) string {
@@ -291,12 +353,12 @@ func RepositoryUsername(path string) string {
 		return fallback
 	}
 
-	st, ok := info.Sys().(*syscall.Stat_t)
+	uid, ok := fileOwnerID(info)
 	if !ok {
 		return fallback
 	}
 
-	u, err := user.LookupId(strconv.FormatUint(uint64(st.Uid), 10))
+	u, err := user.LookupId(uid)
 	if err != nil {
 		debugx.Println("unable to lookup repository owner, using current user", err)
 		return fallback
@@ -678,7 +740,7 @@ func Env(repo *git.Repository, remote string, branch string, vcsclone string) (e
 		return nil, errorsx.Wrapf(err, "base env: %s", uri)
 	}
 
-	return append(env, benv...), nil
+	return append(append(env, benv...), UserEnv(repo)...), nil
 }
 
 // ideally we shouldn't need this but unfortunately go-git doesn't apply 'instead of' rules properly.
@@ -702,6 +764,7 @@ func LocalEnv(repo *git.Repository, remote string, branch string) (env []string,
 	}
 
 	env = append(env, benv...)
+	env = append(env, UserEnv(repo)...)
 	if encoded := envx.Format(eg.EnvComputeVCS, uri); encoded != "" {
 		env = append(env, encoded)
 	}
@@ -1108,16 +1171,11 @@ func Bearer(dir string) string {
 // e.g.) the changes a workload made, which would otherwise be lost with the clone. new files
 // are included. the patch is empty if there are no changes, or if clonedir is not a separate clone,
 // the clone is not usable afterwards.
+//
+// commits made within the clone are not part of the patch, it is relative to the clone's HEAD, see AutoPatch.
 func Changes(ctx context.Context, clonedir string, repodir string) ([]byte, error) {
-	if !IsRepository(clonedir) {
+	if !isSeparateClone(clonedir, repodir) {
 		return nil, nil
-	}
-
-	// directories that aren't repositories are symlinked instead of cloned.
-	if resolved, err := filepath.EvalSymlinks(clonedir); err == nil {
-		if original, err := filepath.EvalSymlinks(repodir); err == nil && resolved == original {
-			return nil, nil
-		}
 	}
 
 	username := RepositoryUsername(clonedir)
@@ -1135,46 +1193,18 @@ func Changes(ctx context.Context, clonedir string, repodir string) ([]byte, erro
 	return patch, nil
 }
 
-// ApplyPatch applies the patch to the repository at repodir, changes that are already present are
-// skipped. if the patch cannot be applied repodir is left untouched and the patch is saved to a file,
-// which the returned error names.
-func ApplyPatch(ctx context.Context, repodir string, patch []byte) error {
-	if len(patch) == 0 {
-		return nil
+// isSeparateClone reports whether clonedir is a repository that is not repodir itself.
+// directories that aren't repositories are symlinked instead of cloned.
+func isSeparateClone(clonedir string, repodir string) bool {
+	if !IsRepository(clonedir) {
+		return false
 	}
 
-	patchfile, err := os.CreateTemp("", "eg-*.patch")
-	if err != nil {
-		return err
-	}
-	defer patchfile.Close()
-
-	if _, err = patchfile.Write(patch); err != nil {
-		return errors.Join(err, os.Remove(patchfile.Name()))
-	}
-
-	username := RepositoryUsername(repodir)
-	apply := func(options ...string) error {
-		args := append([]string{"apply"}, append(options, patchfile.Name())...)
-		if out, err := execx.RunAs(ctx, username, "git", append([]string{"-C", repodir}, args...)...).CombinedOutput(); err != nil {
-			return errorsx.Wrapf(fmt.Errorf("%s: %w", strings.TrimSpace(string(out)), err), "git %s failed", strings.Join(args, " "))
+	if resolved, err := filepath.EvalSymlinks(clonedir); err == nil {
+		if original, err := filepath.EvalSymlinks(repodir); err == nil && resolved == original {
+			return false
 		}
-
-		return nil
 	}
 
-	// already present, e.g.) the changes were applied by whatever made them.
-	if err := apply("--reverse", "--check"); err == nil {
-		return os.Remove(patchfile.Name())
-	}
-
-	if err := apply("--check"); err != nil {
-		return errorsx.Wrapf(err, "unable to apply changes, they have been saved to %s", patchfile.Name())
-	}
-
-	if err := apply("--binary"); err != nil {
-		return errorsx.Wrapf(err, "unable to apply changes, they have been saved to %s", patchfile.Name())
-	}
-
-	return os.Remove(patchfile.Name())
+	return true
 }

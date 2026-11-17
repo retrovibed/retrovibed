@@ -13,7 +13,7 @@ import (
 // named. Type is the raw duckdb.Type enum value as a uint32 rather than
 // duckdb.Type itself -- this package stays free of duckdb-go (and its cgo
 // bindings) so it can build for GOOS=wasip1; callers that want the
-// strongly-typed enum (e.g. duckpgwire, which already depends on
+// strongly-typed enum (e.g. duckgres, which already depends on
 // duckdb-go) can convert via duckdb.Type(d.Type).
 type DescribedType struct {
 	Name string
@@ -32,7 +32,7 @@ type DescribeResult struct {
 // Describe prepares query against the duckproxy server sqlConn is
 // connected to, without executing it, and reports its parameter/result
 // type info. This is the one piece of this protocol that exists purely
-// for Postgres-wire frontends (duckpgwire) -- neither end otherwise needs
+// for Postgres-wire frontends (duckgres) -- neither end otherwise needs
 // an OID/type system, since both already speak DuckDB's native types
 // directly. Mirrors duckdb-go's own GetTableNames/ConnId pattern
 // (vendor/.../connection.go) of a package-level helper that does the

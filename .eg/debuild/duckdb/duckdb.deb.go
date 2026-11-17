@@ -30,7 +30,7 @@ func gpgoptions() []eggpg.Option {
 	// eggpg.Options() takes GNUPGHOME from the environment, which inside the container is the
 	// host-provided /eg.mnt/.gnupg (not writable by us: "unsafe ownership", "Permission denied").
 	// pin the isolated per-container home instead.
-	return eggpg.Options().Home("/home/egd/.gnupg").Debug()
+	return eggpg.Options().Home("/home/egd/.gnupg")
 }
 
 var (

@@ -7,6 +7,7 @@ import (
 	"math"
 	"os"
 	"os/user"
+	"strings"
 	"time"
 
 	"github.com/logrusorgru/aurora"
@@ -166,7 +167,7 @@ func (t Command) UnsafeExec(e Execer) Command {
 func (t Command) Debug() Command {
 	original := t.entry
 	t.entry = func(ctx context.Context, user, group, cmd, directory string, environ []string, do Execer) (err error) {
-		log.Println("running command", directory, user, group, cmd, environ)
+		log.Printf("running command: '%s'\ndir(%s) u(%s):g(%s)\n%s", cmd, directory, user, group, strings.Join(environ, "\n"))
 		return original(ctx, user, group, cmd, directory, environ, do)
 	}
 	return t
@@ -240,6 +241,14 @@ func Runtime() Command {
 }
 
 // Env creates a runtime command pre-populated with the current process environment.
+//
+// the Env functions of the runtime/x/wasi packages (eggolang, egyarn, egpostgresql, ...) only return the variables
+// they set and do not copy the process environment. use Env to inherit it and add theirs afterwards, later entries
+// win so the package's variables override inherited ones:
+//
+//	shell.Env().EnvironFrom(eggolang.Env()...).New("go build ./...")
+//
+// when a []string is needed instead of a command, use egenv.InheritEnv().
 func Env() Command {
 	return Runtime().EnvironFrom(os.Environ()...)
 }
@@ -317,7 +326,7 @@ func retry(ctx context.Context, c Command, do func() error) (err error) {
 }
 
 func run(ctx context.Context, user string, group string, cmd string, directory string, environ []string, exec Execer) (err error) {
-	scmd := []string{"-E", "-H", "-u", user, "-g", group, "bash", "-o", "pipefail", "-c", cmd}
+	scmd := []string{"-E", "-H", "-u", user, "-g", group, "bash", "-c", cmd}
 	return exec(ctx, directory, environ, "sudo", scmd)
 }
 
