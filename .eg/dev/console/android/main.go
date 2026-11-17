@@ -6,7 +6,6 @@ import (
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
 	"eg/compute/eggradlex"
-	"eg/compute/egx"
 	"eg/compute/maintainer"
 	"eg/compute/neurals"
 	"fmt"
@@ -17,6 +16,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
+	"github.com/egdaemon/eg/runtime/x/wasi/egerrors"
 	"github.com/egdaemon/eg/runtime/x/wasi/egfs"
 )
 
@@ -141,8 +141,8 @@ func main() {
 				),
 			),
 		),
-		egx.Fallback(
-			Device,
+		egerrors.Chain(
+			eg.Fn(Device),
 			Emulator(port),
 		),
 	)

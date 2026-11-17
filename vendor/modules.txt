@@ -461,7 +461,7 @@ github.com/edsrzf/mmap-go
 # github.com/egdaemon/duckproxy v0.0.0-20261114115105-8cd7c751218f
 ## explicit; go 1.27.2
 github.com/egdaemon/duckproxy/duckproxy
-# github.com/egdaemon/eg v0.0.0-20261117171203-fdfcf0d574ac
+# github.com/egdaemon/eg v0.0.0-20261117185627-84b59eef4eea
 ## explicit; go 1.27.2
 github.com/egdaemon/eg
 github.com/egdaemon/eg/astcodec
@@ -528,6 +528,7 @@ github.com/egdaemon/eg/runtime/x/wasi/egcoverage
 github.com/egdaemon/eg/runtime/x/wasi/egdb
 github.com/egdaemon/eg/runtime/x/wasi/egdebuild
 github.com/egdaemon/eg/runtime/x/wasi/egdmg
+github.com/egdaemon/eg/runtime/x/wasi/egerrors
 github.com/egdaemon/eg/runtime/x/wasi/egflatpak
 github.com/egdaemon/eg/runtime/x/wasi/egfs
 github.com/egdaemon/eg/runtime/x/wasi/eggithub

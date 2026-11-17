@@ -148,7 +148,7 @@ func Install() eg.OpFn {
 	gruntime := shellruntime()
 
 	return shell.Op(
-		gruntime.Newf("mkdir -p ~/.duckdb %s && ln -sfn %s ~/.duckdb", egenv.DirectoryCache("duckdb"), egenv.DirectoryCache("duckdb")),
+		gruntime.Newf("mkdir -p ~/.duckdb %s %s && ln -sfn %s ~/.duckdb", egenv.DirectoryCache("duckdb"), dstdir, egenv.DirectoryCache("duckdb")),
 		gruntime.Newf(
 			"go build -buildvcs=true -tags %s -o %s ./cmd/...",
 			strings.Join(buildTags, ","),

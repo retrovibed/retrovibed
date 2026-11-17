@@ -70,8 +70,9 @@ func Draft(patterns ...string) eg.OpFn {
 }
 
 type release struct {
-	title string
-	notes string
+	title    string
+	notes    string
+	attempts int16
 }
 
 type option = func(*release)
@@ -95,14 +96,23 @@ func (t options) Notes(s string) options {
 	})
 }
 
+// override the number of attempts for creating the release and uploading assets, defaults to 3.
+func (t options) Attempts(n int16) options {
+	return append(t, func(o *release) {
+		o.attempts = n
+	})
+}
+
 // create returns the base command with the environment the gh commands require, including the
 // title and notes so gh never prompts when a tty is available.
 func (t options) create(v string) shell.Command {
 	c := langx.Clone(release{
-		title: v,
+		title:    v,
+		attempts: 3,
 	}, t...)
 
 	return shell.Runtime().
+		Attempts(c.attempts).
 		Environ(_eg.EnvGithubToken, ffigit.Bearer()).
 		Environ("EGGITHUB_RELEASE_NOTES", c.notes).
 		Environ("EGGITHUB_RELEASE_TITLE", c.title).
@@ -116,7 +126,8 @@ func (t options) Draft(patterns ...string) eg.OpFn {
 		version := PatternVersion()
 		runtime := t.create(version)
 
-		if shell.Run(ctx, runtime.Newf("gh release view %s", version)) != nil {
+		// a missing release (404) is the expected case here, so don't retry the lookup.
+		if shell.Run(ctx, runtime.Attempts(1).Newf("gh release view %s", version)) != nil {
 			return shell.Run(
 				ctx,
 				runtime.Newf(

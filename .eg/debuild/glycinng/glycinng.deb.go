@@ -7,13 +7,13 @@ import (
 	"io/fs"
 	"time"
 
-	"eg/compute/errorsx"
 	"eg/compute/maintainer"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
 	"github.com/egdaemon/eg/runtime/wasi/egenv"
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
+	"github.com/egdaemon/eg/runtime/x/wasi/egerrors"
 )
 
 //go:embed .debskel
@@ -36,7 +36,7 @@ func init() {
 		egdebuild.Option.ChangeLogDate(c.Committer.When),
 		egdebuild.Option.Version(fmt.Sprintf("%s.:autopatch:", version)),
 		egdebuild.Option.Description("glycin-ng", "in-process, sandboxed (Landlock/seccomp) image decoder; drop-in replacement for libglycin-2-0/glycin-loaders that avoids their bwrap/subprocess-spawn model"),
-		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
+		egdebuild.Option.Debian(egerrors.Never(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("cargo", "rustc", "lld"),
 		egdebuild.Option.Envvar("PACKAGE_VERSION", version),
 		egdebuild.Option.Envvar("GIT_COMMIT_HASH", c.Hash.String()),
@@ -48,7 +48,7 @@ func init() {
 // cargo/rustc that image provides for `cargo vendor` -- the outer/default eg
 // container Prepare itself runs in does not have a Rust toolchain at all.
 func Prepare(ctx context.Context, o eg.Op) error {
-	return egdebuild.Prepare(Runner(), errorsx.Must(fs.Sub(debskel, ".debskel")))(ctx, o)
+	return egdebuild.Prepare(Runner(), egerrors.Never(fs.Sub(debskel, ".debskel")))(ctx, o)
 }
 
 // container for this package.
@@ -73,5 +73,5 @@ func Build(ctx context.Context, o eg.Op) error {
 }
 
 func Upload(ctx context.Context, o eg.Op) error {
-	return egdebuild.UploadDPut(gcfg, errorsx.Must(fs.Sub(debskel, ".debskel")))(ctx, o)
+	return egdebuild.UploadDPut(gcfg, egerrors.Never(fs.Sub(debskel, ".debskel")))(ctx, o)
 }

@@ -2,7 +2,6 @@ package release
 
 import (
 	"context"
-	"eg/compute/maintainer"
 	"eg/compute/tarballs"
 	"log"
 	"os"
@@ -38,32 +37,6 @@ func Release() eg.OpFn {
 			egenv.DirectoryWorkload(tarballs.AppImage()),
 			egenv.DirectoryWorkload(tarballs.AppImageZsync()),
 		),
-	)
-}
-
-func AppImageBuild() eg.OpFn {
-	// packaging metainfo.
-	// https://docs.appimage.org/packaging-guide/optional/appstream.html
-	// runtime to look into.
-	// https://github.com/pkgforge-dev/Anylinux-AppImages
-	appimage := tarballs.AppImage()
-	builddir := egenv.DirectoryWorkload("build", tarballs.AppImageBuild())
-	return shell.Op(
-		shell.Newf("mkdir -p %s", builddir),
-		shell.Newf(
-			"appimage-builder --recipe %s --skip-tests --build-dir %s",
-			egenv.DirectoryWorking(".dist", "AppImageBuilder.yml"),
-			builddir,
-		).Directory(egenv.DirectoryWorkload()).
-			Timeout(egenv.TTL()).
-			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed())).
-			Environ("VERSION", tarballs.Version()).
-			Environ("APT_ARCH", egarch.Host()).
-			Environ("APPIMAGE_ARCH", egarch.POSIX()).
-			Environ("APPIMAGE_COMP", "zstd").
-			Environ("APPIMAGE_FILE_NAME", appimage).
-			Environ("GPG_ID", maintainer.GPGID),
-		shell.Newf("cp %s* %s", egenv.DirectoryWorkload(appimage), egenv.DirectoryCache()),
 	)
 }
 

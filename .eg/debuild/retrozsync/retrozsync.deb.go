@@ -12,7 +12,6 @@ import (
 	"io/fs"
 	"time"
 
-	"eg/compute/errorsx"
 	"eg/compute/maintainer"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -20,6 +19,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/eggit"
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
+	"github.com/egdaemon/eg/runtime/x/wasi/egerrors"
 )
 
 //go:embed .debskel
@@ -44,7 +44,7 @@ func init() {
 		egdebuild.Option.ChangeLogDate(c.Committer.When),
 		egdebuild.Option.Version(fmt.Sprintf("%s.:autopatch:", version)),
 		egdebuild.Option.Description("Go rewrite of zsync with HTTPS support", "installs retrozsync and retrozsyncmake built from github.com/cph6/zsync to /usr/bin"),
-		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
+		egdebuild.Option.Debian(egerrors.Never(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("golang-1.27", "tree"),
 	)
 }
@@ -83,5 +83,5 @@ func Build(ctx context.Context, o eg.Op) error {
 }
 
 func Upload(ctx context.Context, o eg.Op) error {
-	return egdebuild.UploadDPut(gcfg, errorsx.Must(fs.Sub(debskel, ".debskel")), egdebuild.Option.Timeout(20*time.Minute))(ctx, o)
+	return egdebuild.UploadDPut(gcfg, egerrors.Never(fs.Sub(debskel, ".debskel")), egdebuild.Option.Timeout(20*time.Minute))(ctx, o)
 }

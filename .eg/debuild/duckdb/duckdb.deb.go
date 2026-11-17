@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/fs"
 
-	"eg/compute/errorsx"
 	"eg/compute/maintainer"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -15,6 +14,7 @@ import (
 	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egccache"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
+	"github.com/egdaemon/eg/runtime/x/wasi/egerrors"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggpg"
 )
 
@@ -49,7 +49,7 @@ func init() {
 		egdebuild.Option.ChangeLogDate(c.Committer.When),
 		egdebuild.Option.Version(fmt.Sprintf("%s.:autopatch:", version)),
 		egdebuild.Option.Description("duckdb", "embeddable columnar database"),
-		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
+		egdebuild.Option.Debian(egerrors.Never(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("rsync", "curl", "tree", "ca-certificates", "cmake", "ninja-build", "libssl-dev", "git"),
 		egdebuild.Option.Envvar("PACKAGE_VERSION", version),
 		egdebuild.Option.Envvar("GIT_COMMIT_HASH", c.Hash.String()),
@@ -66,7 +66,7 @@ func withgpg(c egdebuild.Config) egdebuild.Config {
 func Prepare(ctx context.Context, o eg.Op) error {
 	return eg.Parallel(
 		Download,
-		egdebuild.Prepare(Runner(), errorsx.Must(fs.Sub(debskel, ".debskel"))),
+		egdebuild.Prepare(Runner(), egerrors.Never(fs.Sub(debskel, ".debskel"))),
 	)(ctx, o)
 }
 
@@ -78,7 +78,7 @@ func Runner() eg.ContainerRunner {
 func Build(ctx context.Context, o eg.Op) error {
 	gcfg := withgpg(gcfg)
 	return eg.Sequential(
-		egbug.DebugFailure(
+		egbug.Debug(
 			eggpg.Seed(gpgoptions()...),
 			eggpg.Debug(gpgoptions()...),
 		),
@@ -100,5 +100,5 @@ func Build(ctx context.Context, o eg.Op) error {
 }
 
 func Upload(ctx context.Context, o eg.Op) error {
-	return egdebuild.UploadDPut(withgpg(gcfg), errorsx.Must(fs.Sub(debskel, ".debskel")))(ctx, o)
+	return egdebuild.UploadDPut(withgpg(gcfg), egerrors.Never(fs.Sub(debskel, ".debskel")))(ctx, o)
 }

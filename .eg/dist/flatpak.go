@@ -1,0 +1,85 @@
+package dist
+
+import (
+	"context"
+	"eg/compute/flatpakmods"
+	"eg/compute/tarballs"
+
+	"github.com/egdaemon/eg/runtime/wasi/eg"
+	"github.com/egdaemon/eg/runtime/wasi/egenv"
+	"github.com/egdaemon/eg/runtime/x/wasi/egflatpak"
+	"github.com/egdaemon/eg/runtime/x/wasi/eggithub"
+	"github.com/egdaemon/eg/runtime/x/wasi/egtarball"
+)
+
+func flatpak(final egflatpak.Module) *egflatpak.Builder {
+	return egflatpak.New(
+		"space.retrovibe.Console", "retrovibe",
+		egflatpak.Option().SDK("org.gnome.Sdk", "50").Runtime("org.gnome.Platform", "50").
+			Modules(
+				flatpakmods.Libduckdb(),
+				flatpakmods.Libass(),
+				flatpakmods.Libbs2b(),
+				flatpakmods.Libplacebo(),
+				flatpakmods.Libx264(),
+				flatpakmods.Libx265(),
+				flatpakmods.Libffmpeg(),
+				flatpakmods.Libmpv(),
+				final,
+			).
+			AllowWayland().
+			AllowDRI().
+			AllowNetwork().
+			AllowDownload().
+			AllowMusic().
+			AllowVideos().Allow(
+			// we specify environment variables here so they show up in flatseal for easy adjustments.
+			"--socket=pulseaudio",                           // for mpv
+			"--filesystem=xdg-run/pipewire-0:ro",            // for mpv
+			"--filesystem=~/.duckdb:create",                 // for duckdb
+			"--socket=fallback-x11",                         // to appease the flatpak linter for flathub.
+			"--share=ipc",                                   // enable standard desktop functionality.
+			"--filesystem=xdg-run/gvfsd",                    // enable standard desktop functionality. (probably unnnecessary)
+			"--env=LC_NUMERIC=C",                            // for mpv
+			"--env=TMPDIR=/var/tmp/",                        // enaure golang sets its os.TempDir() to a working value.
+			"--env=RETROVIBED_MDNS_ADVERTISE=false",         // disable MDNS advertising when running in flatpak since it doesn't work.
+			"--env=RETROVIBED_AUTO_IDENTIFY_MEDIA=false",    // automatically identify metadata for content. experimental.
+			"--env=RETROVIBED_MEDIA_AUTO_ARCHIVE=true",      // enable content marked for archiving being uploaded into storage.
+			"--env=RETROVIBED_MEDIA_AUTO_RECLAIM=false",     // allow automatically reclaiming disk space by removing archived data.
+			"--env=RETROVIBED_TORRENT_AUTO_DISCOVERY=false", // peer scanning is an experimental feature.
+			"--env=RETROVIBED_TORRENT_AUTO_BOOTSTRAP=true",  // auto bootstrap the dht from a global endpoint.
+			"--env=RETROVIBED_TORRENT_ALLOW_SEEDING=true",   // allow uploading to peers
+			"--env=RETROVIBED_TORRENT_PUBLIC_IP4=\"\"",      // manually set the public ipv4 address.
+			"--env=RETROVIBED_TORRENT_PUBLIC_IP6=\"\"",      // manually set the public ipv6 address.
+			"--env=RETROVIBED_JWT_SECRET=",                  // specify the jwt secret to use for signing tokens. generally this should not be necessary.
+			"--env=RETROVIBED_SELF_SIGNED_HOSTS=127.0.0.1",  // TLS hosts to include in the self signed certificate.
+		)...)
+}
+
+// Manifest generates the manifest for distribution.
+func FlatpakManifest() eg.OpFn {
+	return func(ctx context.Context, o eg.Op) error {
+		// needs to be in an op so that the sha256 and download url are defered until this command actually runs.
+		return eg.Sequential(
+			egflatpak.ManifestOp(
+				egenv.DirectoryCache(tarballs.Flatpak()),
+				flatpak(
+					moduleTarball(eggithub.DownloadURL(tarballs.Retrovibed()), egtarball.SHA256(tarballs.Retrovibed())),
+				),
+			),
+		)(ctx, o)
+	}
+}
+
+func moduleTarball(url, sha256d string) egflatpak.Module {
+	return egflatpak.NewModule("retrovibed", "simple", egflatpak.ModuleOptions().Commands(
+		"sed 's|Exec=retrovibed|Exec=/app/bin/retrovibed|' usr/share/applications/space.retrovibe.Console.desktop > /app/share/applications/space.retrovibe.Console.desktop",
+		"mv usr/share/icons/hicolor/scalable/apps/space.retrovibe.Console.svg /app/share/icons/hicolor/scalable/apps/space.retrovibe.Console.svg",
+		"mv usr/share/metainfo/space.retrovibe.Console.metainfo.xml /app/share/metainfo/space.retrovibe.Console.metainfo.xml",
+		"mv usr/share/licenses/space.retrovibe.Console /app/share/licenses/space.retrovibe.Console",
+		"mv usr/lib/retrovibed/* /app/bin",
+		"mv /app/bin/lib/libretrovibed.so /app/lib",
+		"rm -rf usr",
+		"rm -rf etc",
+	).Sources(egflatpak.SourceTarball(url, sha256d))...)
+}

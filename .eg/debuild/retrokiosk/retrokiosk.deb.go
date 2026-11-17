@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"time"
 
-	"eg/compute/errorsx"
 	"eg/compute/maintainer"
 
 	"github.com/egdaemon/eg/runtime/wasi/eg"
@@ -17,6 +16,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
+	"github.com/egdaemon/eg/runtime/x/wasi/egerrors"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggpg"
 )
 
@@ -49,7 +49,7 @@ func init() {
 		egdebuild.Option.ChangeLogDate(c.Committer.When),
 		egdebuild.Option.Version("0.0.:autopatch:"),
 		egdebuild.Option.Description("retrovibed console kiosk appliance", "boots a machine directly into a fullscreen retrovibed Console session, no desktop or login required"),
-		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
+		egdebuild.Option.Debian(egerrors.Never(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("rsync", "tree"),
 		egdebuild.Option.Depends("avahi-daemon", "cage", "kbd", "libfuse2", "pipewire-audio", "retrozsync", "ssh"),
 	)
@@ -65,7 +65,7 @@ func withgpg(c egdebuild.Config) egdebuild.Config {
 func Prepare(ctx context.Context, o eg.Op) error {
 	return eg.Parallel(
 		// egdebuild.Prepare(Runner(), nil),
-		egdebuild.Prepare(Runner(), errorsx.Must(fs.Sub(debskel, ".debskel"))),
+		egdebuild.Prepare(Runner(), egerrors.Never(fs.Sub(debskel, ".debskel"))),
 	)(ctx, o)
 }
 
@@ -79,7 +79,7 @@ func Build(ctx context.Context, o eg.Op) error {
 		// override eg compute local's setting of the home directory.
 		// ideally we should default to this except when performing local
 		// compute workloads.
-		egbug.DebugFailure(
+		egbug.Debug(
 			eggpg.Seed(gpgoptions()...),
 			eggpg.Debug(gpgoptions()...),
 		),
@@ -101,7 +101,7 @@ func Upload(ctx context.Context, o eg.Op) error {
 	gcfg := withgpg(gcfg)
 	return egdebuild.UploadDPut(
 		gcfg,
-		errorsx.Must(fs.Sub(debskel, ".debskel")),
+		egerrors.Never(fs.Sub(debskel, ".debskel")),
 		egdebuild.Option.Timeout(20*time.Minute),
 	)(ctx, o)
 }

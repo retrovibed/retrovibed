@@ -2,7 +2,6 @@ package debian
 
 import (
 	"context"
-	"eg/compute/errorsx"
 	"eg/compute/maintainer"
 	"embed"
 	"io/fs"
@@ -14,6 +13,7 @@ import (
 	"github.com/egdaemon/eg/runtime/wasi/shell"
 	"github.com/egdaemon/eg/runtime/x/wasi/egbug"
 	"github.com/egdaemon/eg/runtime/x/wasi/egdebuild"
+	"github.com/egdaemon/eg/runtime/x/wasi/egerrors"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggolang"
 	"github.com/egdaemon/eg/runtime/x/wasi/eggpg"
 )
@@ -47,7 +47,7 @@ func init() {
 		egdebuild.Option.ChangeLogDate(c.Committer.When),
 		egdebuild.Option.Version("0.0.:autopatch:"),
 		egdebuild.Option.Description("media distribution platform", "provides torrenting functionality with builtin media player and cloud storage allowing you to take your content anywhere you go"),
-		egdebuild.Option.Debian(errorsx.Must(fs.Sub(debskel, ".debskel"))),
+		egdebuild.Option.Debian(egerrors.Never(fs.Sub(debskel, ".debskel"))),
 		egdebuild.Option.DependsBuild("golang-1.27", "cargo", "rustc", "tree", "dh-make", "debhelper", "pkg-config", "duckdb", "libavcodec-dev", "libavformat-dev", "libavutil-dev", "libswresample-dev", "libavfilter-dev", "libavdevice-dev", "libswscale-dev"),
 		egdebuild.Option.Depends("duckdb", "ffmpeg"),
 	)
@@ -67,7 +67,7 @@ func Prepare(ctx context.Context, o eg.Op) error {
 		shell.Op(
 			sruntime.Newf("git worktree add %s HEAD", debdir),
 		),
-		egdebuild.Prepare(Runner(), errorsx.Must(fs.Sub(debskel, ".debskel"))),
+		egdebuild.Prepare(Runner(), egerrors.Never(fs.Sub(debskel, ".debskel"))),
 	)(ctx, o)
 }
 
@@ -79,7 +79,7 @@ func Runner() eg.C8S {
 func Build(ctx context.Context, o eg.Op) error {
 	gcfg := withgpg(gcfg)
 	return eg.Sequential(
-		egbug.DebugFailure(
+		egbug.Debug(
 			eggpg.Seed(gpgoptions()...),
 			eggpg.Debug(gpgoptions()...),
 		),
@@ -96,7 +96,7 @@ func Build(ctx context.Context, o eg.Op) error {
 
 func Upload(ctx context.Context, o eg.Op) error {
 	gcfg := withgpg(gcfg)
-	return egdebuild.UploadDPut(gcfg, errorsx.Must(fs.Sub(debskel, ".debskel")))(ctx, o)
+	return egdebuild.UploadDPut(gcfg, egerrors.Never(fs.Sub(debskel, ".debskel")))(ctx, o)
 }
 
 func Copy(dst string) eg.OpFn {
