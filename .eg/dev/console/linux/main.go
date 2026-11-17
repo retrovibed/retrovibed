@@ -38,6 +38,7 @@ func main() {
 					),
 					neurals.MaybeBuild(filepath.Join("dev.native.libs", "libpredicttext.a"), neurals.Compile, neurals.Clone),
 				),
+				duckdb.IsolateSharedLibrary(egenv.DirectoryCache("dev.native.libs")),
 				console.Generate,
 				console.GenerateDevBinding(
 					shell.Runtime(),

@@ -59,8 +59,10 @@ func GenerateDevBinding(runtime shell.Command, outdir string, staticdirs ...stri
 	return func(ctx context.Context, _ eg.Op) error {
 		var cgoFlags strings.Builder
 
+		// rpath so libretrovibed.so loads the dev libduckdb.so built alongside it rather than
+		// whatever libduckdb.so the system happens to provide.
 		for _, dir := range staticdirs {
-			fmt.Fprintf(&cgoFlags, " -L%s", dir)
+			fmt.Fprintf(&cgoFlags, " -L%s -Wl,-rpath,%s", dir, dir)
 		}
 
 		runtime := flutterRuntimev2(runtime)
