@@ -64,7 +64,6 @@ func withgpg(c egdebuild.Config) egdebuild.Config {
 
 func Prepare(ctx context.Context, o eg.Op) error {
 	return eg.Parallel(
-		// egdebuild.Prepare(Runner(), nil),
 		egdebuild.Prepare(Runner(), egerrors.Never(fs.Sub(debskel, ".debskel"))),
 	)(ctx, o)
 }

@@ -13,7 +13,7 @@ import (
 // cgroup limits are printed alongside the host totals because the limits are what the workload is
 // actually held to, and tmpfs mounts are counted against the memory limit. Every command is
 // lenient, tools or files that do not exist on the machine (e.g. no gpu) are reported and skipped.
-// it has the shape of a debug operation, see egbug.DebugFailure.
+// it has the shape of a debug operation, see egbug.Debug.
 func Compute(ctx context.Context, op eg.Op) error {
 	debug := shell.Runtime().Lenient(true)
 	return shell.Run(

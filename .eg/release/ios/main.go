@@ -38,11 +38,11 @@ func main() {
 				neurals.CompileIOS(egenv.DirectoryCache("dev.native.libs")),
 			),
 			console.GenerateFlutter,
-			egbug.DebugFailure(
+			egbug.Debug(
 				console.CompileIOSBinding,
 				egbug.Log("bindings failed to build for iOS"),
 			),
-			egbug.DebugFailure(
+			egbug.Debug(
 				console.BuildIOS,
 				egbug.Log("flutter failed to build iOS app"),
 			),

@@ -37,7 +37,7 @@ func main() {
 			shell.Op(
 				shell.New("brew install go duckdb gpgme flutter ffmpeg@7 cocoapods"),
 			),
-			egbug.DebugFailure(
+			egbug.Debug(
 				console.GenerateDevDarwinBinding(runtime, console.DarwinLibDir()),
 				eg.Sequential(
 					egbug.Log("failed to build native library / generate ffi bindings"),

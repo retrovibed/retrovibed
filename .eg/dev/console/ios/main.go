@@ -33,7 +33,7 @@ func EnsureDuckDB(runtime shell.Command, duckdbsrc, duckdbinet, duckdbvss, duckd
 		}
 
 		libpath := filepath.Join(duckdbbuild, "src", "libduckdb_static.a")
-		return egbug.DebugFailure(
+		return egbug.Debug(
 			shell.Op(
 				shell.Newf(
 					"test -f %s || cmake -B %s -S %s -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_ARCHITECTURES=%s -DCMAKE_OSX_SYSROOT=$(xcrun --sdk iphonesimulator --show-sdk-path) -DCMAKE_OSX_DEPLOYMENT_TARGET=16.0 -DCMAKE_BUILD_TYPE=Release -DEXTENSION_STATIC_BUILD=1 -DBUILD_SHELL=0 -DBUILD_UNITTESTS=0 -DDUCKDB_EXPLICIT_PLATFORM=ios_%s \"-DBUILD_EXTENSIONS=icu;json\" -GNinja",
@@ -87,7 +87,7 @@ func main() {
 			),
 			EnsureDuckDB(runtime, duckdbsrc, duckdbinet, duckdbvss, duckdbArm64, "arm64"),
 			EnsureDuckDB(runtime, duckdbsrc, duckdbinet, duckdbvss, duckdbX86, "x86_64"),
-			egbug.DebugFailure(
+			egbug.Debug(
 				shell.Op(
 					flutter.New("mkdir -p build/nativelib/ios-sim-arm64 build/nativelib/ios-sim-x86_64"),
 					GoBuild(flutter, duckdbsrc, duckdbArm64, "arm64", "arm64-apple-ios16.0-simulator", "ios-sim-arm64"),
@@ -98,7 +98,7 @@ func main() {
 					Debug(runtime),
 				),
 			),
-			egbug.DebugFailure(
+			egbug.Debug(
 				shell.Op(
 					flutter.New("cp build/nativelib/ios-sim-arm64/libretrovibed.h build/nativelib/libretrovibed.h"),
 					flutter.New("dart run ffigen --config ffigen.yaml --compiler-opts \"-I$(clang --print-resource-dir)/include\""),
