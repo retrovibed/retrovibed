@@ -1,6 +1,15 @@
 version: "2"
 linters:
   settings:
+    staticcheck:
+      checks:
+        - all
+        - -QF1001 # De Morgan's law suggestions hurt readability
+        - -ST1000 # package comments, off in golangci-lint's default set.
+        - -ST1003 # doesnt apply to generated code.
+        - -ST1020 # doc comment style, off in golangci-lint's default set.
+        - -ST1021 # doc comment style, off in golangci-lint's default set.
+        - -ST1022 # doc comment style, off in golangci-lint's default set.
     errcheck: # https://golangci-lint.run/docs/linters/configuration/#errcheck
       # Report about not checking of errors in type assertions: `a := b.(MyStruct)`.
       # Such cases aren't reported by default.

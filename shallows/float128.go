@@ -12,9 +12,9 @@ import (
 type Float128 []float32
 
 // Scan implements the database/sql Scanner interface.
-func (dst *Float128) Scan(src any) error {
+func (t *Float128) Scan(src any) error {
 	if src == nil {
-		*dst = nil
+		*t = nil
 		return nil
 	}
 
@@ -22,7 +22,7 @@ func (dst *Float128) Scan(src any) error {
 	case []float32:
 		out := make(Float128, len(v))
 		copy(out, v)
-		*dst = out
+		*t = out
 		return nil
 	case []any:
 		out := make(Float128, len(v))
@@ -33,7 +33,7 @@ func (dst *Float128) Scan(src any) error {
 			}
 			out[i] = f
 		}
-		*dst = out
+		*t = out
 		return nil
 	}
 
@@ -41,9 +41,9 @@ func (dst *Float128) Scan(src any) error {
 }
 
 // Value implements the database/sql/driver Valuer interface.
-func (src Float128) Value() (driver.Value, error) {
-	if src == nil {
+func (t Float128) Value() (driver.Value, error) {
+	if t == nil {
 		return nil, nil
 	}
-	return []float32(src), nil
+	return []float32(t), nil
 }

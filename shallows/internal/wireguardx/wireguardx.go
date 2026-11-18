@@ -179,9 +179,9 @@ const (
 	notInASection
 )
 
-func (c *Config) maybeAddPeer(p *Peer) {
+func (conf *Config) maybeAddPeer(p *Peer) {
 	if p != nil {
-		c.Peers = append(c.Peers, *p)
+		conf.Peers = append(conf.Peers, *p)
 	}
 }
 

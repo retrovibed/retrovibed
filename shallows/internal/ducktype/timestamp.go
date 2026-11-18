@@ -62,26 +62,26 @@ type NullTime struct {
 	InfinityModifier InfinityModifier
 }
 
-func (dst *NullTime) Infinity() {
-	dst.Status = Present
-	dst.InfinityModifier = Infinity
+func (t *NullTime) Infinity() {
+	t.Status = Present
+	t.InfinityModifier = Infinity
 }
 
-func (dst *NullTime) NegativeInfinity() {
-	dst.Status = Present
-	dst.InfinityModifier = NegativeInfinity
+func (t *NullTime) NegativeInfinity() {
+	t.Status = Present
+	t.InfinityModifier = NegativeInfinity
 }
 
 // Scan implements the database/sql Scanner interface.
-func (dst *NullTime) Scan(src interface{}) error {
+func (t *NullTime) Scan(src interface{}) error {
 	if src == nil {
-		*dst = NullTime{Status: Null}
+		*t = NullTime{Status: Null}
 		return nil
 	}
 
 	switch src := src.(type) {
 	case time.Time:
-		*dst = NewNullTime(src)
+		*t = NewNullTime(src)
 		return nil
 	}
 
@@ -89,13 +89,13 @@ func (dst *NullTime) Scan(src interface{}) error {
 }
 
 // Value implements the database/sql/driver Valuer interface.
-func (src NullTime) Value() (driver.Value, error) {
-	switch src.Status {
+func (t NullTime) Value() (driver.Value, error) {
+	switch t.Status {
 	case Present:
-		if src.InfinityModifier != None {
-			return src.InfinityModifier.String(), nil
+		if t.InfinityModifier != None {
+			return t.InfinityModifier.String(), nil
 		}
-		return src.Time, nil
+		return t.Time, nil
 	case Null:
 		return nil, nil
 	default:

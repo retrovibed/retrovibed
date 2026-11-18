@@ -193,16 +193,16 @@ func (t FileContents) MarshalText() (text []byte, err error) {
 	return []byte(t), nil
 }
 
-func (s *FileContents) UnmarshalText(text []byte) error {
+func (t *FileContents) UnmarshalText(text []byte) error {
 	// Check for the @ prefix
 	if path, ok := strings.CutPrefix(string(text), "@"); ok {
 		content, err := os.ReadFile(path)
 		if err != nil {
 			return fmt.Errorf("failed to read file %q: %w", path, err)
 		}
-		*s = FileContents(content)
+		*t = FileContents(content)
 	} else {
-		*s = FileContents(text)
+		*t = FileContents(text)
 	}
 
 	return nil
