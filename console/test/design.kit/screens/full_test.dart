@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/design.kit/screens/full.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 import 'package:retrovibed/windowx.dart';
-import 'package:window_manager/legacy.dart';
 
 void main() {
   group('Full initial state', () {
@@ -21,9 +20,8 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    // Regression: window_manager's isFullScreen() is an unguarded channel
-    // read that can report true before the window is actually settled
-    // (see windowx_test.dart's waitUntilReadyToShow correction test). Full
+    // Regression: the platform's fullscreen state can report true before
+    // the window is actually settled (see WindowManagerX.settle). Full
     // must not get permanently stuck on a bad initial read - a subsequent
     // onWindowLeaveFullScreen event has to be able to correct it.
     testWidgets('a stale fullscreen:true initial report is corrected by a later leave-fullscreen event', (
@@ -40,7 +38,7 @@ void main() {
 
       expect(Full.nochrome(capturedContext), isTrue);
 
-      (Full.of(capturedContext) as WindowListener).onWindowLeaveFullScreen();
+      Full.of(capturedContext)!.onWindowLeaveFullScreen();
       await tester.pump();
 
       expect(Full.nochrome(capturedContext), isFalse);
@@ -108,11 +106,11 @@ void main() {
 
       expect(Full.nochrome(capturedContext), isFalse);
 
-      (Full.of(capturedContext) as WindowListener).onWindowEnterFullScreen();
+      Full.of(capturedContext)!.onWindowEnterFullScreen();
       await tester.pump();
       expect(Full.nochrome(capturedContext), isTrue);
 
-      (Full.of(capturedContext) as WindowListener).onWindowLeaveFullScreen();
+      Full.of(capturedContext)!.onWindowLeaveFullScreen();
       await tester.pump();
       expect(Full.nochrome(capturedContext), isFalse);
     });

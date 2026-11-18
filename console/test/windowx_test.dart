@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:window_manager/legacy.dart';
+import 'package:window_manager/window_manager.dart' show TitleBarStyle;
 import 'package:retrovibed/windowx.dart';
 
 void main() {
@@ -9,8 +9,15 @@ void main() {
   // to intercept. Tests run in a VM without the native library, where the real
   // defaults must degrade to harmless no-ops with settled state.
   group('WindowManagerX real defaults without a native window', () {
-    test('ensureInitialized completes', () async {
-      await WindowManagerX().ensureInitialized();
+    test('settle completes', () async {
+      await WindowManagerX().settle();
+    });
+
+    test('addListener/removeListener complete', () async {
+      final wm = WindowManagerX();
+      const events = WindowEventsX();
+      wm.addListener(events);
+      wm.removeListener(events);
     });
 
     test('setTitleBarStyle completes', () async {
@@ -32,9 +39,9 @@ void main() {
       expect(await wm.isMaximized(), isFalse);
     });
 
-    test('waitUntilReadyToShow completes and reports a settled state', () async {
+    test('settle completes and reports a settled state', () async {
       final wm = WindowManagerX();
-      await wm.waitUntilReadyToShow();
+      await wm.settle();
 
       expect(await wm.isFullScreen(), isFalse);
       expect(await wm.isMaximized(), isFalse);
@@ -58,8 +65,7 @@ void main() {
       final calls = <String>[];
       final wm = WindowManagerX.fake(calls: calls);
 
-      await wm.ensureInitialized();
-      await wm.waitUntilReadyToShow();
+      await wm.settle();
       await wm.setTitleBarStyle(TitleBarStyle.hidden);
       await wm.setFullScreen(true);
       await wm.isFullScreen();
@@ -67,10 +73,11 @@ void main() {
       await wm.unmaximize();
       await wm.isMaximized();
       await wm.close();
+      wm.addListener(const WindowEventsX());
+      wm.removeListener(const WindowEventsX());
 
       expect(calls, [
-        'ensureInitialized',
-        'waitUntilReadyToShow',
+        'settle',
         'setTitleBarStyle',
         'setFullScreen',
         'isFullScreen',
@@ -78,13 +85,9 @@ void main() {
         'unmaximize',
         'isMaximized',
         'close',
+        'addListener',
+        'removeListener',
       ]);
-    });
-
-    test('waitUntilReadyToShow invokes the given callback, like the real plugin', () async {
-      var called = false;
-      await WindowManagerX.fake().waitUntilReadyToShow(null, () => called = true);
-      expect(called, isTrue);
     });
   });
 }

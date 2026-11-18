@@ -1,5 +1,4 @@
 import 'dart:io' as io;
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/retrovibed.dart' as retro;
 
@@ -21,33 +20,6 @@ Future<int> _captureFault(Future<void> Function() fn) async {
     // expected — exit was intercepted
   }
   return code!;
-}
-
-void _mockWindowManager() {
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-      .setMockMethodCallHandler(
-    const MethodChannel('window_manager'),
-    (call) async {
-      switch (call.method) {
-        // waitUntilReadyToShow reads these as bool and casts the channel
-        // result directly - a null response (the default below) would throw.
-        case 'isFullScreen':
-        case 'isMaximized':
-        case 'isMinimized':
-          return false;
-        default:
-          return null;
-      }
-    },
-  );
-}
-
-void _clearWindowManagerMock() {
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-      .setMockMethodCallHandler(
-    const MethodChannel('window_manager'),
-    null,
-  );
 }
 
 void main() {
@@ -72,8 +44,6 @@ void main() {
   });
 
   group('run — fn uses fault', () {
-    setUp(_mockWindowManager);
-    tearDown(_clearWindowManagerMock);
 
     test('run calls fn and fault(0) exits cleanly', () async {
       expect(

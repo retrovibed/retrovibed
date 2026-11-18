@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:window_manager/legacy.dart';
+import 'package:window_manager/window_manager.dart' show DragToMoveArea;
 
 import 'package:retrovibed/navbar.dart' as navbar;
 import 'package:retrovibed/remote.dart' as remote;

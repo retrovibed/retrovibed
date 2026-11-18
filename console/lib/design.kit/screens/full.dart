@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:window_manager/legacy.dart';
 import 'package:retrovibed/env.dart' as env;
 import 'package:retrovibed/windowx.dart';
 
@@ -26,8 +25,12 @@ class Full extends StatefulWidget {
   State<Full> createState() => _FullState();
 }
 
-class _FullState extends State<Full> with WindowListener {
+class _FullState extends State<Full> {
   bool chromeless = false;
+  late final WindowEventsX _events = WindowEventsX(
+    onEnterFullScreen: onWindowEnterFullScreen,
+    onLeaveFullScreen: onWindowLeaveFullScreen,
+  );
 
   void toggle() {
     final next = !chromeless;
@@ -50,7 +53,7 @@ class _FullState extends State<Full> with WindowListener {
   @override
   void initState() {
     super.initState();
-    widget.windowManager.addListener(this);
+    widget.windowManager.addListener(_events);
     widget.windowManager.isFullScreen().then((kFullscreen) {
       setState(() {
         chromeless = kFullscreen;
@@ -62,18 +65,20 @@ class _FullState extends State<Full> with WindowListener {
 
   @override
   void dispose() {
-    widget.windowManager.removeListener(this);
+    widget.windowManager.removeListener(_events);
     super.dispose();
   }
 
   // Keeps chromeless in sync with fullscreen changes that don't go through
   // toggle() - an OS-level shortcut, another entry point, or a setFullScreen
   // call above that failed silently (its catchError only logs).
-  @override
-  void onWindowEnterFullScreen() => setState(() => chromeless = true);
+  void onWindowEnterFullScreen() {
+    if (mounted) setState(() => chromeless = true);
+  }
 
-  @override
-  void onWindowLeaveFullScreen() => setState(() => chromeless = false);
+  void onWindowLeaveFullScreen() {
+    if (mounted) setState(() => chromeless = false);
+  }
 
   @override
   Widget build(BuildContext context) {

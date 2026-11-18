@@ -1,5 +1,4 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:window_manager/legacy.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn/login.dart' as login;
 import 'package:retrovibed/windowx.dart';
@@ -12,13 +11,17 @@ class Hamburger extends StatefulWidget {
   State<Hamburger> createState() => _HamburgerState();
 }
 
-class _HamburgerState extends State<Hamburger> with WindowListener {
+class _HamburgerState extends State<Hamburger> {
   bool _maximized = false;
+  late final WindowEventsX _events = WindowEventsX(
+    onMaximize: onWindowMaximize,
+    onUnmaximize: onWindowUnmaximize,
+  );
 
   @override
   void initState() {
     super.initState();
-    widget.windowManager.addListener(this);
+    widget.windowManager.addListener(_events);
     widget.windowManager.isMaximized().then((v) => setState(() => _maximized = v)).catchError((cause) {
       print("failed to read initial maximized state ${cause}");
     });
@@ -26,15 +29,17 @@ class _HamburgerState extends State<Hamburger> with WindowListener {
 
   @override
   void dispose() {
-    widget.windowManager.removeListener(this);
+    widget.windowManager.removeListener(_events);
     super.dispose();
   }
 
-  @override
-  void onWindowMaximize() => setState(() => _maximized = true);
+  void onWindowMaximize() {
+    if (mounted) setState(() => _maximized = true);
+  }
 
-  @override
-  void onWindowUnmaximize() => setState(() => _maximized = false);
+  void onWindowUnmaximize() {
+    if (mounted) setState(() => _maximized = false);
+  }
 
   @override
   Widget build(BuildContext context) {

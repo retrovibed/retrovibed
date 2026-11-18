@@ -235,13 +235,12 @@ Future<void> run(void Function() fn) async {
   checkpointdb();
   print("cp 5 ${DateTime.now()}");
   if (theming.Defaults.defaults.desktop) {
-    await windowx.ensureInitialized();
-    // waitUntilReadyToShow force-corrects isFullScreen/isMaximized/isMinimized
-    // to a known state before anything else reads them (see window_manager's
-    // own implementation) - without this, early reads of that state (e.g. in
-    // Full/Hamburger initState) can be unreliable, especially on Linux where
-    // isFullScreen reads live GDK window state that may not be settled yet.
-    await windowx.waitUntilReadyToShow();
+    // settle force-corrects isFullScreen/isMaximized/isMinimized to a known
+    // state before anything else reads them - without this, early reads of
+    // that state (e.g. in Full/Hamburger initState) can be unreliable,
+    // especially on Linux where isFullScreen reads live GDK window state that
+    // may not be settled yet.
+    await windowx.settle();
     await Future.wait([
       windowx.setTitleBarStyle(TitleBarStyle.hidden),
       windowx.maximize(),
