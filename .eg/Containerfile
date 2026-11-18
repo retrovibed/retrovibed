@@ -5,17 +5,17 @@ ARG GOMODCACHE="/tmp/gomod"
 ARG GOCACHE="/tmp/gocache"
 
 RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d59"
-RUN apt-get update
-RUN apt-get install -y software-properties-common build-essential ca-certificates curl sudo
+RUN apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 update
+RUN apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 install -y software-properties-common build-essential ca-certificates curl sudo
 RUN add-apt-repository -n ppa:longsleep/golang-backports
 RUN add-apt-repository -n ppa:egdaemon/eg
 RUN add-apt-repository -n ppa:jljatone/retrovibed
 
 RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d55"
-RUN apt-get update && apt-get -y install golang-1.27 egworkload duckdb podman netavark rsync vim dput devscripts dh-make dput uidmap dbus-user-session git unzip xz-utils zip libglu1-mesa clang lld cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
+RUN apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 update && apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 -y install golang-1.27 egworkload duckdb podman netavark rsync vim dput devscripts dh-make dput uidmap dbus-user-session git unzip xz-utils zip libglu1-mesa clang lld cmake git ninja-build pkg-config libgtk-3-dev liblzma-dev libstdc++-12-dev
 RUN sh /usr/share/eg/install/github.sh > /dev/null
 RUN echo "cache buster 059a9a06-1686-4f49-9a7f-a30535886d50"
-RUN apt-get update && apt-get -y install snapd protobuf-compiler pkgconf clang-19 gh tree flatpak-builder libmpv-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libavfilter-dev libavdevice-dev libswscale-dev xwayland-run
+RUN apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 update && apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 -y install snapd protobuf-compiler pkgconf clang-19 gh tree flatpak-builder libmpv-dev libavcodec-dev libavformat-dev libavutil-dev libswresample-dev libavfilter-dev libavdevice-dev libswscale-dev xwayland-run
 
 RUN ln -s /usr/lib/go-1.27/bin/go /usr/local/bin/go
 
@@ -27,7 +27,7 @@ RUN GOPROXY=direct go install -tags duckdb_use_lib github.com/james-lawrence/gen
 RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 
 # install flatpak
-RUN apt-get update && apt-get -y install tree flatpak-builder libmpv-dev
+RUN apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 update && apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 -y install tree flatpak-builder libmpv-dev
 RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 # install flutter
@@ -44,7 +44,7 @@ RUN sudo -H -S -u egd -g egd dart pub global activate protoc_plugin 25.1.0
 
 RUN echo "cache buster 159a9a06-1686-4f49-9a7f-a30535786d59"
 # install appimage-builder for AppImage packaging
-RUN apt-get update && apt-get -y install pipx python3-dev python3-venv python3-apt squashfs-tools patchelf desktop-file-utils libgdk-pixbuf-xlib-2.0-dev fakeroot gnupg2 zsync
+RUN apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 update && apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 -y install pipx python3-dev python3-venv python3-apt squashfs-tools patchelf desktop-file-utils libgdk-pixbuf-xlib-2.0-dev fakeroot gnupg2 zsync
 # Use pipx to install appimage-builder globally (available in /usr/local/bin)
 RUN PIPX_HOME=/opt/pipx PIPX_BIN_DIR=/usr/local/bin pipx install git+https://github.com/james-lawrence/appimage-builder.git@fix/apprun2-multiarch-linker
 
@@ -54,11 +54,11 @@ RUN curl -sSfL https://github.com/AppImage/appimagetool/releases/download/contin
 # noop apt-key (deprecated in newer Ubuntu, causes errors in some tools, specifically appimage-builder which doesnt use it but checks for it)
 RUN printf '#!/bin/sh\nexit 0\n' > /usr/local/bin/apt-key && chmod +x /usr/local/bin/apt-key
 
-RUN apt-get install -y rustup
+RUN apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 install -y rustup
 RUN sudo -u egd rustup default stable
 ENV PATH=/home/egd/.cargo/bin:$PATH
 
-RUN apt-get update && apt-get install -y cargo rustc wayland-utils waypipe
+RUN apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 update && apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 install -y cargo rustc wayland-utils waypipe
 
 # pre-install duckdb extensions used by shallows migrations so codegen doesn't need network access at runtime.
 # and because genieql needs them to execute the migrations....
@@ -69,7 +69,7 @@ RUN systemd-tmpfiles --clean
 RUN rm -rf /tmp/gomod /tmp/gocache
 RUN du -xsh /tmp/*
 
-RUN apt-get -y install openssh-server npm
+RUN apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 -y install openssh-server npm
 RUN npm install -g @anthropic-ai/claude-code
 RUN sudo -H -S -u egd -g egd dart pub global activate flutter_hot_reload
 RUN ln -s /home/egd/.pub-cache/bin/flutter-w /usr/local/bin/flutter-w

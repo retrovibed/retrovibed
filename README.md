@@ -53,9 +53,22 @@ am update retrovibed
 
 #### install deb daemon
 
+install from the ppa:
+
 ```bash
 add-apt-repository ppa:jljatone/retrovibed
 apt-get update && apt-get install retrovibed
+```
+
+or from a github release with [gh](https://cli.github.com):
+
+```bash
+d=$(mktemp -d) && gh release download --repo retrovibed/retrovibed --pattern "retrovibed_*_$(dpkg --print-architecture).deb" --dir "$d" && sudo apt-get install "$d"/*.deb
+```
+
+then configure and start the daemon:
+
+```bash
 
 # /etc/retrovibed/config.env has documentation
 # around the available settings.
