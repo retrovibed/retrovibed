@@ -93,8 +93,7 @@ github.com/duckdb/duckdb-go/v2 v2.10505.0 h1:SWwvLn2Qx/RQSnQNupwgIF8VbnJ5A6OQU9l
 github.com/duckdb/duckdb-go/v2 v2.10505.0/go.mod h1:m0PW4J4FG9hlFlVdXi6Ds9owpyIDaBdE2jyce00fGcE=
 github.com/dustin/go-humanize v1.1.0 h1:dbKTrvD0klcbBV/h4AWJdMuZogJACoMlvWIWZ5b2xWg=
 github.com/dustin/go-humanize v1.1.0/go.mod h1:hc1CvRkJMsgxqjmjMQF3QNRAZBwY8AXBAzKYoSX9sFI=
-github.com/egdaemon/duckproxy v0.0.0-20261114115105-8cd7c751218f h1:JKgH95MPa4Q1c/O6PMl0rgojVwBClYHOuPNyJAzAkJA=
-github.com/egdaemon/duckproxy v0.0.0-20261114115105-8cd7c751218f/go.mod h1:LvAlbnY/z3glFhk1nQM8YEw4E8xqSzHu3zARGfQQMHQ=
+github.com/egdaemon/duckproxy v0.0.0-20261118154833-a9dd281813bb h1:cv4vk8fXK7HRWUiu+7Hxrdl25+I6Bp3t9SgToVyZVfA=
 github.com/egdaemon/eg v0.0.0-20261117185627-84b59eef4eea h1:CVw/q+ly0diMyALAhvD7UpElfRjhyaQzKt/R/AgHpmU=
 github.com/egdaemon/eg v0.0.0-20261117185627-84b59eef4eea/go.mod h1:rq9wa0zt4NZONWtC1TTQA7pIMWd9rR/yYmSY0qkfhZw=
 github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d h1:vpuyri6vixAcYsEBsCI9wk32/fGI/ZpJp0z4zkZ3oS0=

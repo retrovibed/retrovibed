@@ -1,5 +1,5 @@
 //go:build duckdb_use_static_lib
 
-package goosex
+package cmdopts
 
 const extensionSQL = "LOAD icu; LOAD inet; LOAD vss;"

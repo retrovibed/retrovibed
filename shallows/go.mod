@@ -1,6 +1,6 @@
 module github.com/retrovibed/retrovibed/shallows
 
-go 1.27.0
+go 1.27.2
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
@@ -16,6 +16,7 @@ require (
 	github.com/dashotv/tvdb v0.5.2
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/duckdb/duckdb-go/v2 v2.10505.0
+	github.com/egdaemon/duckproxy v0.0.0-20261118154833-a9dd281813bb
 	github.com/egdaemon/gdx v0.0.0-20261115232526-a70109276a78
 	github.com/egdaemon/gdx/konggdx v0.0.0-20261115232526-a70109276a78
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d
@@ -111,6 +112,7 @@ require (
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
+	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/gofrs/uuid/v5 v5.5.1 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/flatbuffers v25.12.19+incompatible // indirect

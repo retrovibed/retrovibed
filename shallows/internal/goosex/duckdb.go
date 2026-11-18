@@ -12,13 +12,21 @@ import (
 	"github.com/pressly/goose/v3"
 	"github.com/pressly/goose/v3/database"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqlx"
 )
 
-type DuckdbStore struct{}
+type DuckdbStore struct {
+	// table tracking the applied migrations, may be qualified with a catalog, defaults to goose.DefaultTablename.
+	table string
+}
 
 func (t DuckdbStore) Tablename() string {
-	return goose.DefaultTablename
+	if t.table == "" {
+		return goose.DefaultTablename
+	}
+
+	return t.table
 }
 
 func (t DuckdbStore) CreateVersionTable(ctx context.Context, db database.DBTxConn) error {
@@ -94,9 +102,11 @@ func (t DuckdbStore) ListMigrations(ctx context.Context, db database.DBTxConn) (
 
 var m sync.Mutex
 
-func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err error) {
+func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS, opts ...Option) (err error) {
 	m.Lock()
 	defer m.Unlock()
+
+	cfg := langx.Clone(config{}, opts...)
 
 	if version, err := sqlx.String(ctx, db, "SELECT library_version FROM pragma_version()"); err != nil {
 		return err
@@ -104,29 +114,14 @@ func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err 
 		log.Println("detected duckdb", version)
 	}
 
-	if _, err := db.ExecContext(ctx, extensionSQL); err != nil {
-		return errorsx.Wrap(err, "failed to load inet extension")
-	}
-
-	if _, err := db.ExecContext(ctx, "SET GLOBAL hnsw_enable_experimental_persistence = true;"); err != nil {
-		return errorsx.Wrap(err, "failed to enable hnsw persistence")
-	}
-
-	// debugging.
-	// if _, err := db.ExecContext(ctx, "CALL enable_logging('QueryLog', storage_path = '/tmp/retrovibed.duckdb.log', storage_buffer_size = 0);"); err != nil {
-	// 	return errorsx.Wrap(err, "failed to enable query logging to stderr")
-	// }
-
-	if _, err := db.ExecContext(ctx, "FORCE CHECKPOINT;"); err != nil {
-		return errorsx.Wrap(err, "failed to checkpoint database")
-	}
-
 	mprov, err := goose.NewProvider(
 		"",
 		db,
 		migrations,
-		goose.WithStore(DuckdbStore{}),
+		goose.WithStore(DuckdbStore{table: cfg.table}),
 		goose.WithAllowOutofOrder(true),
+		// serialize migrations between processes sharing the database, see duckdbLocker.
+		goose.WithSessionLocker(newDuckdbLocker(cfg.pre, cfg.post)),
 		// goose.WithVerbose(true),
 	)
 	if err != nil {
@@ -135,10 +130,6 @@ func InitializeDatabase(ctx context.Context, db *sql.DB, migrations fs.FS) (err 
 
 	if _, err := mprov.Up(ctx); err != nil {
 		return errorsx.Wrap(err, "unable to run migrations")
-	}
-
-	if _, err := db.ExecContext(ctx, "FORCE CHECKPOINT;"); err != nil {
-		return errorsx.Wrap(err, "failed to checkpoint database")
 	}
 
 	return nil

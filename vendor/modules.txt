@@ -458,9 +458,13 @@ github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
-# github.com/egdaemon/duckproxy v0.0.0-20261114115105-8cd7c751218f
+# github.com/egdaemon/duckproxy v0.0.0-20261118154833-a9dd281813bb
 ## explicit; go 1.27.2
+github.com/egdaemon/duckproxy/duckgres
 github.com/egdaemon/duckproxy/duckproxy
+github.com/egdaemon/duckproxy/duckserve
+github.com/egdaemon/duckproxy/duckshare
+github.com/egdaemon/duckproxy/internal/errorsx
 # github.com/egdaemon/eg v0.0.0-20261117185627-84b59eef4eea
 ## explicit; go 1.27.2
 github.com/egdaemon/eg

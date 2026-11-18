@@ -52,7 +52,10 @@ func TestCacheMigrationSyncIDPopulatedTable(t *testing.T) {
 
 	// reopen with the full migration set, applying the sync_id migration to
 	// the existing rows.
-	db, err = migrateCache(ctx, path)
+	migrations, err := fs.Sub(embedmigrationscache, ".migrations.cache")
+	require.NoError(t, err)
+
+	db, err = InitializeDatabase(ctx, path, migrations)
 	require.NoError(t, err)
 	defer db.Close()
 

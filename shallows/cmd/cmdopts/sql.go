@@ -3,19 +3,21 @@ package cmdopts
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
 	"embed"
 	"fmt"
 	"io/fs"
 	"log"
-	"os"
 	"path/filepath"
 	"time"
 
-	_ "github.com/duckdb/duckdb-go/v2"
+	duckdb "github.com/duckdb/duckdb-go/v2"
+	"github.com/egdaemon/duckproxy/duckshare"
 
 	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/retroapi/userx"
+	"github.com/retrovibed/retrovibed/shallows/internal/fsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/goosex"
 )
 
@@ -39,22 +41,49 @@ func Database(ctx context.Context) (db *sql.DB, err error) {
 
 // DatabaseCustom opens metapath, opens and migrates cachepath, and attaches
 // cachepath onto the metapath connection under the "cache" catalog. See
-// AttachCache and DatabaseCache.
+// DatabaseCache.
+//
+// cache.db is never opened directly: duckdb only allows a single process to have
+// a file open, so the meta.db connector is shared between processes (see
+// shared) and the cache is attached to, and migrated through, that one
+// instance.
 func DatabaseCustom(ctx context.Context, metapath, cachepath string) (db *sql.DB, err error) {
-	if db, err = DatabaseMetaCustom(ctx, metapath); err != nil {
+	// attaching doesn't create the directory of the cache.
+	if err = fsx.MkDirs(0700, filepath.Dir(metapath), filepath.Dir(cachepath)); err != nil {
 		return nil, err
 	}
 
-	cachedb, err := migrateCache(ctx, cachepath)
+	// the cache is attached by the connector, not once after opening, because the
+	// attachment is lost when the process owning the shared file exits and
+	// another takes over, see duckshare.WithInit.
+	connector, err := shared(metapath, fmt.Sprintf("ATTACH IF NOT EXISTS '%s' AS cache;", cachepath))
 	if err != nil {
 		return nil, err
 	}
 
-	if err = cachedb.Close(); err != nil {
+	if db, err = initialize(ctx, connector, errorsx.Must(fs.Sub(embedmigrations, ".migrations"))); err != nil {
 		return nil, err
 	}
 
-	if err = AttachCache(ctx, db, "cache", cachepath); err != nil {
+	defer func() {
+		if err == nil {
+			return
+		}
+		debugx.Println("closing database due to error during initialization", err)
+		errorsx.Log(db.Close())
+	}()
+
+	// the version table is qualified because goose checks for pending migrations
+	// on a connection whose default catalog is meta. USE makes the unqualified
+	// statements of the migrations, and the migration lock, apply to the cache.
+	err = goosex.InitializeDatabase(
+		ctx,
+		db,
+		errorsx.Must(fs.Sub(embedmigrationscache, ".migrations.cache")),
+		goosex.WithTableName("cache.goose_db_version"),
+		goosex.WithPreStatements("USE cache;"),
+	)
+	if err != nil {
 		return nil, err
 	}
 
@@ -65,20 +94,58 @@ func DatabaseMetaCustom(ctx context.Context, path string) (db *sql.DB, err error
 	return InitializeDatabase(ctx, path, errorsx.Must(fs.Sub(embedmigrations, ".migrations")))
 }
 
-// InitializeDatabase opens path, creating its parent directory if necessary, and
-// applies migrations. Shared by DatabaseCustom (meta.db) and DatabaseCache
-// (cache.db) so the two databases are opened and initialized identically,
-// differing only in which migration set they apply.
-func InitializeDatabase(ctx context.Context, path string, migrations fs.FS) (db *sql.DB, err error) {
-	log.Println("database path", path)
+// shared returns a connector for the duckdb file at path which lets concurrent
+// processes use it, the first to connect owns the file and serves it to the
+// others (see duckshare). init statements run on every connection the owner
+// opens to the file, they must be safe to repeat. an empty path is a private
+// in-memory database.
+func shared(path string, init ...string) (driver.Connector, error) {
+	log.Printf("database path: '%s'\n", path)
 
-	if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {
+	// state held by the duckdb instance, restored whenever a process takes the
+	// shared file over.
+	init = append([]string{
+		extensionSQL,
+		"SET GLOBAL hnsw_enable_experimental_persistence = true;",
+		// debugging.
+		// "CALL enable_logging('QueryLog', storage_path = '/tmp/retrovibed.duckdb.log', storage_buffer_size = 0);",
+	}, init...)
+
+	if path == "" {
+		return duckdb.NewConnector("", func(execer driver.ExecerContext) error {
+			for _, stmt := range init {
+				if _, err := execer.ExecContext(context.Background(), stmt, nil); err != nil {
+					return errorsx.Wrap(err, "unable to initialize the connection")
+				}
+			}
+
+			return nil
+		})
+	}
+
+	if err := fsx.MkDirs(0700, filepath.Dir(path)); err != nil {
 		return nil, err
 	}
 
-	if db, err = sql.Open("duckdb", path); err != nil {
-		return nil, errorsx.Wrap(err, "unable to open db")
+	return duckshare.New(userx.DefaultRuntimeDirectory(userx.DefaultRelRoot()), path, duckshare.WithInit(init...)), nil
+}
+
+// InitializeDatabase opens path, creating its parent directory if necessary, and
+// applies migrations. Shared by DatabaseMetaCustom (meta.db) and tests so
+// databases are opened and initialized identically, differing only in which
+// migration set they apply.
+func InitializeDatabase(ctx context.Context, path string, migrations fs.FS, opts ...goosex.Option) (db *sql.DB, err error) {
+	connector, err := shared(path)
+	if err != nil {
+		return nil, err
 	}
+
+	return initialize(ctx, connector, migrations, opts...)
+}
+
+// initialize opens connector and applies migrations.
+func initialize(ctx context.Context, connector driver.Connector, migrations fs.FS, opts ...goosex.Option) (db *sql.DB, err error) {
+	db = sql.OpenDB(connector)
 
 	// duckdb-go caches returned connections as idle rather than actually closing
 	// them, which leaves their underlying DuckDB session (and whatever MVCC/index
@@ -96,7 +163,15 @@ func InitializeDatabase(ctx context.Context, path string, migrations fs.FS) (db 
 		errorsx.Log(db.Close())
 	}()
 
-	return db, goosex.InitializeDatabase(ctx, db, migrations)
+	if err = Checkpoint(ctx, db); err != nil {
+		return db, err
+	}
+
+	if err = goosex.InitializeDatabase(ctx, db, migrations, opts...); err != nil {
+		return db, err
+	}
+
+	return db, Checkpoint(ctx, db)
 }
 
 // .migrations.cache holds the schema for cache.db: data that is rebuildable
@@ -108,35 +183,16 @@ func InitializeDatabase(ctx context.Context, path string, migrations fs.FS) (db 
 var embedmigrationscache embed.FS
 
 // DatabaseCache opens and migrates path (see .migrations.cache) and attaches it
-// under the "cache" catalog of an otherwise empty in-memory database, with no
-// dependency on a meta database. Cache-resident tables (e.g.
-// library_known_media) are referenced fully qualified as cache.<table> (or
-// "cache"."<table>" for INSERT/UPDATE/DELETE targets) throughout the
+// under the "cache" catalog of the default meta.db. The cache is only ever
+// opened through meta.db, so concurrent commands (and the daemon) share the one
+// instance rather than contending for the cache file. Cache-resident tables
+// (e.g. library_known_media) are referenced fully qualified as cache.<table>
+// (or "cache"."<table>" for INSERT/UPDATE/DELETE targets) throughout the
 // genieql-generated code. A database's catalog is named after its file, so
 // attaching from a separate instance is what makes those queries resolve for
 // any path rather than only one named cache.db.
 func DatabaseCache(ctx context.Context, path string) (db *sql.DB, err error) {
-	return DatabaseCustom(ctx, "", path)
-}
-
-// migrateCache opens and migrates path (see .migrations.cache) as its own
-// standalone database, whose catalog is named after its file.
-func migrateCache(ctx context.Context, path string) (db *sql.DB, err error) {
-	return InitializeDatabase(ctx, path, errorsx.Must(fs.Sub(embedmigrationscache, ".migrations.cache")))
-}
-
-// AttachCache attaches cachepath (see DatabaseCache) onto db under the
-// "cache" catalog. ATTACH is instance-wide — shared by every connection
-// duckdb's pool opens against the same file, not just the one that issued it
-// — so this only needs to run once per db; IF NOT EXISTS keeps a repeat call
-// a no-op instead of an "already attached" error.
-func AttachCache(ctx context.Context, db *sql.DB, name, path string) (err error) {
-	attach := fmt.Sprintf("ATTACH IF NOT EXISTS '%s' AS %s;", path, name)
-	if _, err = db.ExecContext(ctx, attach); err != nil {
-		return errorsx.Wrap(err, "unable to attach cache database")
-	}
-
-	return nil
+	return DatabaseCustom(ctx, userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db"), path)
 }
 
 func Checkpoint(ctx context.Context, db *sql.DB) (err error) {

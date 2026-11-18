@@ -99,15 +99,14 @@ func TestFeedGeneration(t *testing.T) {
 		)
 		defer done()
 
-		known := library.Known{
-			ID:            knownID,
-			UID:           knownID,
-			Md5:           uuidx.NewV4().String(),
-			Title:         "Test Movie",
-			OriginalTitle: "Test Movie Original",
-			Overview:      "A test movie for feed generation",
-			ParentUID:     uuidx.Nil().String(),
-		}
+		var known library.Known
+		require.NoError(t, testx.Fake(&known, library.KnownOptionTestDefaults, func(k *library.Known) {
+			k.ID = knownID
+			k.UID = knownID
+			k.Title = "Test Movie"
+			k.OriginalTitle = "Test Movie Original"
+			k.Overview = "A test movie for feed generation"
+		}))
 		require.NoError(t, library.KnownInsertWithDefaults(ctx, q, known).Scan(&known))
 
 		var lmd1 library.Metadata
