@@ -12,13 +12,17 @@ Wireguard _wireguard({
   return Wireguard(id: id, description: description, port: port);
 }
 
+// Edit is hosted inside a scrollable list in the app, so mirror that here;
+// the full form is taller than the default test viewport.
+Widget _host(Widget child) {
+  return Scaffold(body: SingleChildScrollView(child: child));
+}
+
 void main() {
   group('Edit Widget Tests', () {
     group('layout', () {
       testWidgets('renders without overflow', (WidgetTester tester) async {
-        await tester.pumpApp(
-          Scaffold(body: Edit(_wireguard())),
-        );
+        await tester.pumpApp(_host(Edit(_wireguard())));
         await tester.pumpAndSettle();
 
         expect(tester.takeException(), isNull);
@@ -42,9 +46,7 @@ void main() {
       testWidgets('displays description and port fields', (
         WidgetTester tester,
       ) async {
-        await tester.pumpApp(
-          Scaffold(body: Edit(_wireguard())),
-        );
+        await tester.pumpApp(_host(Edit(_wireguard())));
         await tester.pumpAndSettle();
 
         expect(find.text('test config'), findsOneWidget);
@@ -54,9 +56,7 @@ void main() {
       });
 
       testWidgets('displays delete button', (WidgetTester tester) async {
-        await tester.pumpApp(
-          Scaffold(body: Edit(_wireguard())),
-        );
+        await tester.pumpApp(_host(Edit(_wireguard())));
         await tester.pumpAndSettle();
 
         expect(find.byIcon(Icons.delete), findsOneWidget);
@@ -70,8 +70,8 @@ void main() {
         Wireguard? changed;
 
         await tester.pumpApp(
-          Scaffold(
-            body: Edit(
+          _host(
+            Edit(
               _wireguard(),
               onChange: (o, wg) async => changed = wg,
             ),
@@ -92,8 +92,8 @@ void main() {
         Wireguard? changed;
 
         await tester.pumpApp(
-          Scaffold(
-            body: Edit(
+          _host(
+            Edit(
               _wireguard(),
               onChange: (o, wg) async => changed = wg,
             ),
@@ -114,8 +114,8 @@ void main() {
         Wireguard? changed;
 
         await tester.pumpApp(
-          Scaffold(
-            body: Edit(
+          _host(
+            Edit(
               _wireguard(),
               onChange: (o, wg) async => changed = wg,
             ),
@@ -130,9 +130,7 @@ void main() {
       });
 
       testWidgets('handles default onChange', (WidgetTester tester) async {
-        await tester.pumpApp(
-          Scaffold(body: Edit(_wireguard())),
-        );
+        await tester.pumpApp(_host(Edit(_wireguard())));
         await tester.pumpAndSettle();
 
         final descField = find.widgetWithText(TextFormField, 'test config');

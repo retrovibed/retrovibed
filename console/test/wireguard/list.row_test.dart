@@ -91,7 +91,9 @@ void main() {
       testWidgets('tapping row toggles edit panel visibility', (
         WidgetTester tester,
       ) async {
-        await tester.pumpApp(ListRow(_wireguard()));
+        // Rows live in a scrollable list in the app; the expanded Edit
+        // form is taller than the test viewport.
+        await tester.pumpApp(SingleChildScrollView(child: ListRow(_wireguard())));
         await tester.pumpAndSettle();
 
         // Tap the row to expand
@@ -116,7 +118,7 @@ void main() {
       testWidgets('expanded panel contains Edit widget', (
         WidgetTester tester,
       ) async {
-        await tester.pumpApp(ListRow(_wireguard()));
+        await tester.pumpApp(SingleChildScrollView(child: ListRow(_wireguard())));
         await tester.pumpAndSettle();
 
         await tester.tap(find.text('test config').first);
