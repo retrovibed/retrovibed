@@ -1,6 +1,6 @@
 import 'package:uuid/uuid.dart' as uuid;
 import 'package:retrovibed/uuidx.dart' as uuidx;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import './media.pb.dart';
 

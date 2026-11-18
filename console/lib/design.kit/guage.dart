@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class Gauge extends StatelessWidget {
   /// The percentage of the gauge that should be filled (0.0 to 1.0).

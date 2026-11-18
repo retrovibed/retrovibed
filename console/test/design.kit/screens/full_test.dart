@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/design.kit/screens/full.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 import 'package:retrovibed/windowx.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:window_manager/legacy.dart';
 
 void main() {
   group('Full initial state', () {

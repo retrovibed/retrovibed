@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/design.kit/forms.dart' as forms;

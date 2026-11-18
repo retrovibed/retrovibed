@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart' as m;
+import 'package:material_ui/material_ui.dart' as m;
 import 'package:retrovibed/design.kit/theme.defaults.dart' as theming;
 
 class Container extends m.StatelessWidget {

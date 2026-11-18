@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:fixnum/fixnum.dart' as fixnum;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/remote/api.dart' as remote;
 import 'package:retrovibed/remote/player.control.playback.dart';

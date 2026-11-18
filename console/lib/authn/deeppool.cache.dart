@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/meta.dart' as _meta;
 import 'package:retrovibed/meta/api.deeppool.dart' as deeppool;
 import 'package:retrovibed/billing/api.dart' as billing;

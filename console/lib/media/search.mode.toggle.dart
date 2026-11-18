@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'search.mode.dart';
 
 // Reused by the library, discovery, and remote search trays to switch

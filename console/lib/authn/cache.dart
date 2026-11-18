@@ -1,5 +1,5 @@
 import 'package:fixnum/fixnum.dart' as fixnum;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/meta.dart' as _meta;
 import 'package:retrovibed/httpx.dart' as httpx;

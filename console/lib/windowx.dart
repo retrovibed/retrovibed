@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:window_manager/window_manager.dart';
-
+import 'package:window_manager/legacy.dart';
 typedef FnVoid = Future<void> Function();
 typedef FnBool = Future<bool> Function();
 typedef FnSetFullScreen = Future<void> Function(bool);

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/retrovibed.dart' as retro;
 
 bool _isMetered(List<ConnectivityResult> results) {

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 // Poll calls [onTick] every [interval] until it resolves true, then stops.
 // interval == Duration.zero means disabled: no timer runs. Switching interval

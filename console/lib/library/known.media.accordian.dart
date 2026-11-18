@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'api.dart' as api;
 import 'known.media.typography.dart';

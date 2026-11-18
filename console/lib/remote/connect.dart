@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:fixnum/fixnum.dart' as fixnum;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:retrovibed/authn.dart' as authn;

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:retrovibed/media.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
 import 'package:retrovibed/mimex.dart' as mimex;
 import 'package:retrovibed/authn.dart' as authn;

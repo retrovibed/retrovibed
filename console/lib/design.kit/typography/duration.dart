@@ -1,5 +1,5 @@
 import 'dart:core' as core;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 typedef DurationFormatter = Widget Function(core.Duration duration);
 

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:qs_dart/qs_dart.dart' as qs;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media/media.pb.dart';

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:window_manager/legacy.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/authn/login.dart' as login;
 import 'package:retrovibed/windowx.dart';

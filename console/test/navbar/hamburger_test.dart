@@ -1,49 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/navbar/hamburger.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
+import 'package:retrovibed/windowx.dart';
 
 List<String> _calls = [];
 bool _maximized = false;
 
-void _mockWindowManager() {
-  _calls = [];
-  _maximized = false;
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-      .setMockMethodCallHandler(
-    const MethodChannel('window_manager'),
-    (call) async {
-      _calls.add(call.method);
-      switch (call.method) {
-        case 'isMaximized':
-          return _maximized;
-        case 'maximize':
-          _maximized = true;
-          return null;
-        case 'unmaximize':
-          _maximized = false;
-          return null;
-        case 'close':
-          return null;
-        default:
-          return null;
-      }
-    },
-  );
-}
-
-void _clearMock() {
-  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-      .setMockMethodCallHandler(
-    const MethodChannel('window_manager'),
-    null,
-  );
-}
-
 void main() {
-  setUp(_mockWindowManager);
-  tearDown(_clearMock);
+  setUp(() {
+    _calls = [];
+    _maximized = false;
+  });
 
   Future<void> openMenu(WidgetTester tester) async {
     await tester.tap(find.byIcon(Icons.menu));
@@ -52,14 +20,14 @@ void main() {
 
   group('Hamburger rendering', () {
     testWidgets('renders menu icon', (WidgetTester tester) async {
-      await tester.pumpApp(Hamburger());
+      await tester.pumpApp(Hamburger(windowManager: WindowManagerX.fake(calls: _calls, maximized: _maximized)));
       await tester.pumpAndSettle();
       expect(find.byIcon(Icons.menu), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders as PopupMenuButton', (WidgetTester tester) async {
-      await tester.pumpApp(Hamburger());
+      await tester.pumpApp(Hamburger(windowManager: WindowManagerX.fake(calls: _calls, maximized: _maximized)));
       await tester.pumpAndSettle();
       expect(find.byType(PopupMenuButton<String>), findsOneWidget);
       expect(tester.takeException(), isNull);
@@ -68,7 +36,7 @@ void main() {
 
   group('Hamburger menu items', () {
     testWidgets('shows three items when opened', (WidgetTester tester) async {
-      await tester.pumpApp(Hamburger());
+      await tester.pumpApp(Hamburger(windowManager: WindowManagerX.fake(calls: _calls, maximized: _maximized)));
       await tester.pumpAndSettle();
       await openMenu(tester);
 
@@ -79,7 +47,7 @@ void main() {
     });
 
     testWidgets('shows correct icons', (WidgetTester tester) async {
-      await tester.pumpApp(Hamburger());
+      await tester.pumpApp(Hamburger(windowManager: WindowManagerX.fake(calls: _calls, maximized: _maximized)));
       await tester.pumpAndSettle();
       await openMenu(tester);
 
@@ -91,7 +59,7 @@ void main() {
 
     testWidgets('shows Minimize when maximized', (WidgetTester tester) async {
       _maximized = true;
-      await tester.pumpApp(Hamburger());
+      await tester.pumpApp(Hamburger(windowManager: WindowManagerX.fake(calls: _calls, maximized: _maximized)));
       await tester.pumpAndSettle();
       await openMenu(tester);
 
@@ -105,7 +73,7 @@ void main() {
     testWidgets('maximize calls windowManager.maximize', (
       WidgetTester tester,
     ) async {
-      await tester.pumpApp(Hamburger());
+      await tester.pumpApp(Hamburger(windowManager: WindowManagerX.fake(calls: _calls, maximized: _maximized)));
       await tester.pumpAndSettle();
       _calls.clear();
       await openMenu(tester);
@@ -120,7 +88,7 @@ void main() {
       WidgetTester tester,
     ) async {
       _maximized = true;
-      await tester.pumpApp(Hamburger());
+      await tester.pumpApp(Hamburger(windowManager: WindowManagerX.fake(calls: _calls, maximized: _maximized)));
       await tester.pumpAndSettle();
       _calls.clear();
       await openMenu(tester);
@@ -134,7 +102,7 @@ void main() {
     testWidgets('exit calls windowManager.close', (
       WidgetTester tester,
     ) async {
-      await tester.pumpApp(Hamburger());
+      await tester.pumpApp(Hamburger(windowManager: WindowManagerX.fake(calls: _calls, maximized: _maximized)));
       await tester.pumpAndSettle();
       _calls.clear();
       await openMenu(tester);

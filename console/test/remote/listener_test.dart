@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:fixnum/fixnum.dart' as fixnum;
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:retrovibed/authn.dart' as authn;
@@ -16,6 +15,7 @@ import 'package:retrovibed/remote/api.dart' as remote;
 import 'package:retrovibed/remote/listener.dart';
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 import 'package:retrovibed/uuidx.dart' as uuidx;
+import 'package:retrovibed/windowx.dart';
 
 class _FakeRemoteControlSocket implements remote.RemoteControlSocket {
   final StreamController<remote.Stream> _incoming = StreamController();
@@ -157,6 +157,7 @@ void main() {
     bool withPlaylist = true,
     bool withFull = false,
     media.PlaylistControl? fakePlaylist,
+    WindowManagerX? windowManager,
   }) async {
     final fakeSocket = _FakeRemoteControlSocket();
     late BuildContext capturedContext;
@@ -184,7 +185,7 @@ void main() {
       child,
     );
 
-    if (withFull) tree = ds.Full(tree);
+    if (withFull) tree = ds.Full(tree, windowManager: windowManager);
 
     await tester.pumpApp(authzCurrent: fixedAuth, tree);
     await _settle(tester);
@@ -1124,21 +1125,13 @@ void main() {
 
     testWidgets('with a Full ancestor mounted, toggles and reports the flip', (tester) async {
       final calls = <String>[];
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-        const MethodChannel('window_manager'),
-        (call) async {
-          calls.add(call.method);
-          return null;
-        },
-      );
-      addTearDown(() {
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-          const MethodChannel('window_manager'),
-          null,
-        );
-      });
 
-      final (fakeSocket, _) = await mount(tester, withPlaylist: false, withFull: true);
+      final (fakeSocket, _) = await mount(
+        tester,
+        withPlaylist: false,
+        withFull: true,
+        windowManager: WindowManagerX.fake(calls: calls),
+      );
 
       fakeSocket.emit(
         remote.Stream(
@@ -1171,18 +1164,12 @@ void main() {
     });
 
     testWidgets('sid ordering guard', (tester) async {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-        const MethodChannel('window_manager'),
-        (call) async => null,
+      final (fakeSocket, context) = await mount(
+        tester,
+        withPlaylist: false,
+        withFull: true,
+        windowManager: WindowManagerX.fake(),
       );
-      addTearDown(() {
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-          const MethodChannel('window_manager'),
-          null,
-        );
-      });
-
-      final (fakeSocket, context) = await mount(tester, withPlaylist: false, withFull: true);
 
       await expectSidGuarded(
         tester,
@@ -1197,18 +1184,12 @@ void main() {
     testWidgets('works even without a Playlist ancestor - unlike the other five guarded/unguarded commands', (
       tester,
     ) async {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-        const MethodChannel('window_manager'),
-        (call) async => null,
+      final (fakeSocket, context) = await mount(
+        tester,
+        withPlaylist: false,
+        withFull: true,
+        windowManager: WindowManagerX.fake(),
       );
-      addTearDown(() {
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
-          const MethodChannel('window_manager'),
-          null,
-        );
-      });
-
-      final (fakeSocket, context) = await mount(tester, withPlaylist: false, withFull: true);
 
       fakeSocket.emit(
         remote.Stream(

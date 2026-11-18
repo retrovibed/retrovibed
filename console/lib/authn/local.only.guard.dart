@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/meta.dart' as _meta;
 import 'package:retrovibed/authz.dart' as authz;
 import 'cache.dart';

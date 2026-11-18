@@ -1,5 +1,5 @@
 import 'package:fixnum/fixnum.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/authn.dart' as authn;
 import 'package:retrovibed/design.kit/forms.dart' as forms;
 import 'package:retrovibed/designkit.dart' as ds;

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/authz.dart' as authz;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn/developer.mode.dart';

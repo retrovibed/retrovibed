@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/gestures.dart' show kDoubleTapMinTime;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -44,7 +44,14 @@ extension WidgetTesterExtensions on WidgetTester {
     caching.setglobal(caching.DirsWellKnown(cache: tempDir.path));
  
 
-    await _loadRoboto();
+    // loading the font notifies a system fonts change which schedules a frame callback;
+    // run it in real async and drain the frame so it isn't reported as a leaked animation.
+    // the fontsChange handler is async and its continuation runs as a microtask in the
+    // test's fake-async zone; flush those (idle) so the frame callback it schedules
+    // exists before pump() drains it.
+    await runAsync(_loadRoboto);
+    await idle();
+    await pump();
     final base = theme ?? ThemeData();
     final defaultTextButtonStyle = TextButton.styleFrom(
       enabledMouseCursor: SystemMouseCursors.click,

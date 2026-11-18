@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/media/media.pb.dart';
 import 'package:retrovibed/media/media.known.pb.dart';

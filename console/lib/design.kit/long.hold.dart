@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 // Fires [onHold] after [duration] of continuous pointer contact.
 // Cancels silently if the pointer is lifted or cancelled before [duration].
