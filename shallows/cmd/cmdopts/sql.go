@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"log"
 	"path/filepath"
+	"strings"
 	"time"
 
 	duckdb "github.com/duckdb/duckdb-go/v2"
@@ -183,15 +184,32 @@ func initialize(ctx context.Context, connector driver.Connector, migrations fs.F
 var embedmigrationscache embed.FS
 
 // DatabaseCache opens and migrates path (see .migrations.cache) and attaches it
-// under the "cache" catalog of the default meta.db. The cache is only ever
-// opened through meta.db, so concurrent commands (and the daemon) share the one
-// instance rather than contending for the cache file. Cache-resident tables
-// (e.g. library_known_media) are referenced fully qualified as cache.<table>
+// under the "cache" catalog of a private in-memory meta database. Cache-resident
+// tables (e.g. library_known_media) are referenced fully qualified as cache.<table>
 // (or "cache"."<table>" for INSERT/UPDATE/DELETE targets) throughout the
-// genieql-generated code. A database's catalog is named after its file, so
-// attaching from a separate instance is what makes those queries resolve for
-// any path rather than only one named cache.db.
+// genieql-generated code, attaching is what makes those queries resolve for any
+// path rather than only one named cache.db.
+//
+// the meta database is private rather than the shared meta.db: attaching is skipped
+// when another process already owns the shared meta.db with a different file attached
+// as "cache", which would run the migrations and writes against that process's cache
+// instead, and leave this path unmigrated when ownership is taken over.
+//
+// the exception is the default cache when something else (the daemon) has the file
+// locked: duckdb only allows a single process to have a file open, so that case falls
+// back to attaching through the shared meta.db the daemon serves.
 func DatabaseCache(ctx context.Context, path string) (db *sql.DB, err error) {
+	db, err = DatabaseCustom(ctx, "", path)
+	if err == nil || !strings.Contains(err.Error(), "Could not set lock on file") {
+		return db, err
+	}
+
+	if filepath.Clean(path) != filepath.Clean(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "cache.db")) {
+		return nil, err
+	}
+
+	log.Println("cache is locked by another process, falling back to the shared meta database", err)
+
 	return DatabaseCustom(ctx, userx.DefaultConfigDir(userx.DefaultRelRoot(), "meta.db"), path)
 }
 
