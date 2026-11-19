@@ -22,7 +22,6 @@ func BuildVersion() (_ string, err error) {
 		info *debug.BuildInfo
 		ts   time.Time
 		id   string
-		// dirty bool
 	)
 
 	if info, ok = debug.ReadBuildInfo(); ok {
