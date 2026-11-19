@@ -186,7 +186,8 @@ func (t goldensync) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID) (err error) 
 		}
 	}
 
-	log.Println("syncing media metadata from", t.Sync)
+	log.Println("media metadata sync from", t.Sync, "initiated")
+	defer log.Println("media metadata sync from", t.Sync, "completed")
 
 	httpc, err := cmdopts.DeeppoolClientDefault{SSHID: sshid, Global: gctx}.HTTPClient(gctx.Context)
 	if err != nil {
