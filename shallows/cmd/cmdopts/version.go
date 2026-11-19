@@ -5,6 +5,15 @@ import (
 	"fmt"
 	"runtime/debug"
 	"time"
+
+	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/shallows/internal/langx"
+	"github.com/retrovibed/retrovibed/shallows/internal/timex"
+)
+
+var (
+	Treeish          = ""
+	TreeishTimestamp = "" // RFC3339 commit time, used when vcs.time is unavailable (-buildvcs=false).
 )
 
 func BuildVersion() (_ string, err error) {
@@ -31,6 +40,9 @@ func BuildVersion() (_ string, err error) {
 				}
 			}
 		}
+
+		ts = timex.FirstNonZero(ts, errorsx.ZeroSilent(time.Parse(time.RFC3339, TreeishTimestamp)))
+		id = langx.FirstNonZero(id, Treeish)
 
 		return fmt.Sprintf("%s %s %s", info.Main.Path, ts.Format("2006-01-02"), id), nil
 	}
