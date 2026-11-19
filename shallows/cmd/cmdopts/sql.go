@@ -66,13 +66,14 @@ func DatabaseCustom(ctx context.Context, metapath, cachepath string) (db *sql.DB
 		return nil, err
 	}
 
-	defer func() {
+	defer func(db *sql.DB) {
 		if err == nil {
 			return
 		}
+
 		debugx.Println("closing database due to error during initialization", err)
 		errorsx.Log(db.Close())
-	}()
+	}(db)
 
 	// the version table is qualified because goose checks for pending migrations
 	// on a connection whose default catalog is meta. USE makes the unqualified
