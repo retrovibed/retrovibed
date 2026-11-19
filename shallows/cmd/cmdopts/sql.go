@@ -199,14 +199,19 @@ var embedmigrationscache embed.FS
 // the exception is the default cache when something else (the daemon) has the file
 // locked: duckdb only allows a single process to have a file open, so that case falls
 // back to attaching through the shared meta.db the daemon serves.
+//
+// any other path gets a meta database of its own next to it (path + ".proxy") which is
+// shared between processes (see shared), so commands piped together, i.e.) golden sync
+// into import, use the cache through whichever of them owns it instead of fighting
+// over the file lock.
 func DatabaseCache(ctx context.Context, path string) (db *sql.DB, err error) {
+	if filepath.Clean(path) != filepath.Clean(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "cache.db")) {
+		return DatabaseCustom(ctx, path+".proxy", path)
+	}
+
 	db, err = DatabaseCustom(ctx, "", path)
 	if err == nil || !strings.Contains(err.Error(), "Could not set lock on file") {
 		return db, err
-	}
-
-	if filepath.Clean(path) != filepath.Clean(userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "cache.db")) {
-		return nil, err
 	}
 
 	log.Println("cache is locked by another process, falling back to the shared meta database", err)

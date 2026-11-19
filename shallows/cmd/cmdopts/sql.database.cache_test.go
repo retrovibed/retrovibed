@@ -9,7 +9,7 @@ import (
 )
 
 func TestDatabaseCache(t *testing.T) {
-	t.Run("opens and migrates the path privately", func(t *testing.T) {
+	t.Run("opens and migrates the path", func(t *testing.T) {
 		ctx, done := testx.Context(t)
 		defer done()
 
@@ -19,5 +19,23 @@ func TestDatabaseCache(t *testing.T) {
 
 		var n int
 		require.NoError(t, db.QueryRowContext(ctx, "SELECT COUNT(*) FROM cache.library_known_media").Scan(&n))
+	})
+
+	t.Run("a second handle on the same path shares the first", func(t *testing.T) {
+		ctx, done := testx.Context(t)
+		defer done()
+
+		path := filepath.Join(t.TempDir(), "other.db")
+
+		first, err := DatabaseCache(ctx, path)
+		require.NoError(t, err)
+		defer first.Close()
+
+		second, err := DatabaseCache(ctx, path)
+		require.NoError(t, err)
+		defer second.Close()
+
+		var n int
+		require.NoError(t, second.QueryRowContext(ctx, "SELECT COUNT(*) FROM cache.library_known_media").Scan(&n))
 	})
 }
