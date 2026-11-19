@@ -3,9 +3,9 @@ module eg/compute
 go 1.27.2
 
 require (
-	github.com/egdaemon/eg v0.0.0-20261117185627-84b59eef4eea
+	github.com/egdaemon/eg v0.0.0-20261119061624-8b6a1b6e02ae
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d
-	golang.org/x/net v0.62.0
+	golang.org/x/net v0.63.0
 	google.golang.org/api v0.307.0
 )
 
@@ -51,7 +51,7 @@ require (
 	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/gofrs/uuid/v5 v5.5.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
-	github.com/google/pprof v0.0.0-20261111200114-fac431ef4d26 // indirect
+	github.com/google/pprof v0.0.0-20261118010117-084b33a85f63 // indirect
 	github.com/google/s2a-go v0.1.11 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.23 // indirect
@@ -90,7 +90,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.47.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
-	golang.org/x/crypto v0.58.0 // indirect
+	golang.org/x/crypto v0.59.0 // indirect
 	golang.org/x/exp v0.0.0-20261113113407-e3970619a1a4 // indirect
 	golang.org/x/mod v0.43.0 // indirect
 	golang.org/x/oauth2 v0.37.0 // indirect
@@ -98,7 +98,7 @@ require (
 	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/text v0.44.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
-	golang.org/x/tools v0.52.1-0.20261117052324-6bc5e25e1abb // indirect
+	golang.org/x/tools v0.53.0 // indirect
 	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261005182115-fad411399dd8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect

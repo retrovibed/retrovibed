@@ -20,9 +20,9 @@ require (
 	github.com/porfirion/trie v1.0.0
 	github.com/stretchr/testify v1.12.1
 	github.com/tetratelabs/wazero v1.12.0
-	golang.org/x/crypto v0.58.0
+	golang.org/x/crypto v0.59.0
 	golang.org/x/exp v0.0.0-20261113113407-e3970619a1a4
-	golang.org/x/net v0.62.0
+	golang.org/x/net v0.63.0
 	golang.org/x/oauth2 v0.37.0
 	golang.org/x/sys v0.50.0
 	golang.org/x/text v0.44.0
@@ -51,7 +51,7 @@ require (
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/pprof v0.0.0-20261111200114-fac431ef4d26 // indirect
+	github.com/google/pprof v0.0.0-20261118010117-084b33a85f63 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/mdlayher/socket v0.6.0 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect

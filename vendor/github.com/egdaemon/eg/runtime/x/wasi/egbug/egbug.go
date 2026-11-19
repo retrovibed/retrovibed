@@ -126,7 +126,7 @@ func Env(ctx context.Context, op eg.Op) error {
 }
 
 // debugging information for system initialization
-func SystemInit(ctx context.Context, op eg.Op) error {
+func SystemdServices(ctx context.Context, op eg.Op) error {
 	return shell.Run(
 		ctx,
 		shell.New("systemctl list-units --failed").Privileged().Timeout(time.Second),
@@ -156,7 +156,7 @@ func APTPackage(packages ...string) eg.OpFn {
 
 const (
 	EnvUnsafeDigest = "EG_UNSAFE_ENVVARS_DIGEST"
-	defaultDigest   = "6b4c189e90a5594dfc7a39ce45ce4959"
+	defaultDigest   = "eb18ef2ce42cb3f0ee3d2635cafcd5a7"
 )
 
 //go:embed default.env
@@ -221,6 +221,7 @@ func normalizeEnv(environ *envx.Builder) *envx.Builder {
 	environ.Setenv(_eg.EnvComputeGPU, "false")
 	environ.Setenv(_eg.EnvComputeGuestMigrationsEnabled, "true")
 	environ.Setenv(_eg.EnvComputeTTL, "0s")
+	environ.Setenv(_eg.EnvComputeEnvironToken, "")
 	environ.Setenv(_eg.EnvComputeWorkload, "")
 	environ.Unsetenv(_eg.EnvComputeWorkloadName) // not part of default.env, removed so the digest is unchanged.
 	environ.Setenv(_eg.EnvComputeProfileMode, "")
@@ -232,6 +233,7 @@ func normalizeEnv(environ *envx.Builder) *envx.Builder {
 	environ.Setenv(_eg.EnvGitHeadRef, "HEAD")
 	environ.Setenv(_eg.EnvGitBaseVCS, "git@github.com:egdaemon/eg.git")
 	environ.Setenv(_eg.EnvComputeEnvironToken, "0000000000000000000000000000000000000000")
+	environ.Setenv("TERM", "") // depends on the launching terminal.
 
 	// normalize standard directories.
 	normalizedirprefix(_eg.EnvComputeWorkloadDirectory)
@@ -261,6 +263,14 @@ func normalizeEnv(environ *envx.Builder) *envx.Builder {
 	environ.Unsetenv("SSH_AUTH_SOCK")
 	environ.Unsetenv("GNUPGHOME")
 	environ.Unsetenv("_")
+
+	// git identity is injected from the launching user's config, see gitx.UserEnv.
+	for _, v := range os.Environ() {
+		if k, _, _ := strings.Cut(v, "="); strings.HasPrefix(k, "GIT_CONFIG_") {
+			environ.Unsetenv(k)
+		}
+	}
+
 	environ.Unsetenv("SUDO_COMMAND")
 	environ.Unsetenv("SUDO_GID")
 	environ.Unsetenv("SUDO_HOME")
@@ -269,6 +279,7 @@ func normalizeEnv(environ *envx.Builder) *envx.Builder {
 	environ.Unsetenv(_eg.EnvComputeDefaultGroup)
 	environ.Unsetenv(_eg.EnvComputeTLSInsecure)
 	environ.Unsetenv(_eg.EnvExperimentalBaremetal)
+	environ.Unsetenv(_eg.EnvComputeEgiso) // a machine sets it, a container does not.
 
 	// always ignore compute bin. its development tooling.
 	environ.Unsetenv(_eg.EnvComputeBin)
@@ -325,6 +336,56 @@ func EnsureEnv(expected string, keys ...string) eg.OpFn {
 
 		return nil
 	}
+}
+
+// prints debugging information about the cgroups of the workload, see EnsureCgroups.
+// commands are lenient, a missing file is reported and does not prevent the remaining output.
+func Cgroups(ctx context.Context, op eg.Op) error {
+	const root = "/sys/fs/cgroup"
+	workload := fmt.Sprintf("%s/eg.workload.%s", root, egenv.RunID())
+	lenient := shell.Runtime().Lenient(true)
+	return shell.Run(
+		ctx,
+		lenient.New("echo 'pid:' $$ && echo 'self cgroup:' && cat /proc/self/cgroup"),
+		lenient.New("echo 'pid 1 cgroup:' && cat /proc/1/cgroup"),
+		lenient.New("echo 'cgroup namespace:' && readlink /proc/self/ns/cgroup"),
+		lenient.New("echo 'cgroup mounts:' && grep cgroup /proc/self/mountinfo"),
+		lenient.Newf("echo 'root controllers:' && cat %s/cgroup.controllers", root),
+		lenient.Newf("echo 'root subtree_control:' && cat %s/cgroup.subtree_control", root),
+		lenient.Newf("echo 'root procs:' && cat %s/cgroup.procs", root),
+		lenient.Newf("echo 'root cpu.max:' && cat %s/cpu.max", root),
+		lenient.Newf("echo 'root memory.max:' && cat %s/memory.max", root),
+		lenient.Newf("echo 'root children:' && ls -lhan %s | grep '^d'", root),
+		lenient.Newf("echo 'workload cgroup: %s' && ls -lhan %s", workload, workload),
+		lenient.Newf("echo 'workload controllers:' && cat %s/cgroup.controllers", workload),
+		lenient.Newf("echo 'workload subtree_control:' && cat %s/cgroup.subtree_control", workload),
+		lenient.Newf("echo 'workload procs:' && cat %s/cgroup.procs", workload),
+		lenient.Newf("echo 'workload cpu.max:' && cat %s/cpu.max", workload),
+		lenient.Newf("echo 'workload memory.max:' && cat %s/memory.max", workload),
+	)
+}
+
+// EnsureCgroups asserts the container's cgroup controllers are available to the workload's containers, see
+// runners.IsolateCgroups. the workload is either moved into its own cgroup, or, when the container's systemd
+// manages the cgroup tree (the workload runs in /init.scope), systemd already delegates the controllers and
+// isolation is not needed.
+func EnsureCgroups(ctx context.Context, op eg.Op) error {
+	const root = "/sys/fs/cgroup"
+	workload := fmt.Sprintf("%s/eg.workload.%s", root, egenv.RunID())
+	return shell.Run(
+		ctx,
+		// the workload's commands run in the workload's cgroup, or systemd's.
+		shell.Newf("c=\"$(cat /proc/self/cgroup)\"; case \"$c\" in \"0::/eg.workload.%s\"|\"0::/init.scope\") ;; *) echo \"unexpected cgroup: $c\" >&2; exit 1;; esac", egenv.RunID()),
+		// nothing remains in the root cgroup, a cgroup holding processes can not hand its children controllers.
+		shell.Newf("test -z \"$(cat %s/cgroup.procs)\"", root),
+		// every controller of the container is handed to its children.
+		shell.Newf("test -n \"$(cat %s/cgroup.controllers)\"", root),
+		shell.Newf("test \"$(cat %s/cgroup.subtree_control)\" = \"$(cat %s/cgroup.controllers)\"", root, root),
+		shell.Newf("grep -qw pids %s/cgroup.subtree_control", root),
+		// when the workload has its own cgroup it repeats the container's limits.
+		shell.Newf("! test -d %s || test \"$(cat %s/cpu.max)\" = \"$(cat %s/cpu.max)\"", workload, workload, root),
+		shell.Newf("! test -d %s || test \"$(cat %s/memory.max)\" = \"$(cat %s/memory.max)\"", workload, workload, root),
+	)
 }
 
 func NewCounter() *counter {

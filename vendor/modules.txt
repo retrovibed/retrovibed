@@ -465,7 +465,7 @@ github.com/egdaemon/duckproxy/duckproxy
 github.com/egdaemon/duckproxy/duckserve
 github.com/egdaemon/duckproxy/duckshare
 github.com/egdaemon/duckproxy/internal/errorsx
-# github.com/egdaemon/eg v0.0.0-20261117185627-84b59eef4eea
+# github.com/egdaemon/eg v0.0.0-20261119061624-8b6a1b6e02ae
 ## explicit; go 1.27.2
 github.com/egdaemon/eg
 github.com/egdaemon/eg/astcodec
@@ -510,6 +510,7 @@ github.com/egdaemon/eg/interp/c8s
 github.com/egdaemon/eg/interp/dbproxy
 github.com/egdaemon/eg/interp/events
 github.com/egdaemon/eg/interp/execproxy
+github.com/egdaemon/eg/interp/machines
 github.com/egdaemon/eg/interp/runtime/wasi/ffierrors
 github.com/egdaemon/eg/interp/runtime/wasi/ffiguest
 github.com/egdaemon/eg/jsonx
@@ -520,6 +521,7 @@ github.com/egdaemon/eg/runtime/wasi/egunsafe
 github.com/egdaemon/eg/runtime/wasi/egunsafe/fficoverage
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiegcontainer
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiegenv
+github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiegmachine
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffiexec
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigit
 github.com/egdaemon/eg/runtime/wasi/egunsafe/ffigraph
@@ -750,7 +752,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/google/pprof v0.0.0-20261111200114-fac431ef4d26
+# github.com/google/pprof v0.0.0-20261118010117-084b33a85f63
 ## explicit; go 1.26.0
 github.com/google/pprof/profile
 # github.com/google/s2a-go v0.1.11
@@ -1239,7 +1241,7 @@ go.uber.org/multierr
 # go.yaml.in/yaml/v3 v3.0.6
 ## explicit; go 1.16
 go.yaml.in/yaml/v3
-# golang.org/x/crypto v0.58.0
+# golang.org/x/crypto v0.59.0
 ## explicit; go 1.26.0
 golang.org/x/crypto/argon2
 golang.org/x/crypto/blake2b
@@ -1269,7 +1271,7 @@ golang.org/x/mod/internal/lazyregexp
 golang.org/x/mod/modfile
 golang.org/x/mod/module
 golang.org/x/mod/semver
-# golang.org/x/net v0.62.0
+# golang.org/x/net v0.63.0
 ## explicit; go 1.26.0
 golang.org/x/net/bpf
 golang.org/x/net/dns/dnsmessage
@@ -1311,7 +1313,7 @@ golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 golang.org/x/sys/windows/registry
-# golang.org/x/telemetry v0.0.0-20261009151841-97e8ea77aa2a
+# golang.org/x/telemetry v0.0.0-20261116191925-e77a43154acb
 ## explicit; go 1.26.0
 golang.org/x/telemetry/counter
 golang.org/x/telemetry/internal/counter
@@ -1340,7 +1342,7 @@ golang.org/x/text/width
 # golang.org/x/time v0.16.0
 ## explicit; go 1.26.0
 golang.org/x/time/rate
-# golang.org/x/tools v0.52.1-0.20261117052324-6bc5e25e1abb
+# golang.org/x/tools v0.53.0
 ## explicit; go 1.26.0
 golang.org/x/tools/cmd/goimports
 golang.org/x/tools/cmd/stringer
