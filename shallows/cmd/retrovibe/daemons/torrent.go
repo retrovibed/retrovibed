@@ -72,8 +72,6 @@ func AutoTorrentSettings(defaults *TorrentSettings, options ...func(*TorrentSett
 		Resumable:       defaults.Resumable,
 		Firewalled:      defaults.Firewalled,
 		Port:            defaults.Port,
-		Dht:             defaults.Dht,
-		AutoBootstrap:   defaults.AutoBootstrap,
 		AutoLocateMedia: defaults.AutoLocateMedia,
 		Peers:           &Peers{Min: 16, Max: 64},
 		Upload:          &Limit{Rate: 128 * bytesx.MiB, Burst: 128 * bytesx.MiB},
@@ -89,6 +87,7 @@ func newTorrenting(db *sql.DB, id ssh.Signer, root, media, tvfs fsx.Virtual, mc 
 		locate:           locate,
 		cond:             sync.NewCond(&sync.Mutex{}),
 		cfgpath:          userx.DefaultConfigDir(userx.DefaultRelRoot(), "torrent.cfg"),
+		dhtcfgpath:       userx.DefaultConfigDir(userx.DefaultRelRoot(), "dht.cfg"),
 		discoverycfgpath: userx.DefaultConfigDir(userx.DefaultRelRoot(), "discovery.cfg"),
 		ddiscidpath:      userx.DefaultConfigDir(userx.DefaultRelRoot(), "ddisc.id"),
 		peercachepath:    userx.DefaultCacheDirectory(userx.DefaultRelRoot(), "torrent.peers"),
@@ -118,6 +117,7 @@ type _torrenting struct {
 	pub              *asyncx.Wakeup
 	locate           *asyncx.Wakeup
 	cfgpath          string
+	dhtcfgpath       string
 	discoverycfgpath string
 	ddiscidpath      string
 	peercachepath    string
@@ -203,7 +203,7 @@ func (t *_torrenting) DiscoverySnapshot() (ddisc.Snapshot, error) {
 	return ddisc.Snapshot{}, nil
 }
 
-func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *DiscoverySettings) error {
+func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, dhtcfg *DHTSettings, disc *DiscoverySettings) error {
 	t._reloadStopped = make(chan struct{})
 
 	// wake the blocked cond.Wait() below when ctx is cancelled, so the
@@ -219,6 +219,7 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 		for {
 			var (
 				mcfg  = proto.CloneOf(cfg)
+				mdht  = proto.CloneOf(dhtcfg)
 				mdisc = proto.CloneOf(disc)
 			)
 
@@ -228,6 +229,13 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 				continue
 			}
 			log.Println("torrent settings completed", spew.Sdump(mcfg))
+
+			log.Println("dht settings initiated", spew.Sdump(mdht))
+			if err := t.loadcfg(t.dhtcfgpath, mdht); err != nil {
+				errorsx.Log(errorsx.Wrap(err, "failed to read dht config"))
+				continue
+			}
+			log.Println("dht settings completed", spew.Sdump(mdht))
 
 			log.Println("discovery settings initiated", spew.Sdump(mdisc))
 			if err := t.loadcfg(t.discoverycfgpath, mdisc); err != nil {
@@ -248,6 +256,7 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 
 			_ctx, _done := context.WithCancelCause(ctx)
 			log.Println("torrent settings", spew.Sdump(mcfg))
+			log.Println("dht settings", spew.Sdump(mdht))
 			log.Println("discovery settings", spew.Sdump(mdisc))
 			asyncfailure := func(cause error) {
 				defer t.cond.Broadcast()
@@ -255,7 +264,7 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, disc *Di
 				_done(contextx.IgnoreCancelled(cause))
 			}
 
-			if err := t.Init(_ctx, asyncfailure, mcfg, mdisc); err != nil {
+			if err := t.Init(_ctx, asyncfailure, mcfg, mdht, mdisc); err != nil {
 				_done(err)
 				errorsx.Log(errorsx.Wrap(err, "reloading torrent failed"))
 				if err := limiter.Wait(ctx); err != nil {
@@ -301,6 +310,10 @@ func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
 		return err
 	}
 
+	if err := t.loadcfg(t.dhtcfgpath, &DHTSettings{}); err != nil {
+		return err
+	}
+
 	if err := t.loadcfg(t.discoverycfgpath, &DiscoverySettings{}); err != nil {
 		return err
 	}
@@ -309,9 +322,9 @@ func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
 		return err
 	}
 
-	watch := make([]string, 0, 2*len(paths))
+	watch := make([]string, 0, len(paths)+4)
 	watch = append(watch, paths...)
-	watch = append(watch, t.cfgpath, t.discoverycfgpath, t.wgconfigdir)
+	watch = append(watch, t.cfgpath, t.dhtcfgpath, t.discoverycfgpath, t.wgconfigdir)
 
 	if err := fsx.Watch(ctx, t.cond, watch...); err != nil {
 		return err
@@ -320,7 +333,7 @@ func (t *_torrenting) Watch(ctx context.Context, paths ...string) error {
 	return nil
 }
 
-func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCauseFunc, cfg *TorrentSettings, disc *DiscoverySettings) (err error) {
+func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCauseFunc, cfg *TorrentSettings, dhtcfg *DHTSettings, disc *DiscoverySettings) (err error) {
 	const (
 		dhtk        = 16 // 20 is standard for mainline dht
 		dhtminpeers = dhtk / 4
@@ -338,7 +351,8 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		bootstrap    dht.Option = dht.OptionNoop
 		info                    = torrent.ClientConfigInfoLogger(torrent.LogDiscard())
 		debug                   = torrent.ClientConfigDebugLogger(torrent.LogDiscard())
-		dhtdebug                = dht.OptionLogger(torrent.LogDiscard())
+		dhtinfo                 = dht.OptionLogger(torrent.LogDiscard())
+		dhtdebug                = dht.OptionDebugLogger(torrent.LogDiscard())
 	)
 
 	ddisckey, err := fsx.AutoCached(t.ddiscidpath, func() (_ []byte, _ error) {
@@ -375,8 +389,12 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		debug = torrent.ClientConfigDebugLogger(log.New(os.Stderr, "[torrent - debug] ", log.Flags()))
 	}
 
-	if envx.Boolean(false, env.DHTDebug) {
-		dhtdebug = dht.OptionLogger(log.New(os.Stderr, "[dht] ", log.Flags()))
+	if dhtcfg.Log {
+		dhtinfo = dht.OptionLogger(log.New(os.Stderr, "[dht] ", log.Flags()))
+	}
+
+	if dhtcfg.Debug {
+		dhtdebug = dht.OptionDebugLogger(log.New(os.Stderr, "[dht - debug] ", log.Flags()))
 	}
 
 	if fsx.IsRegularFile(torrentpeers) {
@@ -384,7 +402,7 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 		bootstrap = dht.OptionBootstrapPeerFile(torrentpeers)
 	}
 
-	if cfg.AutoBootstrap {
+	if dhtcfg.AutoBootstrap {
 		log.Println("public bootstrap enabled")
 		bootstrap = langx.Compose(bootstrap, dht.OptionBootstrapGlobal)
 	}
@@ -429,9 +447,10 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 			dht.OptionMuxer(tmux),
 			dht.OptionHostResolver(t._dnscache),
 			torrentx.AutomaticIP(wcfg, wgnet, wgcfg.Port),
+			dhtinfo,
 			dhtdebug,
 			bootstrap,
-			dht.OptionPassive(!(wgcfg.Dht && cfg.Dht)),
+			dht.OptionPassive(!wgcfg.Dht || dhtcfg.Passive),
 		)
 		if err != nil {
 			return errorsx.Wrap(err, "unable to setup dht server")
@@ -466,9 +485,10 @@ func (t *_torrenting) Init(dctx context.Context, asyncfailure context.CancelCaus
 				return true
 			}),
 			dht.OptionUPnP,
+			dhtinfo,
 			dhtdebug,
 			bootstrap,
-			dht.OptionPassive(!cfg.Dht),
+			dht.OptionPassive(dhtcfg.Passive),
 		)
 		if err != nil {
 			return errorsx.Wrap(err, "unable to setup dht server")

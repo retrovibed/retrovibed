@@ -81,7 +81,8 @@ type Command struct {
 	AutoSocks5               bool             `flag:"" name:"auto-socks5" help:"enable the socks5 proxy service" default:"true" negatable:""`
 	AutoAcousticsIndex       bool             `flag:"" name:"auto-acoustics-index" help:"acoustic indexing for currently playing song" default:"true" negatable:""`
 	Socks5                   cmdopts.Listener `flag:"" name:"socks5-address" help:"enable socks5 proxy, requires a vpn to be configured" default:"tcp://:9999"`
-	DHTLogging               bool             `flag:"" name:"dht-logging" help:"enable debug logging for the dht" default:"false" negatable:"" hidden:"true"`
+	DHTLogging               bool             `flag:"" name:"dht-logging" help:"enable dht logging" default:"false" negatable:"" env:"${env_dht_logging}"`
+	DHTDebug                 bool             `flag:"" name:"dht-debug" help:"enable dht debug logging, traces every dht method executed" default:"false" negatable:"" env:"${env_dht_debug}"`
 	RemoteControl            bool             `flag:"" name:"remote-control" help:"enable the remote control websocket relay" default:"false" negatable:""`
 	TorrentResume            bool             `flag:"" name:"torrent-resume" help:"enable announcing and resuming torrents" default:"true" negatable:""`
 	TorrentFirewalled        bool             `flag:"" name:"torrent-firewalled" help:"restrict torrent connections to private networks" env:"${env_torrent_private}"`
@@ -114,10 +115,17 @@ func (t Command) torrentsettings() *TorrentSettings {
 		Resumable:       t.TorrentResume,
 		Firewalled:      t.TorrentFirewalled,
 		Port:            uint32(t.TorrentPort),
-		Dht:             envx.Boolean(true, env.TorrentDHT),
-		AutoBootstrap:   t.AutoBootstrap,
 		AutoLocateMedia: t.AutoLocateMedia,
 	})
+}
+
+func (t Command) dhtsettings() *DHTSettings {
+	return &DHTSettings{
+		Passive:       envx.Boolean(false, env.DHTPassive),
+		AutoBootstrap: t.AutoBootstrap,
+		Log:           envx.Boolean(t.DHTLogging, env.DHTLogging),
+		Debug:         envx.Boolean(t.DHTDebug, env.DHTDebug),
+	}
 }
 
 func (t Command) discoverysettings() *DiscoverySettings {
@@ -361,7 +369,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 	)
 
 	log.Println("checkpoint - distribution")
-	if err = torrenting.Reload(gctx.Context, t.torrentsettings(), t.discoverysettings()); err != nil {
+	if err = torrenting.Reload(gctx.Context, t.torrentsettings(), t.dhtsettings(), t.discoverysettings()); err != nil {
 		return errorsx.Wrap(err, "failed to reload torrent")
 	}
 
@@ -562,6 +570,7 @@ func (t Command) Run(gctx *cmdopts.Global, sshid *cmdopts.SSHID, tlscfg *cmdopts
 
 	metaapi.NewHTTPFileConfig(vpncfgpath).Bind(httpmux.PathPrefix("/s/wireguard").Subrouter())
 	metaapi.NewHTTPFileConfig(torrenting.cfgpath).Bind(httpmux.PathPrefix("/s/torrents").Subrouter())
+	metaapi.NewHTTPFileConfig(torrenting.dhtcfgpath).Bind(httpmux.PathPrefix("/s/dht").Subrouter())
 	metaapi.NewHTTPFileConfig(torrenting.discoverycfgpath).Bind(httpmux.PathPrefix("/s/discovery").Subrouter())
 	metaapi.NewHTTPFileConfig(storagecfgpath).Bind(httpmux.PathPrefix("/s/storage").Subrouter())
 

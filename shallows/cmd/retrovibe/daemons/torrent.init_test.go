@@ -45,6 +45,7 @@ func newTestTorrenting(t *testing.T, q *sql.DB) _torrenting {
 		pub:              asyncx.NewWakeup(t.Context()),
 		cond:             sync.NewCond(&sync.Mutex{}),
 		cfgpath:          rootstore.Path("torrent.cfg"),
+		dhtcfgpath:       rootstore.Path("dht.cfg"),
 		discoverycfgpath: rootstore.Path("discovery.cfg"),
 		ddiscidpath:      rootstore.Path("ddisc.id"),
 		peercachepath:    rootstore.Path("torrent.peers"),
@@ -128,6 +129,7 @@ func TestInit(t *testing.T) {
 			Resumable: true,
 		})
 		disc := &DiscoverySettings{}
+		dhtcfg := &DHTSettings{}
 
 		ctx, cancel := context.WithCancel(t.Context())
 		defer cancel()
@@ -147,11 +149,11 @@ func TestInit(t *testing.T) {
 		}
 
 		// first Init - can start and download
-		require.NoError(t, tr.Init(ctx, noop, cfg, disc))
+		require.NoError(t, tr.Init(ctx, noop, cfg, dhtcfg, disc))
 		startAndRead(tr._tclient.Load())
 
 		// second Init (simulates reload) - new client, torrent resumes
-		require.NoError(t, tr.Init(ctx, noop, cfg, disc))
+		require.NoError(t, tr.Init(ctx, noop, cfg, dhtcfg, disc))
 		startAndRead(tr._tclient.Load())
 	})
 
@@ -161,13 +163,14 @@ func TestInit(t *testing.T) {
 
 		cfg := AutoTorrentSettings(&TorrentSettings{Resumable: false})
 		disc := &DiscoverySettings{}
+		dhtcfg := &DHTSettings{}
 
 		ctx, cancel := context.WithCancel(t.Context())
 		defer cancel()
 
 		noop := func(e error) { require.NoError(t, e) }
 
-		require.NoError(t, tr.Init(ctx, noop, cfg, disc))
+		require.NoError(t, tr.Init(ctx, noop, cfg, dhtcfg, disc))
 		require.NotNil(t, tr._tclient.Load())
 	})
 
@@ -177,27 +180,29 @@ func TestInit(t *testing.T) {
 
 		cfg := AutoTorrentSettings(&TorrentSettings{})
 		disc := &DiscoverySettings{}
+		dhtcfg := &DHTSettings{}
 
 		ctx, cancel := context.WithCancel(t.Context())
 		defer cancel()
 
 		noop := func(e error) { require.NoError(t, e) }
 
-		require.NoError(t, tr.Init(ctx, noop, cfg, disc))
+		require.NoError(t, tr.Init(ctx, noop, cfg, dhtcfg, disc))
 		first := tr._tclient.Load()
 		require.NotNil(t, first)
 
-		require.NoError(t, tr.Init(ctx, noop, cfg, disc))
+		require.NoError(t, tr.Init(ctx, noop, cfg, dhtcfg, disc))
 		second := tr._tclient.Load()
 		require.NotNil(t, second)
 		require.NotSame(t, first, second)
 	})
 
-	t.Run("dht is served when enabled", func(t *testing.T) {
+	t.Run("dht is served when not passive", func(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		tr := newTestTorrenting(t, q)
 
-		cfg := AutoTorrentSettings(&TorrentSettings{Dht: true})
+		cfg := AutoTorrentSettings(&TorrentSettings{})
+		dhtcfg := &DHTSettings{Passive: false}
 		disc := &DiscoverySettings{}
 
 		ctx, cancel := context.WithCancel(t.Context())
@@ -205,16 +210,17 @@ func TestInit(t *testing.T) {
 
 		noop := func(e error) { require.NoError(t, e) }
 
-		require.NoError(t, tr.Init(ctx, noop, cfg, disc))
+		require.NoError(t, tr.Init(ctx, noop, cfg, dhtcfg, disc))
 		require.NotNil(t, tr._tclient.Load())
 		require.True(t, tr._dhts.Load().Available())
 	})
 
-	t.Run("dht is passive when disabled", func(t *testing.T) {
+	t.Run("dht is not served when passive", func(t *testing.T) {
 		q := sqltestx.Metadatabase(t)
 		tr := newTestTorrenting(t, q)
 
-		cfg := AutoTorrentSettings(&TorrentSettings{Dht: false})
+		cfg := AutoTorrentSettings(&TorrentSettings{})
+		dhtcfg := &DHTSettings{Passive: true}
 		disc := &DiscoverySettings{}
 
 		ctx, cancel := context.WithCancel(t.Context())
@@ -222,7 +228,7 @@ func TestInit(t *testing.T) {
 
 		noop := func(e error) { require.NoError(t, e) }
 
-		require.NoError(t, tr.Init(ctx, noop, cfg, disc))
+		require.NoError(t, tr.Init(ctx, noop, cfg, dhtcfg, disc))
 		require.NotNil(t, tr._tclient.Load())
 		require.False(t, tr._dhts.Load().Available())
 	})
@@ -233,13 +239,14 @@ func TestInit(t *testing.T) {
 
 		cfg := AutoTorrentSettings(&TorrentSettings{Firewalled: true})
 		disc := &DiscoverySettings{}
+		dhtcfg := &DHTSettings{}
 
 		ctx, cancel := context.WithCancel(t.Context())
 		defer cancel()
 
 		noop := func(e error) { require.NoError(t, e) }
 
-		require.NoError(t, tr.Init(ctx, noop, cfg, disc))
+		require.NoError(t, tr.Init(ctx, noop, cfg, dhtcfg, disc))
 		require.NotNil(t, tr._tclient.Load())
 	})
 }

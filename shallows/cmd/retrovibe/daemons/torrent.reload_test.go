@@ -19,7 +19,7 @@ func TestReload(t *testing.T) {
 		cfg := AutoTorrentSettings(&TorrentSettings{})
 		disc := &DiscoverySettings{}
 
-		require.NoError(t, tr.Reload(ctx, cfg, disc))
+		require.NoError(t, tr.Reload(ctx, cfg, &DHTSettings{}, disc))
 		defer func() {
 			cancel()
 			<-tr.Stopped()
@@ -35,7 +35,7 @@ func TestReload(t *testing.T) {
 		cfg := AutoTorrentSettings(&TorrentSettings{})
 		disc := &DiscoverySettings{}
 
-		require.NoError(t, tr.Reload(ctx, cfg, disc))
+		require.NoError(t, tr.Reload(ctx, cfg, &DHTSettings{}, disc))
 		defer func() {
 			cancel()
 			<-tr.Stopped()
@@ -55,7 +55,7 @@ func TestReload(t *testing.T) {
 		cfg := AutoTorrentSettings(&TorrentSettings{})
 		disc := &DiscoverySettings{}
 
-		require.NoError(t, tr.Reload(ctx, cfg, disc))
+		require.NoError(t, tr.Reload(ctx, cfg, &DHTSettings{}, disc))
 		defer func() {
 			cancel()
 			<-tr.Stopped()
@@ -86,7 +86,7 @@ func TestReload(t *testing.T) {
 		cfg := AutoTorrentSettings(&TorrentSettings{})
 		disc := &DiscoverySettings{}
 
-		require.NoError(t, tr.Reload(ctx, cfg, disc))
+		require.NoError(t, tr.Reload(ctx, cfg, &DHTSettings{}, disc))
 
 		// wait for first init to complete
 		require.Eventually(t, func() bool {

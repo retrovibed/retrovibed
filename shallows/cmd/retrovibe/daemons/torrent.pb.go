@@ -129,14 +129,12 @@ type TorrentSettings struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Seed            bool                   `protobuf:"varint,1,opt,name=seed,proto3" json:"seed,omitempty"`
 	Pex             bool                   `protobuf:"varint,2,opt,name=pex,proto3" json:"pex,omitempty"`
-	AutoBootstrap   bool                   `protobuf:"varint,3,opt,name=auto_bootstrap,proto3" json:"auto_bootstrap,omitempty"`
 	AutoLocateMedia bool                   `protobuf:"varint,4,opt,name=auto_locate_media,proto3" json:"auto_locate_media,omitempty"`
 	Firewalled      bool                   `protobuf:"varint,5,opt,name=firewalled,proto3" json:"firewalled,omitempty"`
 	Resumable       bool                   `protobuf:"varint,6,opt,name=resumable,proto3" json:"resumable,omitempty"`
 	Ip4             string                 `protobuf:"bytes,7,opt,name=ip4,proto3" json:"ip4,omitempty"`
 	Ip6             string                 `protobuf:"bytes,8,opt,name=ip6,proto3" json:"ip6,omitempty"`
 	Port            uint32                 `protobuf:"varint,9,opt,name=port,proto3" json:"port,omitempty"`
-	Dht             bool                   `protobuf:"varint,10,opt,name=dht,proto3" json:"dht,omitempty"`
 	Log             bool                   `protobuf:"varint,998,opt,name=log,proto3" json:"log,omitempty"`
 	Debug           bool                   `protobuf:"varint,999,opt,name=debug,proto3" json:"debug,omitempty"`
 	Download        *Limit                 `protobuf:"bytes,1000,opt,name=download,proto3" json:"download,omitempty"`
@@ -193,13 +191,6 @@ func (x *TorrentSettings) GetPex() bool {
 	return false
 }
 
-func (x *TorrentSettings) GetAutoBootstrap() bool {
-	if x != nil {
-		return x.AutoBootstrap
-	}
-	return false
-}
-
 func (x *TorrentSettings) GetAutoLocateMedia() bool {
 	if x != nil {
 		return x.AutoLocateMedia
@@ -240,13 +231,6 @@ func (x *TorrentSettings) GetPort() uint32 {
 		return x.Port
 	}
 	return 0
-}
-
-func (x *TorrentSettings) GetDht() bool {
-	if x != nil {
-		return x.Dht
-	}
-	return false
 }
 
 func (x *TorrentSettings) GetLog() bool {
@@ -305,6 +289,74 @@ func (x *TorrentSettings) GetMaximumRequests() uint64 {
 	return 0
 }
 
+type DHTSettings struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Passive       bool                   `protobuf:"varint,1,opt,name=passive,proto3" json:"passive,omitempty"`
+	AutoBootstrap bool                   `protobuf:"varint,2,opt,name=auto_bootstrap,proto3" json:"auto_bootstrap,omitempty"`
+	Log           bool                   `protobuf:"varint,998,opt,name=log,proto3" json:"log,omitempty"`
+	Debug         bool                   `protobuf:"varint,999,opt,name=debug,proto3" json:"debug,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DHTSettings) Reset() {
+	*x = DHTSettings{}
+	mi := &file_torrents_torrent_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DHTSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DHTSettings) ProtoMessage() {}
+
+func (x *DHTSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_torrents_torrent_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DHTSettings.ProtoReflect.Descriptor instead.
+func (*DHTSettings) Descriptor() ([]byte, []int) {
+	return file_torrents_torrent_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *DHTSettings) GetPassive() bool {
+	if x != nil {
+		return x.Passive
+	}
+	return false
+}
+
+func (x *DHTSettings) GetAutoBootstrap() bool {
+	if x != nil {
+		return x.AutoBootstrap
+	}
+	return false
+}
+
+func (x *DHTSettings) GetLog() bool {
+	if x != nil {
+		return x.Log
+	}
+	return false
+}
+
+func (x *DHTSettings) GetDebug() bool {
+	if x != nil {
+		return x.Debug
+	}
+	return false
+}
+
 type DiscoverySettings struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
@@ -319,7 +371,7 @@ type DiscoverySettings struct {
 
 func (x *DiscoverySettings) Reset() {
 	*x = DiscoverySettings{}
-	mi := &file_torrents_torrent_proto_msgTypes[3]
+	mi := &file_torrents_torrent_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -331,7 +383,7 @@ func (x *DiscoverySettings) String() string {
 func (*DiscoverySettings) ProtoMessage() {}
 
 func (x *DiscoverySettings) ProtoReflect() protoreflect.Message {
-	mi := &file_torrents_torrent_proto_msgTypes[3]
+	mi := &file_torrents_torrent_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -344,7 +396,7 @@ func (x *DiscoverySettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DiscoverySettings.ProtoReflect.Descriptor instead.
 func (*DiscoverySettings) Descriptor() ([]byte, []int) {
-	return file_torrents_torrent_proto_rawDescGZIP(), []int{3}
+	return file_torrents_torrent_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DiscoverySettings) GetEnabled() bool {
@@ -399,11 +451,10 @@ const file_torrents_torrent_proto_rawDesc = "" +
 	"\x03max\x18\x02 \x01(\rR\x03max\"1\n" +
 	"\x05Limit\x12\x12\n" +
 	"\x04rate\x18\x01 \x01(\rR\x04rate\x12\x14\n" +
-	"\x05burst\x18\x02 \x01(\rR\x05burst\"\xcd\x04\n" +
+	"\x05burst\x18\x02 \x01(\rR\x05burst\"\xb4\x04\n" +
 	"\x0fTorrentSettings\x12\x12\n" +
 	"\x04seed\x18\x01 \x01(\bR\x04seed\x12\x10\n" +
-	"\x03pex\x18\x02 \x01(\bR\x03pex\x12&\n" +
-	"\x0eauto_bootstrap\x18\x03 \x01(\bR\x0eauto_bootstrap\x12,\n" +
+	"\x03pex\x18\x02 \x01(\bR\x03pex\x12,\n" +
 	"\x11auto_locate_media\x18\x04 \x01(\bR\x11auto_locate_media\x12\x1e\n" +
 	"\n" +
 	"firewalled\x18\x05 \x01(\bR\n" +
@@ -411,9 +462,7 @@ const file_torrents_torrent_proto_rawDesc = "" +
 	"\tresumable\x18\x06 \x01(\bR\tresumable\x12\x10\n" +
 	"\x03ip4\x18\a \x01(\tR\x03ip4\x12\x10\n" +
 	"\x03ip6\x18\b \x01(\tR\x03ip6\x12\x12\n" +
-	"\x04port\x18\t \x01(\rR\x04port\x12\x10\n" +
-	"\x03dht\x18\n" +
-	" \x01(\bR\x03dht\x12\x11\n" +
+	"\x04port\x18\t \x01(\rR\x04port\x12\x11\n" +
 	"\x03log\x18\xe6\a \x01(\bR\x03log\x12\x15\n" +
 	"\x05debug\x18\xe7\a \x01(\bR\x05debug\x12,\n" +
 	"\bdownload\x18\xe8\a \x01(\v2\x0f.torrents.LimitR\bdownload\x12(\n" +
@@ -421,7 +470,13 @@ const file_torrents_torrent_proto_rawDesc = "" +
 	"\ainbound\x18\xea\a \x01(\v2\x0f.torrents.LimitR\ainbound\x12,\n" +
 	"\boutbound\x18\xeb\a \x01(\v2\x0f.torrents.LimitR\boutbound\x12&\n" +
 	"\x05peers\x18\xec\a \x01(\v2\x0f.torrents.PeersR\x05peers\x12+\n" +
-	"\x10maximum_requests\x18\xed\a \x01(\x04R\x10maximum_requestsJ\x05\b\v\x10\xe6\a\"\xb6\x01\n" +
+	"\x10maximum_requests\x18\xed\a \x01(\x04R\x10maximum_requestsJ\x04\b\x03\x10\x04J\x04\b\n" +
+	"\x10\vJ\x05\b\v\x10\xe6\aR\x0eauto_bootstrapR\x03dht\"y\n" +
+	"\vDHTSettings\x12\x18\n" +
+	"\apassive\x18\x01 \x01(\bR\apassive\x12&\n" +
+	"\x0eauto_bootstrap\x18\x02 \x01(\bR\x0eauto_bootstrap\x12\x11\n" +
+	"\x03log\x18\xe6\a \x01(\bR\x03log\x12\x15\n" +
+	"\x05debug\x18\xe7\a \x01(\bR\x05debug\"\xb6\x01\n" +
 	"\x11DiscoverySettings\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x14\n" +
 	"\x05ratio\x18\x02 \x01(\rR\x05ratio\x12\x1e\n" +
@@ -446,12 +501,13 @@ func file_torrents_torrent_proto_rawDescGZIP() []byte {
 	return file_torrents_torrent_proto_rawDescData
 }
 
-var file_torrents_torrent_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_torrents_torrent_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_torrents_torrent_proto_goTypes = []any{
 	(*Peers)(nil),             // 0: torrents.Peers
 	(*Limit)(nil),             // 1: torrents.Limit
 	(*TorrentSettings)(nil),   // 2: torrents.TorrentSettings
-	(*DiscoverySettings)(nil), // 3: torrents.DiscoverySettings
+	(*DHTSettings)(nil),       // 3: torrents.DHTSettings
+	(*DiscoverySettings)(nil), // 4: torrents.DiscoverySettings
 }
 var file_torrents_torrent_proto_depIdxs = []int32{
 	1, // 0: torrents.TorrentSettings.download:type_name -> torrents.Limit
@@ -477,7 +533,7 @@ func file_torrents_torrent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_torrents_torrent_proto_rawDesc), len(file_torrents_torrent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

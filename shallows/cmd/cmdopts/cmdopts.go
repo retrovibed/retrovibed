@@ -46,6 +46,7 @@ func (t Global) AfterApply() (err error) {
 		err = langx.FirstNonZero(
 			err,
 			os.Setenv(env.TorrentLogging, "true"),
+			os.Setenv(env.DHTLogging, "true"),
 		)
 		fallthrough
 	case 2: // DEBUG
