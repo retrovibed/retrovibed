@@ -220,8 +220,8 @@ func DatabaseCache(ctx context.Context, path string) (db *sql.DB, err error) {
 }
 
 func Checkpoint(ctx context.Context, db *sql.DB) (err error) {
-	log.Println("------------------------------------------------ database checkpoint initiated ------------------------------------------------")
-	defer log.Println("------------------------------------------------ database checkpoint completed ------------------------------------------------")
+	debugx.Println("------------------------------------------------ database checkpoint initiated ------------------------------------------------")
+	defer debugx.Println("------------------------------------------------ database checkpoint completed ------------------------------------------------")
 
 	if _, err := db.ExecContext(ctx, "FORCE CHECKPOINT;"); err != nil {
 		return errorsx.Wrap(err, "failed to checkpoint database")
