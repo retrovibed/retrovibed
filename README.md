@@ -102,13 +102,13 @@ add-apt-repository ppa:jljatone/retrovibed
 apt-get update && apt-get install retrovibed retrokiosk
 
 # bootstrap the device with your account
-retrovibe identity generate '{username}:{password}'
+retrovibed identity generate '{username}:{password}'
 reboot
 ```
 
 on first boot, once the Console is on screen, pick the remote daemon to connect to from its daemon dropdown - that choice persists across reboots.
 
-or register it without the Console: `retrovibe device add otherhost.lan:9998 --description="..." --download --default`
+or register it without the Console: `retrovibed device add otherhost.lan:9998 --description="..." --download --default`
 
 to remove the kiosk and get a normal login back:
 
@@ -119,13 +119,13 @@ apt-get remove retrokiosk
 ### determine ssh public key for client side
 
 ```bash
-retrovibe identity show
+retrovibed identity show
 ```
 
-### install daemon from source
+### install cli from source
 
 ```bash
-go install github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/...
+go build -C shallows -o ~/go/bin/retrovibed ./cmd/retrovibe
 ```
 
 ### general commands
@@ -159,9 +159,9 @@ retrovibed's plugins are significantly safer than other torrenting systems. they
 there are some default content plugins available for testing purposes, you are responsible for following the laws of your region with their use.
 
 ```bash
-retrovibe ddisc search plugin install git@git.sr.ht:~jatone/retroscaped --package ./piratebay --name piratebay
-retrovibe ddisc search plugin install git@git.sr.ht:~jatone/retroscaped --package ./leetx --name leetx
-retrovibe ddisc search plugin install git@git.sr.ht:~jatone/retroscaped --package ./unit3d --name {name} \
+retrovibed ddisc search plugin install git@git.sr.ht:~jatone/retroscaped --package ./piratebay --name piratebay
+retrovibed ddisc search plugin install git@git.sr.ht:~jatone/retroscaped --package ./leetx --name leetx
+retrovibed ddisc search plugin install git@git.sr.ht:~jatone/retroscaped --package ./unit3d --name {name} \
  -b main.categoryMovies=1 \
  -b main.categoryTV=2 \
  -b main.categoryGames=7 \
@@ -241,7 +241,7 @@ retrovibed identity generate {secret}
 on the device you're exporting from:
 
 ```bash
-retrovibed library export --no-torrent | ssh user@newdevicehost "~/go/bin/retrovibe library import jsonl"
+retrovibed library export --no-torrent | ssh user@newdevicehost "~/go/bin/retrovibed library import jsonl"
 
 retrovibed torrent export | ssh user@newdevicehost "retrovibed torrent import peer --peer='olddevicehost:port'"
 ```

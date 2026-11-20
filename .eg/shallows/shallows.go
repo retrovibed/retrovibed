@@ -150,9 +150,9 @@ func Install() eg.OpFn {
 	return shell.Op(
 		gruntime.Newf("mkdir -p ~/.duckdb %s %s && ln -sfn %s ~/.duckdb", egenv.DirectoryCache("duckdb"), dstdir, egenv.DirectoryCache("duckdb")),
 		gruntime.Newf(
-			"go build -buildvcs=true -tags %s -o %s ./cmd/...",
+			"go build -buildvcs=true -tags %s -o %s ./cmd/retrovibe",
 			strings.Join(buildTags, ","),
-			dstdir,
+			filepath.Join(dstdir, "retrovibed"),
 		),
 		gruntime.Newf("cp libpredicttext.so %s/", dstdir).Directory(egenv.DirectoryCache("neurals")),
 	)

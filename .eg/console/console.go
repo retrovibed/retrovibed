@@ -211,6 +211,9 @@ func Install() eg.OpFn {
 		return eg.Sequential(
 			shell.Op(
 				runtime.New("rsync --mkpath -av ${FLUTTER_RELEASE_BUNDLE}/* ${OUTPUTDIR}/"),
+				// flutter names the executable after the pubspec package (retrovibed); retrovibed is the cli
+				// entry point which execs the console as retrovibe (see retrovibed console).
+				runtime.New("mv ${OUTPUTDIR}/retrovibed ${OUTPUTDIR}/retrovibe"),
 			),
 		)(ctx, o)
 	}

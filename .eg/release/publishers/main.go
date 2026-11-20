@@ -70,9 +70,9 @@ func Setup(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		shell.Newf("mkdir -p %s", wasmdir()),
-		runtime().New("retrovibe version"),
-		runtime().New("retrovibe identity generate ${RETROVIBED_IDENTITY_SEED}"),
-		runtime().New("retrovibe identity show"),
+		runtime().New("retrovibed version"),
+		runtime().New("retrovibed identity generate ${RETROVIBED_IDENTITY_SEED}"),
+		runtime().New("retrovibed identity show"),
 	)
 }
 
@@ -109,9 +109,9 @@ func Publish(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		rt.Newf(
-			"retrovibe library import directory --no-directory-prefix --mimetype application/vnd.retrovibed.publish.module --insecure --endpoint=\"https://host.containers.internal:9998\" %s"+
-				" | retrovibe community info retropublish"+
-				" | retrovibe library publish --no-dry-run --endpoint=\"https://host.containers.internal:9998\"",
+			"retrovibed library import directory --no-directory-prefix --mimetype application/vnd.retrovibed.publish.module --insecure --endpoint=\"https://host.containers.internal:9998\" %s"+
+				" | retrovibed community info retropublish"+
+				" | retrovibed library publish --no-dry-run --endpoint=\"https://host.containers.internal:9998\"",
 			wasmdir(),
 		).Timeout(egenv.TTL()),
 	)
