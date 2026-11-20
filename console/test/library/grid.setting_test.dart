@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/library/grid.setting.dart';
 import 'package:retrovibed/torrents.dart' as torrents;
+import 'package:retrovibed/dht.dart' as dht;
 import 'package:retrovibed/storage.dart' as storage;
-import 'package:retrovibed/wireguard.dart' as wireguard;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
@@ -16,11 +16,8 @@ void main() {
       await tester.pumpApp(
         GridSettings(
           torrents: ({options = const []}) => Future.value(torrents.TorrentSettings()),
+          dht: ({options = const []}) => Future.value(dht.DHTSettings()),
           storage: ({options = const []}) => Future.value(storage.StorageSettingsResponse()),
-          wgcurrent: (nettype) => Future.value(wireguard.WireguardCurrentResponse(wireguard: wireguard.Wireguard())),
-          wgupdate:
-              (v, {options = const []}) =>
-                  Future.value(wireguard.WireguardUpdateResponse(wireguard: wireguard.Wireguard())),
         ),
         physicalSize: entry.value,
       );
@@ -91,11 +88,8 @@ void main() {
             children: [
               GridSettings(
                 torrents: ({options = const []}) => Future.value(torrents.TorrentSettings()),
+                dht: ({options = const []}) => Future.value(dht.DHTSettings()),
                 storage: ({options = const []}) => Future.value(storage.StorageSettingsResponse()),
-                wgcurrent: (nettype) => Future.value(wireguard.WireguardCurrentResponse(wireguard: wireguard.Wireguard())),
-                wgupdate:
-                    (v, {options = const []}) =>
-                        Future.value(wireguard.WireguardUpdateResponse(wireguard: wireguard.Wireguard())),
               ),
             ],
           ),
@@ -117,11 +111,8 @@ void main() {
           child: ds.Card(
             GridSettings(
               torrents: ({options = const []}) => Future.value(torrents.TorrentSettings()),
+              dht: ({options = const []}) => Future.value(dht.DHTSettings()),
               storage: ({options = const []}) => Future.value(storage.StorageSettingsResponse()),
-              wgcurrent: (nettype) => Future.value(wireguard.WireguardCurrentResponse(wireguard: wireguard.Wireguard())),
-              wgupdate:
-                  (v, {options = const []}) =>
-                      Future.value(wireguard.WireguardUpdateResponse(wireguard: wireguard.Wireguard())),
             ),
           ),
         ),

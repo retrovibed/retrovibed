@@ -47,7 +47,6 @@ const TorrentSettings$json = {
   '2': [
     {'1': 'seed', '3': 1, '4': 1, '5': 8, '10': 'seed'},
     {'1': 'pex', '3': 2, '4': 1, '5': 8, '10': 'pex'},
-    {'1': 'auto_bootstrap', '3': 3, '4': 1, '5': 8, '10': 'auto_bootstrap'},
     {
       '1': 'auto_locate_media',
       '3': 4,
@@ -60,7 +59,6 @@ const TorrentSettings$json = {
     {'1': 'ip4', '3': 7, '4': 1, '5': 9, '10': 'ip4'},
     {'1': 'ip6', '3': 8, '4': 1, '5': 9, '10': 'ip6'},
     {'1': 'port', '3': 9, '4': 1, '5': 13, '10': 'port'},
-    {'1': 'dht', '3': 10, '4': 1, '5': 8, '10': 'dht'},
     {'1': 'log', '3': 998, '4': 1, '5': 8, '10': 'log'},
     {'1': 'debug', '3': 999, '4': 1, '5': 8, '10': 'debug'},
     {
@@ -112,23 +110,43 @@ const TorrentSettings$json = {
     },
   ],
   '9': [
+    {'1': 3, '2': 4},
+    {'1': 10, '2': 11},
     {'1': 11, '2': 998},
   ],
+  '10': ['auto_bootstrap', 'dht'],
 };
 
 /// Descriptor for `TorrentSettings`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List torrentSettingsDescriptor = $convert.base64Decode(
     'Cg9Ub3JyZW50U2V0dGluZ3MSEgoEc2VlZBgBIAEoCFIEc2VlZBIQCgNwZXgYAiABKAhSA3BleB'
-    'ImCg5hdXRvX2Jvb3RzdHJhcBgDIAEoCFIOYXV0b19ib290c3RyYXASLAoRYXV0b19sb2NhdGVf'
-    'bWVkaWEYBCABKAhSEWF1dG9fbG9jYXRlX21lZGlhEh4KCmZpcmV3YWxsZWQYBSABKAhSCmZpcm'
-    'V3YWxsZWQSHAoJcmVzdW1hYmxlGAYgASgIUglyZXN1bWFibGUSEAoDaXA0GAcgASgJUgNpcDQS'
-    'EAoDaXA2GAggASgJUgNpcDYSEgoEcG9ydBgJIAEoDVIEcG9ydBIQCgNkaHQYCiABKAhSA2RodB'
-    'IRCgNsb2cY5gcgASgIUgNsb2cSFQoFZGVidWcY5wcgASgIUgVkZWJ1ZxIsCghkb3dubG9hZBjo'
-    'ByABKAsyDy50b3JyZW50cy5MaW1pdFIIZG93bmxvYWQSKAoGdXBsb2FkGOkHIAEoCzIPLnRvcn'
-    'JlbnRzLkxpbWl0UgZ1cGxvYWQSKgoHaW5ib3VuZBjqByABKAsyDy50b3JyZW50cy5MaW1pdFIH'
-    'aW5ib3VuZBIsCghvdXRib3VuZBjrByABKAsyDy50b3JyZW50cy5MaW1pdFIIb3V0Ym91bmQSJg'
-    'oFcGVlcnMY7AcgASgLMg8udG9ycmVudHMuUGVlcnNSBXBlZXJzEisKEG1heGltdW1fcmVxdWVz'
-    'dHMY7QcgASgEUhBtYXhpbXVtX3JlcXVlc3RzSgUICxDmBw==');
+    'IsChFhdXRvX2xvY2F0ZV9tZWRpYRgEIAEoCFIRYXV0b19sb2NhdGVfbWVkaWESHgoKZmlyZXdh'
+    'bGxlZBgFIAEoCFIKZmlyZXdhbGxlZBIcCglyZXN1bWFibGUYBiABKAhSCXJlc3VtYWJsZRIQCg'
+    'NpcDQYByABKAlSA2lwNBIQCgNpcDYYCCABKAlSA2lwNhISCgRwb3J0GAkgASgNUgRwb3J0EhEK'
+    'A2xvZxjmByABKAhSA2xvZxIVCgVkZWJ1ZxjnByABKAhSBWRlYnVnEiwKCGRvd25sb2FkGOgHIA'
+    'EoCzIPLnRvcnJlbnRzLkxpbWl0Ughkb3dubG9hZBIoCgZ1cGxvYWQY6QcgASgLMg8udG9ycmVu'
+    'dHMuTGltaXRSBnVwbG9hZBIqCgdpbmJvdW5kGOoHIAEoCzIPLnRvcnJlbnRzLkxpbWl0Ugdpbm'
+    'JvdW5kEiwKCG91dGJvdW5kGOsHIAEoCzIPLnRvcnJlbnRzLkxpbWl0UghvdXRib3VuZBImCgVw'
+    'ZWVycxjsByABKAsyDy50b3JyZW50cy5QZWVyc1IFcGVlcnMSKwoQbWF4aW11bV9yZXF1ZXN0cx'
+    'jtByABKARSEG1heGltdW1fcmVxdWVzdHNKBAgDEARKBAgKEAtKBQgLEOYHUg5hdXRvX2Jvb3Rz'
+    'dHJhcFIDZGh0');
+
+@$core.Deprecated('Use dHTSettingsDescriptor instead')
+const DHTSettings$json = {
+  '1': 'DHTSettings',
+  '2': [
+    {'1': 'passive', '3': 1, '4': 1, '5': 8, '10': 'passive'},
+    {'1': 'auto_bootstrap', '3': 2, '4': 1, '5': 8, '10': 'auto_bootstrap'},
+    {'1': 'log', '3': 998, '4': 1, '5': 8, '10': 'log'},
+    {'1': 'debug', '3': 999, '4': 1, '5': 8, '10': 'debug'},
+  ],
+};
+
+/// Descriptor for `DHTSettings`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List dHTSettingsDescriptor = $convert.base64Decode(
+    'CgtESFRTZXR0aW5ncxIYCgdwYXNzaXZlGAEgASgIUgdwYXNzaXZlEiYKDmF1dG9fYm9vdHN0cm'
+    'FwGAIgASgIUg5hdXRvX2Jvb3RzdHJhcBIRCgNsb2cY5gcgASgIUgNsb2cSFQoFZGVidWcY5wcg'
+    'ASgIUgVkZWJ1Zw==');
 
 @$core.Deprecated('Use discoverySettingsDescriptor instead')
 const DiscoverySettings$json = {

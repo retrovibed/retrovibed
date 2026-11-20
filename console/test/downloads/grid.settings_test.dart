@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:retrovibed/downloads/grid.settings.dart';
 import 'package:retrovibed/media.dart' as media;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
-import 'package:retrovibed/wireguard/api.dart' as wireguard_api;
 
 final _resolutions = Resolutions.variant();
 
@@ -14,13 +13,6 @@ void main() {
         GridSettings(
           media.discoveredsearch.request(limit: 32),
           onChange: (_) {},
-          wgcurrent: (nettype) async {
-            return wireguard_api.WireguardCurrentResponse.create()
-              ..wireguard = wireguard_api.Wireguard();
-          },
-          wgupdate: (_, {options = const []}) async {
-            return wireguard_api.WireguardUpdateResponse.create();
-          },
         ),
         physicalSize: entry.value,
       );

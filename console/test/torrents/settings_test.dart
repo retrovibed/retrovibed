@@ -23,7 +23,7 @@ void main() {
       expect(find.text('download rate'), findsOneWidget);
       expect(find.text('upload rate'), findsOneWidget);
       expect(find.text('peers'), findsOneWidget);
-      expect(find.text('log'), findsOneWidget);
+      expect(find.text('info'), findsOneWidget);
       expect(find.text('debug'), findsOneWidget);
       expect(find.text('firewall'), findsOneWidget);
 
@@ -49,7 +49,7 @@ void main() {
       expect(find.text('download rate'), findsOneWidget);
       expect(find.text('upload rate'), findsOneWidget);
       expect(find.text('peers'), findsOneWidget);
-      expect(find.text('log'), findsOneWidget);
+      expect(find.text('info'), findsOneWidget);
       expect(find.text('debug'), findsOneWidget);
       expect(find.text('firewall'), findsOneWidget);
     });
@@ -76,7 +76,7 @@ void main() {
       expect(find.text('download rate'), findsOneWidget);
       expect(find.text('upload rate'), findsOneWidget);
       expect(find.text('peers'), findsOneWidget);
-      expect(find.text('log'), findsOneWidget);
+      expect(find.text('info'), findsOneWidget);
       expect(find.text('debug'), findsOneWidget);
       expect(find.text('firewall'), findsOneWidget);
 

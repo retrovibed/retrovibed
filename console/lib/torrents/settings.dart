@@ -9,7 +9,6 @@ class Settings extends StatefulWidget {
   static api.TorrentSettings zero = api.TorrentSettings(
     seed: true,
     pex: true,
-    dht: true,
     log: false,
     debug: false,
   );
@@ -229,9 +228,34 @@ class _EditView extends State<Settings> {
             children: [
               Expanded(
                 child: Tooltip(
+                  message: "restrict torrent connections to private networks, public peers will be blocked",
+                  child: forms.Checkbox(
+                    const Text("firewall"),
+                    value: current.firewalled,
+                    onChanged: (v) {
+                      final _update = current.deepCopy()..firewalled = v ?? current.firewalled;
+                      setState(() => current = _update);
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            spacing: defaults.spacing,
+            children: [
+              Text("logging", style: Theme.of(context).textTheme.labelMedium),
+              const Expanded(child: Divider()),
+            ],
+          ),
+          Row(
+            spacing: defaults.spacing,
+            children: [
+              Expanded(
+                child: Tooltip(
                   message: "log torrent client activity to the daemon's output",
                   child: forms.Checkbox(
-                    const Text("log"),
+                    const Text("info"),
                     value: current.log,
                     onChanged: (v) {
                       final _update = current.deepCopy()..log = v ?? current.log;
@@ -248,37 +272,6 @@ class _EditView extends State<Settings> {
                     value: current.debug,
                     onChanged: (v) {
                       final _update = current.deepCopy()..debug = v ?? current.debug;
-                      setState(() => current = _update);
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Row(
-            spacing: defaults.spacing,
-            children: [
-              Expanded(
-                child: Tooltip(
-                  message: "restrict torrent connections to private networks, public peers will be blocked",
-                  child: forms.Checkbox(
-                    const Text("firewall"),
-                    value: current.firewalled,
-                    onChanged: (v) {
-                      final _update = current.deepCopy()..firewalled = v ?? current.firewalled;
-                      setState(() => current = _update);
-                    },
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Tooltip(
-                  message: "actively participate in the distributed hash table to find peers, passive when disabled",
-                  child: forms.Checkbox(
-                    const Text("dht"),
-                    value: current.dht,
-                    onChanged: (v) {
-                      final _update = current.deepCopy()..dht = v ?? current.dht;
                       setState(() => current = _update);
                     },
                   ),

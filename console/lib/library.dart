@@ -11,4 +11,5 @@ export 'package:retrovibed/library/known.media.download.list.dart';
 export 'package:retrovibed/library/known.media.locator.dart';
 export 'package:retrovibed/library/known.media.row.display.dart';
 export 'package:retrovibed/library/api.dart';
+export 'package:retrovibed/library/network.settings.dart';
 export 'package:retrovibed/library/watch.history.tracker.dart';

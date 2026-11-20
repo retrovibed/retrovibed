@@ -1,9 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/designkit.dart' as ds;
-import 'package:retrovibed/authn.dart' as authn;
-import 'package:retrovibed/torrents.dart' as torrents;
-import 'package:retrovibed/wireguard.dart' as wireguard;
 import 'package:retrovibed/discovery.dart' as discovery;
+import 'package:retrovibed/library/network.settings.dart';
 import 'package:retrovibed/media.dart' as media;
 
 class _GridItem extends StatelessWidget {
@@ -31,43 +29,13 @@ class _GridItem extends StatelessWidget {
 class GridSettings extends StatelessWidget {
   final media.DownloadSearchRequest current;
   final void Function(media.DownloadSearchRequest r) onChange;
-  final wireguard.FnWireguardCurrent wgcurrent;
-  final wireguard.FnWireguardUpdate wgupdate;
-  const GridSettings(
-    this.current, {
-    super.key,
-    required this.onChange,
-    this.wgcurrent = wireguard.wireguard.current,
-    this.wgupdate = wireguard.wireguard.update,
-  });
+  const GridSettings(this.current, {super.key, required this.onChange});
 
   @override
   Widget build(BuildContext context) {
     final items = [
-      _GridItem(
-        leading: [ds.Heading(Text("sharing"))],
-        torrents.Settings.future(
-          torrents.api.get(options: [authn.request(authn.AuthzCache.meta(context))]),
-          onChange: (v) {
-            return torrents.api.create(
-              v,
-              options: [authn.request(authn.AuthzCache.meta(context))],
-            );
-          },
-        ),
-        trailing: const [],
-      ),
+      _GridItem(NetworkSettings()),
       _GridItem(discovery.Settings()),
-      _GridItem(
-        leading: [ds.Heading(Text("network"))],
-        wireguard.Settings.future(
-          wgcurrent(wireguard.WireguardNettype.DISTRIBUTION).then((r) => r.wireguard),
-          onChange: (v) {
-            return wgupdate(v, options: [authn.request(authn.AuthzCache.meta(context))]).then((r) => r.wireguard);
-          },
-        ),
-        trailing: const [],
-      ),
     ];
 
     return LayoutBuilder(

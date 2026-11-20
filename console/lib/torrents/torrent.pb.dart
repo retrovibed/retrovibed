@@ -155,14 +155,12 @@ class TorrentSettings extends $pb.GeneratedMessage {
   factory TorrentSettings({
     $core.bool? seed,
     $core.bool? pex,
-    $core.bool? autoBootstrap,
     $core.bool? autoLocateMedia,
     $core.bool? firewalled,
     $core.bool? resumable,
     $core.String? ip4,
     $core.String? ip6,
     $core.int? port,
-    $core.bool? dht,
     $core.bool? log,
     $core.bool? debug,
     Limit? download,
@@ -175,14 +173,12 @@ class TorrentSettings extends $pb.GeneratedMessage {
     final result = TorrentSettings._();
     if (seed != null) result.seed = seed;
     if (pex != null) result.pex = pex;
-    if (autoBootstrap != null) result.autoBootstrap = autoBootstrap;
     if (autoLocateMedia != null) result.autoLocateMedia = autoLocateMedia;
     if (firewalled != null) result.firewalled = firewalled;
     if (resumable != null) result.resumable = resumable;
     if (ip4 != null) result.ip4 = ip4;
     if (ip6 != null) result.ip6 = ip6;
     if (port != null) result.port = port;
-    if (dht != null) result.dht = dht;
     if (log != null) result.log = log;
     if (debug != null) result.debug = debug;
     if (download != null) result.download = download;
@@ -209,14 +205,12 @@ class TorrentSettings extends $pb.GeneratedMessage {
       createEmptyInstance: TorrentSettings.$_createMessage)
     ..aOB(1, _omitFieldNames ? '' : 'seed')
     ..aOB(2, _omitFieldNames ? '' : 'pex')
-    ..aOB(3, _omitFieldNames ? '' : 'auto_bootstrap')
     ..aOB(4, _omitFieldNames ? '' : 'auto_locate_media')
     ..aOB(5, _omitFieldNames ? '' : 'firewalled')
     ..aOB(6, _omitFieldNames ? '' : 'resumable')
     ..aOS(7, _omitFieldNames ? '' : 'ip4')
     ..aOS(8, _omitFieldNames ? '' : 'ip6')
     ..aI(9, _omitFieldNames ? '' : 'port', fieldType: $pb.PbFieldType.OU3)
-    ..aOB(10, _omitFieldNames ? '' : 'dht')
     ..aOB(998, _omitFieldNames ? '' : 'log')
     ..aOB(999, _omitFieldNames ? '' : 'debug')
     ..aOM<Limit>(1000, _omitFieldNames ? '' : 'download',
@@ -274,159 +268,234 @@ class TorrentSettings extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   void clearPex() => $_clearField(2);
 
-  @$pb.TagNumber(3)
-  $core.bool get autoBootstrap => $_getBF(2);
-  @$pb.TagNumber(3)
-  set autoBootstrap($core.bool value) => $_setBool(2, value);
-  @$pb.TagNumber(3)
-  $core.bool hasAutoBootstrap() => $_has(2);
-  @$pb.TagNumber(3)
-  void clearAutoBootstrap() => $_clearField(3);
-
   @$pb.TagNumber(4)
-  $core.bool get autoLocateMedia => $_getBF(3);
+  $core.bool get autoLocateMedia => $_getBF(2);
   @$pb.TagNumber(4)
-  set autoLocateMedia($core.bool value) => $_setBool(3, value);
+  set autoLocateMedia($core.bool value) => $_setBool(2, value);
   @$pb.TagNumber(4)
-  $core.bool hasAutoLocateMedia() => $_has(3);
+  $core.bool hasAutoLocateMedia() => $_has(2);
   @$pb.TagNumber(4)
   void clearAutoLocateMedia() => $_clearField(4);
 
   @$pb.TagNumber(5)
-  $core.bool get firewalled => $_getBF(4);
+  $core.bool get firewalled => $_getBF(3);
   @$pb.TagNumber(5)
-  set firewalled($core.bool value) => $_setBool(4, value);
+  set firewalled($core.bool value) => $_setBool(3, value);
   @$pb.TagNumber(5)
-  $core.bool hasFirewalled() => $_has(4);
+  $core.bool hasFirewalled() => $_has(3);
   @$pb.TagNumber(5)
   void clearFirewalled() => $_clearField(5);
 
   @$pb.TagNumber(6)
-  $core.bool get resumable => $_getBF(5);
+  $core.bool get resumable => $_getBF(4);
   @$pb.TagNumber(6)
-  set resumable($core.bool value) => $_setBool(5, value);
+  set resumable($core.bool value) => $_setBool(4, value);
   @$pb.TagNumber(6)
-  $core.bool hasResumable() => $_has(5);
+  $core.bool hasResumable() => $_has(4);
   @$pb.TagNumber(6)
   void clearResumable() => $_clearField(6);
 
   @$pb.TagNumber(7)
-  $core.String get ip4 => $_getSZ(6);
+  $core.String get ip4 => $_getSZ(5);
   @$pb.TagNumber(7)
-  set ip4($core.String value) => $_setString(6, value);
+  set ip4($core.String value) => $_setString(5, value);
   @$pb.TagNumber(7)
-  $core.bool hasIp4() => $_has(6);
+  $core.bool hasIp4() => $_has(5);
   @$pb.TagNumber(7)
   void clearIp4() => $_clearField(7);
 
   @$pb.TagNumber(8)
-  $core.String get ip6 => $_getSZ(7);
+  $core.String get ip6 => $_getSZ(6);
   @$pb.TagNumber(8)
-  set ip6($core.String value) => $_setString(7, value);
+  set ip6($core.String value) => $_setString(6, value);
   @$pb.TagNumber(8)
-  $core.bool hasIp6() => $_has(7);
+  $core.bool hasIp6() => $_has(6);
   @$pb.TagNumber(8)
   void clearIp6() => $_clearField(8);
 
   @$pb.TagNumber(9)
-  $core.int get port => $_getIZ(8);
+  $core.int get port => $_getIZ(7);
   @$pb.TagNumber(9)
-  set port($core.int value) => $_setUnsignedInt32(8, value);
+  set port($core.int value) => $_setUnsignedInt32(7, value);
   @$pb.TagNumber(9)
-  $core.bool hasPort() => $_has(8);
+  $core.bool hasPort() => $_has(7);
   @$pb.TagNumber(9)
   void clearPort() => $_clearField(9);
 
-  @$pb.TagNumber(10)
-  $core.bool get dht => $_getBF(9);
-  @$pb.TagNumber(10)
-  set dht($core.bool value) => $_setBool(9, value);
-  @$pb.TagNumber(10)
-  $core.bool hasDht() => $_has(9);
-  @$pb.TagNumber(10)
-  void clearDht() => $_clearField(10);
-
   @$pb.TagNumber(998)
-  $core.bool get log => $_getBF(10);
+  $core.bool get log => $_getBF(8);
   @$pb.TagNumber(998)
-  set log($core.bool value) => $_setBool(10, value);
+  set log($core.bool value) => $_setBool(8, value);
   @$pb.TagNumber(998)
-  $core.bool hasLog() => $_has(10);
+  $core.bool hasLog() => $_has(8);
   @$pb.TagNumber(998)
   void clearLog() => $_clearField(998);
 
   @$pb.TagNumber(999)
-  $core.bool get debug => $_getBF(11);
+  $core.bool get debug => $_getBF(9);
   @$pb.TagNumber(999)
-  set debug($core.bool value) => $_setBool(11, value);
+  set debug($core.bool value) => $_setBool(9, value);
   @$pb.TagNumber(999)
-  $core.bool hasDebug() => $_has(11);
+  $core.bool hasDebug() => $_has(9);
   @$pb.TagNumber(999)
   void clearDebug() => $_clearField(999);
 
   @$pb.TagNumber(1000)
-  Limit get download => $_getN(12);
+  Limit get download => $_getN(10);
   @$pb.TagNumber(1000)
   set download(Limit value) => $_setField(1000, value);
   @$pb.TagNumber(1000)
-  $core.bool hasDownload() => $_has(12);
+  $core.bool hasDownload() => $_has(10);
   @$pb.TagNumber(1000)
   void clearDownload() => $_clearField(1000);
   @$pb.TagNumber(1000)
-  Limit ensureDownload() => $_ensure(12);
+  Limit ensureDownload() => $_ensure(10);
 
   @$pb.TagNumber(1001)
-  Limit get upload => $_getN(13);
+  Limit get upload => $_getN(11);
   @$pb.TagNumber(1001)
   set upload(Limit value) => $_setField(1001, value);
   @$pb.TagNumber(1001)
-  $core.bool hasUpload() => $_has(13);
+  $core.bool hasUpload() => $_has(11);
   @$pb.TagNumber(1001)
   void clearUpload() => $_clearField(1001);
   @$pb.TagNumber(1001)
-  Limit ensureUpload() => $_ensure(13);
+  Limit ensureUpload() => $_ensure(11);
 
   @$pb.TagNumber(1002)
-  Limit get inbound => $_getN(14);
+  Limit get inbound => $_getN(12);
   @$pb.TagNumber(1002)
   set inbound(Limit value) => $_setField(1002, value);
   @$pb.TagNumber(1002)
-  $core.bool hasInbound() => $_has(14);
+  $core.bool hasInbound() => $_has(12);
   @$pb.TagNumber(1002)
   void clearInbound() => $_clearField(1002);
   @$pb.TagNumber(1002)
-  Limit ensureInbound() => $_ensure(14);
+  Limit ensureInbound() => $_ensure(12);
 
   @$pb.TagNumber(1003)
-  Limit get outbound => $_getN(15);
+  Limit get outbound => $_getN(13);
   @$pb.TagNumber(1003)
   set outbound(Limit value) => $_setField(1003, value);
   @$pb.TagNumber(1003)
-  $core.bool hasOutbound() => $_has(15);
+  $core.bool hasOutbound() => $_has(13);
   @$pb.TagNumber(1003)
   void clearOutbound() => $_clearField(1003);
   @$pb.TagNumber(1003)
-  Limit ensureOutbound() => $_ensure(15);
+  Limit ensureOutbound() => $_ensure(13);
 
   @$pb.TagNumber(1004)
-  Peers get peers => $_getN(16);
+  Peers get peers => $_getN(14);
   @$pb.TagNumber(1004)
   set peers(Peers value) => $_setField(1004, value);
   @$pb.TagNumber(1004)
-  $core.bool hasPeers() => $_has(16);
+  $core.bool hasPeers() => $_has(14);
   @$pb.TagNumber(1004)
   void clearPeers() => $_clearField(1004);
   @$pb.TagNumber(1004)
-  Peers ensurePeers() => $_ensure(16);
+  Peers ensurePeers() => $_ensure(14);
 
   @$pb.TagNumber(1005)
-  $fixnum.Int64 get maximumRequests => $_getI64(17);
+  $fixnum.Int64 get maximumRequests => $_getI64(15);
   @$pb.TagNumber(1005)
-  set maximumRequests($fixnum.Int64 value) => $_setInt64(17, value);
+  set maximumRequests($fixnum.Int64 value) => $_setInt64(15, value);
   @$pb.TagNumber(1005)
-  $core.bool hasMaximumRequests() => $_has(17);
+  $core.bool hasMaximumRequests() => $_has(15);
   @$pb.TagNumber(1005)
   void clearMaximumRequests() => $_clearField(1005);
+}
+
+class DHTSettings extends $pb.GeneratedMessage {
+  factory DHTSettings({
+    $core.bool? passive,
+    $core.bool? autoBootstrap,
+    $core.bool? log,
+    $core.bool? debug,
+  }) {
+    final result = DHTSettings._();
+    if (passive != null) result.passive = passive;
+    if (autoBootstrap != null) result.autoBootstrap = autoBootstrap;
+    if (log != null) result.log = log;
+    if (debug != null) result.debug = debug;
+    return result;
+  }
+
+  DHTSettings._();
+
+  factory DHTSettings.fromBuffer($core.List<$core.int> data,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DHTSettings()..mergeFromBuffer(data, registry);
+  factory DHTSettings.fromJson($core.String json,
+          [$pb.ExtensionRegistry registry = $pb.ExtensionRegistry.EMPTY]) =>
+      DHTSettings()..mergeFromJson(json, registry);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      _omitMessageNames ? '' : 'DHTSettings',
+      package: const $pb.PackageName(_omitMessageNames ? '' : 'torrents'),
+      createEmptyInstance: DHTSettings.$_createMessage)
+    ..aOB(1, _omitFieldNames ? '' : 'passive')
+    ..aOB(2, _omitFieldNames ? '' : 'auto_bootstrap')
+    ..aOB(998, _omitFieldNames ? '' : 'log')
+    ..aOB(999, _omitFieldNames ? '' : 'debug')
+    ..hasRequiredFields = false;
+
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DHTSettings clone() => deepCopy();
+  @$core.Deprecated('See https://github.com/google/protobuf.dart/issues/998.')
+  DHTSettings copyWith(void Function(DHTSettings) updates) =>
+      super.copyWith((message) => updates(message as DHTSettings))
+          as DHTSettings;
+
+  @$core.override
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  @$core.Deprecated('Use DHTSettings() / DHTSettings.new instead')
+  static DHTSettings create() => DHTSettings._();
+  static $pb.GeneratedMessage $_createMessage() => DHTSettings._();
+  @$core.override
+  DHTSettings createEmptyInstance() => DHTSettings._();
+  @$core.pragma('dart2js:noInline')
+  static DHTSettings getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DHTSettings>(
+          DHTSettings.$_createMessage);
+  static DHTSettings? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.bool get passive => $_getBF(0);
+  @$pb.TagNumber(1)
+  set passive($core.bool value) => $_setBool(0, value);
+  @$pb.TagNumber(1)
+  $core.bool hasPassive() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPassive() => $_clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.bool get autoBootstrap => $_getBF(1);
+  @$pb.TagNumber(2)
+  set autoBootstrap($core.bool value) => $_setBool(1, value);
+  @$pb.TagNumber(2)
+  $core.bool hasAutoBootstrap() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAutoBootstrap() => $_clearField(2);
+
+  @$pb.TagNumber(998)
+  $core.bool get log => $_getBF(2);
+  @$pb.TagNumber(998)
+  set log($core.bool value) => $_setBool(2, value);
+  @$pb.TagNumber(998)
+  $core.bool hasLog() => $_has(2);
+  @$pb.TagNumber(998)
+  void clearLog() => $_clearField(998);
+
+  @$pb.TagNumber(999)
+  $core.bool get debug => $_getBF(3);
+  @$pb.TagNumber(999)
+  set debug($core.bool value) => $_setBool(3, value);
+  @$pb.TagNumber(999)
+  $core.bool hasDebug() => $_has(3);
+  @$pb.TagNumber(999)
+  void clearDebug() => $_clearField(999);
 }
 
 class DiscoverySettings extends $pb.GeneratedMessage {

@@ -2,10 +2,11 @@ import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/authn.dart' as authn;
-import 'package:retrovibed/torrents.dart' as torrents_pkg;
-import 'package:retrovibed/wireguard.dart' as wireguard;
-import 'package:retrovibed/storage.dart' as storage_pkg;
+import 'package:retrovibed/torrents.dart' as libtorrents;
+import 'package:retrovibed/storage.dart' as libstorage;
 import 'package:retrovibed/discovery.dart' as discovery;
+import 'package:retrovibed/library/network.settings.dart';
+import 'package:retrovibed/dht.dart' as libdht;
 
 class _GridItem extends StatelessWidget {
   final Widget child;
@@ -30,23 +31,24 @@ class _GridItem extends StatelessWidget {
 }
 
 class GridSettings extends StatelessWidget {
-  final Future<torrents_pkg.TorrentSettings> Function({
+  final Future<libtorrents.TorrentSettings> Function({
     List<httpx.Option> options,
   })
   torrents;
-  final Future<storage_pkg.StorageSettingsResponse> Function({
+  final Future<libdht.DHTSettings> Function({
+    List<httpx.Option> options,
+  })
+  dht;
+  final Future<libstorage.StorageSettingsResponse> Function({
     List<httpx.Option> options,
   })
   storage;
-  final wireguard.FnWireguardCurrent wgcurrent;
-  final wireguard.FnWireguardUpdate wgupdate;
 
   GridSettings({
     super.key,
-    this.torrents = torrents_pkg.api.get,
-    this.storage = storage_pkg.api.get,
-    this.wgcurrent = wireguard.wireguard.current,
-    this.wgupdate = wireguard.wireguard.update,
+    this.torrents = libtorrents.api.get,
+    this.dht = libdht.api.get,
+    this.storage = libstorage.api.get,
   });
 
   @override
@@ -54,41 +56,24 @@ class GridSettings extends StatelessWidget {
     final items = [
       _GridItem(discovery.Settings()),
       _GridItem(
-        leading: [ds.Heading(Text("sharing"))],
-        torrents_pkg.Settings.future(
-          httpx.withRetry(
-            () => torrents(options: [authn.request(authn.AuthzCache.meta(context))]),
-          ),
-          onChange: (v) {
-            return torrents_pkg.api.create(
-              v,
-              options: [authn.request(authn.AuthzCache.meta(context))],
-            );
-          },
+        NetworkSettings(
+          torrent: ({options = const []}) => httpx.withRetry(() => torrents(options: options)),
+          dhts: ({options = const []}) => httpx.withRetry(() => dht(options: options)),
         ),
-        trailing: const [],
       ),
       _GridItem(
-        storage_pkg.MinimalSettings.future(
+        libstorage.MinimalSettings.future(
           httpx.withRetry(
             () => storage(
               options: [authn.request(authn.AuthzCache.meta(context))],
             ),
           ),
           onChange: (v) {
-            return storage_pkg.api.create(
+            return libstorage.api.create(
               v,
               options: [authn.request(authn.AuthzCache.meta(context))],
             );
           },
-        ),
-      ),
-      _GridItem(
-        leading: [ds.Heading(Text("network"))],
-        wireguard.Settings.future(
-          wgcurrent(wireguard.WireguardNettype.DISTRIBUTION).then((r) => r.wireguard),
-          onChange: (v) =>
-              wgupdate(v, options: [authn.request(authn.AuthzCache.meta(context))]).then((r) => r.wireguard),
         ),
       ),
     ];
