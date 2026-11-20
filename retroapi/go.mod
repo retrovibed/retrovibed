@@ -12,7 +12,7 @@ require (
 	github.com/go-playground/form/v4 v4.3.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/schema v1.4.1
-	github.com/james-lawrence/torrent v0.0.0-20261116225812-8de32a756b3b
+	github.com/james-lawrence/torrent v0.0.0-20261120201415-92794f78f2bd
 	github.com/justinas/alice v1.2.0
 	github.com/mattn/go-isatty v0.0.24
 	github.com/mdlayher/netlink v1.11.2
@@ -21,7 +21,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/tetratelabs/wazero v1.12.0
 	golang.org/x/crypto v0.59.0
-	golang.org/x/exp v0.0.0-20261113113407-e3970619a1a4
+	golang.org/x/exp v0.0.0-20261120182113-8801fbdfac81
 	golang.org/x/net v0.63.0
 	golang.org/x/oauth2 v0.37.0
 	golang.org/x/sys v0.50.0
@@ -44,8 +44,8 @@ require (
 	github.com/anacrolix/sync v0.5.4 // indirect
 	github.com/anacrolix/utp v0.2.0 // indirect
 	github.com/benbjohnson/immutable v0.4.3 // indirect
-	github.com/bits-and-blooms/bitset v1.29.0 // indirect
-	github.com/bits-and-blooms/bloom/v3 v3.7.1 // indirect
+	github.com/bits-and-blooms/bitset v1.30.0 // indirect
+	github.com/bits-and-blooms/bloom/v3 v3.7.2 // indirect
 	github.com/bradfitz/iter v0.0.0-20191230175014-e8f45d346db8 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
 	github.com/felixge/fgprof v0.9.5 // indirect
@@ -55,6 +55,7 @@ require (
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/mdlayher/socket v0.6.0 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
+	github.com/twmb/murmur3 v1.2.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/sync v0.25.0 // indirect
