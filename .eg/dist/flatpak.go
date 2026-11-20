@@ -14,7 +14,7 @@ import (
 
 func flatpak(final egflatpak.Module) *egflatpak.Builder {
 	return egflatpak.New(
-		"space.retrovibe.Console", "retrovibe",
+		"space.retrovibe.Console", "retrovibed",
 		egflatpak.Option().SDK("org.gnome.Sdk", "50").Runtime("org.gnome.Platform", "50").
 			Modules(
 				flatpakmods.Libduckdb(),

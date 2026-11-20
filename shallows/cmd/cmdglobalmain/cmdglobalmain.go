@@ -31,6 +31,7 @@ import (
 	"github.com/retrovibed/retrovibed/shallows/cmd/cmdtorrent"
 	"github.com/retrovibed/retrovibed/shallows/cmd/retrovibe/daemons"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
+	"github.com/retrovibed/retrovibed/shallows/internal/envx"
 	"github.com/retrovibed/retrovibed/shallows/internal/md5x"
 	"github.com/retrovibed/retrovibed/shallows/internal/stringsx"
 	"github.com/willabides/kongplete"
@@ -70,8 +71,8 @@ func Main(args ...string) {
 		Ddisc     cmdddisc.Commands      `cmd:"" help:"media discovery commands, used to manage discovery of media"`
 		ETL       cmdetl.Commands        `cmd:"" help:"etl commands for processing jsonl through llm endpoints"`
 		Gdx       konggdx.Commands       `cmd:"" help:"pull profiles/traces from a running eg debug socket"`
-		Daemon    daemons.Command        `cmd:"" help:"run the backend daemon" default:"true"`
-		Console   cmdopts.CmdExec        `cmd:"" hidden:"" help:"open the retrovibe console (ui)"`
+		Daemon    daemons.Command        `cmd:"" help:"run the backend daemon"`
+		Console   cmdopts.CmdExec        `cmd:"" help:"open the retrovibe console (ui)" default:"withargs"`
 	}
 
 	var (
@@ -143,6 +144,7 @@ func Main(args ...string) {
 			"env_auto_reclaim":                  env.AutoReclaim,
 			"env_trace":                         env.Trace,
 			"vars_gdx_socket":                   gdxpath,
+			"vars_exec_cwd":                     envx.String(".", "APPRUN_RUNTIME"),
 			"vars_gdx_default_output":           "-",
 		},
 		kong.UsageOnError(),
