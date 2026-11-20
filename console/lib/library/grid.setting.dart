@@ -10,22 +10,14 @@ import 'package:retrovibed/dht.dart' as libdht;
 
 class _GridItem extends StatelessWidget {
   final Widget child;
-  final List<Widget> leading;
-  final List<Widget> trailing;
-  const _GridItem(
-    this.child, {
-    this.leading = const [],
-    this.trailing = const [],
-  });
+  const _GridItem(this.child);
 
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
     return ds.Card(
       alignment: Alignment.topLeft,
-      leading: leading,
       ClipRRect(borderRadius: defaults.borderRadius, child: child),
-      trailing: trailing,
     );
   }
 }
