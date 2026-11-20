@@ -39,7 +39,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/duckdb/duckdb-go/v2 v2.10505.0 // indirect
 	github.com/dustin/go-humanize v1.1.0 // indirect
-	github.com/egdaemon/duckproxy v0.0.0-20261118154833-a9dd281813bb // indirect
+	github.com/egdaemon/duckproxy v0.0.0-20261120193429-c2b61b872b69 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect

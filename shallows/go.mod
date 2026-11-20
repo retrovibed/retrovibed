@@ -16,12 +16,13 @@ require (
 	github.com/dashotv/tvdb v0.5.2
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/duckdb/duckdb-go/v2 v2.10505.0
-	github.com/egdaemon/duckproxy v0.0.0-20261118154833-a9dd281813bb
+	github.com/egdaemon/duckproxy v0.0.0-20261120193429-c2b61b872b69
+	github.com/egdaemon/duckproxy/duckkong v0.0.0-20261120193429-c2b61b872b69
 	github.com/egdaemon/gdx v0.0.0-20261115232526-a70109276a78
 	github.com/egdaemon/gdx/konggdx v0.0.0-20261115232526-a70109276a78
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d
 	github.com/fsnotify/fsnotify v1.10.1
-	github.com/gabriel-vasile/mimetype v1.4.13
+	github.com/gabriel-vasile/mimetype v1.4.15
 	github.com/go-playground/form/v4 v4.3.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
@@ -59,6 +60,7 @@ require (
 	cloud.google.com/go/auth v0.24.1-0.20261001053825-dbc26066f70a // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.3.0 // indirect
 	cloud.google.com/go/compute/metadata v0.10.0 // indirect
+	github.com/alecthomas/chroma/v2 v2.27.0 // indirect
 	github.com/anacrolix/generics v0.2.0 // indirect
 	github.com/anacrolix/log v0.17.0 // indirect
 	github.com/anacrolix/missinggo/perf v1.0.0 // indirect
@@ -67,7 +69,7 @@ require (
 	github.com/anacrolix/multiless v0.4.0 // indirect
 	github.com/anacrolix/stm v0.6.0 // indirect
 	github.com/anacrolix/sync v0.5.4 // indirect
-	github.com/apache/arrow-go/v18 v18.5.1 // indirect
+	github.com/apache/arrow-go/v18 v18.8.0 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.29.0 // indirect
@@ -90,6 +92,7 @@ require (
 	github.com/colega/zeropool v0.0.0-20230505084239-6fb4a4f75381 // indirect
 	github.com/csnewman/flutter-go-bridge v0.2.0 // indirect
 	github.com/djthorpe/go-errors v1.0.3 // indirect
+	github.com/dlclark/regexp2/v2 v2.8.0 // indirect
 	github.com/duckdb/duckdb-go-bindings v0.10505.0 // indirect
 	github.com/duckdb/duckdb-go-bindings/lib/darwin-amd64 v0.10505.0 // indirect
 	github.com/duckdb/duckdb-go-bindings/lib/darwin-arm64 v0.10505.0 // indirect
@@ -99,6 +102,7 @@ require (
 	github.com/dustin/go-humanize v1.1.0 // indirect
 	github.com/ebitengine/purego v0.10.1 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
+	github.com/egdaemon/duckproxy/usqlx v0.0.0-20261120183610-afbab7aa8c71 // indirect
 	github.com/egdaemon/wasinet/wazeronet v0.0.0-20260928194155-07f223337a8d // indirect
 	github.com/ericlagergren/decimal v0.0.0-20240411145413-00de7ca16731 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
@@ -107,13 +111,15 @@ require (
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/felixge/fgprof v0.9.5 // indirect
 	github.com/felixge/httpsnoop v1.1.0 // indirect
+	github.com/go-git/go-billy/v5 v5.9.1 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
-	github.com/goccy/go-json v0.10.5 // indirect
+	github.com/goccy/go-json v0.10.6 // indirect
 	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/gofrs/uuid/v5 v5.5.1 // indirect
+	github.com/gohxs/readline v0.0.0-20171011095936-a780388e6e7c // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/flatbuffers v25.12.19+incompatible // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -133,13 +139,16 @@ require (
 	github.com/jackc/pgtype v1.14.4 // indirect
 	github.com/jackc/pgx/v5 v5.13.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.4 // indirect
+	github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade // indirect
+	github.com/kenshaw/rasterm v0.1.17 // indirect
 	github.com/klauspost/compress v1.20.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.4.0 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
-	github.com/mattn/go-runewidth v0.0.23 // indirect
+	github.com/mattn/go-runewidth v0.0.30 // indirect
+	github.com/mattn/go-sixel v0.0.12 // indirect
 	github.com/mdlayher/netlink v1.11.2 // indirect
 	github.com/mdlayher/socket v0.6.0 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
@@ -150,6 +159,7 @@ require (
 	github.com/muesli/ansi v0.0.0-20230316100256-276c6243b2f6 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
+	github.com/nathan-fiscaletti/consolesize-go v0.0.0-20260406063853-3bac975de715 // indirect
 	github.com/pierrec/lz4/v4 v4.1.33 // indirect
 	github.com/pkg/profile v1.7.0 // indirect
 	github.com/porfirion/trie v1.0.0 // indirect
@@ -159,10 +169,14 @@ require (
 	github.com/riywo/loginshell v0.0.0-20200815045211-7d26008be1ab // indirect
 	github.com/serenize/snaker v0.0.0-20201027110005-a7ad2135616e // indirect
 	github.com/sethvargo/go-retry v0.5.0 // indirect
+	github.com/soniakeys/quant v1.0.0 // indirect
 	github.com/spf13/cobra v1.10.2 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/tetratelabs/wazero v1.12.0 // indirect
-	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
+	github.com/xo/dburl v0.25.1 // indirect
+	github.com/xo/tblfmt v0.18.3 // indirect
+	github.com/xo/terminfo v1.0.0 // indirect
+	github.com/yookoala/realpath v1.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/xxh3 v1.1.0 // indirect
 	github.com/zieckey/goini v0.0.0-20240615065340-08ee21c836fb // indirect
@@ -179,9 +193,8 @@ require (
 	golang.org/x/net v0.63.0 // indirect
 	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/sys v0.50.0 // indirect
-	golang.org/x/telemetry v0.0.0-20261116191925-e77a43154acb // indirect
+	golang.org/x/term v0.48.0 // indirect
 	golang.org/x/tools v0.53.0 // indirect
-	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
 	google.golang.org/grpc v1.84.0 // indirect
