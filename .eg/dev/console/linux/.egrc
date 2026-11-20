@@ -2,3 +2,4 @@
 [serve]
 --ttl=8h
 --wayland
+--mount-read-only=${HOME}/Downloads:/workload/downloads
