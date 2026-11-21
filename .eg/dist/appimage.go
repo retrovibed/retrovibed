@@ -24,36 +24,26 @@ func AppImageBuild() eg.OpFn {
 	// appimage-builder modifies its AppDir in place (deploys packages, patches binaries), so it works on
 	// a clone of the tarball directory to keep the tarball, and the builds sharing it, untouched.
 	appdir := egtarball.Path(tarballs.AppImageBuild())
-	// must match Dir::Cache::archives in the host apt config.
-	aptarchives := egenv.DirectoryCache(_eg.DefaultModuleDirectory(), "apt", "archives")
+	// persistent cache for build independent data (apt debs and indexes, AppRun binaries, runtime).
+	cachedir := egenv.DirectoryCache(_eg.DefaultModuleDirectory())
 	return shell.Op(
 		shell.Newf("rsync -a --mkpath %s/ %s/", egtarball.Path(tarballs.Retrovibed()), appdir),
 		// appimage-builder runs apt with its own APT_CONFIG (ignoring /etc/apt), but it does read
 		// the apt.conf.d inside the build dir. sync the host's apt configuration into it so apt
 		// behaves the same as the host (retries for transient failures, e.g. 503s from the
 		// launchpad PPA). docker-clean is excluded: it disables the package cache dirs that
-		// appimage-builder points at its build dir.
+		// appimage-builder points at its cache dir.
 		shell.Newf(
 			"rsync -a --mkpath --exclude=docker-clean /etc/apt/apt.conf.d/ %s/",
 			filepath.Join(builddir, "apt", "apt.conf.d"),
 		),
-		// keep downloaded packages in the persistent workload cache so reruns skip what's already fetched.
 		shell.Newf(
-			`printf 'Dir::Cache::archives "%s";\n' > %s`,
-			aptarchives,
-			filepath.Join(builddir, "apt", "apt.conf.d", "99.retro.apt"),
-		),
-		// appimage-builder hardcodes <builddir>/apt/archives when locating downloaded debs, so
-		// symlink that to the cache dir configured above so both agree.
-		shell.Newf("mkdir -p %s", aptarchives),
-		shell.Newf("rm -rf %s", filepath.Join(builddir, "apt", "archives")),
-		shell.Newf("ln -s %s %s", aptarchives, filepath.Join(builddir, "apt", "archives")),
-		shell.Newf(
-			"appimage-builder --recipe %s --skip-tests --build-dir %s",
+			"appimage-builder --recipe %s --skip-tests",
 			egenv.DirectoryWorking(".dist", "AppImageBuilder.yml"),
-			builddir,
 		).Directory(egenv.DirectoryWorkload()).
 			Timeout(egenv.TTL()).
+			Environ("APPIMAGE_BUILDER_BUILD_DIR", builddir).
+			Environ("APPIMAGE_BUILDER_CACHE_DIR", cachedir).
 			Environ("APPDIR", appdir).
 			Environ("VERSION", tarballs.Version()).
 			Environ("APT_ARCH", egarch.Host()).
