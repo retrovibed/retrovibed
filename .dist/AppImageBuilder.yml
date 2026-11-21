@@ -113,6 +113,10 @@ AppDir:
       [ -e "$d/libmpv.so.2" ] && ln -sf libmpv.so.2 "$d/libmpv.so"
     done
 
+    # FONTCONFIG_SYSROOT prefixes the user's home directory (font cache, ~/.fonts) with the
+    # bundle path as well, point it back at the real home so the cache is writable -- see notes below.
+    ln -sfn /home "${APPDIR}/home"
+
     # THIRD PARTY BUG workaround: appimage-builder's runtime setup locates the dynamic
     # linker with a hardcoded "*/x86_64-linux-gnu/ld-linux*.so*" glob and crashes with
     # "'NoneType' object has no attribute 'parent'" on any other architecture. On
@@ -128,14 +132,17 @@ AppDir:
     done
 
   # THIRD PARTY BUG: "Fontconfig warning: .../49-sansserif.conf: invalid constant used: math".
-  # The bundled libfontconfig has /usr/share/fontconfig (its template directory) compiled in,
-  # so even with FONTCONFIG_FILE it parses the HOST's conf.avail, which can be newer than the
-  # bundled library and use syntax it doesn't know. No env var overrides that path, so root all
-  # fontconfig lookups inside the bundle with FONTCONFIG_SYSROOT so library and config match.
-  # note: this also roots the font directories, host fonts are not visible.
+  # The bundled libfontconfig has /usr/share/fontconfig/conf.avail (its template directory)
+  # compiled in and loads it even when FONTCONFIG_FILE points at the bundled config, so it parses
+  # the HOST's conf.avail, which can be newer than the bundled library and use syntax it doesn't
+  # know. No env var overrides that path except FONTCONFIG_SYSROOT, which roots all fontconfig
+  # lookups inside the bundle so library and config match.
+  # known side effects: the font directories and cache directories are rooted in the (read-only)
+  # bundle too, so host fonts are not visible. the user's home (cache, ~/.fonts) is handled by the
+  # $APPDIR/home -> /home symlink in after_bundle.
   runtime:
     env:
-      FONTCONFIG_SYSROOT: '$APPDIR'
+      FONTCONFIG_SYSROOT: "$APPDIR"
 
   files:
     exclude:
