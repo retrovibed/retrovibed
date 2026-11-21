@@ -94,6 +94,15 @@ func Tarball() eg.OpFn {
 	return eg.Sequential(
 		egtarball.Pack(archive),
 		egtarball.SHA256Op(archive),
+		// local runs only (eg compute local, where cloning is disabled): leave a copy of the packed tarball
+		// in the persistent cache directory so its contents can be extracted and reused
+		// (e.g. as APPDIR when testing appimage-builder locally).
+		eg.When(
+			!egenv.CloneEnabled(),
+			shell.Op(
+				shell.Newf("cp %s %s", egtarball.Archive(archive), egenv.DirectoryCache()),
+			),
+		),
 	)
 }
 
