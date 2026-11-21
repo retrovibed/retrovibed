@@ -83,6 +83,7 @@ AppDir:
       # direct
       - libmpv2
       - ffmpeg
+      - duckdb
       # platform/transitive
       - libgtk-3-0t64
       - libglu1-mesa
@@ -109,6 +110,14 @@ AppDir:
     for d in "${APPDIR}"/usr/lib/*-linux-gnu; do
       [ -e "$d/libmpv.so.2" ] && ln -sf libmpv.so.2 "$d/libmpv.so"
     done
+
+    # retrovibed links libduckdb.so dynamically (no rpath), ensure its available.
+    echo "---- libduckdb ----"
+    find "${APPDIR}" -name 'libduckdb*' -exec ls -l {} +
+    if [ -z "$(find "${APPDIR}" -name 'libduckdb.so' -print -quit)" ]; then
+      echo "libduckdb.so missing from the bundle" >&2
+      exit 1
+    fi
 
   # THIRD PARTY BUG: "Fontconfig warning: .../49-sansserif.conf: invalid constant used: math".
   # The bundled libfontconfig loads the HOST's /usr/share/fontconfig/conf.avail (a compiled in
