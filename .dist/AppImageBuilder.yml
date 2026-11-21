@@ -83,7 +83,6 @@ AppDir:
       # direct
       - libmpv2
       - ffmpeg
-      # - duckdb
       # platform/transitive
       - libgtk-3-0t64
       - libglu1-mesa
