@@ -119,7 +119,7 @@ func TestDecodePCM(t *testing.T) {
 		require.NotEmpty(t, buf)
 	})
 
-	t.Run("fails on concatenated MP3 with corrupt region within segment", func(t *testing.T) {
+	t.Run("succeeds on concatenated MP3 with corrupt region within segment", func(t *testing.T) {
 		// .fixtures/decode.corrupted.example.2.mp3 is a 12s MP3 followed by an
 		// equal-sized block of null bytes. Generated with:
 		//   ffmpeg -f lavfi -i "sine=frequency=440:duration=12" -ar 44100 -ac 1 tone.wav
@@ -130,12 +130,12 @@ func TestDecodePCM(t *testing.T) {
 		//
 		// FFmpeg estimates ~24s (bitrate × file size). endTs=16s extends into the
 		// null region; Demux hits AVERROR_INVALIDDATA before the frame callback
-		// ever fires, so done stays false and the error propagates. This documents
-		// the desired behavior (return available data rather than fail); it will
-		// fail until fixed.
+		// ever fires, so done stays false. The desired behavior is to return the
+		// available data rather than fail.
 		seg := Segment{Offset: 0, Duration: 16 * time.Second}
-		_, err := decodeSegment(t.Context(), ".fixtures/decode.corrupted.example.2.mp3", seg)
-		require.ErrorContains(t, err, "Invalid data found when processing input")
+		buf, err := decodeSegment(t.Context(), ".fixtures/decode.corrupted.example.2.mp3", seg)
+		require.NoError(t, err)
+		require.NotEmpty(t, buf)
 	})
 }
 
