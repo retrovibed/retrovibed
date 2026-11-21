@@ -85,7 +85,7 @@ AppDir:
       # direct
       - libmpv2
       - ffmpeg
-      - duckdb
+      # - duckdb
       # platform/transitive
       - libgtk-3-0t64
       - libglu1-mesa
@@ -128,13 +128,16 @@ AppDir:
     done
 
   # THIRD PARTY BUG: "Fontconfig warning: .../49-sansserif.conf: invalid constant used: math".
-  # The bundled libfontconfig has /etc/fonts and /usr/share/fontconfig compiled in, so it
-  # parses the HOST's config, which can be newer than the bundled library and use constants
-  # it doesn't know. Point it at the bundled fontconfig-config so library and config match.
+  # The bundled libfontconfig loads the HOST's /usr/share/fontconfig/conf.avail (a compiled in
+  # path) when the config includes conf.d, and the host's copy can be newer than the bundled
+  # library and use syntax it doesn't know. FONTCONFIG_SYSROOT avoids that but also prefixes the
+  # user's home (font cache) and the font file paths, so instead use a minimal configuration
+  # (.dist/linux/usr/lib/retrovibed/fonts.conf) with no conf.d include.
+  # trade-off: none of the conf.d defaults apply (hinting/antialiasing, dejavu/vera aliases,
+  # generic family mapping). flutter ships its own fonts, gtk falls back to what it finds.
   runtime:
     env:
-      FONTCONFIG_PATH: '$APPDIR/etc/fonts'
-      FONTCONFIG_FILE: '$APPDIR/etc/fonts/fonts.conf'
+      FONTCONFIG_FILE: "$APPDIR/usr/lib/retrovibed/fonts.conf"
 
   files:
     exclude:
