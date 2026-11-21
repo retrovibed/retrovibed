@@ -113,10 +113,6 @@ AppDir:
       [ -e "$d/libmpv.so.2" ] && ln -sf libmpv.so.2 "$d/libmpv.so"
     done
 
-    # FONTCONFIG_SYSROOT prefixes the user's home directory (font cache, ~/.fonts) with the
-    # bundle path as well, point it back at the real home so the cache is writable -- see notes below.
-    ln -sfn /home "${APPDIR}/home"
-
     # THIRD PARTY BUG workaround: appimage-builder's runtime setup locates the dynamic
     # linker with a hardcoded "*/x86_64-linux-gnu/ld-linux*.so*" glob and crashes with
     # "'NoneType' object has no attribute 'parent'" on any other architecture. On
@@ -132,17 +128,16 @@ AppDir:
     done
 
   # THIRD PARTY BUG: "Fontconfig warning: .../49-sansserif.conf: invalid constant used: math".
-  # The bundled libfontconfig has /usr/share/fontconfig/conf.avail (its template directory)
-  # compiled in and loads it even when FONTCONFIG_FILE points at the bundled config, so it parses
-  # the HOST's conf.avail, which can be newer than the bundled library and use syntax it doesn't
-  # know. No env var overrides that path except FONTCONFIG_SYSROOT, which roots all fontconfig
-  # lookups inside the bundle so library and config match.
-  # known side effects: the font directories and cache directories are rooted in the (read-only)
-  # bundle too, so host fonts are not visible. the user's home (cache, ~/.fonts) is handled by the
-  # $APPDIR/home -> /home symlink in after_bundle.
+  # The bundled libfontconfig loads the HOST's /usr/share/fontconfig/conf.avail (a compiled in
+  # path) when the config includes conf.d, and the host's copy can be newer than the bundled
+  # library and use syntax it doesn't know. FONTCONFIG_SYSROOT avoids that but also prefixes the
+  # user's home (font cache) and the font file paths, so instead use a minimal configuration
+  # (.dist/linux/usr/lib/retrovibed/fonts.conf) with no conf.d include.
+  # trade-off: none of the conf.d defaults apply (hinting/antialiasing, dejavu/vera aliases,
+  # generic family mapping). flutter ships its own fonts, gtk falls back to what it finds.
   runtime:
     env:
-      FONTCONFIG_SYSROOT: "$APPDIR"
+      FONTCONFIG_FILE: "$APPDIR/usr/lib/retrovibed/fonts.conf"
 
   files:
     exclude:
