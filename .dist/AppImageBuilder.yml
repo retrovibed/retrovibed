@@ -128,13 +128,14 @@ AppDir:
     done
 
   # THIRD PARTY BUG: "Fontconfig warning: .../49-sansserif.conf: invalid constant used: math".
-  # The bundled libfontconfig has /etc/fonts and /usr/share/fontconfig compiled in, so it
-  # parses the HOST's config, which can be newer than the bundled library and use constants
-  # it doesn't know. Point it at the bundled fontconfig-config so library and config match.
+  # The bundled libfontconfig has /usr/share/fontconfig (its template directory) compiled in,
+  # so even with FONTCONFIG_FILE it parses the HOST's conf.avail, which can be newer than the
+  # bundled library and use syntax it doesn't know. No env var overrides that path, so root all
+  # fontconfig lookups inside the bundle with FONTCONFIG_SYSROOT so library and config match.
+  # note: this also roots the font directories, host fonts are not visible.
   runtime:
     env:
-      FONTCONFIG_PATH: '$APPDIR/etc/fonts'
-      FONTCONFIG_FILE: '$APPDIR/etc/fonts/fonts.conf'
+      FONTCONFIG_SYSROOT: '$APPDIR'
 
   files:
     exclude:
