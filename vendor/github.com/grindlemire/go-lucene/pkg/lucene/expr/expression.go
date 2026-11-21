@@ -4,8 +4,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math"
+	"math/big"
+	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
+
+	"github.com/grindlemire/go-lucene/internal/wildcard"
 )
 
 // Lucene Grammar:
@@ -39,6 +46,7 @@ type Expression struct {
 	// these are operator specific states we have to track
 	boostPower    float64
 	fuzzyDistance int
+	numberText    string
 }
 
 // RangeBoundary represents the boundary conditions for a range operator
@@ -77,9 +85,117 @@ func Lit(in any) *Expression {
 	return Expr(in, Literal)
 }
 
-// WILD represents a literal wildcard expression
+// NumberLit returns a literal for the number v, written as text in the query,
+// such as 1.0 or 02134. A driver that compares the number as text uses text,
+// the SQL drivers write text in place of a float that rounds it, and String
+// prints it. text is kept only when it differs from how v prints, so
+// NumberLit(5, "5") equals Lit(5). It is also dropped when it is not a plain
+// decimal number equal to v, so it can never print as another query.
+func NumberLit(v any, text string) *Expression {
+	e := Lit(v)
+	if text != numberString(v) && spellsNumber(text, v) {
+		e.numberText = text
+	}
+	return e
+}
+
+// numberSpelling matches a number as the lexer reads it: an optional minus,
+// digits with an optional dot or a dot and digits, and an optional exponent.
+var numberSpelling = regexp.MustCompile(`^-?([0-9]+\.?[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?$`)
+
+// spellsNumber reports whether text is a plain decimal number equal to v. A
+// number too small for a float64, such as 1e-400, equals no value: it parses
+// to 0, but it is not 0.
+func spellsNumber(text string, v any) bool {
+	if !numberSpelling.MatchString(text) {
+		return false
+	}
+	f, err := strconv.ParseFloat(text, 64)
+	if err != nil {
+		return false
+	}
+	if mantissa, _, _ := strings.Cut(strings.ToLower(text), "e"); f == 0 && strings.ContainsAny(mantissa, "123456789") {
+		return false
+	}
+	switch n := v.(type) {
+	case int:
+		return spellsInt(text, big.NewInt(int64(n)))
+	case int8:
+		return spellsInt(text, big.NewInt(int64(n)))
+	case int16:
+		return spellsInt(text, big.NewInt(int64(n)))
+	case int32:
+		return spellsInt(text, big.NewInt(int64(n)))
+	case int64:
+		return spellsInt(text, big.NewInt(n))
+	case uint:
+		return spellsInt(text, new(big.Int).SetUint64(uint64(n)))
+	case uint8:
+		return spellsInt(text, new(big.Int).SetUint64(uint64(n)))
+	case uint16:
+		return spellsInt(text, new(big.Int).SetUint64(uint64(n)))
+	case uint32:
+		return spellsInt(text, new(big.Int).SetUint64(uint64(n)))
+	case uint64:
+		return spellsInt(text, new(big.Int).SetUint64(n))
+	case float32:
+		return float32(f) == n
+	case float64:
+		return f == n
+	default:
+		return false
+	}
+}
+
+// spellsInt reports whether the decimal number text is exactly the integer n.
+// It compares exactly rather than through a float64, which reads
+// 9007199254740993 as 9007199254740992. spellsNumber has already parsed text
+// as a float64 that neither overflowed nor underflowed, so its magnitude is
+// within a float64's range, and parsing it exactly costs time in proportion
+// to its length.
+func spellsInt(text string, n *big.Int) bool {
+	r, ok := new(big.Rat).SetString(text)
+	return ok && r.IsInt() && r.Num().Cmp(n) == 0
+}
+
+// numberString prints v the way the SQL drivers print a number as text.
+func numberString(v any) string {
+	switch n := v.(type) {
+	case float64:
+		return strconv.FormatFloat(n, 'f', -1, 64)
+	case float32:
+		return strconv.FormatFloat(float64(n), 'f', -1, 32)
+	default:
+		return fmt.Sprint(v)
+	}
+}
+
+// NumberText returns the text that a NumberLit was written as. It is empty
+// when the number prints as written.
+func (e *Expression) NumberText() string {
+	// Left can change after NumberLit checked the text, so check it again.
+	if e.numberText == "" || !spellsNumber(e.numberText, e.Left) {
+		return ""
+	}
+	return e.numberText
+}
+
+// WILD represents a literal wildcard expression. Its value uses Lucene
+// wildcard syntax: * matches any run of characters, ? matches one character,
+// and a backslash makes the next character literal, so fo\*bar* matches text
+// that starts with fo*bar.
 func WILD(in any) *Expression {
 	return Expr(in, Wild)
+}
+
+// EscapeWildcard returns a wildcard pattern that matches the text s and
+// nothing else, for building a pattern in code from text such as user input.
+// It puts a backslash before each backslash, * and ?, and before each of
+// | ( ) [ ] { } and +, which keep their SIMILAR TO meaning in a pattern built
+// in code. Add wildcards around the result, as in
+// LIKE("name", EscapeWildcard(prefix)+"*").
+func EscapeWildcard(s string) string {
+	return wildcard.Escape(s)
 }
 
 // REGEXP represents a literal regular expression
@@ -116,7 +232,8 @@ func LESSEQ(a any, b any) *Expression {
 	return Expr(a, LessEq, b)
 }
 
-// LIKE creates a LIKE expression. b uses Lucene wildcard syntax (* and ?, not SQL % and _).
+// LIKE creates a LIKE expression. b uses Lucene wildcard syntax (* and ?, not
+// SQL % and _), with a backslash before a * or ? that should match itself.
 func LIKE(a any, b any) *Expression {
 	return Expr(a, Like, b)
 }
@@ -181,10 +298,25 @@ func IsExpr(in any) bool {
 	return isExpr
 }
 
+// IsASTOrJSONContainer reports whether v is a piece of an AST (an Expression,
+// a slice of them, or a RangeBoundary), nil, or a map or slice left over from
+// JSON decoding. None of these is a value that can stand in for a single
+// term. Validate and the SQL drivers share this check so they reject the
+// same things.
+func IsASTOrJSONContainer(v any) bool {
+	switch v.(type) {
+	case nil, *Expression, Expression, []*Expression, []Expression,
+		*RangeBoundary, RangeBoundary, map[string]any, []any:
+		return true
+	default:
+		return false
+	}
+}
+
 // Validate validates the expression is correctly structured.
 func Validate(in any) (err error) {
 	e, isExpr := in.(*Expression)
-	if !isExpr {
+	if !isExpr || e == nil {
 		// if we don't have an expression we must be in a leaf node
 		return nil
 	}
@@ -206,7 +338,12 @@ func Validate(in any) (err error) {
 	return Validate(e.Right)
 }
 
-// Column represents a column in sql. It will not be escaped by quotes in the sql rendering
+// Column represents a column in sql. The drivers quote it for the dialect.
+//
+// String prints a name with a dot in it as written, so Column("labels.k")
+// prints as labels.k, and parsing that with lucene.WithJSONFields("labels")
+// reads the key k of the JSON column labels. Build a JSONPath to address a
+// key in a JSON column.
 type Column string
 
 // GoString is a debug print for the column type
@@ -214,9 +351,87 @@ func (c Column) GoString() string {
 	return fmt.Sprintf("COLUMN(%s)", c)
 }
 
+// JSONPath addresses a key inside a JSON column, e.g. labels.category is
+// Column "labels" with Path ["category"]. The parser produces it in column
+// position for columns registered with lucene.WithJSONFields.
+type JSONPath struct {
+	Column Column   `json:"column"`
+	Path   []string `json:"path"`
+}
+
+// jsonPathLeaf is the JSON form of a JSONPath leaf. The "json_path" key tells
+// it apart from a nested expression object.
+type jsonPathLeaf struct {
+	JSONPath *jsonPathFields `json:"json_path"`
+}
+
+// jsonPathFields has JSONPath's fields without its MarshalJSON method.
+type jsonPathFields JSONPath
+
+// MarshalJSON wraps the path in a "json_path" object so UnmarshalJSON can tell
+// it apart from a nested expression.
+func (p JSONPath) MarshalJSON() ([]byte, error) {
+	return json.Marshal(jsonPathLeaf{JSONPath: (*jsonPathFields)(&p)})
+}
+
+// String renders the path in lucene dot syntax, e.g. labels.category. A name
+// that does not lex as one word, such as labels.a b, is quoted as a phrase:
+// "labels.a b". A dot inside the column or a key has no spelling that reads
+// back as the same path, because a dot always separates keys. It is written
+// as \., so the field does not read back as a different path: Parse rejects
+// labels.a\.b for a JSON column labels.
+func (p JSONPath) String() string {
+	names := make([]string, 0, len(p.Path)+1)
+	for _, name := range append([]string{string(p.Column)}, p.Path...) {
+		names = append(names, strings.ReplaceAll(name, ".", `\.`))
+	}
+	s := strings.Join(names, ".")
+	if isPlainTerm(strings.ReplaceAll(s, `\.`, ".")) {
+		return s
+	}
+	return quotePhrase(s)
+}
+
+// GoString is a debug print for the json path type
+func (p JSONPath) GoString() string {
+	return fmt.Sprintf("JSON_PATH(%s)", p)
+}
+
+// Validate reports whether the path can be rendered. The column must be
+// non-empty, and each path segment non-empty valid UTF-8 without a double
+// quote, backslash or control character.
+func (p JSONPath) Validate() error {
+	if len(p.Column) == 0 {
+		return fmt.Errorf("json path column name is empty")
+	}
+	if len(p.Path) == 0 {
+		return fmt.Errorf("json path on column %q is empty", p.Column)
+	}
+	for _, seg := range p.Path {
+		switch {
+		case seg == "":
+			return fmt.Errorf("json path has an empty segment: %q", string(p.Column)+"."+strings.Join(p.Path, "."))
+		case !utf8.ValidString(seg):
+			return fmt.Errorf("json path segment is not valid UTF-8: %q", seg)
+		case strings.ContainsAny(seg, `"\`):
+			return fmt.Errorf("json path segment contains a double quote or backslash: %q", seg)
+		case strings.ContainsFunc(seg, unicode.IsControl):
+			return fmt.Errorf("json path segment contains a control character: %q", seg)
+		}
+	}
+	return nil
+}
+
 // Expr creates a general new expression. The other public functions are just helpers that call this
 // function underneath.
 func Expr(left any, op Operator, right ...any) *Expression {
+	// A nil *Expression is no expression at all, so it is stored as nil, the
+	// same as an untyped nil: Validate and the drivers report it as missing.
+	left = untypedNil(left)
+	for i := range right {
+		right[i] = untypedNil(right[i])
+	}
+
 	// A bare null literal in column position (e.g. `null:foo`) is a column
 	// named "null", not a SQL NULL. Demote it to a literal column.
 	if e, ok := left.(*Expression); ok && e.Op == Null && operatesOnColumn(op) {
@@ -270,26 +485,17 @@ func Expr(left any, op Operator, right ...any) *Expression {
 		return e
 	}
 
-	// support passing a slice to an IN operator
-	if op == In && len(right) > 0 {
-		e.Right = right[0].(*Expression)
+	// The right side of an IN is stored as given. Validate and the drivers
+	// report anything but a LIST there.
+	if op == In {
+		if len(right) > 0 {
+			e.Right = right[0]
+		}
 		return e
 	}
 
 	if op == List {
-		// super gross but this is how go handles any types that are slices
-		slice, isSlice := left.([]any)[0].([]*Expression)
-		if isSlice {
-			e.Left = slice
-			return e
-		}
-
-		l := left.([]any)
-		vals := []*Expression{}
-		for _, v := range l {
-			vals = append(vals, v.(*Expression))
-		}
-		e.Left = vals
+		e.Left = listItems(left)
 		return e
 	}
 
@@ -305,6 +511,42 @@ func Expr(left any, op Operator, right ...any) *Expression {
 	return e
 }
 
+// untypedNil returns nil for a nil *Expression and in otherwise.
+func untypedNil(in any) any {
+	if e, ok := in.(*Expression); ok && e == nil {
+		return nil
+	}
+	return in
+}
+
+// listItems builds the items of a LIST from the arguments to LIST: one
+// []*Expression, or values that are each an expression or a value such as "x"
+// or 5. An IN matches its items exactly, so a value becomes a literal, even
+// one with a * in it. A nil stays a nil item, which Validate and the drivers
+// report.
+func listItems(in any) []*Expression {
+	args, _ := in.([]any)
+	if len(args) == 1 {
+		if items, ok := args[0].([]*Expression); ok {
+			return items
+		}
+	}
+	items := make([]*Expression, 0, len(args))
+	for _, v := range args {
+		v = untypedNil(v)
+		if v == nil {
+			items = append(items, nil)
+			continue
+		}
+		if e, ok := v.(*Expression); ok {
+			items = append(items, e)
+			continue
+		}
+		items = append(items, Lit(v))
+	}
+	return items
+}
+
 type jsonExpression struct {
 	Left     json.RawMessage `json:"left"`
 	Operator string          `json:"operator"`
@@ -318,6 +560,22 @@ type jsonExpression struct {
 // MarshalJSON is a custom JSON serialization for the Expression
 func (e Expression) MarshalJSON() (out []byte, err error) {
 	// if we are in a leaf node just marshal the value
+	if text := e.NumberText(); e.Op == Literal && text != "" {
+		return json.Marshal(numberLeaf{Number: numberFields{Value: e.Left, Text: text}})
+	}
+	if s, ok := e.Left.(string); ok {
+		if key, tagged := termKeys[e.Op]; tagged && literalToExpr(s).Op != e.Op {
+			return json.Marshal(map[string]string{key: s})
+		}
+	}
+	// encoding/json writes a float64 below 1e-6 or from 1e21 up with an
+	// exponent, as 1e-7. A bare number keeps the text it was written as, so
+	// that would decode with text the literal never had. Writing the
+	// float64 as numberString does makes the text match the value, so the
+	// literal decodes with no text.
+	if f, ok := e.Left.(float64); ok && e.Op == Literal && !math.IsNaN(f) && !math.IsInf(f, 0) {
+		return []byte(numberString(f)), nil
+	}
 	if e.Op == Literal || e.Op == Wild || e.Op == Regexp || e.Op == Null {
 		return json.Marshal(e.Left)
 	}
@@ -360,9 +618,40 @@ func (e *Expression) UnmarshalJSON(data []byte) (err error) {
 	// if this does not look like an object it must be a literal
 	if !isJSONObject(json.RawMessage(data)) {
 		Expr, err := unmarshalLiteral(json.RawMessage(data))
+		if err != nil {
+			return err
+		}
 		// this is required because apparently you can't swap pointers to your receiver mid method
 		*e = *Expr
+		return nil
+	}
+
+	var keys map[string]json.RawMessage
+	if err := json.Unmarshal(data, &keys); err != nil {
 		return err
+	}
+	if raw, ok := keys["json_path"]; ok {
+		p, err := unmarshalJSONPath(raw, len(keys))
+		if err != nil {
+			return err
+		}
+		*e = *Lit(p)
+		return nil
+	}
+	if raw, ok := keys["number"]; ok {
+		n, err := unmarshalNumber(raw, len(keys))
+		if err != nil {
+			return err
+		}
+		*e = *n
+		return nil
+	}
+	if t, ok, err := unmarshalTerm(keys); ok || err != nil {
+		if err != nil {
+			return err
+		}
+		*e = *t
+		return nil
 	}
 
 	// unmarshal the current layer in the json first, then worry about
@@ -400,23 +689,31 @@ func (e *Expression) UnmarshalJSON(data []byte) (err error) {
 
 	e.Op = fromString[c.Operator]
 
+	// The left side of a field operator is its field. MarshalJSON writes a
+	// missing field, as on a range inside a field group, as null, so null
+	// here means no field rather than a NULL expression. A column named null
+	// marshals as the string "null".
+	if operatesOnColumn(e.Op) && isJSONNull(c.Left) {
+		e.Left = nil
+	}
+
 	// if the left hand side is a string then it must be a column
 	if isStringlike(e.Left) && operatesOnColumn(e.Op) {
 		e.Left = wrapInColumn(e.Left)
 	}
 
 	if len(c.Right) > 0 && looksLikeRangeBoundary(c.Right) {
-		var boundary RangeBoundary
-		err = json.Unmarshal(c.Right, &boundary)
+		var raw jsonBoundary
+		err = json.Unmarshal(c.Right, &raw)
 		if err != nil {
 			return err
 		}
-		if !IsExpr(boundary.Min) {
-			boundary.Min = literalToExpr(toIntIfNecessary(boundary.Min))
+		boundary := RangeBoundary{Inclusive: raw.Inclusive}
+		if boundary.Min, err = unmarshalBound(raw.Min); err != nil {
+			return err
 		}
-
-		if !IsExpr(boundary.Max) {
-			boundary.Max = literalToExpr(toIntIfNecessary(boundary.Max))
+		if boundary.Max, err = unmarshalBound(raw.Max); err != nil {
+			return err
 		}
 		e.Right = &boundary
 	} else if len(c.Right) > 0 {
@@ -444,24 +741,192 @@ func (e *Expression) UnmarshalJSON(data []byte) (err error) {
 	return nil
 }
 
+func unmarshalJSONPath(raw json.RawMessage, keys int) (JSONPath, error) {
+	if keys != 1 {
+		return JSONPath{}, fmt.Errorf("json_path must be the only key of its object")
+	}
+	var p jsonPathFields
+	if err := json.Unmarshal(raw, &p); err != nil {
+		return JSONPath{}, fmt.Errorf("invalid json_path: %w", err)
+	}
+	if err := JSONPath(p).Validate(); err != nil {
+		return JSONPath{}, fmt.Errorf("invalid json_path: %w", err)
+	}
+	return JSONPath(p), nil
+}
+
+// numberLeaf is the JSON form of a number literal that keeps the text it was
+// written as, such as {"number":{"value":1,"text":"1.0"}}.
+type numberLeaf struct {
+	Number numberFields `json:"number"`
+}
+
+type numberFields struct {
+	Value any    `json:"value"`
+	Text  string `json:"text"`
+}
+
+// unmarshalNumber decodes a numberLeaf. Like the parser, it reads the number
+// as an int when its text is an int, and as a float64 otherwise.
+func unmarshalNumber(raw json.RawMessage, keys int) (*Expression, error) {
+	if keys != 1 {
+		return nil, fmt.Errorf("number must be the only key of its object")
+	}
+	var n struct {
+		Value json.Number `json:"value"`
+		Text  string      `json:"text"`
+	}
+	if err := json.Unmarshal(raw, &n); err != nil {
+		return nil, fmt.Errorf("invalid number: %w", err)
+	}
+	if n.Text == "" {
+		return nil, fmt.Errorf("invalid number: text must not be empty")
+	}
+	if !numberSpelling.MatchString(n.Text) {
+		return nil, fmt.Errorf("invalid number: text %q is not a decimal number", n.Text)
+	}
+	if _, err := strconv.Atoi(n.Text); err == nil {
+		i, err := strconv.Atoi(n.Value.String())
+		if err != nil {
+			return nil, fmt.Errorf("invalid number: value %q is not an int", n.Value)
+		}
+		return checkedNumberLit(i, n.Text)
+	}
+	f, err := n.Value.Float64()
+	if err != nil {
+		return nil, fmt.Errorf("invalid number: %w", err)
+	}
+	return checkedNumberLit(f, n.Text)
+}
+
+// unmarshalBareNumber decodes a JSON number as the parser reads the same
+// number in a query: as an int when it is one, and as a float64 that keeps
+// its text otherwise, so 9223372036854775808 keeps its digits. A number that
+// a float64 can't hold, such as 1e400 or 1e-400, is an error.
+func unmarshalBareNumber(text string) (*Expression, error) {
+	if i, err := strconv.Atoi(text); err == nil {
+		return NumberLit(i, text), nil
+	}
+	f, err := strconv.ParseFloat(text, 64)
+	if err != nil || !spellsNumber(text, f) {
+		return nil, fmt.Errorf("invalid number %s: it is out of range for a float64", text)
+	}
+	return NumberLit(f, text), nil
+}
+
+// isJSONNumber reports whether in is a JSON number.
+func isJSONNumber(in json.RawMessage) bool {
+	trimmed := bytes.TrimSpace(in)
+	return len(trimmed) > 0 && (trimmed[0] == '-' || (trimmed[0] >= '0' && trimmed[0] <= '9')) && json.Valid(trimmed)
+}
+
+func checkedNumberLit(v any, text string) (*Expression, error) {
+	if !spellsNumber(text, v) {
+		return nil, fmt.Errorf("invalid number: text %q does not equal value %v", text, v)
+	}
+	return NumberLit(v, text), nil
+}
+
+// termKeys gives the JSON key of each kind of string term that has an object
+// form. A term is written as a plain JSON string when that string decodes
+// back to the same kind of term, and as {"<key>": "<value>"} otherwise: the
+// literal fo* is {"literal":"fo*"}, because the string "fo*" decodes as a
+// wildcard, and a wildcard built in code with no * is {"wildcard":"foo"}.
+var termKeys = map[Operator]string{
+	Literal: "literal",
+	Wild:    "wildcard",
+	Regexp:  "regexp",
+}
+
+// unmarshalTerm decodes the object form of a string term. ok is false when
+// keys holds none of the term keys.
+func unmarshalTerm(keys map[string]json.RawMessage) (e *Expression, ok bool, err error) {
+	for op, key := range termKeys {
+		raw, found := keys[key]
+		if !found {
+			continue
+		}
+		if len(keys) != 1 {
+			return nil, true, fmt.Errorf("%s must be the only key of its object", key)
+		}
+		var s string
+		if err := json.Unmarshal(raw, &s); err != nil {
+			return nil, true, fmt.Errorf("invalid %s: %w", key, err)
+		}
+		return Expr(s, op), true, nil
+	}
+	return nil, false, nil
+}
+
+// jsonBoundary is the JSON form of a RangeBoundary, with the bounds left
+// undecoded so that a number keeps its digits.
+type jsonBoundary struct {
+	Min       json.RawMessage `json:"min"`
+	Max       json.RawMessage `json:"max"`
+	Inclusive bool            `json:"inclusive"`
+}
+
+// unmarshalBound decodes a range bound into a literal. A number reads as it
+// does in a query. Any other object stays a map, which Validate rejects.
+func unmarshalBound(raw json.RawMessage) (*Expression, error) {
+	if isJSONNumber(raw) {
+		return unmarshalBareNumber(string(bytes.TrimSpace(raw)))
+	}
+	var in any
+	if len(raw) > 0 {
+		if err := json.Unmarshal(raw, &in); err != nil {
+			return nil, err
+		}
+	}
+	m, isObject := in.(map[string]any)
+	if !isObject || !isLeafObject(m) {
+		return literalToExpr(in), nil
+	}
+	raw, err := json.Marshal(m)
+	if err != nil {
+		return nil, err
+	}
+	return unmarshalLiteral(raw)
+}
+
+// isLeafObject reports whether m is the object form of a single term: a
+// number that keeps its text, or a string term.
+func isLeafObject(m map[string]any) bool {
+	if _, ok := m["number"]; ok {
+		return true
+	}
+	for _, key := range termKeys {
+		if _, ok := m[key]; ok {
+			return true
+		}
+	}
+	return false
+}
+
 func unmarshalLiteral(in json.RawMessage) (e *Expression, err error) {
 	e = ptr(empty())
+
+	// a number that keeps the text it was written as, or a string term
+	if isJSONObject(in) {
+		var keys map[string]json.RawMessage
+		if err := json.Unmarshal(in, &keys); err != nil {
+			return e, err
+		}
+		if raw, ok := keys["number"]; ok {
+			return unmarshalNumber(raw, len(keys))
+		}
+		if t, ok, err := unmarshalTerm(keys); ok || err != nil {
+			return t, err
+		}
+	}
 
 	// JSON `null` -> NULL expression.
 	if bytes.Equal(bytes.TrimSpace(in), []byte("null")) {
 		return NULL(), nil
 	}
 
-	// check if it is an int first because all ints can be parsed as floats
-	i, err := strconv.Atoi(string(in))
-	if err == nil {
-		return Lit(i), nil
-	}
-
-	// check if it is a float
-	f, err := strconv.ParseFloat(string(in), 64)
-	if err == nil {
-		return Lit(f), nil
+	if isJSONNumber(in) {
+		return unmarshalBareNumber(string(bytes.TrimSpace(in)))
 	}
 
 	// we know it is some sort of string so decode it
@@ -516,13 +981,19 @@ func literalToExpr(in any) *Expression {
 		return REGEXP(s)
 	}
 
-	// if it contains a * or ? then it probably is a wildcard expression
-	// TODO this should probably check for escaping
+	// A string with a * or ? is a wildcard pattern, even when they are all
+	// escaped: the backslashes are part of the pattern, so fo\* matches the
+	// text fo*.
 	if strings.ContainsAny(s, "*?") {
 		return WILD(s)
 	}
 
 	return Lit(s)
+}
+
+// isJSONNull reports whether in is the JSON literal null.
+func isJSONNull(in json.RawMessage) bool {
+	return bytes.Equal(bytes.TrimSpace(in), []byte("null"))
 }
 
 func isJSONObject(in json.RawMessage) bool {
@@ -575,21 +1046,6 @@ func wrapInColumn(in any) (out *Expression) {
 		}
 	}
 	return e
-}
-
-// apparently the json unmarshal only parses float64 values so we check if the float64
-// is actually a whole number. If it is then make it an int
-func toIntIfNecessary(in any) (out any) {
-	f, isFloat := in.(float64)
-	if !isFloat {
-		return in
-	}
-
-	if f == float64(int(f)) {
-		return int(f)
-	}
-
-	return f
 }
 
 func empty() Expression {

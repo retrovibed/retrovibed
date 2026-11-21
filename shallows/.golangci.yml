@@ -50,7 +50,8 @@ linters:
         - (*github.com/james-lawrence/torrent.Client).Close
         - (*github.com/james-lawrence/torrent.Client).Stop
         - (*database/sql.DB).Close
-        - (*github.com/mutablelogic/go-media/pkg/ffmpeg.Reader).Close
+        - (*github.com/mutablelogic/go-media/reader.Reader).Close
+        - (*github.com/mutablelogic/go-media/writer.Resampler).Close
         - os.RemoveAll
         - os.Remove
       # Display function signature instead of selector.

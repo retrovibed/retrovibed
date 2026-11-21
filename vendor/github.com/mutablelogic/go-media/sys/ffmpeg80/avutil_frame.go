@@ -162,6 +162,16 @@ func AVUtil_frame_get_num_planes(frame *AVFrame) int {
 	return 0
 }
 
+// Set up dst as a new reference to the same data described by src, sharing
+// its underlying buffer(s) (bumping their refcount) rather than copying -
+// dst must already be allocated but not yet hold any buffers of its own.
+func AVUtil_frame_ref(dst, src *AVFrame) error {
+	if ret := AVError(C.av_frame_ref((*C.struct_AVFrame)(dst), (*C.struct_AVFrame)(src))); ret != 0 {
+		return ret
+	}
+	return nil
+}
+
 // Copy frame data
 func AVUtil_frame_copy(dst, src *AVFrame) error {
 	if ret := AVError(C.av_frame_copy((*C.struct_AVFrame)(dst), (*C.struct_AVFrame)(src))); ret < 0 {
@@ -289,6 +299,19 @@ func (ctx *AVFrame) Pts() int64 {
 
 func (ctx *AVFrame) SetPts(pts int64) {
 	ctx.pts = C.int64_t(pts)
+}
+
+// IsKeyFrame returns true if the frame is a keyframe, which can be decoded
+// without the frames before it
+func (ctx *AVFrame) IsKeyFrame() bool {
+	return ctx.flags&C.AV_FRAME_FLAG_KEY != 0
+}
+
+// BestEffortTs returns the frame's timestamp as estimated by the decoder,
+// in the frame's timebase, which is set when the pts isn't, or
+// AV_NOPTS_VALUE if it's unknown
+func (ctx *AVFrame) BestEffortTs() int64 {
+	return int64(ctx.best_effort_timestamp)
 }
 
 func (ctx *AVFrame) TimeBase() AVRational {

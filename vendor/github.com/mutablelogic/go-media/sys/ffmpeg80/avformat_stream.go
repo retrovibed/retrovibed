@@ -77,6 +77,18 @@ func (ctx *AVStream) SetTimeBase(time_base AVRational) {
 	ctx.time_base = C.AVRational(time_base)
 }
 
+func (ctx *AVStream) Metadata() *AVDictionary {
+	return &AVDictionary{ctx.metadata}
+}
+
+func (ctx *AVStream) SetMetadata(dict *AVDictionary) {
+	if dict == nil {
+		ctx.metadata = nil
+	} else {
+		ctx.metadata = dict.ctx
+	}
+}
+
 func (ctx *AVStream) Disposition() AVDisposition {
 	return AVDisposition(ctx.disposition)
 }
@@ -87,6 +99,13 @@ func (ctx *AVStream) SetDisposition(disposition AVDisposition) {
 
 func (ctx *AVStream) StartTime() int64 {
 	return int64(ctx.start_time)
+}
+
+// SampleAspectRatio returns the sample aspect ratio the container gives the
+// stream, such as from Matroska's display size or MP4's pasp box, or 0:1 if
+// it doesn't give one
+func (ctx *AVStream) SampleAspectRatio() AVRational {
+	return AVRational(ctx.sample_aspect_ratio)
 }
 
 func (ctx *AVStream) Duration() int64 {

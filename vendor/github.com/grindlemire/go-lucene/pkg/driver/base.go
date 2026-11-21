@@ -2,10 +2,15 @@ package driver
 
 import (
 	"fmt"
+	"math"
+	"math/big"
+	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/grindlemire/go-lucene/internal/wildcard"
 	"github.com/grindlemire/go-lucene/pkg/lucene/expr"
+	"github.com/grindlemire/go-lucene/pkg/lucene/reduce"
 )
 
 // stripRegexpDelimiters removes surrounding /.../ delimiters from a Lucene
@@ -20,14 +25,14 @@ func stripRegexpDelimiters(s string) string {
 // isNullExpr returns true if the value is a *expr.Expression with Op == Null.
 func isNullExpr(in any) bool {
 	e, ok := in.(*expr.Expression)
-	return ok && e.Op == expr.Null
+	return ok && e != nil && e.Op == expr.Null
 }
 
 // isNullEquals returns true if the value is an Expression of the form
 // Equals(left, Null). Used to collapse Not/MustNot wrappers into IS NOT NULL.
 func isNullEquals(in any) bool {
 	e, ok := in.(*expr.Expression)
-	if !ok || e.Op != expr.Equals {
+	if !ok || e == nil || e.Op != expr.Equals {
 		return false
 	}
 	return isNullExpr(e.Right)
@@ -89,6 +94,13 @@ type Base struct {
 	// a Postgres-compatible default to preserve backwards compatibility for
 	// custom drivers built against the pre-dialect API.
 	Dialect Dialect
+	// CaseInsensitiveFields lists the columns whose string matches ignore
+	// case. On these columns, equality, IN lists and wildcards with a string
+	// value wrap both sides in LOWER() and keep the dialect's operator.
+	// Numbers, regexes, ranges, comparisons, field:* and null checks are not
+	// changed. Names match exactly. The lucene.WithCaseInsensitiveFields
+	// option sets this for the lucene.ToX functions.
+	CaseInsensitiveFields []string
 }
 
 // dialect returns the configured dialect, falling back to defaultDialect if
@@ -111,6 +123,20 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 		return "", nil, fmt.Errorf("null cannot be rendered as a standalone value")
 	}
 
+	if err := missingOperand(e); err != nil {
+		return "", nil, err
+	}
+	e = withoutNilOperands(e)
+
+	shaped, err := fieldShape(e)
+	if err != nil {
+		return "", nil, err
+	}
+	// A field spread over a group is a new tree, which gets every check.
+	if shaped != e {
+		return b.RenderParam(shaped)
+	}
+
 	// Standalone Regexp expression: strip /.../ delimiters and return as a
 	// parameterized value. This mirrors what serializeParams does for nested
 	// Regexp sub-expressions.
@@ -123,9 +149,19 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 		return "?", []any{s}, nil
 	}
 
+	// A number that a float64 can't hold goes into the SQL as written. No Go
+	// value the drivers bind holds it: a float64 rounds it, and a string is
+	// compared as text against a JSON value in MySQL and SQLite.
+	if text, ok := lostDigits(e); ok {
+		return string(text), nil, nil
+	}
+
 	// Not/MustNot wrapping Equals(field, Null) -> IS NOT NULL.
 	if (e.Op == expr.Not || e.Op == expr.MustNot) && isNullEquals(e.Left) {
 		inner, _ := e.Left.(*expr.Expression)
+		if _, err := fieldShape(inner); err != nil {
+			return "", nil, err
+		}
 		col, cparams, err := b.serializeParams(inner.Left)
 		if err != nil {
 			return "", cparams, err
@@ -133,12 +169,22 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 		return fmt.Sprintf("%s IS NOT NULL", col), cparams, nil
 	}
 
-	d := b.dialect()
+	if p, ok := jsonPathLeft(e); ok {
+		return b.renderJSONPathCompare(e, p, b.renderCompareParam)
+	}
 
 	left, lparams, err := b.serializeParams(e.Left)
 	if err != nil {
 		return s, params, err
 	}
+	str, rparams, err := b.renderCompareParam(e, left, left)
+	return str, append(lparams, rparams...), err
+}
+
+// renderCompareParam renders e once its left side is rendered. nullLeft is the
+// left side for an IS NULL test.
+func (b Base) renderCompareParam(e *expr.Expression, left, nullLeft string) (s string, params []any, err error) {
+	d := b.dialect()
 
 	// Range: access typed boundary directly, skip serializing right side
 	if e.Op == expr.Range {
@@ -147,7 +193,10 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 			return "", nil, fmt.Errorf("range operator requires *expr.RangeBoundary, got %T", e.Right)
 		}
 		str, rangeParams, err := b.renderRangeParam(left, boundary)
-		return str, append(lparams, rangeParams...), err
+		if err != nil {
+			return "", nil, err
+		}
+		return str, rangeParams, nil
 	}
 
 	// Null right-hand side handling. Intercept before serializing the right
@@ -155,12 +204,22 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 	if isNullExpr(e.Right) {
 		switch e.Op {
 		case expr.Equals:
-			return fmt.Sprintf("%s IS NULL", left), lparams, nil
+			return fmt.Sprintf("%s IS NULL", nullLeft), nil, nil
 		case expr.Greater, expr.Less, expr.GreaterEq, expr.LessEq:
 			return "", nil, fmt.Errorf(
 				"comparison operator %s cannot be used with null; use field:null for IS NULL",
 				e.Op,
 			)
+		}
+	}
+
+	if e.Op == expr.In && b.foldsCase(e.Left) {
+		str, inParams, ok, err := b.renderFoldedIn(left, e.Right, b.serializeParams)
+		if err != nil {
+			return "", nil, err
+		}
+		if ok {
+			return str, inParams, nil
 		}
 	}
 
@@ -170,14 +229,14 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 		if ok && nullCount > 0 {
 			switch len(nonNulls) {
 			case 0:
-				return fmt.Sprintf("%s IS NULL", left), lparams, nil
+				return fmt.Sprintf("%s IS NULL", nullLeft), nil, nil
 			case 1:
 				rhs, rparams, err := b.serializeParams(nonNulls[0])
 				if err != nil {
 					return "", nil, err
 				}
-				return fmt.Sprintf("(%s = %s OR %s IS NULL)", left, rhs, left),
-					append(lparams, rparams...), nil
+				return fmt.Sprintf("(%s = %s OR %s IS NULL)", left, rhs, nullLeft),
+					rparams, nil
 			default:
 				// Hand-roll the List rather than calling expr.LIST: that constructor
 				// takes ...any and would require boxing the []*expr.Expression slice.
@@ -186,9 +245,18 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 				if err != nil {
 					return "", nil, err
 				}
-				return fmt.Sprintf("(%s IN %s OR %s IS NULL)", left, inStr, left),
-					append(lparams, inParams...), nil
+				return fmt.Sprintf("(%s IN %s OR %s IS NULL)", left, inStr, nullLeft),
+					inParams, nil
 			}
+		}
+	}
+
+	var pattern string
+	var hasPattern bool
+	if e.Op == expr.Like {
+		pattern, hasPattern, err = likeOperand(e.Right)
+		if err != nil {
+			return "", nil, err
 		}
 	}
 
@@ -201,7 +269,7 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 	// dialect so each database can decide how to represent "any value".
 	if right == "'*'" && e.Op == expr.Like {
 		str, err := d.RenderStandaloneWild(left)
-		return str, lparams, err
+		return str, nil, err
 	}
 
 	// Detect regex (Lucene /regex/) vs. wildcard and let the dialect escape
@@ -214,8 +282,8 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 		if rightExpr, ok := e.Right.(*expr.Expression); ok && rightExpr.Op == expr.Regexp {
 			isRegex = true
 		}
-		if !isRegex && len(rparams) > 0 {
-			transformed, useRegex := d.PrepareLikePattern(rparams[0].(string))
+		if hasPattern && len(rparams) == 1 {
+			transformed, useRegex := d.PrepareLikePattern(pattern)
 			rparams[0] = transformed
 			if useRegex {
 				isRegex = true
@@ -223,7 +291,7 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 		}
 	}
 
-	params = append(lparams, rparams...)
+	params = rparams
 
 	if e.Op != expr.Not &&
 		e.Op != expr.List &&
@@ -239,6 +307,10 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 		}
 	}
 
+	if b.foldsCaseCompare(e, hasPattern) {
+		left, right = lower(left), lower(right)
+	}
+
 	if e.Op == expr.Like {
 		str, err := d.RenderLike(left, right, isRegex)
 		return str, params, err
@@ -250,7 +322,10 @@ func (b Base) RenderParam(e *expr.Expression) (s string, params []any, err error
 	}
 
 	str, err := fn(left, right)
-	return str, params, err
+	if err != nil {
+		return "", nil, err
+	}
+	return str, params, nil
 }
 
 // Render will render the expression based on the renderFNs provided by the driver.
@@ -261,6 +336,20 @@ func (b Base) Render(e *expr.Expression) (s string, err error) {
 
 	if e.Op == expr.Null {
 		return "", fmt.Errorf("null cannot be rendered as a standalone value")
+	}
+
+	if err := missingOperand(e); err != nil {
+		return "", err
+	}
+	e = withoutNilOperands(e)
+
+	shaped, err := fieldShape(e)
+	if err != nil {
+		return "", err
+	}
+	// A field spread over a group is a new tree, which gets every check.
+	if shaped != e {
+		return b.Render(shaped)
 	}
 
 	// Standalone Regexp expression: strip /.../ delimiters and return as a
@@ -275,9 +364,16 @@ func (b Base) Render(e *expr.Expression) (s string, err error) {
 		return b.dialect().EscapeStringLiteral(s), nil
 	}
 
+	if text, ok := lostDigits(e); ok {
+		return string(text), nil
+	}
+
 	// Not/MustNot wrapping Equals(field, Null) -> IS NOT NULL.
 	if (e.Op == expr.Not || e.Op == expr.MustNot) && isNullEquals(e.Left) {
 		inner, _ := e.Left.(*expr.Expression)
+		if _, err := fieldShape(inner); err != nil {
+			return "", err
+		}
 		col, err := b.serialize(inner.Left)
 		if err != nil {
 			return "", err
@@ -285,12 +381,29 @@ func (b Base) Render(e *expr.Expression) (s string, err error) {
 		return fmt.Sprintf("%s IS NOT NULL", col), nil
 	}
 
-	d := b.dialect()
+	if p, ok := jsonPathLeft(e); ok {
+		str, _, err := b.renderJSONPathCompare(e, p, b.renderCompareInline)
+		return str, err
+	}
 
 	left, err := b.serialize(e.Left)
 	if err != nil {
 		return s, err
 	}
+	return b.renderCompare(e, left, left)
+}
+
+// renderCompareInline adapts renderCompare to the signature that
+// renderJSONPathCompare shares with renderCompareParam.
+func (b Base) renderCompareInline(e *expr.Expression, left, nullLeft string) (string, []any, error) {
+	s, err := b.renderCompare(e, left, nullLeft)
+	return s, nil, err
+}
+
+// renderCompare renders e once its left side is rendered. nullLeft is the left
+// side for an IS NULL test.
+func (b Base) renderCompare(e *expr.Expression, left, nullLeft string) (s string, err error) {
+	d := b.dialect()
 
 	// Range: access typed boundary directly, skip serializing right side
 	if e.Op == expr.Range {
@@ -298,7 +411,11 @@ func (b Base) Render(e *expr.Expression) (s string, err error) {
 		if !ok {
 			return "", fmt.Errorf("range operator requires *expr.RangeBoundary, got %T", e.Right)
 		}
-		return b.renderRange(left, boundary)
+		str, err := b.renderRange(left, boundary)
+		if err != nil {
+			return "", err
+		}
+		return str, nil
 	}
 
 	// Null right-hand side handling. Intercept before serializing the right
@@ -306,12 +423,26 @@ func (b Base) Render(e *expr.Expression) (s string, err error) {
 	if isNullExpr(e.Right) {
 		switch e.Op {
 		case expr.Equals:
-			return fmt.Sprintf("%s IS NULL", left), nil
+			return fmt.Sprintf("%s IS NULL", nullLeft), nil
 		case expr.Greater, expr.Less, expr.GreaterEq, expr.LessEq:
 			return "", fmt.Errorf(
 				"comparison operator %s cannot be used with null; use field:null for IS NULL",
 				e.Op,
 			)
+		}
+	}
+
+	if e.Op == expr.In && b.foldsCase(e.Left) {
+		ser := func(v any) (string, []any, error) {
+			s, err := b.serialize(v)
+			return s, nil, err
+		}
+		str, _, ok, err := b.renderFoldedIn(left, e.Right, ser)
+		if err != nil {
+			return "", err
+		}
+		if ok {
+			return str, nil
 		}
 	}
 
@@ -321,13 +452,13 @@ func (b Base) Render(e *expr.Expression) (s string, err error) {
 		if ok && nullCount > 0 {
 			switch len(nonNulls) {
 			case 0:
-				return fmt.Sprintf("%s IS NULL", left), nil
+				return fmt.Sprintf("%s IS NULL", nullLeft), nil
 			case 1:
 				rhs, err := b.serialize(nonNulls[0])
 				if err != nil {
 					return "", err
 				}
-				return fmt.Sprintf("(%s = %s OR %s IS NULL)", left, rhs, left), nil
+				return fmt.Sprintf("(%s = %s OR %s IS NULL)", left, rhs, nullLeft), nil
 			default:
 				// Hand-roll the List rather than calling expr.LIST: that constructor
 				// takes ...any and would require boxing the []*expr.Expression slice.
@@ -336,8 +467,17 @@ func (b Base) Render(e *expr.Expression) (s string, err error) {
 				if err != nil {
 					return "", err
 				}
-				return fmt.Sprintf("(%s IN %s OR %s IS NULL)", left, inStr, left), nil
+				return fmt.Sprintf("(%s IN %s OR %s IS NULL)", left, inStr, nullLeft), nil
 			}
+		}
+	}
+
+	var pattern string
+	var hasPattern bool
+	if e.Op == expr.Like {
+		pattern, hasPattern, err = likeOperand(e.Right)
+		if err != nil {
+			return "", err
 		}
 	}
 
@@ -354,16 +494,18 @@ func (b Base) Render(e *expr.Expression) (s string, err error) {
 
 	// Detect regex (Lucene /regex/) vs. wildcard and let the dialect transform
 	// the pattern and optionally flip to the regex path. Positioned before
-	// paren-wrap to stay symmetric with RenderParam.
+	// paren-wrap to stay symmetric with RenderParam. The dialect transforms
+	// the raw pattern, the same text RenderParam binds, and the result is
+	// escaped afterwards: escaping first would leave any backslash the
+	// transform adds (MySQL's \. in the regex fallback) unescaped.
 	isRegex := false
 	if e.Op == expr.Like {
 		if rightExpr, ok := e.Right.(*expr.Expression); ok && rightExpr.Op == expr.Regexp {
 			isRegex = true
 		}
-		if !isRegex && len(right) >= 2 && right[0] == '\'' && right[len(right)-1] == '\'' {
-			inner := right[1 : len(right)-1]
-			transformed, useRegex := d.PrepareLikePattern(inner)
-			right = "'" + transformed + "'"
+		if hasPattern {
+			transformed, useRegex := d.PrepareLikePattern(pattern)
+			right = d.EscapeStringLiteral(transformed)
 			if useRegex {
 				isRegex = true
 			}
@@ -384,6 +526,10 @@ func (b Base) Render(e *expr.Expression) (s string, err error) {
 		}
 	}
 
+	if b.foldsCaseCompare(e, hasPattern) {
+		left, right = lower(left), lower(right)
+	}
+
 	if e.Op == expr.Like {
 		return d.RenderLike(left, right, isRegex)
 	}
@@ -393,14 +539,228 @@ func (b Base) Render(e *expr.Expression) (s string, err error) {
 		return s, fmt.Errorf("unable to render operator [%s]", e.Op)
 	}
 
-	return fn(left, right)
+	str, err := fn(left, right)
+	if err != nil {
+		return "", err
+	}
+	return str, nil
+}
+
+// missingOperand reports an operand that e needs and does not have. The
+// parser always fills them in, but a tree built in code or read from JSON can
+// leave one out, as expr.Eq("a", nil) does, and would render as broken SQL
+// such as "a" = . A nil *expr.Expression counts as missing. A missing field is
+// reported by fieldShape.
+func missingOperand(e *expr.Expression) error {
+	// The case folding and JSON path renderers read a LIST's items before
+	// they are rendered.
+	if list, ok := e.Right.(*expr.Expression); ok && list != nil && list.Op == expr.List {
+		if err := missingOperand(list); err != nil {
+			return err
+		}
+	}
+	switch e.Op {
+	case expr.And, expr.Or:
+		if isNil(e.Left) || isNil(e.Right) {
+			return fmt.Errorf("%s %s needs an expression on each side", article(e.Op), e.Op)
+		}
+	case expr.Not, expr.Must, expr.MustNot, expr.Boost, expr.Fuzzy:
+		if isNil(e.Left) {
+			return fmt.Errorf("%s %s needs an expression", article(e.Op), e.Op)
+		}
+	case expr.Literal, expr.Wild, expr.Regexp:
+		if isNil(e.Left) {
+			return fmt.Errorf("%s %s needs a value", article(e.Op), e.Op)
+		}
+	case expr.Range:
+		if isNil(e.Right) {
+			return fmt.Errorf("a RANGE needs bounds, as in field:[a TO b]")
+		}
+	case expr.Equals, expr.Like, expr.In, expr.Greater, expr.Less, expr.GreaterEq, expr.LessEq:
+		if isNil(e.Right) {
+			return fmt.Errorf("%s %s needs a value, as in %s", article(e.Op), e.Op, fieldExamples[e.Op])
+		}
+
+	case expr.List:
+		items, ok := e.Left.([]*expr.Expression)
+		if !ok {
+			return fmt.Errorf("a LIST holds a []*expr.Expression, not %T", e.Left)
+		}
+		if len(items) == 0 {
+			return fmt.Errorf("a LIST needs at least one value")
+		}
+		for _, item := range items {
+			if item == nil {
+				return fmt.Errorf("a LIST item is nil")
+			}
+		}
+	}
+	return nil
+}
+
+// withoutNilOperands returns e with a nil *expr.Expression operand set to
+// nil, so the rest of rendering treats it as no operand, as missingOperand
+// does. e itself is not changed.
+func withoutNilOperands(e *expr.Expression) *expr.Expression {
+	left, lok := e.Left.(*expr.Expression)
+	right, rok := e.Right.(*expr.Expression)
+	if !(lok && left == nil) && !(rok && right == nil) {
+		return e
+	}
+	c := *e
+	if lok && left == nil {
+		c.Left = nil
+	}
+	if rok && right == nil {
+		c.Right = nil
+	}
+	return &c
+}
+
+// missingOperandIn runs missingOperand on e and on every expression under it.
+func missingOperandIn(e *expr.Expression) error {
+	if err := missingOperand(e); err != nil {
+		return err
+	}
+	switch v := e.Left.(type) {
+	case *expr.Expression:
+		if v != nil {
+			if err := missingOperandIn(v); err != nil {
+				return err
+			}
+		}
+	case []*expr.Expression:
+		for _, item := range v {
+			if item != nil {
+				if err := missingOperandIn(item); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	if v, ok := e.Right.(*expr.Expression); ok && v != nil {
+		return missingOperandIn(v)
+	}
+	return nil
+}
+
+// isNil reports whether in is nil or a nil *expr.Expression or
+// *expr.RangeBoundary.
+func isNil(in any) bool {
+	switch v := in.(type) {
+	case nil:
+		return true
+	case *expr.Expression:
+		return v == nil
+	case *expr.RangeBoundary:
+		return v == nil
+	default:
+		return false
+	}
+}
+
+// fieldShape checks that a field operator has a field and a value it can
+// compare, and spreads a field over a group of terms. Render does not run
+// expr.Validate, so a tree built in code or read from JSON can hold a group
+// where the parser only puts a single term.
+//
+// An EQUALS whose value is not a single term goes through reduce.FieldGroup,
+// as the parser's a:(...) does, so it renders as the parsed query does. A
+// group gets the field on every term in it, as in a:(x AND y), and a value
+// with a field of its own keeps it, so expr.Eq("a", expr.Eq("b", 1)) is
+// b = 1, as a:(b:1) is. A comparison, an IN list item and a field compare
+// one value, so anything but a single term there is an error, as
+// a:>(x OR y) is for the parser and expr.Validate. The right side of an IN
+// must be a LIST. A LIKE pattern is checked by likeOperand.
+func fieldShape(e *expr.Expression) (*expr.Expression, error) {
+	switch e.Op {
+	case expr.Equals, expr.Like, expr.In, expr.Range, expr.Greater, expr.Less, expr.GreaterEq, expr.LessEq:
+	default:
+		return e, nil
+	}
+
+	if e.Left == nil {
+		if e.Op == expr.Range {
+			return nil, fmt.Errorf("a range needs a field, as in field:[a TO b]")
+		}
+		return nil, fmt.Errorf("%s %s needs a field, as in %s", article(e.Op), e.Op, fieldExamples[e.Op])
+	}
+	if field, ok := e.Left.(*expr.Expression); ok && !isSingleTerm(field) {
+		return nil, fmt.Errorf("the field of %s %s must be a single term, not %s %s expression", article(e.Op), e.Op, article(field.Op), field.Op)
+	}
+
+	value, ok := e.Right.(*expr.Expression)
+	if !ok {
+		if e.Op == expr.In {
+			return nil, fmt.Errorf("the right side of an IN must be a LIST, not %T", e.Right)
+		}
+		return e, nil
+	}
+	switch e.Op {
+	case expr.Equals:
+		if isSingleTerm(value) {
+			return e, nil
+		}
+		if value.Op == expr.List {
+			return nil, fmt.Errorf("the value in an EQUALS must be a single term, not a LIST expression")
+		}
+		// The group is rebuilt with the field on each term, so check the
+		// whole group first: a missing operand in it would be dropped or
+		// panic on the way.
+		if err := missingOperandIn(value); err != nil {
+			return nil, err
+		}
+		field, ok := e.Left.(*expr.Expression)
+		if !ok {
+			field = &expr.Expression{Op: expr.Literal, Left: e.Left}
+		}
+		return reduce.FieldGroup(field, value), nil
+	case expr.In:
+		if value.Op != expr.List {
+			return nil, fmt.Errorf("the right side of an IN must be a LIST, not %s %s expression", article(value.Op), value.Op)
+		}
+		items, _ := value.Left.([]*expr.Expression)
+		for _, item := range items {
+			if item != nil && !isSingleTerm(item) {
+				return nil, fmt.Errorf("an IN list item must be a single term, not %s %s expression", article(item.Op), item.Op)
+			}
+		}
+	case expr.Greater, expr.Less, expr.GreaterEq, expr.LessEq:
+		if !isSingleTerm(value) {
+			return nil, fmt.Errorf("the value in %s %s comparison must be a single term, not %s %s expression", article(e.Op), e.Op, article(value.Op), value.Op)
+		}
+	}
+	return e, nil
+}
+
+// fieldExamples shows each field operator with its field, for the error when
+// the field is missing.
+var fieldExamples = map[expr.Operator]string{
+	expr.Equals:    "field:value",
+	expr.Like:      "field:value*",
+	expr.In:        "field:(a OR b)",
+	expr.Greater:   "field:>value",
+	expr.Less:      "field:<value",
+	expr.GreaterEq: "field:>=value",
+	expr.LessEq:    "field:<=value",
+}
+
+// isSingleTerm reports whether e is a word, phrase, number, wildcard, regex or
+// null. An empty expression also counts, so it renders as it did before.
+func isSingleTerm(e *expr.Expression) bool {
+	switch e.Op {
+	case expr.Undefined, expr.Literal, expr.Wild, expr.Regexp, expr.Null:
+		return true
+	default:
+		return false
+	}
 }
 
 func (b Base) isSimple(in any) bool {
 	switch v := in.(type) {
 	case *expr.Expression:
 		return v.Op == expr.Undefined || v.Op == expr.Literal || v.Op == expr.Regexp || v.Op == expr.Wild
-	case expr.Column:
+	case expr.Column, expr.JSONPath:
 		return true
 	case nil:
 		return true
@@ -419,6 +779,9 @@ func (b Base) serialize(in any) (s string, err error) {
 	switch v := in.(type) {
 	case *expr.Expression:
 		if v.Op == expr.Regexp {
+			if err := missingOperand(v); err != nil {
+				return "", err
+			}
 			s, _ := v.Left.(string)
 			s = stripRegexpDelimiters(s)
 			if err := validateStringLiteral(s); err != nil {
@@ -438,16 +801,169 @@ func (b Base) serialize(in any) (s string, err error) {
 		}
 		return strings.Join(strs, ", "), nil
 	case expr.Column:
-		if len(v) == 0 {
-			return "", fmt.Errorf("column name is empty")
-		}
-		return b.dialect().QuoteColumn(string(v))
+		return b.quoteColumn(v)
+	case expr.JSONPath:
+		sql, err := b.renderJSONPath(v)
+		return sql.Text, err
 	case string:
+		if err := validateStringLiteral(v); err != nil {
+			return "", err
+		}
 		return b.dialect().EscapeStringLiteral(v), nil
 	case bool:
 		return b.dialect().SerializeBool(v), nil
 	default:
-		return fmt.Sprintf("%v", v), nil
+		if s, ok, err := formatNumber(v, 'g'); ok {
+			return s, err
+		}
+		return "", fmt.Errorf("unsupported value of type %T", v)
+	}
+}
+
+// quoteColumn checks a column name and quotes it for the dialect. Column names
+// are always written into the SQL, so they get the same NUL and UTF-8 checks
+// as string literals.
+func (b Base) quoteColumn(c expr.Column) (string, error) {
+	if len(c) == 0 {
+		return "", fmt.Errorf("column name is empty")
+	}
+	if err := validateStringLiteral(string(c)); err != nil {
+		return "", err
+	}
+	return b.dialect().QuoteColumn(string(c))
+}
+
+// formatNumber renders a Go integer or float as a SQL numeric literal, using
+// floatFmt as the strconv format for floats. ok is false when v is not a
+// number. NaN and the infinities are rejected: they would print as NaN or
+// +Inf, which SQL reads as column references.
+func formatNumber(v any, floatFmt byte) (s string, ok bool, err error) {
+	switch n := v.(type) {
+	case int:
+		return strconv.Itoa(n), true, nil
+	case int8:
+		return strconv.FormatInt(int64(n), 10), true, nil
+	case int16:
+		return strconv.FormatInt(int64(n), 10), true, nil
+	case int32:
+		return strconv.FormatInt(int64(n), 10), true, nil
+	case int64:
+		return strconv.FormatInt(n, 10), true, nil
+	case uint:
+		return strconv.FormatUint(uint64(n), 10), true, nil
+	case uint8:
+		return strconv.FormatUint(uint64(n), 10), true, nil
+	case uint16:
+		return strconv.FormatUint(uint64(n), 10), true, nil
+	case uint32:
+		return strconv.FormatUint(uint64(n), 10), true, nil
+	case uint64:
+		return strconv.FormatUint(n, 10), true, nil
+	case float32:
+		return formatFloat(float64(n), floatFmt, 32)
+	case float64:
+		return formatFloat(n, floatFmt, 64)
+	case numberText:
+		return string(n), true, nil
+	default:
+		return "", false, nil
+	}
+}
+
+// numberText is the text a number was written as, for a number that its Go
+// value does not hold. lostDigits only returns one that is a plain decimal
+// number, so it is safe to write into the SQL.
+type numberText string
+
+// plainDecimal matches a plain decimal number, with an optional minus, digits
+// with an optional dot or a dot and digits, and an optional exponent, such as
+// -1.5 or 9223372036854775808. That is SQL's numeric literal syntax, so text
+// that matches it reads as one number in the SQL.
+var plainDecimal = regexp.MustCompile(`^-?([0-9]+\.?[0-9]*|\.[0-9]+)([eE][+-]?[0-9]+)?$`)
+
+// lostDigits returns the text that e, a number literal, was written as when
+// its float value is a different number. A float64 holds
+// 9223372036854775808 as 9223372036854776000, for example, and
+// 0.1000000000000000055511151231257827 as 0.1. Such a number has to reach
+// the database as its text for the database to compare it as written.
+//
+// The text goes into the SQL unquoted, so lostDigits checks it here rather
+// than relying on NumberLit: it must be a plain decimal number, and it must
+// still parse to the value, which a caller can change after NumberLit
+// checked it.
+func lostDigits(e *expr.Expression) (numberText, bool) {
+	text := e.NumberText()
+	if e.Op != expr.Literal || text == "" || !plainDecimal.MatchString(text) {
+		return "", false
+	}
+	var held string
+	switch f := e.Left.(type) {
+	case float64:
+		parsed, err := strconv.ParseFloat(text, 64)
+		if err != nil || parsed != f || f == 0 {
+			return "", false
+		}
+		held = strconv.FormatFloat(f, 'g', -1, 64)
+	case float32:
+		parsed, err := strconv.ParseFloat(text, 32)
+		if err != nil || float32(parsed) != f || f == 0 {
+			return "", false
+		}
+		held = strconv.FormatFloat(float64(f), 'g', -1, 32)
+	default:
+		// An integer renders as its own digits, so its text never reaches
+		// the SQL.
+		return "", false
+	}
+	// The text parsed to a float that is neither 0 nor infinite, so its
+	// magnitude is within a float's range, and parsing it exactly costs time
+	// in proportion to its length.
+	written, ok := new(big.Rat).SetString(text)
+	if !ok {
+		return "", false
+	}
+	value, ok := new(big.Rat).SetString(held)
+	if !ok || written.Cmp(value) == 0 {
+		return "", false
+	}
+	return numberText(text), true
+}
+
+func formatFloat(f float64, floatFmt byte, bitSize int) (string, bool, error) {
+	if math.IsNaN(f) || math.IsInf(f, 0) {
+		return "", true, fmt.Errorf("%v has no SQL literal form; pass it as a parameter instead", f)
+	}
+	return strconv.FormatFloat(f, floatFmt, -1, bitSize), true, nil
+}
+
+// likeOperand checks the right side of a LIKE and returns its raw pattern.
+// The right side must be one term: a wildcard or literal holding a string
+// (hasPattern is true), a regexp holding a string, or a literal column,
+// which is compared as-is. Anything else, such as a number or a compound
+// expression, has no pattern text to translate and is an error.
+func likeOperand(right any) (pattern string, hasPattern bool, err error) {
+	switch v := right.(type) {
+	case string:
+		return v, true, nil
+	case expr.Column:
+		return "", false, nil
+	case *expr.Expression:
+		switch v.Op {
+		case expr.Wild, expr.Literal, expr.Regexp:
+		default:
+			return "", false, fmt.Errorf("LIKE pattern must be a single term, not %s %s expression", article(v.Op), v.Op)
+		}
+		switch left := v.Left.(type) {
+		case string:
+			return left, v.Op != expr.Regexp, nil
+		case expr.Column:
+			if v.Op == expr.Literal {
+				return "", false, nil
+			}
+		}
+		return "", false, fmt.Errorf("LIKE pattern must be a string, not %T", v.Left)
+	default:
+		return "", false, fmt.Errorf("LIKE pattern must be a single term, not %T", right)
 	}
 }
 
@@ -459,6 +975,9 @@ func (b Base) serializeParams(in any) (s string, params []any, err error) {
 	switch v := in.(type) {
 	case *expr.Expression:
 		if v.Op == expr.Regexp {
+			if err := missingOperand(v); err != nil {
+				return "", nil, err
+			}
 			s, _ := v.Left.(string)
 			s = stripRegexpDelimiters(s)
 			if err := validateStringLiteral(s); err != nil {
@@ -479,14 +998,14 @@ func (b Base) serializeParams(in any) (s string, params []any, err error) {
 		}
 		return strings.Join(strs, ", "), params, nil
 	case expr.Column:
-		if len(v) == 0 {
-			return "", params, fmt.Errorf("column name is empty")
-		}
-		quoted, err := b.dialect().QuoteColumn(string(v))
+		quoted, err := b.quoteColumn(v)
 		if err != nil {
 			return "", params, err
 		}
 		return quoted, params, nil
+	case expr.JSONPath:
+		sql, err := b.renderJSONPath(v)
+		return sql.Text, params, err
 	case bool:
 		return "?", []any{b.dialect().BoolParam(v)}, nil
 	case string:
@@ -499,46 +1018,88 @@ func (b Base) serializeParams(in any) (s string, params []any, err error) {
 		// escape single quotes with double single quotes
 		return "?", []any{v}, nil
 	default:
+		// Binding an AST piece or a JSON map/slice would send the database
+		// a Go struct, map, or slice instead of a term.
+		if expr.IsASTOrJSONContainer(v) {
+			return "", nil, fmt.Errorf("unsupported value of type %T", v)
+		}
 		return "?", []any{v}, nil
 	}
 }
 
 // extractBoundValue unwraps a range boundary value from its Expression wrapper.
-// Returns the raw Go value (int, float64, string) and whether the bound is unbounded (*).
+// Returns the bound's Go value, which can be any non-AST, non-container value, and whether the bound is unbounded (*).
+// A number that its Go value does not hold is returned as its numberText.
+// A bound must be a single term. Render does not run Validate, so a hand-built
+// or JSON-decoded AST can still carry a compound bound here.
 func extractBoundValue(bound any) (val any, unbounded bool, err error) {
-	e, ok := bound.(*expr.Expression)
-	if !ok {
-		return bound, false, nil
+	val = bound
+	if e, ok := bound.(*expr.Expression); ok && e != nil {
+		switch e.Op {
+		case expr.Null:
+			return nil, false, fmt.Errorf("null is not allowed as a range bound; use field:null for IS NULL")
+		case expr.Wild:
+			// Only a bare * leaves this side open. Any other wildcard bound,
+			// such as ab*, is literal text, as in Lucene, so its escapes are
+			// dropped: f\o* is fo*.
+			s, ok := e.Left.(string)
+			if ok && s == "*" {
+				return nil, true, nil
+			}
+			val = e.Left
+			if ok {
+				val = wildcard.Unescape(s)
+			}
+		case expr.Literal, expr.Regexp:
+			val = e.Left
+			if text, ok := lostDigits(e); ok {
+				val = text
+			}
+		default:
+			return nil, false, fmt.Errorf("range bound must be a single term, not %s %s expression", article(e.Op), e.Op)
+		}
 	}
-	if e.Op == expr.Null {
-		return nil, false, fmt.Errorf("null is not allowed as a range bound; use field:null for IS NULL")
+	if isNil(val) {
+		return nil, false, fmt.Errorf("a range bound is missing")
 	}
-	if e.Op == expr.Wild {
-		return nil, true, nil
+	if expr.IsASTOrJSONContainer(val) {
+		return nil, false, fmt.Errorf("range bound must be a single term, not %T", val)
 	}
-	return e.Left, false, nil
+	return val, false, nil
+}
+
+// article returns "an" for an operator name that starts with a vowel and
+// "a" otherwise.
+func article(op expr.Operator) string {
+	if name := op.String(); name != "" && strings.ContainsRune("AEIOU", rune(name[0])) {
+		return "an"
+	}
+	return "a"
 }
 
 // formatRangeValue renders a range bound value as a SQL literal.
 func (b Base) formatRangeValue(val any) (string, error) {
 	switch v := val.(type) {
-	case int:
-		return strconv.Itoa(v), nil
-	case float64:
-		return strconv.FormatFloat(v, 'f', -1, 64), nil
 	case string:
+		if err := validateStringLiteral(v); err != nil {
+			return "", err
+		}
 		return b.dialect().EscapeStringLiteral(v), nil
+	case bool:
+		return b.dialect().SerializeBool(v), nil
 	case expr.Column:
-		return b.dialect().QuoteColumn(string(v))
-	default:
-		return fmt.Sprintf("%v", v), nil
+		return b.quoteColumn(v)
 	}
+	if s, ok, err := formatNumber(val, 'f'); ok {
+		return s, err
+	}
+	return "", fmt.Errorf("unsupported range bound value of type %T", val)
 }
 
 // isNumericBound checks whether a range bound value is numeric.
 func isNumericBound(val any) bool {
 	switch val.(type) {
-	case int, float64:
+	case int, float64, numberText:
 		return true
 	default:
 		return false
@@ -619,29 +1180,58 @@ func (b Base) renderRangeParam(left string, boundary *expr.RangeBoundary) (strin
 		return "1=1", nil, nil
 	}
 
+	var minSQL, maxSQL string
+	var params []any
+	if !minUnbounded {
+		if minSQL, params, err = b.rangeParam(minVal, params); err != nil {
+			return "", nil, err
+		}
+	}
+	if !maxUnbounded {
+		if maxSQL, params, err = b.rangeParam(maxVal, params); err != nil {
+			return "", nil, err
+		}
+	}
+
 	if minUnbounded {
 		if inclusive {
-			return fmt.Sprintf("%s <= ?", left), []any{maxVal}, nil
+			return fmt.Sprintf("%s <= %s", left, maxSQL), params, nil
 		}
-		return fmt.Sprintf("%s < ?", left), []any{maxVal}, nil
+		return fmt.Sprintf("%s < %s", left, maxSQL), params, nil
 	}
 
 	if maxUnbounded {
 		if inclusive {
-			return fmt.Sprintf("%s >= ?", left), []any{minVal}, nil
+			return fmt.Sprintf("%s >= %s", left, minSQL), params, nil
 		}
-		return fmt.Sprintf("%s > ?", left), []any{minVal}, nil
+		return fmt.Sprintf("%s > %s", left, minSQL), params, nil
 	}
 
 	if isNumericBound(minVal) || isNumericBound(maxVal) {
 		if inclusive {
-			return fmt.Sprintf("%s >= ? AND %s <= ?", left, left), []any{minVal, maxVal}, nil
+			return fmt.Sprintf("%s >= %s AND %s <= %s", left, minSQL, left, maxSQL), params, nil
 		}
-		return fmt.Sprintf("%s > ? AND %s < ?", left, left), []any{minVal, maxVal}, nil
+		return fmt.Sprintf("%s > %s AND %s < %s", left, minSQL, left, maxSQL), params, nil
 	}
 
 	if inclusive {
-		return fmt.Sprintf("%s BETWEEN ? AND ?", left), []any{minVal, maxVal}, nil
+		return fmt.Sprintf("%s BETWEEN %s AND %s", left, minSQL, maxSQL), params, nil
 	}
-	return fmt.Sprintf("%s > ? AND %s < ?", left, left), []any{minVal, maxVal}, nil
+	return fmt.Sprintf("%s > %s AND %s < %s", left, minSQL, left, maxSQL), params, nil
+}
+
+// rangeParam renders one range bound for the parameterized path. A column is
+// written into the SQL as a quoted identifier, as Render does, so both modes
+// compare against the column. So is a number that its Go value does not hold,
+// as RenderParam does for one outside a range. Anything else becomes a
+// placeholder and is appended to params.
+func (b Base) rangeParam(val any, params []any) (string, []any, error) {
+	switch v := val.(type) {
+	case expr.Column:
+		quoted, err := b.quoteColumn(v)
+		return quoted, params, err
+	case numberText:
+		return string(v), params, nil
+	}
+	return "?", append(params, val), nil
 }

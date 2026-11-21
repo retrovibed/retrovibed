@@ -4,21 +4,25 @@ package acoustics
 
 import (
 	"context"
+	"errors"
 	"io"
+	"time"
 
-	media "github.com/mutablelogic/go-media"
-	"github.com/mutablelogic/go-media/pkg/ffmpeg"
+	"github.com/mutablelogic/go-media/frame"
+	"github.com/mutablelogic/go-media/reader"
+	ff "github.com/mutablelogic/go-media/sys/ffmpeg80"
+	"github.com/mutablelogic/go-media/writer"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
-// ProbeDuration opens the file with FFmpeg and returns its duration in seconds.
-func ProbeDuration(path string) (float64, error) {
-	reader, err := ffmpeg.Open(path)
+// ProbeDuration opens the file with FFmpeg and returns its duration.
+func ProbeDuration(path string) (time.Duration, error) {
+	r, err := reader.Open(path)
 	if err != nil {
 		return 0, err
 	}
-	defer reader.Close()
-	return reader.Duration().Seconds(), nil
+	defer r.Close()
+	return r.Duration(), nil
 }
 
 // DecodePCM decodes each segment of an audio file to mono float32 at SampleRate.
@@ -41,52 +45,79 @@ func decodeSegment(ctx context.Context, path string, seg Segment) ([]float32, er
 	var (
 		buf = make([]float32, 0, 330_750)
 	)
-	reader, err := ffmpeg.Open(path)
+	r, err := reader.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	defer reader.Close()
+	defer r.Close()
 
-	best := reader.BestStream(media.AUDIO)
+	best := -1
+	for index, stream := range r.Streams() {
+		if stream.Par().CodecType() == ff.AVMEDIA_TYPE_AUDIO && (best < 0 || index < best) {
+			best = index
+		}
+	}
 	if best < 0 {
 		return nil, errorsx.String("no audio stream")
 	}
 
-	par, err := ffmpeg.NewAudioPar("flt", "mono", SampleRate)
+	// mono float32 at SampleRate, in frames of any size.
+	par := ff.AVCodec_parameters_alloc()
+	if par == nil {
+		return nil, errorsx.String("failed to allocate codec parameters")
+	}
+	defer ff.AVCodec_parameters_free(par)
+	par.SetCodecType(ff.AVMEDIA_TYPE_AUDIO)
+	par.SetSampleFormat(ff.AV_SAMPLE_FMT_FLT)
+	par.SetSampleRate(SampleRate)
+	var layout ff.AVChannelLayout
+	ff.AVUtil_channel_layout_default(&layout, 1)
+	if err = par.SetChannelLayout(layout); err != nil {
+		return nil, err
+	}
+	resampler, err := writer.NewResampler(par, 0, ff.AVRational{})
 	if err != nil {
 		return nil, err
 	}
+	defer resampler.Close()
 
-	if err = reader.Seek(best, seg.OffsetSec); err != nil {
+	if err = r.Seek(best, seg.Offset); err != nil {
 		return nil, err
 	}
 
-	endTs := seg.OffsetSec + seg.DurationSec
+	endTs := seg.Offset + seg.Duration
 
 	var done bool
-	err = reader.Demux(ctx, func(stream int, p *ffmpeg.Par) (*ffmpeg.Par, error) {
-		if stream == best {
-			return par, nil
-		}
+	collect := func(f frame.Frame) error {
+		buf = append(buf, f.(*frame.AudioFrame).Float32(0)...)
+		return nil
+	}
 
-		return nil, nil
-	}, func(_ int, frame *ffmpeg.Frame) error {
-		if frame.Type() != media.AUDIO {
-			return nil
-		}
+	decoder, err := reader.NewDecoder(func(f frame.Frame) error {
+		af := f.(*frame.AudioFrame)
 
-		if ts := frame.Ts(); ts != ffmpeg.TS_UNDEFINED && ts >= endTs {
+		if time.Duration(ff.AVUtil_rational_rescale_q(af.Pts(), af.TimeBase(), ff.AVUtil_rational(1, int(time.Second)))) >= endTs {
 			done = true
 			return io.EOF
 		}
 
-		buf = append(buf, frame.Float32(0)...)
-
-		return nil
-	}, nil)
-
-	if err != nil && !done {
+		return resampler.Process(f, collect)
+	})
+	if err != nil {
 		return nil, err
+	}
+	if err = decoder.Add(best); err != nil {
+		return nil, err
+	}
+
+	if err = r.Decode(ctx, nil, decoder); err != nil && !(done && errors.Is(err, io.EOF)) {
+		return nil, err
+	}
+
+	if !done {
+		if err = resampler.Process(nil, collect); err != nil {
+			return nil, err
+		}
 	}
 
 	return buf, nil

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gabriel-vasile/mimetype"
-	"github.com/mutablelogic/go-media/pkg/ffmpeg"
+	"github.com/mutablelogic/go-media/reader"
 	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 	"github.com/retrovibed/retrovibed/shallows/internal/slicesx"
@@ -24,7 +24,7 @@ func Extract(src io.ReadSeeker) (_zero Extracted, err error) {
 	}
 
 	if strings.HasPrefix(mime.String(), "audio/") {
-		c, err := ffmpeg.NewReader(src)
+		c, err := reader.NewReader(src)
 		if err != nil {
 			return _zero, errorsx.Wrap(err, "unable to create ffmpeg reader")
 		}
@@ -34,7 +34,7 @@ func Extract(src io.ReadSeeker) (_zero Extracted, err error) {
 	}
 
 	if strings.HasPrefix(mime.String(), "video/") {
-		c, err := ffmpeg.NewReader(src)
+		c, err := reader.NewReader(src)
 		if err != nil {
 			return _zero, errorsx.Wrap(err, "unable to create ffmpeg reader")
 		}
@@ -46,7 +46,7 @@ func Extract(src io.ReadSeeker) (_zero Extracted, err error) {
 	return _zero, errorsx.String("unknown content")
 }
 
-func Audio(mime *mimetype.MIME, src *ffmpeg.Reader) (m *MetadataAudio, err error) {
+func Audio(mime *mimetype.MIME, src *reader.Reader) (m *MetadataAudio, err error) {
 	const (
 		KeyTitle  = "TITLE"
 		KeyAlbum  = "ALBUM"
@@ -91,7 +91,7 @@ func Audio(mime *mimetype.MIME, src *ffmpeg.Reader) (m *MetadataAudio, err error
 	}, nil
 }
 
-func Video(mime *mimetype.MIME, src *ffmpeg.Reader) (m *MetadataVideo, err error) {
+func Video(mime *mimetype.MIME, src *reader.Reader) (m *MetadataVideo, err error) {
 	const (
 		KeyTitle = "TITLE"
 	)

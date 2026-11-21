@@ -219,14 +219,15 @@ func lexSpace(l *Lexer) tokenStateFn {
 func lexVal(l *Lexer) tokenStateFn {
 	l.start = l.pos
 	switch r := l.next(); {
-	case isAlphaNumeric(r) || isWildcard(r) || isEscape(r) || isLiteralChar(r):
+	// a term can start with a dot, as in Lucene, so .5 is a number
+	case isAlphaNumeric(r) || isWildcard(r) || isEscape(r) || isLiteralChar(r) || r == '.':
 		l.backup()
 		return lexWord
 	case isSymbol(r):
 		return l.emit(symbols[r])
 	// special case minus sign since it can be a negative number or a minus
 	case r == '-':
-		if !unicode.IsDigit(l.peek()) {
+		if !startsNumber(l.input[l.pos:]) {
 			return l.emit(TMinus)
 		}
 		l.backup()
@@ -289,10 +290,17 @@ func lexWord(l *Lexer) tokenStateFn {
 loop:
 	for {
 		switch r := l.next(); {
-		case isAlphaNumeric(r) || isWildcard(r) || isLiteralChar(r) || r == '.' || r == '-':
+		// After the first character a term can hold - and +, as in Lucene,
+		// so c++, a-b and the exponent of 1E+3 stay in the term. Only a + or
+		// - that starts a term is an operator.
+		case isAlphaNumeric(r) || isWildcard(r) || isLiteralChar(r) || r == '.' || r == '-' || r == '+':
 			// do nothing
 		case isEscape(r):
-			l.next() // just ignore the next character
+			// skip the escaped character. A backslash at the end of the
+			// input has nothing to escape, which Lucene rejects too.
+			if l.next() == eof {
+				return l.errorf("term can not end with an escape character")
+			}
 		default:
 			l.backup()
 			break loop
@@ -346,13 +354,6 @@ func (l *Lexer) next() rune {
 	return r
 }
 
-// peek returns but does not consume the next rune in the input.
-func (l *Lexer) peek() rune {
-	r := l.next()
-	l.backup()
-	return r
-}
-
 // backup steps back one rune.
 func (l *Lexer) backup() {
 	if !l.atEOF && l.pos > 0 {
@@ -373,6 +374,14 @@ func (l *Lexer) errorf(format string, args ...any) tokenStateFn {
 	l.pos = 0
 	l.input = l.input[:0]
 	return nil
+}
+
+// startsNumber reports whether s starts with a digit, or a dot and a digit.
+// A minus in front of one is a negative number rather than the - operator.
+func startsNumber(s string) bool {
+	s = strings.TrimPrefix(s, ".")
+	r, _ := utf8.DecodeRuneInString(s)
+	return unicode.IsDigit(r)
 }
 
 // isAlphaNumeric reports whether r is an alphabetic, digit, or underscore.

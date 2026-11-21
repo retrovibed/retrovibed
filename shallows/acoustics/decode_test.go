@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -51,7 +52,7 @@ func TestProbeDuration(t *testing.T) {
 	t.Run("returns the duration of a valid file", func(t *testing.T) {
 		dur, err := ProbeDuration(writeWAV(t, 44100, 12.0, 440))
 		require.NoError(t, err)
-		require.True(t, dur >= 11.0 && dur <= 13.0, "duration %.3fs, expected ~12s", dur)
+		require.True(t, dur >= 11*time.Second && dur <= 13*time.Second, "duration %v, expected ~12s", dur)
 	})
 
 	t.Run("errors on a missing file", func(t *testing.T) {
@@ -62,13 +63,13 @@ func TestProbeDuration(t *testing.T) {
 
 func TestDecodePCM(t *testing.T) {
 	t.Run("decodes every segment to mono float32 at SampleRate", func(t *testing.T) {
-		segments := SegmentsForDuration(12.0)
+		segments := SegmentsForDuration(12 * time.Second)
 
 		pcm, err := DecodePCM(t.Context(), writeWAV(t, 44100, 12.0, 440), segments)
 		require.NoError(t, err)
 		require.Len(t, pcm, NumSegments)
 
-		expected := int(segments[0].DurationSec * SampleRate)
+		expected := int(segments[0].Duration.Seconds() * SampleRate)
 		for i, seg := range pcm {
 			require.True(t, len(seg) >= expected/2 && len(seg) <= expected*2,
 				"segment %d: %d samples, expected ~%d at %dHz", i, len(seg), expected, SampleRate)
@@ -82,14 +83,14 @@ func TestDecodePCM(t *testing.T) {
 	})
 
 	t.Run("errors on a missing file", func(t *testing.T) {
-		_, err := DecodePCM(t.Context(), filepath.Join(t.TempDir(), "missing.wav"), SegmentsForDuration(12.0))
+		_, err := DecodePCM(t.Context(), filepath.Join(t.TempDir(), "missing.wav"), SegmentsForDuration(12*time.Second))
 		require.Error(t, err)
 	})
 
 	t.Run("errors on a non-media file", func(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "notaudio.txt")
 		require.NoError(t, os.WriteFile(path, []byte("this is not media"), 0o600))
-		_, err := DecodePCM(t.Context(), path, SegmentsForDuration(12.0))
+		_, err := DecodePCM(t.Context(), path, SegmentsForDuration(12*time.Second))
 		require.Error(t, err)
 	})
 
@@ -102,17 +103,17 @@ func TestDecodePCM(t *testing.T) {
 		//
 		// FFmpeg emits "invalid concatenated file detected" on open. The segment
 		// ends well before the seam (6s < 12s) so decoding succeeds cleanly.
-		seg := Segment{OffsetSec: 0, DurationSec: 6.0}
+		seg := Segment{Offset: 0, Duration: 6 * time.Second}
 		buf, err := decodeSegment(t.Context(), ".fixtures/decode.corrupted.example.1.mp3", seg)
 		require.NoError(t, err)
 		require.NotEmpty(t, buf)
 	})
 
 	t.Run("succeeds on concatenated MP3 when corrupt region is beyond endTs", func(t *testing.T) {
-		// Same fixture as below. DurationSec=12 means endTs=12s, which is right at
+		// Same fixture as below. Duration=12s means endTs=12s, which is right at
 		// the seam; the frame callback sets done=true before Demux errors on the
 		// null region, so the error is suppressed and we get valid audio back.
-		seg := Segment{OffsetSec: 0.0, DurationSec: 12.0}
+		seg := Segment{Offset: 0, Duration: 12 * time.Second}
 		buf, err := decodeSegment(t.Context(), ".fixtures/decode.corrupted.example.2.mp3", seg)
 		require.NoError(t, err)
 		require.NotEmpty(t, buf)
@@ -132,7 +133,7 @@ func TestDecodePCM(t *testing.T) {
 		// ever fires, so done stays false and the error propagates. This documents
 		// the desired behavior (return available data rather than fail); it will
 		// fail until fixed.
-		seg := Segment{OffsetSec: 0.0, DurationSec: 16.0}
+		seg := Segment{Offset: 0, Duration: 16 * time.Second}
 		_, err := decodeSegment(t.Context(), ".fixtures/decode.corrupted.example.2.mp3", seg)
 		require.ErrorContains(t, err, "Invalid data found when processing input")
 	})

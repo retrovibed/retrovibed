@@ -20,8 +20,6 @@ capnproto.org/go/capnp/v3/util/sync/mutex
 ## explicit; go 1.26.0
 cloud.google.com/go/auth
 cloud.google.com/go/auth/credentials
-cloud.google.com/go/auth/credentials/idtoken
-cloud.google.com/go/auth/credentials/impersonate
 cloud.google.com/go/auth/credentials/internal/externalaccount
 cloud.google.com/go/auth/credentials/internal/externalaccountuser
 cloud.google.com/go/auth/credentials/internal/gdch
@@ -59,7 +57,7 @@ github.com/KimMachineGun/automemlimit/memlimit
 # github.com/Masterminds/squirrel v1.5.4
 ## explicit; go 1.14
 github.com/Masterminds/squirrel
-# github.com/Microsoft/go-winio v0.6.3
+# github.com/Microsoft/go-winio v0.6.4
 ## explicit; go 1.26.0
 github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/internal/fs
@@ -105,7 +103,7 @@ github.com/alecthomas/chroma/v2/formatters/html
 github.com/alecthomas/chroma/v2/formatters/svg
 github.com/alecthomas/chroma/v2/lexers
 github.com/alecthomas/chroma/v2/styles
-# github.com/alecthomas/kong v1.16.1
+# github.com/alecthomas/kong v1.17.0
 ## explicit; go 1.20
 github.com/alecthomas/kong
 # github.com/anacrolix/generics v0.2.0
@@ -337,18 +335,18 @@ github.com/charmbracelet/bubbles/viewport
 # github.com/charmbracelet/bubbletea v1.3.6
 ## explicit; go 1.23.0
 github.com/charmbracelet/bubbletea
-# github.com/charmbracelet/colorprofile v0.4.2
-## explicit; go 1.24.2
+# github.com/charmbracelet/colorprofile v0.4.3
+## explicit; go 1.25.0
 github.com/charmbracelet/colorprofile
 # github.com/charmbracelet/huh v1.0.0
 ## explicit; go 1.23.0
 github.com/charmbracelet/huh
 github.com/charmbracelet/huh/internal/accessibility
 github.com/charmbracelet/huh/internal/selector
-# github.com/charmbracelet/lipgloss v1.1.0
+# github.com/charmbracelet/lipgloss v1.1.1-0.20250404203927-76690c660834
 ## explicit; go 1.18
 github.com/charmbracelet/lipgloss
-# github.com/charmbracelet/x/ansi v0.11.6
+# github.com/charmbracelet/x/ansi v0.11.9
 ## explicit; go 1.24.2
 github.com/charmbracelet/x/ansi
 github.com/charmbracelet/x/ansi/parser
@@ -410,6 +408,8 @@ github.com/coder/websocket/internal/wsjs
 # github.com/colega/zeropool v0.0.0-20230505084239-6fb4a4f75381
 ## explicit; go 1.20
 github.com/colega/zeropool
+# github.com/containerd/platforms v1.0.0-rc.4
+## explicit; go 1.24
 # github.com/csnewman/flutter-go-bridge v0.2.0
 ## explicit; go 1.20
 github.com/csnewman/flutter-go-bridge/cmd/flutter-go-bridge
@@ -432,10 +432,7 @@ github.com/dashotv/tvdb/openapi/types
 # github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 ## explicit
 github.com/davecgh/go-spew/spew
-# github.com/djthorpe/go-errors v1.0.3
-## explicit; go 1.17
-github.com/djthorpe/go-errors
-# github.com/dlclark/regexp2/v2 v2.8.0
+# github.com/dlclark/regexp2/v2 v2.8.4
 ## explicit; go 1.25
 github.com/dlclark/regexp2/v2
 github.com/dlclark/regexp2/v2/helpers
@@ -467,13 +464,12 @@ github.com/duckdb/duckdb-go/v2/mapping
 # github.com/dustin/go-humanize v1.1.0
 ## explicit; go 1.21
 github.com/dustin/go-humanize
-# github.com/ebitengine/purego v0.10.1
-## explicit; go 1.18
+# github.com/ebitengine/purego v0.11.3
+## explicit; go 1.25.0
 github.com/ebitengine/purego
 github.com/ebitengine/purego/internal/cgo
 github.com/ebitengine/purego/internal/fakecgo
 github.com/ebitengine/purego/internal/strings
-github.com/ebitengine/purego/internal/xreflect
 # github.com/edsrzf/mmap-go v1.2.0
 ## explicit; go 1.17
 github.com/edsrzf/mmap-go
@@ -621,8 +617,6 @@ github.com/emirpasic/gods/lists/arraylist
 github.com/emirpasic/gods/trees
 github.com/emirpasic/gods/trees/binaryheap
 github.com/emirpasic/gods/utils
-# github.com/envoyproxy/go-control-plane/envoy v1.39.0
-## explicit; go 1.25.0
 # github.com/ericlagergren/decimal v0.0.0-20240411145413-00de7ca16731
 ## explicit; go 1.16
 github.com/ericlagergren/decimal
@@ -760,8 +754,8 @@ github.com/go-playground/form/v4
 ## explicit; go 1.18
 github.com/go-viper/mapstructure/v2
 github.com/go-viper/mapstructure/v2/internal/errors
-# github.com/goccy/go-json v0.10.6
-## explicit; go 1.19
+# github.com/goccy/go-json v0.11.2
+## explicit; go 1.23
 github.com/goccy/go-json
 github.com/goccy/go-json/internal/decoder
 github.com/goccy/go-json/internal/encoder
@@ -849,10 +843,11 @@ github.com/gorilla/mux
 # github.com/gorilla/schema v1.4.1
 ## explicit; go 1.20
 github.com/gorilla/schema
-# github.com/grindlemire/go-lucene v0.2.1
+# github.com/grindlemire/go-lucene v0.3.1
 ## explicit; go 1.25.0
 github.com/grindlemire/go-lucene
 github.com/grindlemire/go-lucene/internal/lex
+github.com/grindlemire/go-lucene/internal/wildcard
 github.com/grindlemire/go-lucene/pkg/driver
 github.com/grindlemire/go-lucene/pkg/lucene/expr
 github.com/grindlemire/go-lucene/pkg/lucene/reduce
@@ -862,8 +857,8 @@ github.com/hashicorp/errwrap
 # github.com/hashicorp/go-multierror v1.1.1
 ## explicit; go 1.13
 github.com/hashicorp/go-multierror
-# github.com/hashicorp/mdns v1.0.6
-## explicit; go 1.13
+# github.com/hashicorp/mdns v1.0.7
+## explicit; go 1.25
 github.com/hashicorp/mdns
 # github.com/huandu/xstrings v1.5.0
 ## explicit; go 1.12
@@ -998,7 +993,7 @@ github.com/james-lawrence/torrent/upnp
 # github.com/jeandeaual/go-locale v0.0.0-20250612000132-0ef82f21eade
 ## explicit; go 1.18
 github.com/jeandeaual/go-locale
-# github.com/jfreymuth/pulse v0.1.2
+# github.com/jfreymuth/pulse v0.1.3
 ## explicit; go 1.12
 github.com/jfreymuth/pulse
 github.com/jfreymuth/pulse/proto
@@ -1011,13 +1006,14 @@ github.com/kenshaw/rasterm
 # github.com/kevinburke/ssh_config v1.6.0
 ## explicit; go 1.18
 github.com/kevinburke/ssh_config
-# github.com/klauspost/compress v1.20.1
+# github.com/klauspost/compress v1.20.4
 ## explicit; go 1.25
 github.com/klauspost/compress
 github.com/klauspost/compress/fse
 github.com/klauspost/compress/huff0
 github.com/klauspost/compress/internal/cpuinfo
 github.com/klauspost/compress/internal/le
+github.com/klauspost/compress/internal/regmask
 github.com/klauspost/compress/internal/snapref
 github.com/klauspost/compress/zstd
 github.com/klauspost/compress/zstd/internal/xxhash
@@ -1044,7 +1040,7 @@ github.com/linxGnu/pqueue/segment/v1
 # github.com/logrusorgru/aurora v2.0.3+incompatible
 ## explicit
 github.com/logrusorgru/aurora
-# github.com/lucasb-eyer/go-colorful v1.3.0
+# github.com/lucasb-eyer/go-colorful v1.4.1
 ## explicit; go 1.12
 github.com/lucasb-eyer/go-colorful
 # github.com/mattn/go-isatty v0.0.24
@@ -1053,7 +1049,7 @@ github.com/mattn/go-isatty
 # github.com/mattn/go-localereader v0.0.1
 ## explicit
 github.com/mattn/go-localereader
-# github.com/mattn/go-runewidth v0.0.30
+# github.com/mattn/go-runewidth v0.0.31
 ## explicit; go 1.23
 github.com/mattn/go-runewidth
 # github.com/mattn/go-sixel v0.0.12
@@ -1066,8 +1062,8 @@ github.com/mdlayher/netlink/nlenc
 # github.com/mdlayher/socket v0.6.0
 ## explicit; go 1.25.0
 github.com/mdlayher/socket
-# github.com/mfridman/interpolate v0.0.2
-## explicit; go 1.19
+# github.com/mfridman/interpolate v0.2.0
+## explicit; go 1.25.0
 github.com/mfridman/interpolate
 # github.com/michiwend/golang-pretty v0.0.0-20141116172505-8ac61812ea3f
 ## explicit
@@ -1093,13 +1089,21 @@ github.com/muesli/cancelreader
 # github.com/muesli/termenv v0.16.0
 ## explicit; go 1.17
 github.com/muesli/termenv
-# github.com/mutablelogic/go-media v1.8.3
-## explicit; go 1.24.0
+# github.com/mutablelogic/go-media v1.11.5
+## explicit; go 1.27.0
 github.com/mutablelogic/go-media
-github.com/mutablelogic/go-media/pkg/ffmpeg
-github.com/mutablelogic/go-media/pkg/ffmpeg/schema
-github.com/mutablelogic/go-media/pkg/file
+github.com/mutablelogic/go-media/frame
+github.com/mutablelogic/go-media/profile/schema
+github.com/mutablelogic/go-media/reader
 github.com/mutablelogic/go-media/sys/ffmpeg80
+github.com/mutablelogic/go-media/writer
+# github.com/mutablelogic/go-pg v1.4.7
+## explicit; go 1.27.0
+github.com/mutablelogic/go-pg
+# github.com/mutablelogic/go-server v1.7.20
+## explicit; go 1.27.0
+github.com/mutablelogic/go-server/pkg/httpresponse
+github.com/mutablelogic/go-server/pkg/types
 # github.com/nathan-fiscaletti/consolesize-go v0.0.0-20260406063853-3bac975de715
 ## explicit; go 1.21
 github.com/nathan-fiscaletti/consolesize-go
@@ -1136,10 +1140,10 @@ github.com/porfirion/trie
 github.com/posener/complete
 github.com/posener/complete/cmd
 github.com/posener/complete/cmd/install
-# github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55
+# github.com/power-devops/perfstat v0.0.0-20260916203055-22a1a467d9f0
 ## explicit; go 1.14
 github.com/power-devops/perfstat
-# github.com/pressly/goose/v3 v3.29.0
+# github.com/pressly/goose/v3 v3.30.1
 ## explicit; go 1.26.0
 github.com/pressly/goose/v3
 github.com/pressly/goose/v3/database
@@ -1171,8 +1175,8 @@ github.com/sergi/go-diff/diffmatchpatch
 # github.com/sethvargo/go-retry v0.5.0
 ## explicit; go 1.25
 github.com/sethvargo/go-retry
-# github.com/shirou/gopsutil/v4 v4.26.6
-## explicit; go 1.24.0
+# github.com/shirou/gopsutil/v4 v4.26.10
+## explicit; go 1.26.0
 github.com/shirou/gopsutil/v4/common
 github.com/shirou/gopsutil/v4/disk
 github.com/shirou/gopsutil/v4/internal/common
@@ -1248,8 +1252,8 @@ github.com/xo/dburl/passfile
 # github.com/xo/tblfmt v0.18.3
 ## explicit; go 1.25.0
 github.com/xo/tblfmt
-# github.com/xo/terminfo v1.0.0
-## explicit; go 1.19
+# github.com/xo/terminfo v1.2.0
+## explicit; go 1.25
 github.com/xo/terminfo
 # github.com/yookoala/realpath v1.0.0
 ## explicit
@@ -1270,8 +1274,8 @@ go.opencensus.io
 ## explicit; go 1.24.0
 go.opentelemetry.io/auto/sdk
 go.opentelemetry.io/auto/sdk/internal/telemetry
-# go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.71.0
-## explicit; go 1.25.0
+# go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.72.0
+## explicit; go 1.26.0
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
 go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc/internal
 # go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.72.0
@@ -1293,6 +1297,7 @@ go.opentelemetry.io/otel/internal/global
 go.opentelemetry.io/otel/propagation
 go.opentelemetry.io/otel/propagation/internal/hextable
 go.opentelemetry.io/otel/semconv/internal/metricpool
+go.opentelemetry.io/otel/semconv/v1.24.0
 go.opentelemetry.io/otel/semconv/v1.37.0
 go.opentelemetry.io/otel/semconv/v1.37.0/rpcconv
 go.opentelemetry.io/otel/semconv/v1.43.0
@@ -1344,6 +1349,14 @@ golang.org/x/crypto/ssh/knownhosts
 ## explicit; go 1.26.0
 golang.org/x/exp/constraints
 golang.org/x/exp/maps
+# golang.org/x/image v0.47.0
+## explicit; go 1.26.0
+golang.org/x/image/bmp
+golang.org/x/image/internal/safemath
+golang.org/x/image/riff
+golang.org/x/image/vp8
+golang.org/x/image/vp8l
+golang.org/x/image/webp
 # golang.org/x/mod v0.43.0
 ## explicit; go 1.26.0
 golang.org/x/mod/internal/lazyregexp
@@ -1490,17 +1503,17 @@ google.golang.org/api/youtube/v3
 ## explicit; go 1.25.0
 google.golang.org/genproto/googleapis/cloud/location
 google.golang.org/genproto/googleapis/type/expr
-# google.golang.org/genproto/googleapis/api v0.0.0-20261005182115-fad411399dd8
+# google.golang.org/genproto/googleapis/api v0.0.0-20261110000943-09e21b237f2c
 ## explicit; go 1.26.0
 google.golang.org/genproto/googleapis/api
 google.golang.org/genproto/googleapis/api/annotations
-# google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b
+# google.golang.org/genproto/googleapis/rpc v0.0.0-20261110000943-09e21b237f2c
 ## explicit; go 1.26.0
 google.golang.org/genproto/googleapis/rpc/code
 google.golang.org/genproto/googleapis/rpc/errdetails
 google.golang.org/genproto/googleapis/rpc/status
-# google.golang.org/grpc v1.84.0
-## explicit; go 1.25.0
+# google.golang.org/grpc v1.85.0
+## explicit; go 1.26.0
 google.golang.org/grpc
 google.golang.org/grpc/attributes
 google.golang.org/grpc/backoff

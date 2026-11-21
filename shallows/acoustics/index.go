@@ -2,35 +2,36 @@ package acoustics
 
 import (
 	"context"
+	"time"
 
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
 )
 
 const (
-	MinTrackDuration   = 10.0 // seconds; shorter tracks excluded
-	MaxSegmentDuration = 30.0 // cap per segment
+	MinTrackDuration   = 10 * time.Second // shorter tracks excluded
+	MaxSegmentDuration = 30 * time.Second // cap per segment
 	NumSegments        = 3
 	StatsVersion       = 1
 )
 
 type Segment struct {
-	OffsetSec   float64
-	DurationSec float64
+	Offset   time.Duration
+	Duration time.Duration
 }
 
 // SegmentsForDuration splits a track into three equal parts, each capped at
 // MaxSegmentDuration. Returns nil if the track is shorter than MinTrackDuration.
-func SegmentsForDuration(durationSec float64) []Segment {
-	if durationSec < MinTrackDuration {
+func SegmentsForDuration(duration time.Duration) []Segment {
+	if duration < MinTrackDuration {
 		return nil
 	}
 
-	segDur := min(durationSec/NumSegments, MaxSegmentDuration)
+	segDur := min(duration/NumSegments, MaxSegmentDuration)
 	segments := make([]Segment, NumSegments)
 	for i := range NumSegments {
 		segments[i] = Segment{
-			OffsetSec:   float64(i) * durationSec / NumSegments,
-			DurationSec: segDur,
+			Offset:   time.Duration(i) * duration / NumSegments,
+			Duration: segDur,
 		}
 	}
 	return segments
