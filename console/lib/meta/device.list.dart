@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'ffi.retro.api.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import './api.dart' as api;
 import 'device.manual.dart';
@@ -78,7 +79,7 @@ class _DaemonList extends State<DaemonList> with ds.LoadingState {
       return v;
     };
 
-    final items = widget.remoteonly ? _res.items.where((d) => !api.daemons.isLocalDevice(d)).toList() : _res.items;
+    final items = widget.remoteonly ? _res.items.where((d) => !context.ffiretro.isLocalDevice(d)).toList() : _res.items;
 
     return ds.Table(
       loading: loading,

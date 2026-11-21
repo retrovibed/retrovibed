@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'ffi.retro.api.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'api.dart' as api;
 import 'device.auto.dart';
@@ -100,7 +101,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> with ds.LoadingState<Da
       spacing: defaults.spacing / 2,
       children: [
         ds.SearchDropdown.text(
-          DaemonTypography.description(widget.library.value),
+          DaemonTypography.description(widget.library.value, isLocalDevice: context.ffiretro.isLocalDevice),
           padding:
               widget.padding ??
               defaults.padding.copyWith(
@@ -166,7 +167,7 @@ class _DaemonDropdownState extends State<DaemonDropdown> with ds.LoadingState<Da
                       // no need to display the current library in the list.
                       return ds.Empty;
                     }
-                    if (widget.remoteonly && api.daemons.isLocalDevice(daemon)) {
+                    if (widget.remoteonly && context.ffiretro.isLocalDevice(daemon)) {
                       return ds.Empty;
                     }
 

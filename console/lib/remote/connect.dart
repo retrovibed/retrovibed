@@ -339,7 +339,7 @@ class _State extends State<Connect> with LoadingState {
   void _connect() {
     if (!mounted) return;
     if (_endpoint.value.hostname.isEmpty) return;
-    if (meta.daemons.isLocalDevice(_endpoint.value)) {
+    if (context.ffiretro.isLocalDevice(_endpoint.value)) {
       return setState(() {
         loading = false;
         _socket = remote.RemoteControlSocket.disabled;

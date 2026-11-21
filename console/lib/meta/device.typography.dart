@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'ffi.retro.api.dart';
 import 'api.dart' as api;
 
 class DaemonTypography extends StatelessWidget {
@@ -14,17 +15,14 @@ class DaemonTypography extends StatelessWidget {
     this.trailing = const [],
   });
 
-  static String description(
-    api.Daemon current,
-  ) {
-    final isDevice = api.daemons.isLocalDevice(current);
-    return isDevice ? "local library" : current.description;
+  static String description(api.Daemon current, {required bool Function(api.Daemon) isLocalDevice}) {
+    return isLocalDevice(current) ? "local library" : current.description;
   }
 
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final defaultDisplay = description(current);
+    final defaultDisplay = description(current, isLocalDevice: context.ffiretro.isLocalDevice);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

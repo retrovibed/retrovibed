@@ -42,7 +42,6 @@ extension WidgetTesterExtensions on WidgetTester {
       if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
     });
     caching.setglobal(caching.DirsWellKnown(cache: tempDir.path));
- 
 
     // loading the font notifies a system fonts change which schedules a frame callback;
     // run it in real async and drain the frame so it isn't reported as a leaked animation.
@@ -75,20 +74,29 @@ extension WidgetTesterExtensions on WidgetTester {
                 children: [
                   Flexible(
                     fit: fit,
-                    child: authn.AuthzCache(
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final defaults = ds.Defaults.of(context);
-                          final isCompact = constraints.maxWidth < defaults.compact;
-                          return Theme(
-                            data: Theme.of(context).copyWith(
-                              extensions: [defaults.copyWith(isCompact: isCompact)],
-                            ),
-                            child: child,
-                          );
+                    child: meta.RetroFFIScope(
+                      // never reach the native library from widget tests: loopback hosts are "local".
+                      daemons: meta.RetroAPI(
+                        isLocalDevice: (d) {
+                          final host = Uri.parse('https://${d.hostname}').host;
+                          return host == 'localhost' || (InternetAddress.tryParse(host)?.isLoopback ?? false);
                         },
                       ),
-                      current: authzCurrent,
+                      child: authn.AuthzCache(
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final defaults = ds.Defaults.of(context);
+                            final isCompact = constraints.maxWidth < defaults.compact;
+                            return Theme(
+                              data: Theme.of(context).copyWith(
+                                extensions: [defaults.copyWith(isCompact: isCompact)],
+                              ),
+                              child: child,
+                            );
+                          },
+                        ),
+                        current: authzCurrent,
+                      ),
                     ),
                   ),
                 ],

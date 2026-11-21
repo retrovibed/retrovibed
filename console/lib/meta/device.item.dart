@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:retrovibed/designkit.dart' as ds;
+import 'ffi.retro.api.dart';
 import 'package:retrovibed/httpx.dart' as httpx;
 import 'api.dart' as api;
 import 'device.typography.dart';
@@ -28,7 +29,7 @@ class _DaemonDropdownItemState extends State<DaemonDropdownItem> with ds.Loading
   @override
   Widget build(BuildContext context) {
     final defaults = ds.Defaults.of(context);
-    final isDevice = api.daemons.isLocalDevice(widget.library);
+    final isDevice = context.ffiretro.isLocalDevice(widget.library);
     return ds.ErrorScreen(
       cause: cause,
       tint: defaults.dangerTint,
