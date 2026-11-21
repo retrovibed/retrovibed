@@ -83,7 +83,6 @@ AppDir:
       # direct
       - libmpv2
       - ffmpeg
-      # - duckdb
       # platform/transitive
       - libgtk-3-0t64
       - libglu1-mesa
@@ -130,7 +129,5 @@ AppDir:
       - usr/share/bash-completion
 
 AppImage:
-  comp: !ENV "${APPIMAGE_COMP}"
-  arch: !ENV "${APPIMAGE_ARCH}"
   update-information: !ENV "gh-releases-zsync|retrovibed|retrovibed|latest|retrovibed-*-${APPIMAGE_ARCH}.AppImage.zsync"
   file_name: !ENV "${APPIMAGE_FILE_NAME}"
