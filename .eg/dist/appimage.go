@@ -1,8 +1,6 @@
 package dist
 
 import (
-	"path/filepath"
-
 	"eg/compute/maintainer"
 	"eg/compute/tarballs"
 
@@ -28,17 +26,8 @@ func AppImageBuild() eg.OpFn {
 	cachedir := egenv.DirectoryCache(_eg.DefaultModuleDirectory())
 	return shell.Op(
 		shell.Newf("rsync -a --mkpath %s/ %s/", egtarball.Path(tarballs.Retrovibed()), appdir),
-		// appimage-builder runs apt with its own APT_CONFIG (ignoring /etc/apt), but it does read
-		// the apt.conf.d inside the build dir. sync the host's apt configuration into it so apt
-		// behaves the same as the host (retries for transient failures, e.g. 503s from the
-		// launchpad PPA). docker-clean is excluded: it disables the package cache dirs that
-		// appimage-builder points at its cache dir.
 		shell.Newf(
-			"rsync -a --mkpath --exclude=docker-clean /etc/apt/apt.conf.d/ %s/",
-			filepath.Join(builddir, "apt", "apt.conf.d"),
-		),
-		shell.Newf(
-			"appimage-builder --recipe %s --skip-tests",
+			"appimage-builder --recipe %s --skip-tests --appdir ${APPDIR}",
 			egenv.DirectoryWorking(".dist", "AppImageBuilder.yml"),
 		).Directory(egenv.DirectoryWorkload()).
 			Timeout(egenv.TTL()).
