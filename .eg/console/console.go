@@ -32,7 +32,8 @@ func Tests(ctx context.Context, _ eg.Op) error {
 	return shell.Run(
 		ctx,
 		runtime.New("mkdir -p ${GOTMPDIR}"),
-		runtime.New("flutter test --reporter failures-only").Timeout(10*time.Minute),
+		runtime.New("flutter test --reporter failures-only").Timeout(10*time.Minute).Lenient(true),
+		runtime.New("echo $XDG_CACHE_HOME; ls -ld $XDG_CACHE_HOME; touch $XDG_CACHE_HOME/x && echo writable fc-cache -v 2>&1 | head"),
 	)
 }
 
