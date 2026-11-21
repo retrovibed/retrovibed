@@ -21,9 +21,13 @@ func AppImageBuild() eg.OpFn {
 	// https://github.com/pkgforge-dev/Anylinux-AppImages
 	appimage := tarballs.AppImage()
 	builddir := egenv.DirectoryWorkload("build", tarballs.AppImageBuild())
+	// appimage-builder modifies its AppDir in place (deploys packages, patches binaries), so it works on
+	// a clone of the tarball directory to keep the tarball, and the builds sharing it, untouched.
+	appdir := egtarball.Path(tarballs.AppImageBuild())
 	// must match Dir::Cache::archives in the host apt config.
 	aptarchives := egenv.DirectoryCache(_eg.DefaultModuleDirectory(), "apt", "archives")
 	return shell.Op(
+		shell.Newf("rsync -a --mkpath %s/ %s/", egtarball.Path(tarballs.Retrovibed()), appdir),
 		// appimage-builder runs apt with its own APT_CONFIG (ignoring /etc/apt), but it does read
 		// the apt.conf.d inside the build dir. sync the host's apt configuration into it so apt
 		// behaves the same as the host (retries for transient failures, e.g. 503s from the
@@ -50,7 +54,7 @@ func AppImageBuild() eg.OpFn {
 			builddir,
 		).Directory(egenv.DirectoryWorkload()).
 			Timeout(egenv.TTL()).
-			Environ("APPDIR", egtarball.Path(tarballs.Retrovibed())).
+			Environ("APPDIR", appdir).
 			Environ("VERSION", tarballs.Version()).
 			Environ("APT_ARCH", egarch.Host()).
 			Environ("APPIMAGE_ARCH", egarch.POSIX()).
