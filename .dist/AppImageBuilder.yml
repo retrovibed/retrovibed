@@ -127,6 +127,15 @@ AppDir:
       ln -sf "../aarch64-linux-gnu/$(basename "$linker")" "${APPDIR}/usr/lib/x86_64-linux-gnu/$(basename "$linker")"
     done
 
+  # THIRD PARTY BUG: "Fontconfig warning: .../49-sansserif.conf: invalid constant used: math".
+  # The bundled libfontconfig has /etc/fonts and /usr/share/fontconfig compiled in, so it
+  # parses the HOST's config, which can be newer than the bundled library and use constants
+  # it doesn't know. Point it at the bundled fontconfig-config so library and config match.
+  runtime:
+    env:
+      FONTCONFIG_PATH: '$APPDIR/etc/fonts'
+      FONTCONFIG_FILE: '$APPDIR/etc/fonts/fonts.conf'
+
   files:
     exclude:
       - usr/share/man
