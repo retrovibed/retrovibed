@@ -13,6 +13,7 @@ import (
 	"iter"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -108,7 +109,13 @@ func loadcached(path string) (s ssh.Signer, err error) {
 		privencoded []byte
 	)
 
-	if privencoded, err = os.ReadFile(path); err != nil {
+	if privencoded, err = os.ReadFile(path); os.IsNotExist(err) {
+		// if we can't make the directory then the read will fail again.
+		errorsx.Log(fsx.MkDirs(0700, filepath.Dir(path)))
+		privencoded, err = os.ReadFile(path)
+	}
+
+	if err != nil {
 		return nil, err
 	}
 
