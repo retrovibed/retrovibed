@@ -37,8 +37,6 @@ func Linux() eg.OpFn {
 			flathub.Metainfo(),
 		),
 		egbug.Log("tarballing", egtarball.Path(archive), "->", egtarball.Archive(archive)),
-		eg.Sequential(
-			release.Tarball(),
-		),
+		release.Tarball(),
 	)
 }
