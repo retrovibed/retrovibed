@@ -46,7 +46,7 @@ func main() {
 				egbugx.Compute,
 			),
 		),
-		// release.SmokeTest(),
+		release.SmokeTest(),
 		release.Release(),
 	)
 

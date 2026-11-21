@@ -76,7 +76,7 @@ func SmokeTest() eg.OpFn {
 					ctx,
 					image,
 					appimage,
-					[]string{"wlheadless-run", "--", "/retrovibed.AppImage", "--appimage-extract-and-run", "--smoke"},
+					[]string{"wlheadless-run", "--", "/retrovibed.AppImage", "--appimage-extract-and-run", "console", "--smoke"},
 					[]string{"--replace", "--volume", appimage + ":/retrovibed.AppImage:ro"},
 				)
 			})
