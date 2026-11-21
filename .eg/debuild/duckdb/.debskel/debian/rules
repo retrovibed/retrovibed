@@ -14,7 +14,14 @@ override_dh_auto_build:
 	# inet and vss are out-of-tree extensions fetched via network during cmake configure,
 	# which Launchpad's sandboxed builders block. Leave them out and rely on
 	# ENABLE_EXTENSION_AUTOLOADING/AUTOINSTALL to pull them in at runtime instead.
-	GEN=ninja OVERRIDE_GIT_DESCRIBE="v${PACKAGE_VERSION}" GIT_COMMIT_HASH="${GIT_COMMIT_HASH}" ENABLE_EXTENSION_AUTOLOADING=1 ENABLE_EXTENSION_AUTOINSTALL=1 BUILD_EXTENSIONS='autocomplete;json;parquet;icu' DUCKDB_BUILD=Static make -C src
+	#
+	# LDFLAGS (cmake seeds CMAKE_*_LINKER_FLAGS from it) links libduckdb.so with a private, hidden copy of libstdc++ and
+	# libgcc's unwinder (DT_NEEDED reduced to libc/libm). the flutter linux engine (libflutter_linux_gtk.so) exports llvm
+	# libunwind's _Unwind_* symbols and is loaded ahead of libgcc_s, so a libduckdb.so linked against the system
+	# libstdc++ resolves its unwinder to flutter's. exceptions duckdb throws internally then can't be caught and the
+	# process aborts with: terminate called after throwing an instance of 'duckdb::Exception'
+	# see CompileRuntime in .eg/debuild/duckdb/duckdb.build.go, which sets the same flags.
+	LDFLAGS="-static-libstdc++ -static-libgcc -Wl,--exclude-libs,libstdc++.a:libgcc.a:libgcc_eh.a" GEN=ninja OVERRIDE_GIT_DESCRIBE="v${PACKAGE_VERSION}" GIT_COMMIT_HASH="${GIT_COMMIT_HASH}" ENABLE_EXTENSION_AUTOLOADING=1 ENABLE_EXTENSION_AUTOINSTALL=1 BUILD_EXTENSIONS='autocomplete;json;parquet;icu' DUCKDB_BUILD=Static make -C src
 	DESTDIR="linux" cmake --install src/build/release --prefix="/usr"
 
 

@@ -94,30 +94,6 @@ func bundle(sruntime shell.Command) eg.OpFn {
 	}
 }
 
-// IsolateSharedLibrary relinks dir/libduckdb.so from dir/libduckdb.a with a private, hidden copy of
-// libstdc++ and libgcc's unwinder (DT_NEEDED is reduced to libc/libm).
-//
-// the flutter linux engine (libflutter_linux_gtk.so) exports llvm libunwind's _Unwind_* symbols and is
-// loaded ahead of libgcc_s, so a libduckdb.so linked against the system libstdc++ resolves its unwinder
-// to flutter's. exceptions duckdb throws internally (e.g. catalog errors it would normally turn into an
-// error result) then can't be caught and the process aborts with:
-//
-//	terminate called after throwing an instance of 'duckdb::Exception'
-//
-// statically linking duckdb into libretrovibed.so is not an alternative on linux desktop: duckdb's
-// thread locals (jemalloc, the pg parser) need ~11KB of static TLS, more than glibc reserves for
-// dlopen'd libraries ("cannot allocate memory in static TLS block").
-func IsolateSharedLibrary(dir string) eg.OpFn {
-	return func(ctx context.Context, op eg.Op) error {
-		rt := shell.Runtime().Directory(dir)
-		return shell.Run(
-			ctx,
-			rt.New("g++ -shared -o libduckdb.so.isolated -Wl,-soname,libduckdb.so -Wl,--whole-archive libduckdb.a -Wl,--no-whole-archive -static-libstdc++ -static-libgcc -Wl,--exclude-libs,libstdc++.a:libgcc.a:libgcc_eh.a -lpthread -ldl -lm"),
-			rt.New("mv libduckdb.so.isolated libduckdb.so"),
-		)
-	}
-}
-
 // bundlelibtool deduplicates .o files by basename (first-seen wins) before archiving.
 // Uses xcrun ar and cp -n (macOS equivalents of ar and cp --update=none).
 func bundlelibtool(sruntime shell.Command) eg.OpFn {
@@ -135,14 +111,30 @@ func bundlelibtool(sruntime shell.Command) eg.OpFn {
 }
 
 // compile and put the results into the specified directory.
-func CompileDevRuntime() shell.Command {
+//
+// libduckdb.so is linked with a private, hidden copy of libstdc++ and libgcc's unwinder (DT_NEEDED is
+// reduced to libc/libm). cmake seeds its linker flags from LDFLAGS.
+//
+// the flutter linux engine (libflutter_linux_gtk.so) exports llvm libunwind's _Unwind_* symbols and is
+// loaded ahead of libgcc_s, so a libduckdb.so linked against the system libstdc++ resolves its unwinder
+// to flutter's. exceptions duckdb throws internally (e.g. catalog errors it would normally turn into an
+// error result) then can't be caught and the process aborts with:
+//
+//	terminate called after throwing an instance of 'duckdb::Exception'
+//
+// statically linking duckdb into libretrovibed.so is not an alternative on linux desktop: duckdb's
+// thread locals (jemalloc, the pg parser) need ~11KB of static TLS, more than glibc reserves for
+// dlopen'd libraries ("cannot allocate memory in static TLS block").
+//
+// the debian package (.debskel/debian/rules) sets the same flags.
+func CompileRuntime() shell.Command {
 	builddir := "build/dev"
 	absbuilddir := egenv.DirectoryTemp("duckdb", builddir)
 	return shell.Runtime().
-		Debug().
 		Directory(absbuilddir).
 		Environ("BUILD_DIRECTORY", absbuilddir).
-		Environ("BUILD_DIRECTORY_REL", builddir)
+		Environ("BUILD_DIRECTORY_REL", builddir).
+		Environ("LDFLAGS", "-static-libstdc++ -static-libgcc -Wl,--exclude-libs,libstdc++.a:libgcc.a:libgcc_eh.a")
 }
 
 func CompileAndroidRuntime(platform, arch string) shell.Command {
@@ -157,14 +149,13 @@ func CompileAndroidRuntime(platform, arch string) shell.Command {
 	absbuilddir := egenv.DirectoryTemp("duckdb", builddir)
 
 	return egccache.Runtime().
-		Debug().
 		Directory(absbuilddir).
 		Environ("BUILD_DIRECTORY", absbuilddir).
 		Environ("BUILD_DIRECTORY_REL", builddir).
 		Environ("EXTRA_CMAKE_VARIABLES", cmakevars.String())
 }
 
-func CompileDev(sruntime shell.Command) eg.OpFn {
+func CompileLinux(sruntime shell.Command) eg.OpFn {
 	return eg.Sequential(
 		compile(sruntime, egenv.DirectoryWorking(".dist", "duckdb_config.cmake")),
 		bundle(sruntime),
