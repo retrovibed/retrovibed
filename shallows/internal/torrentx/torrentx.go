@@ -280,7 +280,11 @@ func AutomaticIP(wcfg *wireguardx.Config, d netx.Dialer, port uint16) dht.Option
 				addr, d, err := ExternalPort(wcfg, d, port)
 				if err != nil {
 					log.Println("failed to map ports", err)
-					time.Sleep(time.Minute)
+					select {
+					case <-ctx.Done():
+						return
+					case <-time.After(time.Minute):
+					}
 					continue
 				}
 
@@ -288,7 +292,11 @@ func AutomaticIP(wcfg *wireguardx.Config, d netx.Dialer, port uint16) dht.Option
 					return
 				}
 
-				time.Sleep(d)
+				select {
+				case <-ctx.Done():
+					return
+				case <-time.After(d):
+				}
 			}
 		}, nil
 	})
