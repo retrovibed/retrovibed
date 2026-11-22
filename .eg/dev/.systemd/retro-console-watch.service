@@ -1,0 +1,13 @@
+[Unit]
+Description=retrovibed console dart watcher
+Wants=retro-console.service
+After=retro-console.service
+
+[Service]
+Restart=on-failure
+RestartSec=2s
+WorkingDirectory=/workload/eg/console
+ExecStart=/usr/bin/watchexec --postpone --debounce 500ms --on-busy-update=queue -w lib -w hook -w pubspec.yaml -e dart,yaml -- /usr/bin/systemctl --user start retro-console-build.service
+
+[Install]
+WantedBy=retro-console.target

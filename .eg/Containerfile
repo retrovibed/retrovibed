@@ -71,5 +71,7 @@ RUN du -xsh /tmp/*
 
 RUN apt-get -o Acquire::Retries=8 -o Acquire::http::Timeout=8 -o Acquire::https::Timeout=8 -y install openssh-server npm
 RUN npm install -g @anthropic-ai/claude-code
-RUN sudo -H -S -u egd -g egd dart pub global activate flutter_hot_reload
-RUN ln -s /home/egd/.pub-cache/bin/flutter-w /usr/local/bin/flutter-w
+
+# file watcher used by the dev console services (.eg/dev/.systemd) to hot reload.
+RUN echo "cache buster 2f6b1c0e-5d3a-4b7e-9a41-8c2d7e0f6a15"
+RUN curl -fsSL -o /tmp/watchexec.deb https://github.com/watchexec/watchexec/releases/download/v2.8.0/watchexec-2.8.0-$(uname -m)-unknown-linux-gnu.deb && apt-get install -y /tmp/watchexec.deb && rm /tmp/watchexec.deb

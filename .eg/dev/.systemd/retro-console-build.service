@@ -1,0 +1,14 @@
+[Unit]
+Description=retrovibed console analyze, then hot reload
+Wants=retro-console.service
+After=retro-console.service
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/environment.d/retro.env
+WorkingDirectory=/workload/eg/console
+ExecStartPre=/usr/local/bin/dart analyze lib
+ExecStartPre=/usr/local/bin/flutter analyze
+# a failing pre step above aborts the unit, so the reload is only signalled for code that analyzes cleanly.
+# kill-whom=main: the default signals every process in the cgroup and USR1 terminates flutter's children.
+ExecStart=/usr/bin/systemctl --user kill --kill-whom=main --signal=USR1 retro-console.service

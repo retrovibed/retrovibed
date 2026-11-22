@@ -1,0 +1,12 @@
+[Unit]
+Description=retrovibed console (flutter run, hot reload target)
+
+[Service]
+Restart=on-failure
+RestartSec=2s
+EnvironmentFile=%h/.config/environment.d/retro.env
+WorkingDirectory=/workload/eg/console
+ExecStart=/usr/local/bin/flutter run -d linux
+
+[Install]
+WantedBy=retro-console.target

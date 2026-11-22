@@ -45,7 +45,7 @@ func main() {
 					egenv.DirectoryCache("dev.native.libs"),
 				),
 				console.BuildLinux,
-				console.RunDev(`flutter run -d linux`),
+				console.RunDevWatch,
 			),
 		),
 	)

@@ -221,13 +221,7 @@ func Install() eg.OpFn {
 
 func runDev(cmd string, rt shell.Command, envopts ...func(shell.Command) shell.Command) eg.OpFn {
 	return func(ctx context.Context, _ eg.Op) error {
-		runtime := flutterRuntimev2(rt).
-			// Environ("RETROVIBED_TORRENT_DEBUG", "true").
-			Environ("RETROVIBED_TORRENT_AUTO_DISCOVERY", "true").
-			Environ("RETROVIBED_METADATA_AUTODOWNLOAD", "false").
-			Environ("RETROVIBED_DDISC_INDEX_RATIO", "99").
-			Environ("RETROVIBED_DDISC_BACKGROUND_FREQUENCY", "20s").
-			Environ("RETROVIBED_DDISC_BACKGROUND_WORKERS", "1")
+		runtime := devRuntime(rt)
 		for _, envopt := range envopts {
 			runtime = envopt(runtime)
 		}

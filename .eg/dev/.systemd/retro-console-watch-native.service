@@ -1,0 +1,13 @@
+[Unit]
+Description=retrovibed native libs watcher, restarts the console
+Wants=retro-console.service
+After=retro-console.service
+
+[Service]
+Restart=on-failure
+RestartSec=2s
+# a native library cannot be hot reloaded, the app has to restart. static libs (.a) do not affect the running app.
+ExecStart=/usr/bin/watchexec --postpone --debounce 1s --on-busy-update=do-nothing -w /workload/.eg.cache/dev.native.libs -e so -- /usr/bin/systemctl --user restart retro-console.service
+
+[Install]
+WantedBy=retro-console.target
