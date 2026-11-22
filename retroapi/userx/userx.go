@@ -93,7 +93,15 @@ func DefaultRuntimeDirectory(rel ...string) string {
 	}
 
 	defaultdir := filepath.Join("/", "run", "user", user.Uid)
-	return filepath.Join(envx.String(defaultdir, "RUNTIME_DIRECTORY", "XDG_RUNTIME_DIR"), filepath.Join(rel...))
+	base := envx.String(defaultdir, "RUNTIME_DIRECTORY", "XDG_RUNTIME_DIR")
+
+	// systemd's RuntimeDirectory= already points the env at the service directory,
+	// don't nest the leading relative component again.
+	if len(rel) > 0 && filepath.Base(base) == rel[0] {
+		rel = rel[1:]
+	}
+
+	return filepath.Join(base, filepath.Join(rel...))
 }
 
 // return a path relative to the home directory.

@@ -18,8 +18,8 @@ require (
 	github.com/duckdb/duckdb-go/v2 v2.10505.0
 	github.com/egdaemon/duckproxy v0.0.0-20261120193429-c2b61b872b69
 	github.com/egdaemon/duckproxy/duckkong v0.0.0-20261120193429-c2b61b872b69
-	github.com/egdaemon/gdx v0.0.0-20261115232526-a70109276a78
-	github.com/egdaemon/gdx/konggdx v0.0.0-20261115232526-a70109276a78
+	github.com/egdaemon/gdx v0.0.0-20261122004511-9984f3d32236
+	github.com/egdaemon/gdx/konggdx v0.0.0-20261122004511-9984f3d32236
 	github.com/egdaemon/wasinet/wasinet v0.0.0-20261103201433-2f9a9bae892d
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/gabriel-vasile/mimetype v1.4.15

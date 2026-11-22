@@ -24,8 +24,15 @@ const DefaultSocket = "gdx.socket"
 // autosocket builds the default unix socket path:
 // ${RUNTIME_DIR}/${binname}/gdx.socket.
 // binname must be a basename, not a full path (use filepath.Base).
+// when the runtime directory is already scoped to the binary (e.g. systemd
+// RuntimeDirectory=binname) the binname is not appended a second time.
 func autosocket(binname string) string {
-	return userx.RuntimeDirectory(filepath.Base(binname), DefaultSocket)
+	name := filepath.Base(binname)
+	dir := userx.RuntimeDirectory()
+	if filepath.Base(dir) == name {
+		return filepath.Join(dir, DefaultSocket)
+	}
+	return userx.RuntimeDirectory(name, DefaultSocket)
 }
 
 // AutoSocket returns the default unix socket path derived from os.Args[0].

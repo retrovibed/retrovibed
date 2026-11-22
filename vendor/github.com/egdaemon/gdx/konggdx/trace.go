@@ -20,7 +20,12 @@ type Trace struct {
 }
 
 func (t Trace) Run(ctx context.Context) error {
-	return t.Do(ctx, gdxapi.NewUnixClient(t.Socket))
+	socket, err := autoResolveSocket(t.Socket)
+	if err != nil {
+		return err
+	}
+
+	return t.Do(ctx, gdxapi.NewUnixClient(socket))
 }
 
 // Do fetches an execution trace through c, writing it to the configured output. Socket is ignored, allowing

@@ -18,7 +18,12 @@ type Goroutines struct {
 }
 
 func (t Goroutines) Run(ctx context.Context) error {
-	return t.Do(ctx, gdxapi.NewUnixClient(t.Socket))
+	socket, err := autoResolveSocket(t.Socket)
+	if err != nil {
+		return err
+	}
+
+	return t.Do(ctx, gdxapi.NewUnixClient(socket))
 }
 
 // Do fetches the goroutine dump through c, writing it to the configured output. Socket is ignored, allowing
