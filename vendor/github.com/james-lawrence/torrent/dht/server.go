@@ -1015,7 +1015,12 @@ func (s *Server) Close() {
 	for _, b := range bindings {
 		// some PacketConns (e.g. utp.Socket) do not wake a blocked ReadFrom on Close,
 		// a deadline in the past does. serve exits on any read error once closed.
-		_ = b.pc.SetReadDeadline(time.Now())
+		// go-libutp's Socket panics("not implemented") on SetReadDeadline, but its Close wakes
+		// ReadFrom itself, so a panicking deadline is safe to skip.
+		func() {
+			defer func() { _ = recover() }()
+			_ = b.pc.SetReadDeadline(time.Now())
+		}()
 		b.pc.Close()
 	}
 	s.wg.Wait()

@@ -30,7 +30,7 @@ require (
 	github.com/grindlemire/go-lucene v0.3.1
 	github.com/hashicorp/mdns v1.0.7
 	github.com/james-lawrence/genieql v0.0.0-20260917171911-8038e3e1d315
-	github.com/james-lawrence/torrent v0.0.0-20261122014943-10228d774392
+	github.com/james-lawrence/torrent v0.0.0-20261122130412-9f358c6feb62
 	github.com/jfreymuth/pulse v0.1.3
 	github.com/justinas/alice v1.2.0
 	github.com/linxGnu/pqueue v0.2.3
