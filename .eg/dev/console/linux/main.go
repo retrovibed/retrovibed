@@ -4,7 +4,6 @@ import (
 	"context"
 	"eg/compute/console"
 	"eg/compute/debuild/duckdb"
-	"eg/compute/maintainer"
 	"eg/compute/neurals"
 	"log"
 	"path/filepath"
@@ -20,33 +19,27 @@ func main() {
 	ctx, done := context.WithTimeout(context.Background(), egenv.TTL())
 	defer done()
 
-	deb := eg.Container(maintainer.Container)
 	err := eg.Perform(
 		ctx,
 		eggit.AutoClone,
-		eg.Build(deb.BuildFromFile(".eg/Containerfile")),
-		eg.Module(
-			ctx,
-			deb,
-			eg.Sequential(
-				eg.Parallel(
-					duckdb.MaybeBuild(
-						egenv.DirectoryCache("dev.native.libs", "libduckdb.a"),
-						duckdb.CompileRuntime(),
-						duckdb.CompileLinux,
-						duckdb.CloneBuild,
-					),
-					neurals.MaybeBuild(filepath.Join("dev.native.libs", "libpredicttext.a"), neurals.Compile, neurals.Clone),
+		eg.Sequential(
+			eg.Parallel(
+				duckdb.MaybeBuild(
+					egenv.DirectoryCache("dev.native.libs", "libduckdb.a"),
+					duckdb.CompileRuntime(),
+					duckdb.CompileLinux,
+					duckdb.CloneBuild,
 				),
-				console.Generate,
-				console.GenerateDevBinding(
-					shell.Runtime(),
-					egenv.DirectoryCache("dev.native.libs"),
-					egenv.DirectoryCache("dev.native.libs"),
-				),
-				console.BuildLinux,
-				console.RunDevWatch,
+				neurals.MaybeBuild(filepath.Join("dev.native.libs", "libpredicttext.a"), neurals.Compile, neurals.Clone),
 			),
+			console.Generate,
+			console.GenerateDevBinding(
+				shell.Runtime(),
+				egenv.DirectoryCache("dev.native.libs"),
+				egenv.DirectoryCache("dev.native.libs"),
+			),
+			console.BuildLinux,
+			console.RunDevWatch,
 		),
 	)
 
