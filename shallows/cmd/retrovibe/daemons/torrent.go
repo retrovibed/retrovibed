@@ -213,6 +213,27 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, dhtcfg *
 		t.cond.Broadcast()
 	}()
 
+	// cond.Broadcast is lossy: it only wakes goroutines already blocked in Wait.
+	// Events arriving while the loop is inside Init (or re-reading config) would be
+	// dropped, so latch them into a buffered channel the loop consumes.
+	reload := make(chan struct{}, 1)
+	go func() {
+		for {
+			t.cond.L.Lock()
+			t.cond.Wait()
+			t.cond.L.Unlock()
+
+			if ctx.Err() != nil {
+				return
+			}
+
+			select {
+			case reload <- struct{}{}:
+			default:
+			}
+		}
+	}()
+
 	go func() {
 		defer close(t._reloadStopped)
 		limiter := rate.NewLimiter(rate.Every(5*time.Second), 1)
@@ -274,17 +295,14 @@ func (t *_torrenting) Reload(ctx context.Context, cfg *TorrentSettings, dhtcfg *
 			}
 
 			log.Println("torrent client initialized, waiting for reload signal")
-			t.cond.L.Lock()
-			t.cond.Wait()
-			log.Println("reload signal received")
-			_done(nil)
-			t.cond.L.Unlock()
-
 			select {
+			case <-reload:
+				log.Println("reload signal received")
+				_done(nil)
 			case <-ctx.Done():
+				_done(nil)
 				errorsx.Log(context.Cause(ctx))
 				return
-			default:
 			}
 
 			log.Println("reloading torrent client")
