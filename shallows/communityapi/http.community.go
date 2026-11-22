@@ -111,7 +111,10 @@ func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
 
 	client := NewDeeppoolCommunity(t.httpc)
 	resp, err := client.Search(r.Context(), req.Query, req.Offset, req.Limit)
-	if err != nil {
+	if cause, ok := httpx.ErrorWithCode(err); ok {
+		log.Println(errorsx.Wrap(err, "unable to search communities"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, cause.Code))
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to search communities"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadGateway))
 		return

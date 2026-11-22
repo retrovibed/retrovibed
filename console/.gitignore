@@ -49,3 +49,5 @@ linux/
 
 # ignore spike app
 lib/spike.dart
+# Widget Preview related
+.widget_preview/
