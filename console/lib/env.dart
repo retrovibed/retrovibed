@@ -80,4 +80,5 @@ class vars {
       "RETROVIBED_PLAYBACK_HARDWARE_ACCELERATION"; // force enable/disable hardware acceleration
   // HW decoding for Raspberry Pi: 'v4l2m2m-copy',
   static const PlaybackHardwareDecodeMode = "RETROVIBED_PLAYBACK_HARDWARE_DECODE_MODE"; // MPV --hwdec mode.
+  static const PlaybackLogging = "RETROVIBED_PLAYBACK_LOGGING"; // print media_kit/mpv logs, disabled by default.
 }

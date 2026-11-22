@@ -76,7 +76,9 @@ class _VideoState extends State<VideoScreen> {
       setState(() {});
     });
 
-    widget.player.stream.log.listen((log) => print(log));
+    if (env.boolean(env.vars.PlaybackLogging)) {
+      widget.player.stream.log.listen((log) => print(log));
+    }
 
     suberrors = widget.player.stream.error.listen((err) {
       errors.value = ds.Error.unknown(
