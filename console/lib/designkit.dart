@@ -30,6 +30,7 @@ export 'design.kit/image.dart';
 export 'design.kit/key.press.aware.dart';
 export 'design.kit/lazy.visible.dart';
 export 'design.kit/long.hold.dart';
+export 'design.kit/material.legacy.dart';
 export 'design.kit/modals.dart';
 export 'design.kit/noop.dart';
 export 'design.kit/periodic.dart';

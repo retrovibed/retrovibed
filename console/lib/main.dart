@@ -119,7 +119,7 @@ class Retrovibed extends StatelessWidget {
           data: MediaQuery.of(context).copyWith(textScaler: autoscaling(context)),
           child: Theme(
             data: Theme.of(context).copyWith(extensions: [defaults.copyWith(isCompact: isCompact)]),
-            child: child ?? ds.Empty,
+            child: ds.MaterialLegacy(child ?? ds.Empty),
           ),
         );
       },
