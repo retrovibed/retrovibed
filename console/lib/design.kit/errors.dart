@@ -415,6 +415,58 @@ class Error extends StatelessWidget {
     );
   }
 
+  static Error paymentrequired(
+    Object obj, {
+    StackTrace? trace,
+    void Function()? onTap,
+    Widget? message,
+    Color? color,
+    BoxDecoration decoration = ErrorDecorations.info,
+    BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
+  }) {
+    return Error(
+      child: message ?? Text("this feature requires an upgraded plan"),
+      cause: obj,
+      trace: trace ?? StackTrace.current,
+      onTap: onTap,
+      color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
+    );
+  }
+
+  static Error notallowed(
+    Object obj, {
+    StackTrace? trace,
+    void Function()? onTap,
+    Widget? message,
+    Color? color,
+    BoxDecoration decoration = ErrorDecorations.info,
+    BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
+  }) {
+    return Error(
+      child: message ?? Text("content not available with guest account"),
+      cause: obj,
+      trace: trace ?? StackTrace.current,
+      onTap: onTap,
+      color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
+    );
+  }
+
   static Error ratelimited(
     Object obj, {
     StackTrace? trace,
@@ -548,8 +600,12 @@ class Errors {
       case 401:
       case 403:
         return Error.unauthorized(obj, trace: t, onTap: onTap);
+      case 402:
+        return Error.paymentrequired(obj, trace: t, onTap: onTap);
       case 404:
         return Error.text("not found", trace: t, onTap: onTap);
+      case 405:
+        return Error.notallowed(obj, trace: t, onTap: onTap);
       case 409:
         return Error.conflict(obj, trace: t, onTap: onTap);
       case 429:

@@ -186,5 +186,23 @@ void main() {
       );
       expect(attempts, equals(1));
     });
+
+    for (final code in const [402, 405]) {
+      test('does not retry on $code', () async {
+        int attempts = 0;
+        await expectLater(
+          httpx.withRetry(
+            () async {
+              attempts++;
+              throw http.Response('', code);
+            },
+            maxRetries: 5,
+            backoff: httpx.Backoff.constant(Duration.zero),
+          ),
+          throwsA(isA<http.Response>()),
+        );
+        expect(attempts, equals(1));
+      });
+    }
   });
 }

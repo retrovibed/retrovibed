@@ -177,7 +177,7 @@ class ErrorsTest {
   // test for common errors.
   static bool httpauto(Object obj) {
     final code = statusCode(obj);
-    return const [401, 403, 404, 409, 429, 502, 503].contains(code);
+    return const [401, 402, 403, 404, 405, 409, 429, 502, 503].contains(code);
   }
 
   static bool badrequest(Object obj) {
@@ -202,6 +202,16 @@ class ErrorsTest {
 
   static bool err404(Object obj) {
     const code = 404;
+    return (obj is http.Response && obj.statusCode == code) || (obj is HttpClientResponse && obj.statusCode == code);
+  }
+
+  static bool paymentrequired(Object obj) {
+    const code = 402;
+    return (obj is http.Response && obj.statusCode == code) || (obj is HttpClientResponse && obj.statusCode == code);
+  }
+
+  static bool methodnotallowed(Object obj) {
+    const code = 405;
     return (obj is http.Response && obj.statusCode == code) || (obj is HttpClientResponse && obj.statusCode == code);
   }
 

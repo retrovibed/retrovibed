@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:retrovibed/designkit.dart' as ds;
+import 'package:retrovibed/httpx.dart' as httpx;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
 final _resolutions = Resolutions.variant();
@@ -550,6 +551,25 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('service unavailable, please try again shortly'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    }
+
+    for (final (code, message) in const [
+      (402, 'this feature requires an upgraded plan'),
+      (405, 'content not available with guest account'),
+    ]) {
+      testWidgets('$code renders soft info error', (WidgetTester tester) async {
+        final resp = http.Response('', code);
+        expect(httpx.ErrorsTest.httpauto(resp), isTrue);
+
+        final err = ds.Errors.httpauto(resp);
+        expect(err.decoration.color, ds.ErrorDecorations.info.color);
+
+        await tester.pumpApp(SizedBox(width: 300, height: 100, child: err));
+        await tester.pumpAndSettle();
+
+        expect(find.text(message), findsOneWidget);
         expect(tester.takeException(), isNull);
       });
     }
