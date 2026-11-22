@@ -389,6 +389,32 @@ class Error extends StatelessWidget {
     );
   }
 
+  static Error serviceunavailable(
+    Object obj, {
+    StackTrace? trace,
+    void Function()? onTap,
+    Widget? message,
+    Color? color,
+    BoxDecoration decoration = ErrorDecorations.info,
+    BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BoxConstraints? constraints,
+  }) {
+    return Error(
+      child: message ?? Text("service unavailable, please try again shortly"),
+      cause: obj,
+      trace: trace ?? StackTrace.current,
+      onTap: onTap,
+      color: color,
+      decoration: decoration,
+      borderRadius: borderRadius,
+      padding: padding,
+      margin: margin,
+      constraints: constraints,
+    );
+  }
+
   static Error ratelimited(
     Object obj, {
     StackTrace? trace,
@@ -518,7 +544,6 @@ class Errors {
   static Error httpauto(Object obj, {StackTrace? trace, void Function()? onTap}) {
     final t = trace ?? StackTrace.current;
     final code = httpx.ErrorsTest.statusCode(obj);
-    // return [401, 403, 404, 409, 429, 502].contains(code);
     switch (code) {
       case 401:
       case 403:
@@ -529,6 +554,9 @@ class Errors {
         return Error.conflict(obj, trace: t, onTap: onTap);
       case 429:
         return Error.ratelimited(obj, trace: t, onTap: onTap);
+      case 502:
+      case 503:
+        return Error.serviceunavailable(obj, trace: t, onTap: onTap);
       default:
         return Error.unknown(obj, trace: t, onTap: onTap);
     }

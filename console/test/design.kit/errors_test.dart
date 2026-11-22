@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:retrovibed/designkit.dart' as ds;
 import 'package:retrovibed/testing/widget_tester_extensions.dart';
 
@@ -535,5 +536,22 @@ void main() {
       expect(find.byType(SelectionArea), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+  });
+
+  group('Errors.httpauto', () {
+    for (final code in const [502, 503]) {
+      testWidgets('$code renders soft service unavailable', (
+        WidgetTester tester,
+      ) async {
+        final err = ds.Errors.httpauto(http.Response('', code));
+        expect(err.decoration.color, ds.ErrorDecorations.info.color);
+
+        await tester.pumpApp(SizedBox(width: 300, height: 100, child: err));
+        await tester.pumpAndSettle();
+
+        expect(find.text('service unavailable, please try again shortly'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    }
   });
 }

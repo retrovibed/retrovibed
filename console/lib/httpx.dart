@@ -177,7 +177,7 @@ class ErrorsTest {
   // test for common errors.
   static bool httpauto(Object obj) {
     final code = statusCode(obj);
-    return const [401, 403, 404, 409, 429, 502].contains(code);
+    return const [401, 403, 404, 409, 429, 502, 503].contains(code);
   }
 
   static bool badrequest(Object obj) {
