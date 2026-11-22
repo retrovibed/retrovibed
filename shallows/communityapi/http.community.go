@@ -111,9 +111,10 @@ func (t *HTTP) search(w http.ResponseWriter, r *http.Request) {
 
 	client := NewDeeppoolCommunity(t.httpc)
 	resp, err := client.Search(r.Context(), req.Query, req.Offset, req.Limit)
-	if cause, ok := httpx.ErrorWithCode(err); ok {
+	if cause, ok := httpx.Errored(err); ok {
 		log.Println(errorsx.Wrap(err, "unable to search communities"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, cause.Code))
+		return
 	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to search communities"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadGateway))
@@ -147,7 +148,11 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 
 	client := NewDeeppoolCommunity(t.httpc)
 	com, err := client.Find(r.Context(), cid)
-	if err != nil {
+	if cause, ok := httpx.Errored(err); ok {
+		log.Println(errorsx.Wrapf(err, "unable to find community from deeppool - %s", cid))
+		errorsx.Log(httpx.WriteEmptyJSON(w, cause.Code))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrapf(err, "unable to find community from deeppool - %s", cid))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadRequest))
 		return
@@ -180,6 +185,12 @@ func (t *HTTP) subscribe(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// not subscribed — subscribe
 		if existing, err = SubscribeCommunity(r.Context(), t.q, t.httpc, cid); err != nil {
+			if cause, ok := httpx.Errored(err); ok {
+				log.Println(errorsx.Wrap(err, "unable to subscribe to community"))
+				errorsx.Log(httpx.WriteEmptyJSON(w, cause.Code))
+				return
+			}
+
 			log.Println(errorsx.Wrap(err, "unable to subscribe to community"))
 			errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusInternalServerError))
 			return
@@ -203,7 +214,11 @@ func (t *HTTP) resync(w http.ResponseWriter, r *http.Request) {
 	}
 
 	existing, err := ResyncOne(r.Context(), t.q, t.httpc, cid)
-	if err != nil {
+	if cause, ok := httpx.Errored(err); ok {
+		log.Println(errorsx.Wrap(err, "unable to resync community"))
+		errorsx.Log(httpx.WriteEmptyJSON(w, cause.Code))
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "unable to resync community"))
 		errorsx.Log(httpx.WriteEmptyJSON(w, http.StatusBadGateway))
 		return

@@ -94,7 +94,11 @@ func (t *HTTPYouTube) callback(w http.ResponseWriter, r *http.Request) {
 
 	redirectURI := fmt.Sprintf("https://%s%s", r.Host, r.URL.Path)
 	token, err := deeppool.NewYouTube(t.httpc).Exchange(r.Context(), req.Code, redirectURI)
-	if err != nil {
+	if cause, ok := httpx.Errored(err); ok {
+		log.Println(errorsx.Wrap(err, "youtube token exchange failed"))
+		callbackHTML(w, cause.Code, "YouTube linking failed.", "Unable to complete authorization with YouTube.")
+		return
+	} else if err != nil {
 		log.Println(errorsx.Wrap(err, "youtube token exchange failed"))
 		callbackHTML(w, http.StatusBadGateway, "YouTube linking failed.", "Unable to complete authorization with YouTube.")
 		return

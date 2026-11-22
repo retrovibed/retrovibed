@@ -359,6 +359,16 @@ func (t Error) Error() string {
 	return t.cause.Error()
 }
 
+// Errored reports whether err is (or wraps) an *Error of any code,
+// returning that *Error when it does.
+func Errored(err error) (*Error, bool) {
+	if err == nil {
+		return nil, false
+	}
+
+	return errors.AsType[*Error](err)
+}
+
 // ErrorWithCode reports whether err is (or wraps) an *Error whose Code
 // matches one of codes, returning that *Error when it does.
 func ErrorWithCode(err error, codes ...int) (*Error, bool) {

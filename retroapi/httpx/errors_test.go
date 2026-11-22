@@ -1,6 +1,7 @@
 package httpx_test
 
 import (
+	"fmt"
 	"net/http"
 	"testing"
 
@@ -29,6 +30,34 @@ func TestAsError(t *testing.T) {
 		orig := &http.Response{}
 		_, err := httpx.AsError(orig, assert.AnError)
 		require.Equal(t, assert.AnError, err)
+	})
+}
+
+func TestErrored(t *testing.T) {
+	t.Run("matches an *Error of any code", func(t *testing.T) {
+		_, err := httpx.AsError(&http.Response{StatusCode: http.StatusMethodNotAllowed, Status: "405 Method Not Allowed", Header: http.Header{}}, nil)
+
+		cause, ok := httpx.Errored(err)
+		require.True(t, ok)
+		require.Equal(t, http.StatusMethodNotAllowed, cause.Code)
+	})
+
+	t.Run("matches a wrapped *Error", func(t *testing.T) {
+		_, err := httpx.AsError(&http.Response{StatusCode: http.StatusPaymentRequired, Status: "402 Payment Required", Header: http.Header{}}, nil)
+
+		cause, ok := httpx.Errored(fmt.Errorf("wrapped: %w", err))
+		require.True(t, ok)
+		require.Equal(t, http.StatusPaymentRequired, cause.Code)
+	})
+
+	t.Run("does not match a plain error", func(t *testing.T) {
+		_, ok := httpx.Errored(assert.AnError)
+		require.False(t, ok)
+	})
+
+	t.Run("does not match a nil error", func(t *testing.T) {
+		_, ok := httpx.Errored(nil)
+		require.False(t, ok)
 	})
 }
 

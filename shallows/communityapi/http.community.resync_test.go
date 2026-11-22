@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/retrovibed/retrovibed/retroapi/httpx"
 	"github.com/retrovibed/retrovibed/retroapi/jwtx"
 	"github.com/retrovibed/retrovibed/retroapi/testx"
 	"github.com/retrovibed/retrovibed/retroapi/uuidx"
@@ -219,5 +220,107 @@ func TestResyncEndpoint(t *testing.T) {
 
 		routes.ServeHTTP(resp, req)
 		require.Equal(t, http.StatusServiceUnavailable, resp.Code)
+	})
+
+	t.Run("forwards deeppool 402 status", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			p           meta.Profile
+			v           meta.Authz
+			communityID = uuidx.NewV7().String()
+		)
+		defer done()
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		routes := mux.NewRouter()
+		communityapi.NewHTTP(
+			q,
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionHTTPClient(httpx.NewFixedStatusClient(http.StatusPaymentRequired)),
+		).Bind(routes.PathPrefix("/c").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodPost,
+			"/c/"+communityID+"/resync",
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusPaymentRequired, resp.Code)
+	})
+
+	t.Run("forwards deeppool 405 status", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			p           meta.Profile
+			v           meta.Authz
+			communityID = uuidx.NewV7().String()
+		)
+		defer done()
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		routes := mux.NewRouter()
+		communityapi.NewHTTP(
+			q,
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionHTTPClient(httpx.NewFixedStatusClient(http.StatusMethodNotAllowed)),
+		).Bind(routes.PathPrefix("/c").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodPost,
+			"/c/"+communityID+"/resync",
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusMethodNotAllowed, resp.Code)
+	})
+
+	t.Run("forwards deeppool 429 status", func(t *testing.T) {
+		var (
+			ctx, done   = testx.Context(t)
+			q           = sqltestx.Metadatabase(t)
+			p           meta.Profile
+			v           meta.Authz
+			communityID = uuidx.NewV7().String()
+		)
+		defer done()
+
+		require.NoError(t, testx.Fake(&p, meta.ProfileOptionTestDefaults))
+		require.NoError(t, meta.ProfileInsertWithDefaults(ctx, q, p).Scan(&p))
+		require.NoError(t, testx.Fake(&v, meta.AuthzOptionProfileID(p.ID), meta.AuthzOptionAdmin))
+		require.NoError(t, meta.AuthzInsertWithDefaults(ctx, q, v).Scan(&v))
+
+		routes := mux.NewRouter()
+		communityapi.NewHTTP(
+			q,
+			communityapi.HTTPOptionJWTSecret(httpauthtest.UnsafeJWTSecretSource),
+			communityapi.HTTPOptionHTTPClient(httpx.NewFixedStatusClient(http.StatusTooManyRequests)),
+		).Bind(routes.PathPrefix("/c").Subrouter())
+
+		claims := metaapi.NewJWTClaim(metaapi.TokenFromRegisterClaims(jwtx.NewJWTClaims(p.ID, jwtx.ClaimsOptionAuthnExpiration()), metaapi.TokenOptionFromAuthz(v)))
+		resp, req, err := httptestx.BuildRequestBytes(
+			http.MethodPost,
+			"/c/"+communityID+"/resync",
+			nil,
+			httptestx.RequestOptionAuthorization(httpauthtest.UnsafeClaimsToken(claims, httpauthtest.UnsafeJWTSecretSource)),
+		)
+		require.NoError(t, err)
+		routes.ServeHTTP(resp, req)
+		require.Equal(t, http.StatusTooManyRequests, resp.Code)
 	})
 }
