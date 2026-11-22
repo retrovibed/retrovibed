@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/james-lawrence/torrent"
 	"github.com/retrovibed/retrovibed/shallows/internal/sqltestx"
 	"github.com/stretchr/testify/require"
 )
@@ -75,6 +76,38 @@ func TestReload(t *testing.T) {
 		}, 10*time.Second, 50*time.Millisecond)
 
 		require.NotNil(t, tr._tclient.Load())
+	})
+
+	t.Run("a single broadcast during init is not lost", func(t *testing.T) {
+		q := sqltestx.Metadatabase(t)
+		tr := newTestTorrenting(t, q)
+
+		ctx, cancel := context.WithCancel(t.Context())
+
+		cfg := AutoTorrentSettings(&TorrentSettings{})
+		disc := &DiscoverySettings{}
+
+		require.NoError(t, tr.Reload(ctx, cfg, &DHTSettings{}, disc))
+		defer func() {
+			cancel()
+			<-tr.Stopped()
+		}()
+
+		// let the listener goroutine reach cond.Wait, then signal exactly once while
+		// the loop is (most likely) still inside the first Init. a bare cond.Wait
+		// loop drops this signal; the latched channel must keep it.
+		time.Sleep(100 * time.Millisecond)
+		tr.cond.Broadcast()
+
+		var first *torrent.Client
+		require.Eventually(t, func() bool {
+			c := tr._tclient.Load()
+			if first == nil {
+				first = c
+				return false
+			}
+			return c != nil && c != first
+		}, 20*time.Second, 50*time.Millisecond)
 	})
 
 	t.Run("stops reloading after context is cancelled", func(t *testing.T) {

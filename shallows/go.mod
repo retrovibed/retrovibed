@@ -30,7 +30,7 @@ require (
 	github.com/grindlemire/go-lucene v0.3.1
 	github.com/hashicorp/mdns v1.0.7
 	github.com/james-lawrence/genieql v0.0.0-20260917171911-8038e3e1d315
-	github.com/james-lawrence/torrent v0.0.0-20261120201415-92794f78f2bd
+	github.com/james-lawrence/torrent v0.0.0-20261122014943-10228d774392
 	github.com/jfreymuth/pulse v0.1.3
 	github.com/justinas/alice v1.2.0
 	github.com/linxGnu/pqueue v0.2.3
@@ -46,7 +46,7 @@ require (
 	github.com/things-go/go-socks5 v0.1.1
 	github.com/willabides/kongplete v0.4.0
 	golang.org/x/crypto v0.59.0
-	golang.org/x/exp v0.0.0-20261120182113-8801fbdfac81
+	golang.org/x/exp v0.0.0-20261121134650-e1094eeca1b5
 	golang.org/x/oauth2 v0.37.0
 	golang.org/x/text v0.44.0
 	golang.org/x/time v0.16.0

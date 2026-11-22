@@ -1013,6 +1013,9 @@ func (s *Server) Close() {
 	s.mu.Unlock()
 
 	for _, b := range bindings {
+		// some PacketConns (e.g. utp.Socket) do not wake a blocked ReadFrom on Close,
+		// a deadline in the past does. serve exits on any read error once closed.
+		_ = b.pc.SetReadDeadline(time.Now())
 		b.pc.Close()
 	}
 	s.wg.Wait()

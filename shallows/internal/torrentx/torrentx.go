@@ -20,6 +20,7 @@ import (
 	"github.com/retrovibed/retrovibed/retroapi/bytesx"
 	"github.com/retrovibed/retrovibed/retroapi/debugx"
 	"github.com/retrovibed/retrovibed/retroapi/errorsx"
+	"github.com/retrovibed/retrovibed/retroapi/iterx"
 	retronetx "github.com/retrovibed/retrovibed/retroapi/netx"
 	"github.com/retrovibed/retrovibed/shallows/internal/env"
 	"github.com/retrovibed/retrovibed/shallows/internal/envx"
@@ -275,30 +276,30 @@ func AutomaticIP(wcfg *wireguardx.Config, d netx.Dialer, port uint16) dht.Option
 	}
 
 	return dht.OptionDynamicPort(func(ctx context.Context, sc *dht.Server, q dht.Binding, id int160.T, bestaddr netip.AddrPort, local net.PacketConn) (iter.Seq[netip.AddrPort], error) {
-		return func(yield func(netip.AddrPort) bool) {
+		return iterx.FromFn(func(ctx context.Context, yield func(netip.AddrPort) bool) error {
 			for {
-				addr, d, err := ExternalPort(wcfg, d, port)
+				addr, lifetime, err := ExternalPort(wcfg, d, port)
 				if err != nil {
 					log.Println("failed to map ports", err)
 					select {
 					case <-ctx.Done():
-						return
+						return ctx.Err()
 					case <-time.After(time.Minute):
 					}
 					continue
 				}
 
 				if !yield(addr) {
-					return
+					return nil
 				}
 
 				select {
 				case <-ctx.Done():
-					return
-				case <-time.After(d):
+					return ctx.Err()
+				case <-time.After(lifetime):
 				}
 			}
-		}, nil
+		}).Each(ctx), nil
 	})
 }
 
