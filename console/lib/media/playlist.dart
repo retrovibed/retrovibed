@@ -386,6 +386,9 @@ class _PlaylistState extends State<Playlist> implements PlaylistControl {
     // pair while the track is being (re)loaded.
     player.stream.playing.listen((playing) {
       if (_transitioning) return;
+      // eof-reached emits playing:false just before completed:true; the
+      // completed listener is about to advance, so don't flash the overlay.
+      if (!playing && player.state.completed) return;
       _applyPlaying(playing);
     });
   }
